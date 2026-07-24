@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+/*
+  Yuvoy design tokens — the single source of truth for color & type.
+  No hex, font, or spacing value may exist outside this @theme block.
+  Brand world (Social Media Brief): cinematic, editorial, warm.
+*/
+@theme {
+  /* Canonical brand palette */
+  --color-cream: #f5eddf; /* canvas — editorial/light surfaces */
+  --color-cream-deep: #efe6d4; /* raised surface on cream */
+  --color-cream-line: #e4d9c3; /* hairline borders on cream */
+  --color-forest: #1f3a35; /* primary ink — wordmark, headings, buttons */
+  --color-terra: #b5704d; /* accent — the enso dot, CTAs, highlights */
+  --color-terra-deep: #9c6041; /* terra pressed/hover */
+  --color-midnight: #0e1f1a; /* immersive scenes — video, night, depth */
+
+  /* Type — Fraunces (display, italic headlines) + Inter (UI/body) */
+  --font-display: var(--font-fraunces);
+  --font-sans: var(--font-inter);
+
+  /* Motion */
+  --ease-cinematic: cubic-bezier(0.22, 1, 0.36, 0.16);
+
+  /* Editorial rhythm */
+  --tracking-wordmark: 0.38em;
+  --tracking-label: 0.22em;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-cream text-forest font-sans antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    @apply bg-terra text-cream;
+  }
+
+  /* Respect users who prefer less motion — kill entrance animations. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@utility label {
+  /* Wide-tracked uppercase label — the brand's editorial voice. */
+  @apply text-xs font-medium uppercase;
+  letter-spacing: var(--tracking-label);
+}
+
+/* Cinematic entrance — CSS-only so the hero ships zero client JS. */
+@keyframes yuvoy-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility rise {
+  animation: yuvoy-rise 1s var(--ease-cinematic) both;
+}

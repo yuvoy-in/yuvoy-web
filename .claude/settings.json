@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git remote *)",
+      "Bash(git status)",
+      "Bash(git checkout *)",
+      "Bash(git branch *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git pull *)",
+      "Bash(git fetch *)",
+      "Bash(git worktree *)",
+      "Bash(pnpm *)",
+      "Bash(gh pr *)",
+      "Bash(gh issue *)",
+      "Bash(gh run *)"
+    ],
+    "additionalDirectories": [
+      "/Users/vishwanth.barma/Documents/builds/yuvoy/yuvoy-web/.claude"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/vishwanth.barma/Documents/builds/yuvoy/yuvoy-web/.claude/hooks/pre-push-build.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
