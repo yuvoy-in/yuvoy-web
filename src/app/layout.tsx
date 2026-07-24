@@ -5,7 +5,7 @@ import { Providers } from "@/components/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://yuvoy.com"),
+  metadataBase: new URL("https://yuvoy.in"),
   title: {
     default: "Yuvoy — Experience More.",
     template: "%s · Yuvoy",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     title: "Yuvoy — Experience More.",
     description:
       "Immersive, participatory experiences in the Andaman Islands. Don't be a tourist.",
-    url: "https://yuvoy.com",
+    url: "https://yuvoy.in",
   },
   twitter: {
     card: "summary_large_image",
