@@ -1,4 +1,9 @@
-import type { Experience, ExperienceSummary } from "@/lib/api/types";
+import type {
+  Category,
+  Experience,
+  ExperienceMode,
+  ExperienceSummary,
+} from "@/lib/api/types";
 
 const inr = (rupees: number) => ({
   amountMinor: rupees * 100,
@@ -244,8 +249,33 @@ const EXPERIENCES: Experience[] = [
   },
 ];
 
-export function listExperiences(): ExperienceSummary[] {
-  return EXPERIENCES;
+export interface ExperienceFilters {
+  category?: Category;
+  mode?: ExperienceMode;
+  q?: string;
+}
+
+export function listExperiences(
+  filters: ExperienceFilters = {},
+): ExperienceSummary[] {
+  const { category, mode, q } = filters;
+  const query = q?.trim().toLowerCase();
+  return EXPERIENCES.filter((e) => {
+    if (category && e.category !== category) return false;
+    if (mode && e.mode !== mode) return false;
+    if (
+      query &&
+      !`${e.title} ${e.location} ${e.summary}`.toLowerCase().includes(query)
+    ) {
+      return false;
+    }
+    return true;
+  });
+}
+
+/** Categories actually present in the collection, in first-seen order. */
+export function experienceCategories(): Category[] {
+  return [...new Set(EXPERIENCES.map((e) => e.category))];
 }
 
 export function getExperience(slug: string): Experience | undefined {

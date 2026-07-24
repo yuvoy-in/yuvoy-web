@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { ExperienceCard } from "@/components/experience/experience-card";
-import { listExperiences } from "@/lib/experiences/data";
+import { ExperienceFilterBar } from "@/components/experience/filter-bar";
+import { listExperiences, experienceCategories } from "@/lib/experiences/data";
+import type { Category, ExperienceMode } from "@/lib/api/types";
 
 export const metadata: Metadata = {
   title: "Experiences",
@@ -10,8 +13,26 @@ export const metadata: Metadata = {
     "A curated collection of immersive experiences in the Andaman Islands — on the water, across the islands and after dark.",
 };
 
-export default function ExperiencesPage() {
-  const experiences = listExperiences();
+const CATEGORIES = experienceCategories();
+const CATEGORY_SET = new Set<string>(CATEGORIES);
+
+function parseCategory(value?: string): Category | undefined {
+  return value && CATEGORY_SET.has(value) ? (value as Category) : undefined;
+}
+function parseMode(value?: string): ExperienceMode | undefined {
+  return value === "local" || value === "travel" ? value : undefined;
+}
+
+export default async function ExperiencesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string; mode?: string; q?: string }>;
+}) {
+  const sp = await searchParams;
+  const category = parseCategory(sp.category);
+  const mode = parseMode(sp.mode);
+  const experiences = listExperiences({ category, mode, q: sp.q });
+
   return (
     <>
       <SiteHeader />
@@ -26,11 +47,33 @@ export default function ExperiencesPage() {
             team, and growing into the wider Andamans.
           </p>
         </div>
-        <div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {experiences.map((experience) => (
-            <ExperienceCard key={experience.id} experience={experience} />
-          ))}
+
+        <div className="mt-10">
+          <Suspense fallback={null}>
+            <ExperienceFilterBar
+              categories={CATEGORIES}
+              activeCategory={category}
+              activeMode={mode}
+            />
+          </Suspense>
         </div>
+
+        {experiences.length > 0 ? (
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {experiences.map((experience) => (
+              <ExperienceCard key={experience.id} experience={experience} />
+            ))}
+          </div>
+        ) : (
+          <div className="border-cream-line bg-cream-deep/30 mt-12 rounded-3xl border py-20 text-center">
+            <p className="font-display text-forest text-2xl">
+              Nothing here yet.
+            </p>
+            <p className="text-forest/60 mt-2">
+              No experiences match those filters — try clearing them.
+            </p>
+          </div>
+        )}
       </main>
       <SiteFooter />
     </>

@@ -33,14 +33,40 @@ export default async function ExperienceDetailPage({
   const experience = getExperience(slug);
   if (!experience) notFound();
   const meta = CATEGORY_META[experience.category];
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: experience.title,
+    description: experience.summary,
+    brand: { "@type": "Brand", name: "Yuvoy" },
+    offers: {
+      "@type": "Offer",
+      price: (experience.fromPrice.amountMinor / 100).toString(),
+      priceCurrency: experience.fromPrice.currency,
+      availability: "https://schema.org/PreOrder",
+    },
+    ...(experience.reviewCount
+      ? {
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: experience.rating,
+            reviewCount: experience.reviewCount,
+          },
+        }
+      : {}),
+  };
 
   return (
     <>
       <SiteHeader />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <main>
         <div
           className={cn(
-            "relative flex min-h-[42vh] items-end bg-gradient-to-br",
+            "relative flex min-h-[42vh] items-end bg-linear-to-br",
             meta.gradient,
           )}
         >
