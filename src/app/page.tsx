@@ -3,7 +3,9 @@ import { Wordmark } from "@/components/brand/wordmark";
 import { buttonVariants } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site/site-footer";
 import { ExperienceCard } from "@/components/experience/experience-card";
+import { HowItWorks } from "@/components/home/how-it-works";
 import { listExperiences } from "@/lib/experiences/data";
+import { cn } from "@/lib/cn";
 
 export default function HomePage() {
   const featured = listExperiences().slice(0, 3);
@@ -88,6 +90,8 @@ export default function HomePage() {
           </div>
         </section>
 
+        <HowItWorks />
+
         <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
           <div className="flex items-end justify-between gap-4">
             <div>
@@ -107,6 +111,42 @@ export default function HomePage() {
             {featured.map((experience) => (
               <ExperienceCard key={experience.id} experience={experience} />
             ))}
+          </div>
+        </section>
+
+        <section className="bg-midnight px-6 py-24 text-center sm:px-10">
+          <p className="label text-terra">Our philosophy</p>
+          <h2 className="font-display text-cream mx-auto mt-6 max-w-3xl text-3xl leading-tight italic sm:text-5xl">
+            Every person and place you pass is living a life as full and vivid
+            as your own.
+          </h2>
+          <Link
+            href="/philosophy"
+            className={cn(
+              buttonVariants({ variant: "accent", size: "lg" }),
+              "mt-8",
+            )}
+          >
+            Read the philosophy
+          </Link>
+        </section>
+
+        <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
+          <div className="border-cream-line bg-cream-deep/40 flex flex-col items-start gap-6 rounded-3xl border p-10 sm:flex-row sm:items-center sm:justify-between sm:p-14">
+            <div className="max-w-lg">
+              <p className="label text-terra">For hosts</p>
+              <h2 className="font-display text-forest mt-3 text-2xl sm:text-3xl">
+                Create experiences with Yuvoy.
+              </h2>
+              <p className="text-forest/70 mt-3">
+                If you know a place because you live it, we&rsquo;d love to
+                build something with you — from a single dive to a day in the
+                life of the islands.
+              </p>
+            </div>
+            <Link href="/waitlist" className={buttonVariants({ size: "lg" })}>
+              Become a host
+            </Link>
           </div>
         </section>
       </main>
