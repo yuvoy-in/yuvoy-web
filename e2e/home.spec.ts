@@ -15,5 +15,5 @@ test("home leads to the waitlist", async ({ page }) => {
 test("waitlist rejects an empty email", async ({ page }) => {
   await page.goto("/waitlist");
   await page.getByRole("button", { name: "Join the waitlist" }).click();
-  await expect(page.getByRole("alert")).toContainText(/email/i);
+  await expect(page.locator("form").getByRole("alert")).toContainText(/email/i);
 });
