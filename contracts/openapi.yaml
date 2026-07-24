@@ -1,0 +1,437 @@
+openapi: 3.1.0
+info:
+  title: Yuvoy API
+  version: 0.0.0-proposal
+  description: >
+    **Proposal — v0.** The Experience Commerce API consumed by yuvoy-web (and,
+    later, the mobile app). This document is the FE/BE contract. Once `yuvoy-api`
+    exists it becomes the source of truth there; this copy lets the frontend
+    generate types and build against mocks in the meantime.
+
+    Conventions: money is an integer minor unit + currency; timestamps are
+    ISO-8601 UTC; lists use cursor pagination; money-mutating requests require an
+    `Idempotency-Key`; errors use a single envelope `{ error: { code, message, details, requestId } }`.
+servers:
+  - url: https://api.yuvoy.com/v1
+    description: Production
+  - url: https://api-staging.yuvoy.com/v1
+    description: Staging
+tags:
+  - name: auth
+  - name: experiences
+  - name: bookings
+  - name: waitlist
+  - name: me
+
+security: []
+
+paths:
+  /waitlist:
+    post:
+      tags: [waitlist]
+      summary: Join the launch waitlist
+      operationId: joinWaitlist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WaitlistInput" }
+      responses:
+        "201":
+          description: Added (idempotent on email)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WaitlistEntry" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+
+  /experiences:
+    get:
+      tags: [experiences]
+      summary: List published experiences
+      operationId: listExperiences
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Limit"
+        - name: category
+          in: query
+          schema: { $ref: "#/components/schemas/Category" }
+        - name: mode
+          in: query
+          schema: { $ref: "#/components/schemas/ExperienceMode" }
+        - name: q
+          in: query
+          description: Free-text search
+          schema: { type: string }
+      responses:
+        "200":
+          description: A page of experience summaries
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ExperiencePage" }
+
+  /experiences/{slug}:
+    get:
+      tags: [experiences]
+      summary: Get a single experience by slug
+      operationId: getExperience
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: The experience
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Experience" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /experiences/{slug}/availability:
+    get:
+      tags: [experiences]
+      summary: Bookable slots within a date range
+      operationId: getAvailability
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema: { type: string }
+        - name: from
+          in: query
+          required: true
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        "200":
+          description: Available slots
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Slot" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /bookings:
+    post:
+      tags: [bookings]
+      summary: Create a booking (holds a slot, initiates payment)
+      operationId: createBooking
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BookingInput" }
+      responses:
+        "201":
+          description: Booking created in pending_payment
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Booking" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "409":
+          description: Slot no longer available (capacity race)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /auth/otp/request:
+    post:
+      tags: [auth]
+      summary: Request an OTP to a phone number
+      operationId: requestOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone]
+              properties:
+                phone: { type: string, description: E.164 }
+      responses:
+        "202": { description: OTP dispatched }
+        "429": { $ref: "#/components/responses/RateLimited" }
+
+  /auth/otp/verify:
+    post:
+      tags: [auth]
+      summary: Verify an OTP and issue tokens
+      operationId: verifyOtp
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone, code]
+              properties:
+                phone: { type: string }
+                code: { type: string }
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthTokens" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+
+  /me:
+    get:
+      tags: [me]
+      summary: The current user
+      operationId: getMe
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/User" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    Cursor:
+      name: cursor
+      in: query
+      schema: { type: string }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+
+  responses:
+    BadRequest:
+      description: Invalid input
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Unauthorized:
+      description: Missing or invalid credentials
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    RateLimited:
+      description: Too many requests
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string, example: invalid_input }
+            message: { type: string }
+            details: { type: object, additionalProperties: true }
+            requestId: { type: string }
+
+    Money:
+      type: object
+      required: [amountMinor, currency]
+      properties:
+        amountMinor:
+          type: integer
+          description: Amount in the currency's minor unit (paise for INR)
+          example: 450000
+        currency: { type: string, example: INR }
+
+    Category:
+      type: string
+      enum:
+        - adventure
+        - nature_wildlife
+        - food_drink
+        - arts_creativity
+        - learning
+        - culture_heritage
+        - wellness
+        - entertainment
+        - community
+        - sports
+        - local_life
+        - events
+
+    ExperienceMode:
+      type: string
+      enum: [local, travel]
+
+    PolicyTier:
+      type: string
+      enum: [flexible, firm, weather]
+
+    ProviderTier:
+      type: string
+      enum: [professional, creator, community]
+
+    Provider:
+      type: object
+      required: [id, name, tier]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        tier: { $ref: "#/components/schemas/ProviderTier" }
+        verified: { type: boolean }
+
+    Media:
+      type: object
+      required: [id, type, url]
+      properties:
+        id: { type: string }
+        type: { type: string, enum: [image, video] }
+        url: { type: string, format: uri }
+        posterUrl: { type: string, format: uri }
+        alt: { type: string }
+
+    ExperienceSummary:
+      type: object
+      required:
+        [
+          id,
+          slug,
+          title,
+          location,
+          category,
+          mode,
+          durationMinutes,
+          fromPrice,
+          rating,
+          provider,
+        ]
+      properties:
+        id: { type: string }
+        slug: { type: string }
+        title: { type: string }
+        location: { type: string }
+        category: { $ref: "#/components/schemas/Category" }
+        mode: { $ref: "#/components/schemas/ExperienceMode" }
+        durationMinutes: { type: integer }
+        fromPrice: { $ref: "#/components/schemas/Money" }
+        rating: { type: number, format: float, minimum: 0, maximum: 5 }
+        reviewCount: { type: integer }
+        hero: { $ref: "#/components/schemas/Media" }
+        provider: { $ref: "#/components/schemas/Provider" }
+
+    Experience:
+      allOf:
+        - $ref: "#/components/schemas/ExperienceSummary"
+        - type: object
+          required: [summary, description, policyTier, gallery]
+          properties:
+            summary: { type: string }
+            description: { type: string }
+            highlights:
+              type: array
+              items: { type: string }
+            included:
+              type: array
+              items: { type: string }
+            policyTier: { $ref: "#/components/schemas/PolicyTier" }
+            maxGroupSize: { type: integer }
+            gallery:
+              type: array
+              items: { $ref: "#/components/schemas/Media" }
+
+    ExperiencePage:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/ExperienceSummary" }
+        nextCursor:
+          type: string
+          nullable: true
+
+    Slot:
+      type: object
+      required: [id, startsAt, capacity, remaining, price]
+      properties:
+        id: { type: string }
+        startsAt: { type: string, format: date-time }
+        capacity: { type: integer }
+        remaining: { type: integer }
+        price: { $ref: "#/components/schemas/Money" }
+
+    BookingInput:
+      type: object
+      required: [slotId, guests]
+      properties:
+        slotId: { type: string }
+        guests: { type: integer, minimum: 1 }
+
+    Booking:
+      type: object
+      required: [id, status, experienceSlug, slotId, guests, total, createdAt]
+      properties:
+        id: { type: string }
+        status:
+          type: string
+          enum: [pending_payment, confirmed, completed, cancelled, no_show]
+        experienceSlug: { type: string }
+        slotId: { type: string }
+        guests: { type: integer }
+        total: { $ref: "#/components/schemas/Money" }
+        createdAt: { type: string, format: date-time }
+
+    WaitlistInput:
+      type: object
+      required: [email]
+      properties:
+        name: { type: string, maxLength: 80 }
+        email: { type: string, format: email }
+        source: { type: string }
+
+    WaitlistEntry:
+      type: object
+      required: [id, email, createdAt]
+      properties:
+        id: { type: string }
+        email: { type: string }
+        createdAt: { type: string, format: date-time }
+
+    AuthTokens:
+      type: object
+      required: [accessToken, refreshToken, user]
+      properties:
+        accessToken: { type: string }
+        refreshToken: { type: string }
+        user: { $ref: "#/components/schemas/User" }
+
+    User:
+      type: object
+      required: [id, role]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        email: { type: string }
+        phone: { type: string }
+        role: { type: string, enum: [seeker, provider, admin] }
