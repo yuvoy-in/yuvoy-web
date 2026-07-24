@@ -17,7 +17,7 @@ export default function HomePage() {
             aria-hidden
             className="pointer-events-none absolute inset-0 -z-10"
           >
-            <div className="from-terra/15 via-terra/5 absolute top-0 left-1/2 h-[65vh] w-[130vw] -translate-x-1/2 rounded-b-[100%] bg-gradient-to-b to-transparent blur-3xl" />
+            <div className="from-terra/15 via-terra/5 absolute top-0 left-1/2 h-[65vh] w-[130vw] -translate-x-1/2 rounded-b-[100%] bg-linear-to-b to-transparent blur-3xl" />
           </div>
 
           <header className="flex items-center justify-between px-6 py-6 sm:px-10">

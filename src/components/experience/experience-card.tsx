@@ -16,9 +16,7 @@ export function ExperienceCard({
       href={`/experiences/${experience.slug}`}
       className="border-cream-line bg-cream-deep/40 hover:border-forest/25 group flex flex-col overflow-hidden rounded-3xl border transition-all hover:-translate-y-0.5"
     >
-      <div
-        className={cn("relative aspect-[4/5] bg-gradient-to-br", meta.gradient)}
-      >
+      <div className={cn("relative aspect-4/5 bg-linear-to-br", meta.gradient)}>
         <span className="label bg-cream/80 text-forest/70 absolute top-4 left-4 rounded-full px-3 py-1 backdrop-blur">
           {meta.label}
         </span>
