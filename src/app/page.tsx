@@ -4,6 +4,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { SiteFooter } from "@/components/site/site-footer";
 import { ExperienceCard } from "@/components/experience/experience-card";
 import { HowItWorks } from "@/components/home/how-it-works";
+import { MobileMenu } from "@/components/site/mobile-menu";
 import { listExperiences } from "@/lib/experiences/data";
 import { cn } from "@/lib/cn";
 
@@ -50,6 +51,7 @@ export default function HomePage() {
                 Waitlist
               </Link>
             </nav>
+            <MobileMenu />
           </header>
 
           <div className="flex flex-1 flex-col items-center justify-center px-6 pb-16 text-center">

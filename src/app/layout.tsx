@@ -32,7 +32,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${fraunces.variable} ${inter.variable} h-full`}>
       <body className="min-h-full">
-        <Providers>{children}</Providers>
+        <a
+          href="#content"
+          className="focus:bg-forest focus:text-cream sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-full focus:px-4 focus:py-2"
+        >
+          Skip to content
+        </a>
+        <Providers>
+          <div id="content" tabIndex={-1} className="outline-none">
+            {children}
+          </div>
+        </Providers>
       </body>
     </html>
   );

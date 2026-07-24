@@ -42,6 +42,13 @@
     @apply bg-terra text-cream;
   }
 
+  /* Visible keyboard focus for links (buttons carry their own ring). */
+  a:focus-visible {
+    outline: 2px solid var(--color-terra);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
   /* Respect users who prefer less motion — kill entrance animations. */
   @media (prefers-reduced-motion: reduce) {
     *,
