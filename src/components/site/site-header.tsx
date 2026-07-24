@@ -22,6 +22,12 @@ export function SiteHeader() {
           >
             Philosophy
           </Link>
+          <Link
+            href="/journal"
+            className="label text-forest/55 hover:text-forest transition-colors"
+          >
+            Journal
+          </Link>
           <Link href="/waitlist" className={buttonVariants({ size: "sm" })}>
             Waitlist
           </Link>

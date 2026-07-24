@@ -25,3 +25,12 @@ export function formatDuration(minutes: number): string {
   if (Number.isInteger(hours)) return `${hours} hr${hours > 1 ? "s" : ""}`;
   return `${Math.floor(hours)}h ${minutes % 60}m`;
 }
+
+/** ISO date → "12 July 2026". */
+export function formatDate(iso: string): string {
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(iso));
+}

@@ -36,6 +36,12 @@ export default function HomePage() {
                 Philosophy
               </Link>
               <Link
+                href="/journal"
+                className="label text-forest/55 hover:text-forest transition-colors"
+              >
+                Journal
+              </Link>
+              <Link
                 href="/waitlist"
                 className="label text-forest/55 hover:text-forest transition-colors"
               >

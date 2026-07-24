@@ -25,6 +25,12 @@ export function SiteFooter() {
             Philosophy
           </Link>
           <Link
+            href="/journal"
+            className="text-forest/60 hover:text-forest text-sm"
+          >
+            Journal
+          </Link>
+          <Link
             href="/waitlist"
             className="text-forest/60 hover:text-forest text-sm"
           >
