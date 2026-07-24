@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/brand/wordmark";
 import { buttonVariants } from "@/components/ui/button";
+import { MobileMenu } from "@/components/site/mobile-menu";
 
 export function SiteHeader() {
   return (
@@ -9,7 +10,7 @@ export function SiteHeader() {
         <Link href="/" aria-label="Yuvoy home">
           <Wordmark />
         </Link>
-        <nav className="flex items-center gap-6 sm:gap-8">
+        <nav className="hidden items-center gap-6 sm:flex sm:gap-8">
           <Link
             href="/experiences"
             className="label text-forest/55 hover:text-forest transition-colors"
@@ -32,6 +33,7 @@ export function SiteHeader() {
             Waitlist
           </Link>
         </nav>
+        <MobileMenu />
       </div>
     </header>
   );
