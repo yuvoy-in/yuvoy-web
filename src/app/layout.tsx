@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { fraunces, inter } from "@/lib/fonts";
 import { Providers } from "@/components/providers";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://yuvoy.in"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Yuvoy — Experience More.",
     template: "%s · Yuvoy",
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     title: "Yuvoy — Experience More.",
     description:
       "Immersive, participatory experiences in the Andaman Islands. Don't be a tourist.",
-    url: "https://yuvoy.in",
+    url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
