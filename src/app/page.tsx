@@ -62,7 +62,7 @@ export default function HomePage() {
               Havelock · Andaman Islands
             </p>
             <h1
-              className="rise font-display text-forest mt-6 max-w-4xl text-5xl leading-[1.04] tracking-tight sm:text-7xl"
+              className="rise font-display text-forest mt-6 max-w-4xl text-[clamp(2.5rem,11vw,4.5rem)] leading-[1.03] tracking-tight text-balance"
               style={{ animationDelay: "0.15s" }}
             >
               Don&rsquo;t be a <em className="text-terra">tourist</em>.
@@ -76,15 +76,24 @@ export default function HomePage() {
               than pass through it.
             </p>
             <div
-              className="rise mt-10 flex flex-col items-center gap-3 sm:flex-row"
+              className="rise mt-10 flex w-full max-w-xs flex-col items-center gap-3 sm:w-auto sm:max-w-none sm:flex-row"
               style={{ animationDelay: "0.45s" }}
             >
-              <Link href="/waitlist" className={buttonVariants({ size: "lg" })}>
+              <Link
+                href="/waitlist"
+                className={cn(
+                  buttonVariants({ size: "lg" }),
+                  "w-full sm:w-auto",
+                )}
+              >
                 Join the waitlist
               </Link>
               <Link
                 href="/experiences"
-                className={buttonVariants({ variant: "ghost", size: "lg" })}
+                className={cn(
+                  buttonVariants({ variant: "ghost", size: "lg" }),
+                  "w-full sm:w-auto",
+                )}
               >
                 See the experiences
               </Link>
@@ -146,7 +155,10 @@ export default function HomePage() {
                 life of the islands.
               </p>
             </div>
-            <Link href="/waitlist" className={buttonVariants({ size: "lg" })}>
+            <Link
+              href="/waitlist"
+              className={cn(buttonVariants({ size: "lg" }), "w-full sm:w-auto")}
+            >
               Become a host
             </Link>
           </div>

@@ -2,11 +2,11 @@
 
 ## Branches
 
-| Branch                       | Purpose                        | Direct push     | Deploy              |
-| ---------------------------- | ------------------------------ | --------------- | ------------------- |
-| `main`                       | Production. Always deployable. | ❌ PR only      | Production (Vercel) |
-| `dev`                        | Staging / integration.         | ❌ PR only      | Staging (Vercel)    |
-| `feat/*`, `fix/*`, `chore/*` | Short-lived work               | ✅ (you own it) | Preview per PR      |
+| Branch                       | Purpose                        | Direct push     | Deploy                        |
+| ---------------------------- | ------------------------------ | --------------- | ----------------------------- |
+| `main`                       | Production. Always deployable. | ❌ PR only      | Production — Actions → Vercel |
+| `dev`                        | Staging / integration.         | ❌ PR only      | Staging — Actions → Vercel    |
+| `feat/*`, `fix/*`, `chore/*` | Short-lived work               | ✅ (you own it) | CI only (no deploy)           |
 
 `main` and `dev` are **protected**: no direct push, no force-push, require PR + green CI.
 
