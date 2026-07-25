@@ -1,5 +1,7 @@
 name: Deploy
 
+run-name: ${{ github.ref_name == 'main' && 'Production deployment' || 'Staging deployment' }}
+
 # CD via the Vercel CLI (no Vercel–Git connection needed — works on Hobby with
 # an org-owned repo). push to main → prod project; push to dev → staging project.
 on:
@@ -31,6 +33,7 @@ jobs:
     needs: guard
     if: needs.guard.outputs.ready == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 12
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
