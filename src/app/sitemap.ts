@@ -1,8 +1,9 @@
 import type { MetadataRoute } from "next";
 import { experienceSlugs } from "@/lib/experiences/data";
 import { postSlugs } from "@/lib/journal/posts";
+import { SITE_URL } from "@/lib/site";
 
-const BASE = "https://yuvoy.in";
+const BASE = SITE_URL;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const pages = [
