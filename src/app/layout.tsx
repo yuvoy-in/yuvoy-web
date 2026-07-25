@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { fraunces, inter } from "@/lib/fonts";
 import { Providers } from "@/components/providers";
-import { SITE_URL } from "@/lib/site";
+import { SITE_URL, IS_PRODUCTION } from "@/lib/site";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { StagingBanner } from "@/components/site/staging-banner";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
   description:
     "Don't be a tourist. Yuvoy designs immersive, participatory experiences in the Andaman Islands — so you belong to a place, briefly, rather than pass through it.",
   applicationName: "Yuvoy",
+  robots: IS_PRODUCTION ? undefined : { index: false, follow: false },
   openGraph: {
     type: "website",
     siteName: "Yuvoy",
@@ -48,6 +50,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </Providers>
         <Analytics />
         <SpeedInsights />
+        <StagingBanner />
       </body>
     </html>
   );
