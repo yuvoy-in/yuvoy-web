@@ -12,10 +12,9 @@ export const SITE_URL = (
 ).replace(/\/$/, "");
 
 /**
- * True only for the canonical production deploy (`main` on the prod Vercel
- * project). Staging (`dev`) and preview deploys are false → they get noindexed
- * and show a STAGING badge.
+ * True only on the production Vercel project (set `NEXT_PUBLIC_SITE_ENV=production`
+ * there). Everything else — staging, previews, local — is non-prod → noindexed
+ * + shows a STAGING badge. Uses an explicit env var because CLI/Actions deploys
+ * don't carry Vercel's Git env vars.
  */
-export const IS_PRODUCTION =
-  process.env.VERCEL_ENV === "production" &&
-  process.env.VERCEL_GIT_COMMIT_REF === "main";
+export const IS_PRODUCTION = process.env.NEXT_PUBLIC_SITE_ENV === "production";
