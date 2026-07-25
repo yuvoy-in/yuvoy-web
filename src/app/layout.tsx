@@ -49,7 +49,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </div>
         </Providers>
         <Analytics />
-        <SpeedInsights />
+        {IS_PRODUCTION && <SpeedInsights />}
         <StagingBanner />
       </body>
     </html>
