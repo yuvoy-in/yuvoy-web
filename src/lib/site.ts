@@ -16,4 +16,6 @@ export const SITE_URL = (
  * project). Staging (`dev`) and preview deploys are false → they get noindexed
  * and show a STAGING badge.
  */
-export const IS_PRODUCTION = process.env.VERCEL_GIT_COMMIT_REF === "main";
+export const IS_PRODUCTION =
+  process.env.VERCEL_ENV === "production" &&
+  process.env.VERCEL_GIT_COMMIT_REF === "main";
