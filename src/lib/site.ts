@@ -10,3 +10,10 @@ export const SITE_URL = (
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
     : "http://localhost:3000")
 ).replace(/\/$/, "");
+
+/**
+ * True only for the canonical production deploy (`main` on the prod Vercel
+ * project). Staging (`dev`) and preview deploys are false → they get noindexed
+ * and show a STAGING badge.
+ */
+export const IS_PRODUCTION = process.env.VERCEL_GIT_COMMIT_REF === "main";
