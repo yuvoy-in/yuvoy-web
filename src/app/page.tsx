@@ -6,6 +6,7 @@ import { ExperienceCard } from "@/components/experience/experience-card";
 import { HowItWorks } from "@/components/home/how-it-works";
 import { MobileMenu } from "@/components/site/mobile-menu";
 import { listExperiences } from "@/lib/experiences/data";
+import { PROVIDER_WAITLIST_HREF } from "@/lib/waitlist/audience";
 import { cn } from "@/lib/cn";
 
 export default function HomePage() {
@@ -89,13 +90,13 @@ export default function HomePage() {
                 Join the waitlist
               </Link>
               <Link
-                href="/experiences"
+                href={PROVIDER_WAITLIST_HREF}
                 className={cn(
                   buttonVariants({ variant: "ghost", size: "lg" }),
                   "w-full sm:w-auto",
                 )}
               >
-                See the experiences
+                Onboard as a provider
               </Link>
             </div>
           </div>
@@ -156,7 +157,7 @@ export default function HomePage() {
               </p>
             </div>
             <Link
-              href="/waitlist"
+              href={PROVIDER_WAITLIST_HREF}
               className={cn(buttonVariants({ size: "lg" }), "w-full sm:w-auto")}
             >
               Become a host
