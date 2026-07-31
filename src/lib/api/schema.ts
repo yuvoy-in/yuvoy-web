@@ -380,6 +380,12 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        /**
+         * @description Internal follow-up lifecycle for a lead, tracked ops-side only. It is never accepted on a request and never returned in `LeadAcceptance` — a visitor's submission carries no signal about how their registration is being worked. Documented here for the internal ops tooling that reads and updates it directly against the database; no public endpoint reads or writes this value yet.
+         * @default new
+         * @enum {string}
+         */
+        LeadStatus: "new" | "contacted" | "qualified" | "disqualified";
     };
     responses: {
         /** @description Invalid input */
