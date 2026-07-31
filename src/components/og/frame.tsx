@@ -24,7 +24,7 @@ export function renderOg({
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        background: "#F5EDDF",
+        background: "#F5F2EC",
         padding: "72px 80px",
         fontFamily: "sans-serif",
       }}
@@ -35,7 +35,7 @@ export function renderOg({
           fontSize: 26,
           letterSpacing: "0.22em",
           textTransform: "uppercase",
-          color: "#B5704D",
+          color: "#8F4522",
         }}
       >
         {eyebrow}
@@ -45,7 +45,7 @@ export function renderOg({
           display: "flex",
           fontSize: 92,
           lineHeight: 1.04,
-          color: "#1F3A35",
+          color: "#0F4C5C",
           maxWidth: 980,
         }}
       >
@@ -64,11 +64,11 @@ export function renderOg({
             fontSize: 34,
             fontWeight: 600,
             letterSpacing: "0.34em",
-            color: "#1F3A35",
+            color: "#0F4C5C",
           }}
         >
           <span style={{ display: "flex" }}>YUVOY</span>
-          <span style={{ display: "flex", color: "#B5704D" }}>.</span>
+          <span style={{ display: "flex", color: "#8F4522" }}>.</span>
         </div>
         <div
           style={{

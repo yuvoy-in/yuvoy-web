@@ -6,10 +6,10 @@ export default function NotFound() {
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
       <p className="label text-terra">404</p>
-      <h1 className="font-display text-forest mt-5 text-4xl">
+      <h1 className="font-display text-teal mt-5 text-4xl">
         This path leads nowhere.
       </h1>
-      <p className="text-forest/70 mt-4 max-w-md">
+      <p className="text-teal/70 mt-4 max-w-md">
         The page you&rsquo;re looking for isn&rsquo;t here — like a cove that
         moved with the tide.
       </p>

@@ -6,7 +6,13 @@ export default function robots(): MetadataRoute.Robots {
     return { rules: { userAgent: "*", disallow: "/" } };
   }
   return {
-    rules: { userAgent: "*", allow: "/", disallow: ["/api/"] },
+    // /go/* are QR/campaign routes (noindex by metadata too); /privacy and
+    // /terms stay out until business-approved copy replaces the placeholders.
+    rules: {
+      userAgent: "*",
+      allow: "/",
+      disallow: ["/go/", "/privacy", "/terms"],
+    },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

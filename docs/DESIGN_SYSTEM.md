@@ -2,7 +2,7 @@
 
 Single source of truth for visual design. **Every color, font, and spacing value used in the app must map to a token here.** Never invent a value that falls between tokens — add a token (with review) instead.
 
-Direction: cinematic minimalism — full-screen frames, atmospheric imagery, film grain, generous space, slow considered motion. Cream editorial surfaces; Midnight immersive scenes.
+Direction: cinematic minimalism — full-screen frames, atmospheric imagery, film grain, generous space, slow considered motion. Cream editorial surfaces; Ink immersive scenes.
 
 ## 0. Architecture rule
 
@@ -12,17 +12,25 @@ Direction: cinematic minimalism — full-screen frames, atmospheric imagery, fil
 
 ## 1. Color tokens
 
-| Token / utility | Hex       | Role                                                    |
-| --------------- | --------- | ------------------------------------------------------- |
-| `cream`         | `#F5EDDF` | Canvas — default page background                        |
-| `cream-deep`    | `#EFE6D4` | Raised surfaces, inputs, cards on cream                 |
-| `cream-line`    | `#E4D9C3` | Hairline borders on cream                               |
-| `forest`        | `#1F3A35` | Primary ink — text, headings, wordmark, primary buttons |
-| `terra`         | `#B5704D` | Accent — enso dot, CTAs, highlights, focus ring         |
-| `terra-deep`    | `#9C6041` | Terra hover/pressed, error text on cream                |
-| `midnight`      | `#0E1F1A` | Immersive scenes — video, night, depth backgrounds      |
+Brand Kit v1 (ratified 2026-07-31). Contrast ratios measured against WCAG 2.2.
 
-Muted/secondary shades come from **opacity modifiers on `forest`**, not new tokens: `text-forest/70` (secondary), `/55` (tertiary/labels), `/45` (faint), `/20`–`/12` (borders/fills). Use the same for terra where needed.
+| Token / utility | Hex       | Role                                                            |
+| --------------- | --------- | --------------------------------------------------------------- |
+| `cream`         | `#F5F2EC` | Canvas — default page background                                |
+| `cream-deep`    | `#EDE8DE` | Raised surfaces, inputs, cards on cream                         |
+| `cream-line`    | `#DBD2BF` | Hairline borders on cream                                       |
+| `teal`          | `#0F4C5C` | Primary ink — text, headings, wordmark, primary buttons (8.5:1) |
+| `terra`         | `#C96A3D` | Accent — enso dot, LARGE display accents only (3.3:1 on cream)  |
+| `terra-deep`    | `#8F4522` | Text-capable accent — labels, errors, accent buttons (6.2:1)    |
+| `terra-soft`    | `#D98C63` | Accent for labels on `ink` surfaces (6.0:1 on ink)              |
+| `ink`           | `#1C2321` | Immersive scenes — night, depth backgrounds (14.3:1 vs cream)   |
+
+**The terra rule:** `terra` fails AA for normal-size text on cream (3.3:1). It
+may appear only as decoration or at large-text sizes (≥24px / ≥18.7px bold).
+Anything a visitor reads at body/label size uses `terra-deep` on cream and
+`terra-soft` on ink. Accent buttons are `bg-terra-deep text-cream`.
+
+Muted/secondary shades come from **opacity modifiers on `teal`**, not new tokens: `text-teal/70` (secondary), `/55` (tertiary/labels), `/45` (faint), `/20`–`/12` (borders/fills).
 
 ## 2. Typography
 
@@ -55,7 +63,7 @@ Scale: use Tailwind's type scale (`text-sm`…`text-7xl`). Headlines `font-displ
 
 ## 6. Accessibility (release gate)
 
-WCAG 2.2 AA. Keyboard-complete flows; visible focus (`focus-visible:ring-terra`); `aria-invalid` + `role="alert"` on form errors; contrast-checked pairings (terra text only at label/large sizes on cream — body text uses forest). axe runs in CI.
+WCAG 2.2 AA. Keyboard-complete flows; visible focus (`focus-visible:ring-terra-deep`); `aria-invalid` + `role="alert"` on form errors; contrast-checked pairings (terra only at large sizes; readable accents use terra-deep (cream) / terra-soft (ink)). axe runs in CI.
 
 ## 7. Figma / prototype → code
 

@@ -3,17 +3,21 @@
 /*
   Yuvoy design tokens — the single source of truth for color & type.
   No hex, font, or spacing value may exist outside this @theme block.
-  Brand world (Social Media Brief): cinematic, editorial, warm.
+
+  Palette: Brand Kit v1 (ratified 2026-07-31) — Deep Teal, Terracotta, Cream,
+  Ink. Contrast-checked against WCAG 2.2 AA; see docs/DESIGN_SYSTEM.md §1 for
+  the measured ratios and the terra/terra-deep usage rule.
 */
 @theme {
-  /* Canonical brand palette */
-  --color-cream: #f5eddf; /* canvas — editorial/light surfaces */
-  --color-cream-deep: #efe6d4; /* raised surface on cream */
-  --color-cream-line: #e4d9c3; /* hairline borders on cream */
-  --color-forest: #1f3a35; /* primary ink — wordmark, headings, buttons */
-  --color-terra: #b5704d; /* accent — the enso dot, CTAs, highlights */
-  --color-terra-deep: #9c6041; /* terra pressed/hover */
-  --color-midnight: #0e1f1a; /* immersive scenes — video, night, depth */
+  /* Canonical brand palette — Brand Kit v1 */
+  --color-cream: #f5f2ec; /* canvas — editorial/light surfaces */
+  --color-cream-deep: #ede8de; /* raised surface on cream */
+  --color-cream-line: #dbd2bf; /* hairline borders on cream */
+  --color-teal: #0f4c5c; /* primary ink — wordmark, headings, buttons (8.5:1 on cream) */
+  --color-terra: #c96a3d; /* accent — enso dot, large display accents ONLY (3.3:1) */
+  --color-terra-deep: #8f4522; /* text-capable accent — labels, errors, accent buttons (6.2:1) */
+  --color-terra-soft: #d98c63; /* accent for labels on ink surfaces (6.0:1 on ink) */
+  --color-ink: #1c2321; /* immersive scenes — night, depth (14.3:1 vs cream) */
 
   /* Type — Fraunces (display, italic headlines) + Inter (UI/body) */
   --font-display: var(--font-fraunces);
@@ -34,7 +38,7 @@
   }
 
   body {
-    @apply bg-cream text-forest font-sans antialiased;
+    @apply bg-cream text-teal font-sans antialiased;
     text-rendering: optimizeLegibility;
     overflow-x: clip; /* guard against accidental horizontal scroll on mobile */
   }
@@ -45,7 +49,7 @@
 
   /* Visible keyboard focus for links (buttons carry their own ring). */
   a:focus-visible {
-    outline: 2px solid var(--color-terra);
+    outline: 2px solid var(--color-terra-deep);
     outline-offset: 3px;
     border-radius: 4px;
   }
@@ -64,7 +68,8 @@
 }
 
 @utility label {
-  /* Wide-tracked uppercase label — the brand's editorial voice. */
+  /* Wide-tracked uppercase label — the brand's editorial voice.
+     On cream use text-terra-deep; on ink use text-terra-soft (AA). */
   @apply text-xs font-medium uppercase;
   letter-spacing: var(--tracking-label);
 }
