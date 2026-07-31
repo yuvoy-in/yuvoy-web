@@ -20,12 +20,49 @@ tags:
   - name: auth
   - name: experiences
   - name: bookings
+  - name: leads
   - name: waitlist
   - name: me
 
 security: []
 
 paths:
+  /leads:
+    post:
+      tags: [leads]
+      summary: Register pre-launch interest as a traveller or a provider
+      description: >
+        Public, rate-limited pre-launch lead capture. The request is
+        discriminated on `audience`. Geography is generic: `marketKey` names a
+        launch market and destination keys name a destination within it, so
+        future markets reuse this shape unchanged.
+
+
+        A returning contact (same audience + normalised WhatsApp) updates its
+        current preferences and attribution and returns `200`; a new contact
+        returns `201`. Notification jobs are written in the same transaction as
+        the lead, so a saved lead is never lost to an unavailable alert target.
+      operationId: createLead
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LeadInput" }
+      responses:
+        "201":
+          description: New lead recorded
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LeadAcceptance" }
+        "200":
+          description: Existing lead updated (same audience + WhatsApp)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LeadAcceptance" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+
   /waitlist:
     post:
       tags: [waitlist]
@@ -239,6 +276,11 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/Error" }
+    ServiceUnavailable:
+      description: A dependency is unavailable; the request was not recorded
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
 
   schemas:
     Error:
@@ -368,8 +410,8 @@ components:
           type: array
           items: { $ref: "#/components/schemas/ExperienceSummary" }
         nextCursor:
-          type: string
-          nullable: true
+          # OpenAPI 3.1 drops `nullable`; a null union is the 3.1 spelling.
+          type: [string, "null"]
 
     Slot:
       type: object
@@ -435,3 +477,143 @@ components:
         email: { type: string }
         phone: { type: string }
         role: { type: string, enum: [seeker, provider, admin] }
+
+    # ---- Pre-launch lead capture -------------------------------------------
+    # Geography is deliberately generic. `marketKey` names a launch market and
+    # a destination key is "<market>/<destination>". Andaman is the first
+    # market, not the schema's boundary.
+
+    LeadAudience:
+      type: string
+      description: >
+        Which side of the marketplace the contact is. `provider` matches the
+        existing `User.role` and `Provider` vocabulary in this contract.
+      enum: [traveller, provider]
+
+    MarketKey:
+      type: string
+      description: Launch market. Extensible; `andaman` is simply the first.
+      pattern: "^[a-z][a-z0-9_]*$"
+      example: andaman
+
+    DestinationKey:
+      type: string
+      description: A destination within a market, as `<market>/<destination>`.
+      pattern: "^[a-z][a-z0-9_]*/[a-z][a-z0-9_]*$"
+      example: andaman/havelock
+
+    InterestGroup:
+      type: string
+      enum: [diving_water, boats_islands, food_culture, other]
+
+    LeadSource:
+      type: string
+      description: Where the visitor arrived from. Campaign routes set this.
+      enum: [ferry, kiosk, hotel, instagram, direct, web]
+      default: web
+
+    Utm:
+      type: object
+      description: Campaign attribution. Never treated as identifying data.
+      properties:
+        source: { type: string, maxLength: 120 }
+        medium: { type: string, maxLength: 120 }
+        campaign: { type: string, maxLength: 120 }
+        content: { type: string, maxLength: 120 }
+        term: { type: string, maxLength: 120 }
+      additionalProperties: false
+
+    LeadInputBase:
+      type: object
+      required: [audience, contactName, privacyAccepted, marketKey]
+      description: >
+        Contact rule (enforced server-side): a traveller must supply at least
+        one of `whatsapp` or `email`; a provider must supply `whatsapp` (the
+        onboarding conversation happens there). Deduplication uses the
+        normalised contact — WhatsApp number when present, else email.
+      properties:
+        audience: { $ref: "#/components/schemas/LeadAudience" }
+        contactName: { type: string, minLength: 1, maxLength: 120 }
+        whatsapp:
+          type: string
+          description: Normalised to E.164 server-side.
+          maxLength: 32
+          example: "+919000000000"
+        email: { type: string, format: email, maxLength: 254 }
+        privacyAccepted:
+          type: boolean
+          description: Must be true. Acknowledges the Privacy Policy and Terms.
+          const: true
+        marketingOptIn:
+          type: boolean
+          description: Separate, optional, unchecked by default.
+          default: false
+        marketKey: { $ref: "#/components/schemas/MarketKey" }
+        source: { $ref: "#/components/schemas/LeadSource" }
+        utm: { $ref: "#/components/schemas/Utm" }
+        website:
+          type: string
+          description: >
+            Honeypot. Left empty by real visitors; a non-empty value is handled
+            server-side and never becomes an actionable lead.
+          maxLength: 255
+
+    TravellerLeadInput:
+      allOf:
+        - $ref: "#/components/schemas/LeadInputBase"
+        - type: object
+          description: >
+            Deliberately minimal — the public waitlist asks for a name and one
+            way to reach you, nothing more. Destination and interests are
+            optional attribution (campaign routes may set a destination
+            default); they are never required of the visitor.
+          properties:
+            audience: { const: traveller }
+            primaryDestinationKey:
+              { $ref: "#/components/schemas/DestinationKey" }
+            interests:
+              type: array
+              maxItems: 3
+              uniqueItems: true
+              items: { $ref: "#/components/schemas/InterestGroup" }
+
+    ProviderLeadInput:
+      allOf:
+        - $ref: "#/components/schemas/LeadInputBase"
+        - type: object
+          required:
+            [whatsapp, businessName, coverageDestinationKeys, primaryInterest]
+          properties:
+            audience: { const: provider }
+            businessName: { type: string, minLength: 1, maxLength: 160 }
+            coverageDestinationKeys:
+              type: array
+              minItems: 1
+              maxItems: 24
+              uniqueItems: true
+              items: { $ref: "#/components/schemas/DestinationKey" }
+            primaryInterest: { $ref: "#/components/schemas/InterestGroup" }
+
+    LeadInput:
+      oneOf:
+        - $ref: "#/components/schemas/TravellerLeadInput"
+        - $ref: "#/components/schemas/ProviderLeadInput"
+      discriminator:
+        propertyName: audience
+        mapping:
+          traveller: "#/components/schemas/TravellerLeadInput"
+          provider: "#/components/schemas/ProviderLeadInput"
+
+    LeadAcceptance:
+      type: object
+      description: >
+        Deliberately minimal. It confirms the lead was recorded and carries no
+        queue position, priority, or follow-up guarantee.
+      required: [id, audience, status, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        audience: { $ref: "#/components/schemas/LeadAudience" }
+        status:
+          type: string
+          enum: [recorded, updated]
+        createdAt: { type: string, format: date-time }

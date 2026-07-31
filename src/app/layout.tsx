@@ -11,25 +11,26 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Yuvoy — Experience More.",
+    default: "Yuvoy — Don't be a tourist.",
     template: "%s · Yuvoy",
   },
   description:
-    "Don't be a tourist. Yuvoy designs immersive, participatory experiences in the Andaman Islands — so you belong to a place, briefly, rather than pass through it.",
+    "Yuvoy is building a marketplace for real local experiences — opening this season in the Andaman Islands, designed for the world. Register interest as a traveller or an experience provider.",
   applicationName: "Yuvoy",
   robots: IS_PRODUCTION ? undefined : { index: false, follow: false },
   openGraph: {
     type: "website",
     siteName: "Yuvoy",
-    title: "Yuvoy — Experience More.",
+    title: "Yuvoy — Don't be a tourist.",
     description:
-      "Immersive, participatory experiences in the Andaman Islands. Don't be a tourist.",
+      "Real local experiences, starting in the Andaman Islands this season. Register interest as a traveller or a provider.",
     url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Yuvoy — Experience More.",
-    description: "Immersive experiences in the Andaman Islands.",
+    title: "Yuvoy — Don't be a tourist.",
+    description:
+      "Real local experiences, starting in the Andaman Islands this season.",
   },
 };
 
@@ -39,7 +40,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="min-h-full">
         <a
           href="#content"
-          className="focus:bg-forest focus:text-cream sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-full focus:px-4 focus:py-2"
+          className="focus:bg-teal focus:text-cream sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-full focus:px-4 focus:py-2"
         >
           Skip to content
         </a>

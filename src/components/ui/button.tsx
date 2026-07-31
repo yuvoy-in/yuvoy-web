@@ -3,14 +3,15 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/cn";
 
 const button = cva(
-  "inline-flex items-center justify-center rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terra focus-visible:ring-offset-2 focus-visible:ring-offset-cream disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center rounded-full font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-terra-deep focus-visible:ring-offset-2 focus-visible:ring-offset-cream disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        primary: "bg-forest text-cream hover:bg-forest/90",
-        accent: "bg-terra text-cream hover:bg-terra-deep",
-        outline: "border border-forest/25 text-forest hover:bg-forest/5",
-        ghost: "text-forest hover:bg-forest/5",
+        primary: "bg-teal text-cream hover:bg-teal/90",
+        // terra-deep, not terra: cream text on terra is 3.3:1 and fails AA.
+        accent: "bg-terra-deep text-cream hover:bg-terra-deep/90",
+        outline: "border border-teal/25 text-teal hover:bg-teal/5",
+        ghost: "text-teal hover:bg-teal/5",
       },
       size: {
         sm: "h-9 px-4 text-sm",

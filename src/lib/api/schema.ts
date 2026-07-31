@@ -4,6 +4,28 @@
  */
 
 export interface paths {
+    "/leads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register pre-launch interest as a traveller or a provider
+         * @description Public, rate-limited pre-launch lead capture. The request is discriminated on `audience`. Geography is generic: `marketKey` names a launch market and destination keys name a destination within it, so future markets reuse this shape unchanged.
+         *
+         *     A returning contact (same audience + normalised WhatsApp) updates its current preferences and attribution and returns `200`; a new contact returns `201`. Notification jobs are written in the same transaction as the lead, so a saved lead is never lost to an unavailable alert target.
+         */
+        post: operations["createLead"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/waitlist": {
         parameters: {
             query?: never;
@@ -264,6 +286,100 @@ export interface components {
             /** @enum {string} */
             role: "seeker" | "provider" | "admin";
         };
+        /**
+         * @description Which side of the marketplace the contact is. `provider` matches the existing `User.role` and `Provider` vocabulary in this contract.
+         * @enum {string}
+         */
+        LeadAudience: "traveller" | "provider";
+        /**
+         * @description Launch market. Extensible; `andaman` is simply the first.
+         * @example andaman
+         */
+        MarketKey: string;
+        /**
+         * @description A destination within a market, as `<market>/<destination>`.
+         * @example andaman/havelock
+         */
+        DestinationKey: string;
+        /** @enum {string} */
+        InterestGroup: "diving_water" | "boats_islands" | "food_culture" | "other";
+        /**
+         * @description Where the visitor arrived from. Campaign routes set this.
+         * @default web
+         * @enum {string}
+         */
+        LeadSource: "ferry" | "kiosk" | "hotel" | "instagram" | "direct" | "web";
+        /** @description Campaign attribution. Never treated as identifying data. */
+        Utm: {
+            source?: string;
+            medium?: string;
+            campaign?: string;
+            content?: string;
+            term?: string;
+        };
+        /** @description Contact rule (enforced server-side): a traveller must supply at least one of `whatsapp` or `email`; a provider must supply `whatsapp` (the onboarding conversation happens there). Deduplication uses the normalised contact — WhatsApp number when present, else email. */
+        LeadInputBase: {
+            audience: components["schemas"]["LeadAudience"];
+            contactName: string;
+            /**
+             * @description Normalised to E.164 server-side.
+             * @example +919000000000
+             */
+            whatsapp?: string;
+            /** Format: email */
+            email?: string;
+            /**
+             * @description Must be true. Acknowledges the Privacy Policy and Terms.
+             * @constant
+             */
+            privacyAccepted: true;
+            /**
+             * @description Separate, optional, unchecked by default.
+             * @default false
+             */
+            marketingOptIn: boolean;
+            marketKey: components["schemas"]["MarketKey"];
+            source?: components["schemas"]["LeadSource"];
+            utm?: components["schemas"]["Utm"];
+            /** @description Honeypot. Left empty by real visitors; a non-empty value is handled server-side and never becomes an actionable lead. */
+            website?: string;
+        };
+        TravellerLeadInput: components["schemas"]["LeadInputBase"] & {
+            /** @constant */
+            audience?: "traveller";
+            primaryDestinationKey?: components["schemas"]["DestinationKey"];
+            interests?: components["schemas"]["InterestGroup"][];
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            audience: "traveller";
+        };
+        ProviderLeadInput: components["schemas"]["LeadInputBase"] & {
+            /** @constant */
+            audience?: "provider";
+            businessName: string;
+            coverageDestinationKeys: components["schemas"]["DestinationKey"][];
+            primaryInterest: components["schemas"]["InterestGroup"];
+        } & {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            audience: "provider";
+        };
+        LeadInput: components["schemas"]["TravellerLeadInput"] | components["schemas"]["ProviderLeadInput"];
+        /** @description Deliberately minimal. It confirms the lead was recorded and carries no queue position, priority, or follow-up guarantee. */
+        LeadAcceptance: {
+            /** Format: uuid */
+            id: string;
+            audience: components["schemas"]["LeadAudience"];
+            /** @enum {string} */
+            status: "recorded" | "updated";
+            /** Format: date-time */
+            createdAt: string;
+        };
     };
     responses: {
         /** @description Invalid input */
@@ -302,6 +418,15 @@ export interface components {
                 "application/json": components["schemas"]["Error"];
             };
         };
+        /** @description A dependency is unavailable; the request was not recorded */
+        ServiceUnavailable: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/json": components["schemas"]["Error"];
+            };
+        };
     };
     parameters: {
         Cursor: string;
@@ -313,6 +438,42 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    createLead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LeadInput"];
+            };
+        };
+        responses: {
+            /** @description Existing lead updated (same audience + WhatsApp) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadAcceptance"];
+                };
+            };
+            /** @description New lead recorded */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LeadAcceptance"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            429: components["responses"]["RateLimited"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
     joinWaitlist: {
         parameters: {
             query?: never;

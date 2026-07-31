@@ -14,7 +14,7 @@ export function Wordmark({
   return (
     <span
       className={cn(
-        "font-display text-forest text-base font-semibold",
+        "font-display text-teal text-base font-semibold",
         className,
       )}
     >
