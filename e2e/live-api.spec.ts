@@ -17,6 +17,16 @@ import { test, expect } from "@playwright/test";
  */
 const LIVE = process.env.LIVE_API_E2E === "1";
 
+/**
+ * A number no previous run has used. Uniqueness matters: these tests assert on
+ * the create-vs-deduplicate split, so a collision with an earlier run's row
+ * turns the first submit into a 200 and fails a passing build. Nine digits of
+ * the clock give a fresh number roughly every millisecond.
+ */
+function uniquePhone(): string {
+  return `+919${String(Date.now()).slice(-9)}`;
+}
+
 test.describe("live API", () => {
   test.skip(
     !LIVE,
@@ -37,7 +47,7 @@ test.describe("live API", () => {
     const panel = page.getByRole("tabpanel", { name: /travelling/i });
 
     // Unique per run so reruns exercise the create path, not the update path.
-    const phone = `+9190000000${String(Date.now()).slice(-2)}`;
+    const phone = uniquePhone();
 
     await panel.getByLabel("Name").fill("E2E Live Check");
     await panel.getByLabel("WhatsApp number").fill(phone);
@@ -59,15 +69,11 @@ test.describe("live API", () => {
   test("resubmitting the same contact is accepted as an update", async ({
     page,
   }) => {
-    const statuses: number[] = [];
-    page.on("response", (res) => {
-      if (res.url().includes("/v1/leads")) statuses.push(res.status());
-    });
-
     // Fresh number per run: the first submit must create, the second must
     // deduplicate. A fixed number would leave the row behind and make a rerun
     // report 200 twice.
-    const phone = `+9190000002${String(Date.now()).slice(-2)}`;
+    const phone = uniquePhone();
+    const statuses: number[] = [];
 
     for (const attempt of [1, 2]) {
       // A unique query forces a real navigation. Re-visiting "/#register"
@@ -79,18 +85,30 @@ test.describe("live API", () => {
       await panel.getByLabel("WhatsApp number").fill(phone);
       await panel.getByText("Diving & water").click();
       await panel.getByText(/I agree to the/).click();
-      await panel.getByRole("button", { name: "Register interest" }).click();
+
+      // Wait on the response itself rather than only the rendered state, so a
+      // throttled run is diagnosed instead of timing out on a success message
+      // that was never going to appear.
+      const [res] = await Promise.all([
+        page.waitForResponse((r) => r.url().includes("/v1/leads"), {
+          timeout: 20_000,
+        }),
+        panel.getByRole("button", { name: "Register interest" }).click(),
+      ]);
+      statuses.push(res.status());
+
+      test.skip(
+        res.status() === 429,
+        "API rate limit hit — rerun in a minute; this test needs two clean submissions",
+      );
+
       await expect(panel.getByRole("status")).toContainText(
         /registered|updated/i,
-        {
-          timeout: 20_000,
-        },
+        { timeout: 20_000 },
       );
     }
 
-    expect(statuses).toHaveLength(2);
-    expect(statuses[0]).toBe(201); // created
-    expect(statuses[1]).toBe(200); // deduplicated
+    expect(statuses).toEqual([201, 200]); // created, then deduplicated
   });
 
   test("a provider registration from a QR route carries its source", async ({
@@ -108,7 +126,7 @@ test.describe("live API", () => {
     await page.getByRole("tab", { name: /run experiences/i }).click();
     const panel = page.getByRole("tabpanel", { name: /run experiences/i });
 
-    const phone = `+9190000001${String(Date.now()).slice(-2)}`;
+    const phone = uniquePhone();
     await panel.getByLabel("Your name").fill("E2E Live Contact");
     await panel.getByLabel("Business name").fill("E2E Live Dive Co");
     await panel.getByLabel("WhatsApp number").fill(phone);
