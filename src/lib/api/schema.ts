@@ -317,14 +317,15 @@ export interface components {
             content?: string;
             term?: string;
         };
+        /** @description Contact rule (enforced server-side): a traveller must supply at least one of `whatsapp` or `email`; a provider must supply `whatsapp` (the onboarding conversation happens there). Deduplication uses the normalised contact — WhatsApp number when present, else email. */
         LeadInputBase: {
             audience: components["schemas"]["LeadAudience"];
             contactName: string;
             /**
-             * @description Normalised to E.164 server-side. Required.
+             * @description Normalised to E.164 server-side.
              * @example +919000000000
              */
-            whatsapp: string;
+            whatsapp?: string;
             /** Format: email */
             email?: string;
             /**
@@ -346,8 +347,8 @@ export interface components {
         TravellerLeadInput: components["schemas"]["LeadInputBase"] & {
             /** @constant */
             audience?: "traveller";
-            primaryDestinationKey: components["schemas"]["DestinationKey"];
-            interests: components["schemas"]["InterestGroup"][];
+            primaryDestinationKey?: components["schemas"]["DestinationKey"];
+            interests?: components["schemas"]["InterestGroup"][];
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript

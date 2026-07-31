@@ -525,13 +525,18 @@ components:
 
     LeadInputBase:
       type: object
-      required: [audience, contactName, whatsapp, privacyAccepted, marketKey]
+      required: [audience, contactName, privacyAccepted, marketKey]
+      description: >
+        Contact rule (enforced server-side): a traveller must supply at least
+        one of `whatsapp` or `email`; a provider must supply `whatsapp` (the
+        onboarding conversation happens there). Deduplication uses the
+        normalised contact — WhatsApp number when present, else email.
       properties:
         audience: { $ref: "#/components/schemas/LeadAudience" }
         contactName: { type: string, minLength: 1, maxLength: 120 }
         whatsapp:
           type: string
-          description: Normalised to E.164 server-side. Required.
+          description: Normalised to E.164 server-side.
           maxLength: 32
           example: "+919000000000"
         email: { type: string, format: email, maxLength: 254 }
@@ -557,14 +562,17 @@ components:
       allOf:
         - $ref: "#/components/schemas/LeadInputBase"
         - type: object
-          required: [primaryDestinationKey, interests]
+          description: >
+            Deliberately minimal — the public waitlist asks for a name and one
+            way to reach you, nothing more. Destination and interests are
+            optional attribution (campaign routes may set a destination
+            default); they are never required of the visitor.
           properties:
             audience: { const: traveller }
             primaryDestinationKey:
               { $ref: "#/components/schemas/DestinationKey" }
             interests:
               type: array
-              minItems: 1
               maxItems: 3
               uniqueItems: true
               items: { $ref: "#/components/schemas/InterestGroup" }
@@ -573,7 +581,8 @@ components:
       allOf:
         - $ref: "#/components/schemas/LeadInputBase"
         - type: object
-          required: [businessName, coverageDestinationKeys, primaryInterest]
+          required:
+            [whatsapp, businessName, coverageDestinationKeys, primaryInterest]
           properties:
             audience: { const: provider }
             businessName: { type: string, minLength: 1, maxLength: 160 }
