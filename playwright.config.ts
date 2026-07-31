@@ -31,6 +31,16 @@ export default defineConfig({
           url: "http://localhost:3000",
           reuseExistingServer: !process.env.CI,
           timeout: 120_000,
+          env: {
+            // The stubbed specs intercept "**/v1/leads". With no API base URL
+            // configured, submitLead() short-circuits to "unavailable" and
+            // never issues a request, so the stub never fires and the success
+            // assertions fail — which is exactly what happened in CI, where no
+            // NEXT_PUBLIC_* values exist. A placeholder origin keeps the suite
+            // self-contained and independent of any deployed environment.
+            NEXT_PUBLIC_API_BASE_URL:
+              process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://api.test",
+          },
         },
       }),
 });
