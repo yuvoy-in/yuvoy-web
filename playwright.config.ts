@@ -10,7 +10,19 @@ import { defineConfig, devices } from "@playwright/test";
  * instead, making a red environment look green.
  */
 const remoteBaseURL = process.env.PLAYWRIGHT_BASE_URL;
-const baseURL = remoteBaseURL || "http://localhost:3000";
+
+/**
+ * A dedicated port, deliberately not 3000.
+ *
+ * `reuseExistingServer` attaches to whatever is already listening — it does
+ * not check that the thing is *this* app. On a machine running more than one
+ * project, that means the suite can silently test somebody else's site: it
+ * happened, and the giveaway was an unrelated page title in a failure dump.
+ * A project-specific port makes the collision impossible rather than
+ * unlikely, and `pnpm dev` on 3000 stays free for actually looking at the app.
+ */
+const PORT = Number(process.env.PLAYWRIGHT_PORT ?? 3117);
+const baseURL = remoteBaseURL || `http://localhost:${PORT}`;
 
 export default defineConfig({
   testDir: "./e2e",
@@ -27,8 +39,8 @@ export default defineConfig({
     ? {}
     : {
         webServer: {
-          command: "pnpm dev",
-          url: "http://localhost:3000",
+          command: `pnpm dev -p ${PORT}`,
+          url: baseURL,
           reuseExistingServer: !process.env.CI,
           timeout: 120_000,
           env: {

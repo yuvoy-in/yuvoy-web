@@ -51,9 +51,11 @@ test.describe("analytics consent", () => {
 
     await page.goto("/");
     await page.waitForLoadState("networkidle");
-    // Interact, in case an event would fire on engagement.
-    await page.getByRole("heading", { level: 1 }).click();
+    // Interact, in case an event would fire on engagement. Scrolling and a
+    // real click on the page body — not on a heading, which is large, sticky-
+    // header-adjacent and not meant to be a click target.
     await page.mouse.wheel(0, 2000);
+    await page.mouse.click(10, 400);
     await page.waitForTimeout(1200);
 
     expect(
@@ -134,16 +136,29 @@ test("the privacy page describes exactly what runs", async ({ page }) => {
   await page.goto("/privacy");
   const body = (await page.textContent("body")) ?? "";
 
-  // Both systems disclosed by name, with their actual behaviour.
-  expect(body).toMatch(/PostHog/);
+  /*
+    The page must describe what is running *now*, which is: no product
+    analytics at all. Naming a vendor that is dormant would overstate it, in
+    the same way that promising a feature would. When a key is configured this
+    assertion flips to requiring the vendor be named — see the analytics issue.
+  */
+  expect(body).toMatch(/No product analytics are running on this site/i);
+  expect(body).toMatch(/there is no cookie banner/i);
+
+  // Speed Insights does run, so it is disclosed, with its actual scope.
   expect(body).toMatch(/Speed Insights/);
+  expect(body).toMatch(/performance timings only/i);
+
+  // The commitment made about any future analytics.
   expect(body).toMatch(/hosted in the EU/i);
   expect(body).toMatch(
-    /no name, email, phone number or registration reference/i,
+    /no name, email, phone number or reference to your registration/i,
   );
-  expect(body).toMatch(/Privacy choices/);
 
-  // And nothing that is not running.
+  // Nothing we do not actually use.
   expect(body).not.toMatch(/Google Analytics/i);
-  expect(body).not.toMatch(/advertis/i);
+  // ...and the disclaimer itself must stay: "advertising" appearing here is
+  // the policy promising *not* to do it, which is the point.
+  expect(body).toMatch(/We do not sell your details/i);
+  expect(body).toMatch(/or use them for advertising/i);
 });
