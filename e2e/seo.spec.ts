@@ -11,6 +11,7 @@ const INDEXABLE = [
   "/how-it-works",
   "/travellers",
   "/operators",
+  "/safety",
   "/experiences",
   "/destinations",
   "/destinations/havelock",

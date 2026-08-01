@@ -27,6 +27,7 @@ const CONTENT_ROUTES = [
     title: /For travellers/,
   },
   { path: "/operators", h1: /show it properly/i, title: /For operators/ },
+  { path: "/safety", h1: /the sea deserves respect/i, title: /Safety/ },
 ];
 
 for (const route of CONTENT_ROUTES) {
