@@ -17,6 +17,9 @@ const INDEXABLE = [
   "/destinations/havelock",
   "/destinations/neil-island",
   "/destinations/port-blair",
+  "/about",
+  "/journal",
+  "/journal/why-the-andamans",
 ];
 
 /** Collect every `@type` present in a page's JSON-LD, at any nesting depth. */
@@ -167,13 +170,7 @@ test.describe("sitemap and robots", () => {
     request,
   }) => {
     const xml = await (await request.get("/sitemap.xml")).text();
-    for (const excluded of [
-      "/go/",
-      "/journal",
-      "/philosophy",
-      "/privacy",
-      "/terms",
-    ]) {
+    for (const excluded of ["/go/", "/philosophy", "/privacy", "/terms"]) {
       expect(xml, `sitemap must not list ${excluded}`).not.toContain(
         `${excluded}<`,
       );

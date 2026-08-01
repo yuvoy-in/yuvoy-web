@@ -38,6 +38,7 @@ export const SITE_ROUTES: SiteRoute[] = [
     inHeader: true,
     footer: "discover",
   },
+  { href: "/journal", label: "Journal", footer: "discover" },
   // Yuvoy column.
   {
     href: "/how-it-works",
@@ -57,6 +58,7 @@ export const SITE_ROUTES: SiteRoute[] = [
     inHeader: true,
     footer: "yuvoy",
   },
+  { href: "/about", label: "About", footer: "yuvoy" },
   { href: "/waitlist", label: "Join the waitlist", footer: "yuvoy" },
   // Trust column.
   { href: "/safety", label: "Safety", footer: "trust" },
