@@ -1,58 +1,60 @@
+import { Section, SectionHeading } from "@/components/ui/section";
+
 /**
- * FAQ + responsible safety context. Native <details> — accessible, zero JS,
- * works without hydration.
+ * FAQ. Native `<details>` — accessible, zero JS, works without hydration.
+ *
+ * The answers are the honest ones, including the uncomfortable one ("Can I
+ * book something today?" — no). Copy is aligned to the waitlist language the
+ * rest of the site now uses.
  */
 export function Faq() {
   return (
-    <section
-      id="faq"
-      className="mx-auto max-w-3xl scroll-mt-10 px-6 py-20 sm:px-10"
-      aria-labelledby="faq-heading"
-    >
-      <p className="label text-terra-deep">Questions</p>
-      <h2
+    <Section id="faq" aria-labelledby="faq-heading">
+      <SectionHeading
         id="faq-heading"
-        className="font-display text-teal mt-3 text-3xl sm:text-4xl"
-      >
-        The honest answers.
-      </h2>
+        eyebrow="Questions"
+        title="Asked and"
+        accent="answered."
+      />
 
-      <div className="border-cream-line mt-10 divide-y rounded-3xl border">
+      <div className="border-cream-line mt-14 border-t">
         {FAQS.map((faq) => (
-          <details key={faq.q} className="group px-6 py-5 sm:px-8">
-            <summary className="font-display text-teal flex cursor-pointer list-none items-center justify-between gap-4 text-lg marker:content-none">
+          <details key={faq.q} className="group border-cream-line border-b">
+            <summary className="font-display text-teal flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-lg font-bold tracking-tight marker:content-none">
               {faq.q}
               <span
                 aria-hidden
-                className="text-terra-deep text-xl transition-transform group-open:rotate-45"
+                className="text-terra-deep shrink-0 text-2xl leading-none transition-transform duration-200 group-open:rotate-45"
               >
                 +
               </span>
             </summary>
-            <p className="text-teal/70 mt-3 text-sm leading-relaxed">{faq.a}</p>
+            <p className="text-teal/75 max-w-3xl pb-6 leading-relaxed">
+              {faq.a}
+            </p>
           </details>
         ))}
       </div>
-    </section>
+    </Section>
   );
 }
 
 const FAQS = [
   {
-    q: "What is Yuvoy?",
-    a: "A marketplace for real local experiences, being built right now. We connect travellers with the people who actually live a place — starting with water, boats, food and culture in the Andaman Islands, and designed from day one to grow to destinations around the world.",
+    q: "What exactly is Yuvoy?",
+    a: "A marketplace for real local experiences, being built right now. We connect travellers with the people who actually live a place — starting with water, boats, food and culture in the Andaman Islands, and designed from day one to grow to destinations elsewhere.",
   },
   {
-    q: "Why start in the Andamans?",
+    q: "Why the Andaman Islands first?",
     a: "Because the islands hold exactly what we're building for: extraordinary experiences run by locals that most visitors never find. Havelock, Neil and Port Blair are our first destinations — the first market, not the boundary.",
   },
   {
     q: "Can I book something today?",
-    a: "Not yet — and we won't pretend otherwise. Registering tells us where you're headed and what draws you; we'll be in touch as experiences open this season. There's no queue position and no payment is taken.",
+    a: "No — and we won't pretend otherwise. Joining the waitlist tells us where you're headed and what draws you; we'll message you as experiences open. There's no queue position and no payment is taken.",
   },
   {
-    q: "What happens after I register?",
-    a: "Your details go to a real person on the Yuvoy team. Travellers hear from us as the season takes shape; providers get a conversation about what they offer. We aim to follow up quickly, and your registration is never sold or shared.",
+    q: "What happens after I join the waitlist?",
+    a: "Your details go to a real person on the Yuvoy team. Travellers hear from us as the season takes shape; operators get a conversation about what they offer. Your details are never sold or shared.",
   },
   {
     q: "A word on water activities",

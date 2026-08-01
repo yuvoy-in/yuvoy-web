@@ -1,83 +1,92 @@
-import { Wordmark } from "@/components/brand/wordmark";
-import { buttonVariants } from "@/components/ui/button";
+import Link from "next/link";
+import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
+import { LAUNCH_MARKET } from "@/lib/leads/registry";
 
 /**
- * Type-led hero — no photography by design. The palette and Fraunces carry
- * the register until rights-cleared media exists; nothing is simulated.
+ * The homepage hero.
+ *
+ * Type-led by necessity and by design — there is no rights-cleared photography
+ * or video yet, and the project's rules forbid standing in stock imagery or
+ * simulated product screens. The palette, Poppins' mass and the terracotta
+ * turn carry the register instead. Nothing here is simulated.
+ *
+ * Copy is the owner-approved canon from issue #27 and is quoted verbatim.
  */
 export function Hero() {
   return (
-    <section className="relative flex min-h-dvh flex-col overflow-hidden">
+    <section className="relative overflow-hidden">
       {/* Ambient warmth — a soft terracotta dawn over the cream canvas. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <div className="from-terra/15 via-terra/5 absolute top-0 left-1/2 h-[65vh] w-[130vw] -translate-x-1/2 rounded-b-[100%] bg-linear-to-b to-transparent blur-3xl" />
+        <div className="from-terra/18 via-terra/5 absolute -top-40 left-1/2 h-[70vh] w-[140vw] -translate-x-1/2 rounded-b-[100%] bg-linear-to-b to-transparent blur-3xl" />
       </div>
 
-      <header className="flex items-center justify-between px-6 py-6 sm:px-10">
-        <Wordmark />
-        <nav aria-label="Primary" className="flex items-center gap-6 sm:gap-8">
-          <a
-            href="#register"
-            className="label text-teal/55 hover:text-teal hidden transition-colors sm:block"
-          >
-            Travellers
-          </a>
-          <a
-            href="#providers"
-            className="label text-teal/55 hover:text-teal hidden transition-colors sm:block"
-          >
-            Providers
-          </a>
-          <a
-            href="#faq"
-            className="label text-teal/55 hover:text-teal transition-colors"
-          >
-            FAQ
-          </a>
-        </nav>
-      </header>
-
-      <div className="flex flex-1 flex-col items-center justify-center px-6 pb-16 text-center">
+      <div className="container-page flex min-h-[calc(100dvh-4rem)] flex-col justify-center py-20 sm:py-24">
         <p
-          className="rise label text-terra-deep"
+          className="eyebrow rise text-terra-deep"
           style={{ animationDelay: "0.05s" }}
         >
-          Starting in the Andamans · Building for the world
+          Opening first in the Andaman Islands
         </p>
+
+        {/*
+          Each sentence gets its own line. Left to wrap naturally the accent
+          orphaned "Feel" at the end of line one on desktop, which broke the
+          phrase in the wrong place — the terracotta turn has to land on a
+          whole thought.
+        */}
         <h1
-          className="rise font-display text-teal mt-6 max-w-4xl text-[clamp(2.5rem,11vw,4.5rem)] leading-[1.03] tracking-tight text-balance"
+          className="font-display rise mt-8 max-w-5xl text-[clamp(2.25rem,6.5vw,4.5rem)] leading-[1.03] font-extrabold tracking-tight"
           style={{ animationDelay: "0.15s" }}
         >
-          Don&rsquo;t be a <em className="text-terra">tourist</em>.
+          <span className="block">See the experience.</span>
+          <span className="text-terra block italic">
+            Feel if it&rsquo;s right.
+          </span>
+          <span className="block">Then book.</span>
         </h1>
-        <p
-          className="rise text-teal/70 mt-7 max-w-xl text-lg leading-relaxed sm:text-xl"
-          style={{ animationDelay: "0.3s" }}
-        >
-          Yuvoy is building a new way to find real local experiences — on the
-          water, across the islands and after dark. Opening this season in
-          Havelock, Neil and Port Blair.
-        </p>
+
+        <div className="mt-12 flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
+          <p
+            className="rise text-teal/75 max-w-xl text-lg leading-relaxed"
+            style={{ animationDelay: "0.3s" }}
+          >
+            Yuvoy brings local dives, boat days, food and culture to life
+            through honest video from the people who run them. Join the waitlist
+            for first access in Havelock, Neil and Port Blair.
+          </p>
+
+          <div
+            className="rise flex w-full flex-col gap-3 sm:w-auto sm:flex-row lg:shrink-0"
+            style={{ animationDelay: "0.45s" }}
+          >
+            <Link
+              href="/waitlist"
+              className={cn(buttonVariants({ size: "lg" }), "w-full sm:w-auto")}
+            >
+              Join the traveller waitlist
+              <ButtonArrow />
+            </Link>
+            <Link
+              href="/waitlist?audience=provider"
+              className={cn(
+                buttonVariants({ variant: "outline", size: "lg" }),
+                "w-full sm:w-auto",
+              )}
+            >
+              Apply as a founding operator
+            </Link>
+          </div>
+        </div>
+
+        {/* The three launch destinations, named once, close to the promise. */}
         <div
-          className="rise mt-10 flex w-full max-w-xs flex-col items-center gap-3 sm:w-auto sm:max-w-none sm:flex-row"
-          style={{ animationDelay: "0.45s" }}
+          className="rise border-cream-line mt-16 border-t pt-6"
+          style={{ animationDelay: "0.6s" }}
         >
-          <a
-            href="#register"
-            className={cn(buttonVariants({ size: "lg" }), "w-full sm:w-auto")}
-          >
-            Register interest
-          </a>
-          <a
-            href="#providers"
-            className={cn(
-              buttonVariants({ variant: "outline", size: "lg" }),
-              "w-full sm:w-auto",
-            )}
-          >
-            Onboard as a provider
-          </a>
+          <p className="label text-teal/75">
+            {LAUNCH_MARKET.destinations.map((d) => d.label).join(" · ")}
+          </p>
         </div>
       </div>
     </section>

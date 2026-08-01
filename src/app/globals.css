@@ -1,34 +1,44 @@
 @import "tailwindcss";
 
 /*
-  Yuvoy design tokens — the single source of truth for color & type.
-  No hex, font, or spacing value may exist outside this @theme block.
+  Yuvoy design tokens — the single source of truth for color, type and rhythm.
+  No hex, font, or tracking value may exist outside this @theme block.
 
-  Palette: Brand Kit v1 (ratified 2026-07-31) — Deep Teal, Terracotta, Cream,
-  Ink. Contrast-checked against WCAG 2.2 AA; see docs/DESIGN_SYSTEM.md §1 for
-  the measured ratios and the terra/terra-deep usage rule.
+  Palette: Brand Kit v2 (ratified 2026-08-01) — Deep Teal, Terracotta, Cream,
+  Ink. Every pairing below is measured against WCAG 2.2 AA; the ratios and the
+  terra / terra-deep / terra-soft usage rule live in docs/DESIGN_SYSTEM.md §1.
+  Read that rule before using an accent on text — `terra` is NOT body-safe.
 */
 @theme {
-  /* Canonical brand palette — Brand Kit v1 */
-  --color-cream: #f5f2ec; /* canvas — editorial/light surfaces */
-  --color-cream-deep: #ede8de; /* raised surface on cream */
-  --color-cream-line: #dbd2bf; /* hairline borders on cream */
-  --color-teal: #0f4c5c; /* primary ink — wordmark, headings, buttons (8.5:1 on cream) */
-  --color-terra: #c96a3d; /* accent — enso dot, large display accents ONLY (3.3:1) */
-  --color-terra-deep: #8f4522; /* text-capable accent — labels, errors, accent buttons (6.2:1) */
-  --color-terra-soft: #d98c63; /* accent for labels on ink surfaces (6.0:1 on ink) */
-  --color-ink: #1c2321; /* immersive scenes — night, depth (14.3:1 vs cream) */
+  /* ---------------------------------------------------------------- color */
+  --color-cream: #f4efe4; /* canvas — editorial surfaces */
+  --color-cream-deep: #ece5d6; /* raised surface on cream — cards, inputs */
+  --color-cream-line: #e5dcc9; /* hairline borders on cream */
+  --color-teal: #0d3b3e; /* primary ink; dark sections (10.70:1 on cream) */
+  --color-ink: #22302e; /* deepest sections — night, depth (11.97:1) */
+  --color-terra: #be7149; /* accent — decoration + LARGE display text (3.24:1) */
+  --color-terra-deep: #985028; /* text-capable accent + CTA fill (5.21:1) */
+  --color-terra-soft: #d89772; /* accent text on dark (5.02:1 teal / 5.61:1 ink) */
 
-  /* Type — Fraunces (display, italic headlines) + Inter (UI/body) */
-  --font-display: var(--font-fraunces);
-  --font-sans: var(--font-inter);
+  /* ----------------------------------------------------------------- type */
+  --font-display: var(--font-poppins); /* headlines — heavy, geometric */
+  --font-sans: var(--font-inter); /* body + UI */
+  --font-mono: var(--font-plex-mono); /* eyebrows, nav, stats, metadata */
 
-  /* Motion */
-  --ease-cinematic: cubic-bezier(0.22, 1, 0.36, 0.16);
+  /* --------------------------------------------------------------- layout */
+  --container-page: 70rem; /* the page measure — `max-w-page` */
 
-  /* Editorial rhythm */
-  --tracking-wordmark: 0.38em;
-  --tracking-label: 0.22em;
+  /* Editorial near-square. The brand is rectangular: buttons, inputs, cards
+     and panels all share this single radius. Pills are not part of the system. */
+  --radius-edge: 2px;
+
+  /* --------------------------------------------------------------- motion */
+  --ease-cinematic: cubic-bezier(0.22, 1, 0.36, 0.16); /* entrances */
+  --ease-interaction: cubic-bezier(0.32, 0.72, 0, 1); /* interaction feedback */
+
+  /* ------------------------------------------------------------- tracking */
+  --tracking-wordmark: 0.34em;
+  --tracking-label: 0.18em;
 }
 
 @layer base {
@@ -44,7 +54,7 @@
   }
 
   ::selection {
-    @apply bg-terra text-cream;
+    @apply bg-terra-deep text-cream;
   }
 
   /* Visible keyboard focus for links (buttons carry their own ring). */
@@ -54,7 +64,22 @@
     border-radius: 4px;
   }
 
-  /* Respect users who prefer less motion — kill entrance animations. */
+  /*
+    The mobile menu is a native <dialog> opened with showModal(), so it lives
+    in the top layer — it can never be clipped by an ancestor's overflow or
+    stacking context, which is the failure mode a portal was previously needed
+    to work around.
+  */
+  dialog[data-menu]::backdrop {
+    background-color: color-mix(in srgb, var(--color-ink) 72%, transparent);
+    backdrop-filter: blur(3px);
+  }
+
+  /*
+    Respect users who prefer less motion. This neutralises every animation and
+    transition globally, which is why individual components never need their
+    own reduced-motion branch.
+  */
   @media (prefers-reduced-motion: reduce) {
     *,
     ::before,
@@ -67,14 +92,68 @@
   }
 }
 
+/* ------------------------------------------------------------- typography */
+
+/**
+ * Wide-tracked uppercase mono label — the brand's editorial voice.
+ * On cream use `text-terra-deep` or `text-teal/75`; on dark use
+ * `text-terra-soft` or `text-cream/70`. Never `text-terra` (fails AA at this
+ * size), and never below `text-teal/70` on cream.
+ */
 @utility label {
-  /* Wide-tracked uppercase label — the brand's editorial voice.
-     On cream use text-terra-deep; on ink use text-terra-soft (AA). */
-  @apply text-xs font-medium uppercase;
+  @apply font-mono text-xs font-medium uppercase;
   letter-spacing: var(--tracking-label);
 }
 
-/* Cinematic entrance — CSS-only so the hero ships zero client JS. */
+/**
+ * A section eyebrow — the label preceded by a short terracotta rule.
+ * This is the brand's section-opening gesture; use it once per section.
+ */
+@utility eyebrow {
+  @apply inline-flex items-center gap-3 font-mono text-xs font-medium uppercase;
+  letter-spacing: var(--tracking-label);
+
+  &::before {
+    content: "";
+    flex: none;
+    width: 1.75rem;
+    height: 1px;
+    background-color: var(--color-terra);
+  }
+}
+
+/**
+ * Guarantees a pointer target of at least 24px (WCAG 2.2 SC 2.5.8), which
+ * small text links do not reach on their own — a 16px `label` link is a 16px
+ * tap target. Set to 28px for comfort rather than the bare minimum.
+ *
+ * Not needed for links inside a sentence: SC 2.5.8 exempts inline targets
+ * whose size is constrained by the surrounding text's line-height.
+ */
+@utility tap-target {
+  @apply inline-flex items-center;
+  min-height: 1.75rem;
+}
+
+/* ----------------------------------------------------------------- layout */
+
+/** The standard page measure and gutters. Every section uses this. */
+@utility container-page {
+  @apply mx-auto w-full px-6 sm:px-10;
+  max-width: var(--container-page);
+}
+
+/**
+ * The editorial grid: 4 columns on mobile, 8 on tablet, 12 on desktop.
+ * Place children with `col-span-*` at each breakpoint.
+ */
+@utility grid-page {
+  @apply grid grid-cols-4 gap-x-6 sm:grid-cols-8 sm:gap-x-8 lg:grid-cols-12;
+}
+
+/* ----------------------------------------------------------------- motion */
+
+/* Cinematic entrance — CSS-only so above-the-fold content ships zero JS. */
 @keyframes yuvoy-rise {
   from {
     opacity: 0;
@@ -87,5 +166,21 @@
 }
 
 @utility rise {
-  animation: yuvoy-rise 1s var(--ease-cinematic) both;
+  animation: yuvoy-rise 700ms var(--ease-cinematic) both;
+}
+
+/* Mobile menu panel — interaction feedback, so it stays inside the 250ms budget. */
+@keyframes yuvoy-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility menu-in {
+  animation: yuvoy-menu-in 220ms var(--ease-interaction) both;
 }
