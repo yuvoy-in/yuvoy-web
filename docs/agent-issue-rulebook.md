@@ -1,7 +1,6 @@
 # Issue Rulebook — agent-raised issues and PRs
 
-> **Status: proposed, awaiting ratification on [#24](https://github.com/yuvoy-in/yuvoy-web/issues/24).**
-> Written by a Claude Code session because #24 asked for rules and none existed. It is a draft to react to, not a decision already taken — change anything, and it becomes law once you say so on the issue.
+> **Status: ratified 2026-08-02 by @VishwanthBarma on [#24](https://github.com/yuvoy-in/yuvoy-web/issues/24).** This is law. Change it by saying so on an issue, not by drifting from it.
 
 Rules for issues and pull requests opened by an agent (Claude Code sessions) in `yuvoy-web` and `yuvoy-api`. Companion to [backend-team-issue-rulebook.md](backend-team-issue-rulebook.md), which governs FE ↔ BE coordination and is unchanged by this.
 
@@ -92,7 +91,19 @@ State **the exact command and its result**:
 
 - **Agents do not assign issues to people.** Leave unassigned for the owner to triage — an agent cannot know who has capacity.
 - **Exception:** a cross-repo ask goes to that repo's owner, because there is only one candidate.
-- **Agents do not add reviewers** and do not merge a PR unless explicitly told to in the session.
+- **Agents do not add reviewers.**
+
+### Merging — ratified
+
+| Target                   | Rule                                                                           |
+| ------------------------ | ------------------------------------------------------------------------------ |
+| `dev` (staging)          | **Merge once CI is green.** No wait, no ask.                                   |
+| Any red or pending check | **Never merge.** Not "probably fine", not "unrelated failure" — check the run. |
+| `main` (production)      | **Never without the owner saying so**, in that session, for that release.      |
+
+This exists because a PR was merged into `dev` with a red `e2e` check, which
+then needed a follow-up fix. Two real defects were in that check. Confirm green
+_before_ merging, not after.
 
 ---
 
@@ -125,9 +136,11 @@ This project removed a site that published invented prices, invented review coun
 
 ---
 
-## Open questions for ratification
+## Ratification record
 
-1. **`agent` label** — do you want it, or is the author enough to filter on?
-2. **Draft PRs for business-gated work** — right mechanism, or would you rather have a normal PR with `blocked:business`?
-3. **Merging** — §7 says agents never merge unless told. Confirm, or set a standing rule (e.g. "green CI + `scope:fe` → merge to `dev` freely").
-4. **Length cap** — §4 gives none for handovers. Want a hard one?
+Settled on #24, 2026-08-02:
+
+1. **`agent` label** — adopted. The label exists and goes on every agent-raised issue and PR.
+2. **Draft PRs for business-gated work** — kept. It worked: `/safety` sat as a draft until sign-off, while the three pages beside it shipped.
+3. **Merging** — see §7. Green CI → merge to `dev`; production always the owner's call.
+4. **Length cap** — none. The TL;DR carries the weight instead, and must stand alone (§2).

@@ -8,6 +8,7 @@ const SHELL_ROUTES = [
   "/how-it-works",
   "/travellers",
   "/operators",
+  "/safety",
   "/experiences",
   "/destinations",
   "/destinations/havelock",

@@ -1,6 +1,10 @@
 name: Staging deployment
 
 on:
+  # Manual redeploy. NEXT_PUBLIC_* values are inlined at build time, so
+  # changing one in Vercel does nothing until a rebuild — which previously
+  # meant pushing a commit for a config-only change.
+  workflow_dispatch:
   push:
     branches: [dev]
 
