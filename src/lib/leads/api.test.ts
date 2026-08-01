@@ -97,3 +97,60 @@ describe("submitLead", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 });
+
+/*
+  Base-URL normalisation.
+
+  A schemeless value is not a hypothetical: `NEXT_PUBLIC_API_BASE_URL` was set
+  to `api.yuvoy.in` in production, which made fetch() resolve it as a relative
+  path — every submission posted to https://<site>/api.yuvoy.in/v1/leads and
+  404'd, presenting to visitors as an API outage.
+*/
+describe("submitLead base URL handling", () => {
+  beforeEach(() => {
+    vi.stubGlobal("fetch", vi.fn());
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
+  });
+
+  async function urlFor(configured: string): Promise<string> {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", configured);
+    vi.mocked(fetch).mockResolvedValue(
+      jsonResponse(201, {
+        id: "x",
+        audience: "traveller",
+        status: "recorded",
+        createdAt: "2026-07-31T00:00:00Z",
+      }),
+    );
+    await submitLead(INPUT);
+    // The latest call — this helper is used more than once per test.
+    return vi.mocked(fetch).mock.calls.at(-1)![0] as string;
+  }
+
+  it("adds a missing scheme rather than posting to a relative path", async () => {
+    expect(await urlFor("api.yuvoy.in")).toBe("https://api.yuvoy.in/v1/leads");
+  });
+
+  it("leaves an explicit scheme alone", async () => {
+    expect(await urlFor("https://api.yuvoy.in")).toBe(
+      "https://api.yuvoy.in/v1/leads",
+    );
+    expect(await urlFor("http://api.test")).toBe("http://api.test/v1/leads");
+  });
+
+  it("strips trailing slashes so the path never doubles up", async () => {
+    expect(await urlFor("https://api.yuvoy.in//")).toBe(
+      "https://api.yuvoy.in/v1/leads",
+    );
+  });
+
+  it("still reports unavailable when nothing is configured", async () => {
+    vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "   ");
+    const result = await submitLead(INPUT);
+    expect(result.kind).toBe("unavailable");
+    expect(fetch).not.toHaveBeenCalled();
+  });
+});
