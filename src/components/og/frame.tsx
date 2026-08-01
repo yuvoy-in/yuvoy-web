@@ -4,9 +4,19 @@ export const OG_SIZE = { width: 1200, height: 630 };
 export const OG_CONTENT_TYPE = "image/png";
 
 /**
- * Brand-styled Open Graph card (1200×630). Uses inline styles only — satori
- * (behind next/og) supports a flexbox subset, not Tailwind. Default font.
+ * Brand-styled Open Graph card (1200×630).
+ *
+ * Inline styles only: satori (behind next/og) supports a flexbox subset, not
+ * Tailwind, and cannot resolve CSS custom properties. **This is the one place
+ * in the codebase allowed to carry raw hex** — the values below are Brand Kit
+ * v2 verbatim and must be updated with the tokens in globals.css.
  */
+const OG = {
+  cream: "#F4EFE4",
+  teal: "#0D3B3E",
+  terraDeep: "#985028",
+  muted: "rgba(13,59,62,0.65)",
+} as const;
 export function renderOg({
   eyebrow,
   title,
@@ -24,7 +34,7 @@ export function renderOg({
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        background: "#F5F2EC",
+        background: OG.cream,
         padding: "72px 80px",
         fontFamily: "sans-serif",
       }}
@@ -35,7 +45,7 @@ export function renderOg({
           fontSize: 26,
           letterSpacing: "0.22em",
           textTransform: "uppercase",
-          color: "#8F4522",
+          color: OG.terraDeep,
         }}
       >
         {eyebrow}
@@ -43,9 +53,9 @@ export function renderOg({
       <div
         style={{
           display: "flex",
-          fontSize: 92,
+          fontSize: 68,
           lineHeight: 1.04,
-          color: "#0F4C5C",
+          color: OG.teal,
           maxWidth: 980,
         }}
       >
@@ -64,17 +74,17 @@ export function renderOg({
             fontSize: 34,
             fontWeight: 600,
             letterSpacing: "0.34em",
-            color: "#0F4C5C",
+            color: OG.teal,
           }}
         >
           <span style={{ display: "flex" }}>YUVOY</span>
-          <span style={{ display: "flex", color: "#8F4522" }}>.</span>
+          <span style={{ display: "flex", color: OG.terraDeep }}>.</span>
         </div>
         <div
           style={{
             display: "flex",
             fontSize: 26,
-            color: "rgba(31,58,53,0.55)",
+            color: OG.muted,
           }}
         >
           {footer}

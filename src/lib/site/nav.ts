@@ -25,7 +25,9 @@ export interface SiteRoute {
  * shown in the header and within each footer column.
  */
 export const SITE_ROUTES: SiteRoute[] = [
-  // Trust column — the only content routes that exist today besides `/`.
+  // Yuvoy column.
+  { href: "/waitlist", label: "Join the waitlist", footer: "yuvoy" },
+  // Trust column.
   { href: "/privacy", label: "Privacy", footer: "trust" },
   { href: "/terms", label: "Terms", footer: "trust" },
 ];
@@ -65,13 +67,26 @@ export const FOOTER_COLUMNS: {
 
 /**
  * The canonical short-form call to action, repeated in the header, the mobile
- * menu and the footer. Points at the homepage registration section until the
- * dedicated `/waitlist` page ships (rebuild WEB-B), which retargets it here.
+ * menu and the footer. The long forms ("Join the traveller waitlist", "Apply
+ * as a founding operator") are used where there is room to be specific.
  */
 export const PRIMARY_CTA = {
-  href: "/#register",
+  href: "/waitlist",
   label: "Join waitlist",
 } as const;
+
+/**
+ * Routes that already end in the registration form.
+ *
+ * The footer repeats the call to action on every page, which is right almost
+ * everywhere — but stacking it directly beneath the form itself reads as a
+ * page that does not know what it just asked for. These routes suppress it.
+ */
+export function endsWithLeadForm(pathname: string): boolean {
+  return (
+    pathname === "/" || pathname === "/waitlist" || pathname.startsWith("/go/")
+  );
+}
 
 /**
  * Contact and social channels for the footer.
