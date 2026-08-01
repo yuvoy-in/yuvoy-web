@@ -8,6 +8,8 @@ import { SafetyTeaser } from "@/components/landing/safety-teaser";
 import { OperatorInvitation } from "@/components/landing/operator-invitation";
 import { Faq } from "@/components/landing/faq";
 import { LeadForms, type LeadContext } from "@/components/landing/lead-forms";
+import { LandingView } from "@/components/analytics/landing-view";
+import { LAUNCH_MARKET } from "@/lib/leads/registry";
 
 /**
  * The homepage, composed. `/` renders it with organic defaults; the
@@ -33,6 +35,12 @@ import { LeadForms, type LeadContext } from "@/components/landing/lead-forms";
 export function Landing({ context }: { context: LeadContext }) {
   return (
     <main>
+      <LandingView
+        routeType={context.source === "web" ? "home" : "campaign"}
+        source={context.source}
+        marketKey={LAUNCH_MARKET.key}
+        destinationKey={context.destinationKey}
+      />
       <Hero />
       <TrustStrip />
       <WatchFeelBook />

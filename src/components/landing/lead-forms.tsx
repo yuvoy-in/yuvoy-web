@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/cn";
 import { submitLead, type SubmitResult } from "@/lib/leads/api";
+import { useAnalytics } from "@/components/analytics/analytics-provider";
+import { useLeadAnalytics } from "@/lib/analytics/use-lead-analytics";
+import { audienceSelected } from "@/lib/analytics/events";
 import {
   DEFAULT_DESTINATION,
   INTERESTS,
@@ -114,6 +117,27 @@ export function LeadForms({
 }) {
   const [audience, setAudience] = React.useState<LeadAudience>(initialAudience);
   const Heading = headingLevel === 1 ? "h1" : "h2";
+  const { capture } = useAnalytics();
+
+  // audience_selected has three trigger points and one shape. The query-param
+  // preselect fires once on mount; the tab fires on an actual change, so a
+  // page opened at ?audience=provider does not double-fire.
+  const reportedPreselect = React.useRef(false);
+  React.useEffect(() => {
+    if (reportedPreselect.current) return;
+    reportedPreselect.current = true;
+    if (initialAudience !== "traveller") {
+      capture(
+        audienceSelected({ audience: initialAudience, trigger: "query_param" }),
+      );
+    }
+  }, [capture, initialAudience]);
+
+  function selectAudience(next: LeadAudience, trigger: "tab" | "cta") {
+    if (next === audience) return;
+    setAudience(next);
+    capture(audienceSelected({ audience: next, trigger }));
+  }
 
   // #providers deep-links straight onto the provider tab. Those anchors are
   // kept working indefinitely: /waitlist used to be a permanent (308) redirect
@@ -121,12 +145,18 @@ export function LeadForms({
   // before the real page shipped still lands somewhere coherent.
   React.useEffect(() => {
     function syncFromHash() {
-      if (window.location.hash === "#providers") setAudience("provider");
+      if (window.location.hash === "#providers")
+        setAudience((current) => {
+          if (current !== "provider") {
+            capture(audienceSelected({ audience: "provider", trigger: "cta" }));
+          }
+          return "provider";
+        });
     }
     syncFromHash();
     window.addEventListener("hashchange", syncFromHash);
     return () => window.removeEventListener("hashchange", syncFromHash);
-  }, []);
+  }, [capture]);
 
   return (
     <section
@@ -170,7 +200,7 @@ export function LeadForms({
                 id={`tab-${value}`}
                 aria-selected={audience === value}
                 aria-controls={`panel-${value}`}
-                onClick={() => setAudience(value)}
+                onClick={() => selectAudience(value, "tab")}
                 className={cn(
                   "focus-visible:ring-terra-soft rounded-edge flex-1 px-4 py-2.5 text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none",
                   audience === value
@@ -368,6 +398,7 @@ function Honeypot({ register }: { register: object }) {
 
 function TravellerForm({ context }: { context: LeadContext }) {
   const [result, setResult] = React.useState<SubmitResult | null>(null);
+  const track = useLeadAnalytics("traveller", context.source);
 
   const {
     register,
@@ -403,6 +434,15 @@ function TravellerForm({ context }: { context: LeadContext }) {
         setError(field as keyof TravellerValues, { message });
       }
     }
+    if (res.kind === "recorded" || res.kind === "updated") {
+      track.submitted({
+        marketKey: LAUNCH_MARKET.key,
+        destinationKeys: [values.primaryDestinationKey],
+        interests: values.interests as InterestGroup[],
+      });
+    } else {
+      track.submissionFailed(res);
+    }
     setResult(res);
   }
 
@@ -414,7 +454,10 @@ function TravellerForm({ context }: { context: LeadContext }) {
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(onSubmit, (fieldErrors) =>
+        track.validationFailed(Object.keys(fieldErrors)),
+      )}
+      onFocus={track.formStarted}
       noValidate
       className="relative flex flex-col gap-5"
     >
@@ -482,7 +525,13 @@ function TravellerForm({ context }: { context: LeadContext }) {
         </label>
         <select
           id="t-destination"
-          {...register("primaryDestinationKey")}
+          {...register("primaryDestinationKey", {
+            onChange: (event) =>
+              track.destinationChanged(
+                context.destinationKey,
+                event.target.value,
+              ),
+          })}
           className="border-cream/20 bg-cream/5 text-cream focus-visible:border-terra-soft focus-visible:ring-terra-soft/40 rounded-edge h-12 w-full border px-4 text-sm transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
           aria-invalid={!!errors.primaryDestinationKey}
         >
@@ -541,6 +590,7 @@ function TravellerForm({ context }: { context: LeadContext }) {
 
 function ProviderForm({ context }: { context: LeadContext }) {
   const [result, setResult] = React.useState<SubmitResult | null>(null);
+  const track = useLeadAnalytics("provider", context.source);
 
   const {
     register,
@@ -572,6 +622,15 @@ function ProviderForm({ context }: { context: LeadContext }) {
         setError(field as keyof ProviderValues, { message });
       }
     }
+    if (res.kind === "recorded" || res.kind === "updated") {
+      track.submitted({
+        marketKey: LAUNCH_MARKET.key,
+        destinationKeys: values.coverageDestinationKeys,
+        interests: [values.primaryInterest as InterestGroup],
+      });
+    } else {
+      track.submissionFailed(res);
+    }
     setResult(res);
   }
 
@@ -583,7 +642,10 @@ function ProviderForm({ context }: { context: LeadContext }) {
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(onSubmit, (fieldErrors) =>
+        track.validationFailed(Object.keys(fieldErrors)),
+      )}
+      onFocus={track.formStarted}
       noValidate
       className="relative flex flex-col gap-5"
     >
