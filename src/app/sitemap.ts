@@ -14,7 +14,7 @@ import { DESTINATIONS } from "@/lib/site/destinations";
  *   placeholder is worse than a noindexed one.
  * - `/journal`, `/philosophy`, and retired `/experiences/<slug>` detail pages
  *   — 410 Gone. A 410 in a sitemap is a contradiction that slows de-indexing.
- * - `/about`, `/safety` — not shipped yet. Add each with its page.
+ * - `/about` — not shipped yet. Add it with its page.
  *
  * Adding a route here without a `page.tsx` is a promise to a crawler we cannot
  * keep, so the e2e suite fetches every URL in this sitemap and fails on
@@ -33,6 +33,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: "/how-it-works", priority: 0.8, changeFrequency: "monthly" },
     { path: "/travellers", priority: 0.8, changeFrequency: "monthly" },
     { path: "/operators", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/safety", priority: 0.8, changeFrequency: "monthly" },
     { path: "/experiences", priority: 0.7, changeFrequency: "monthly" },
     { path: "/destinations", priority: 0.7, changeFrequency: "monthly" },
     ...DESTINATIONS.map((destination) => ({

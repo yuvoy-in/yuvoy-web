@@ -59,6 +59,7 @@ export const SITE_ROUTES: SiteRoute[] = [
   },
   { href: "/waitlist", label: "Join the waitlist", footer: "yuvoy" },
   // Trust column.
+  { href: "/safety", label: "Safety", footer: "trust" },
   { href: "/privacy", label: "Privacy", footer: "trust" },
   { href: "/terms", label: "Terms", footer: "trust" },
 ];
