@@ -6,12 +6,22 @@ export default function robots(): MetadataRoute.Robots {
     return { rules: { userAgent: "*", disallow: "/" } };
   }
   return {
-    // /go/* are QR/campaign routes (noindex by metadata too); /privacy and
-    // /terms stay out until business-approved copy replaces the placeholders.
+    /*
+      `/go/` only.
+
+      Campaign routes are noindex by metadata and canonicalised to `/`;
+      disallowing them as well keeps them out of competition with the homepage.
+
+      `/privacy` and `/terms` were also disallowed while their copy was
+      placeholder. They come off this list in the same change that lands
+      business-approved copy, removes their `noindex`, and adds them to the
+      sitemap — all three together, never independently. An indexed placeholder
+      is worse than a noindexed one.
+    */
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/go/", "/privacy", "/terms"],
+      disallow: ["/go/"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

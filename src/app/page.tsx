@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Landing } from "@/components/landing/landing";
+import { JsonLd } from "@/components/site/json-ld";
+import { organizationSchema, webSiteSchema } from "@/lib/site/structured-data";
 import { DEFAULT_DESTINATION } from "@/lib/leads/registry";
 
 export const metadata: Metadata = {
@@ -9,8 +11,11 @@ export const metadata: Metadata = {
 /** Canonical homepage — organic traffic, indexable. */
 export default function HomePage() {
   return (
-    <Landing
-      context={{ source: "web", destinationKey: DEFAULT_DESTINATION.key }}
-    />
+    <>
+      <JsonLd schemas={[organizationSchema(), webSiteSchema()]} />
+      <Landing
+        context={{ source: "web", destinationKey: DEFAULT_DESTINATION.key }}
+      />
+    </>
   );
 }

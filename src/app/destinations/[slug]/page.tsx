@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/site/page-header";
 import { Breadcrumbs } from "@/components/site/breadcrumbs";
+import { JsonLd } from "@/components/site/json-ld";
+import { breadcrumbSchema } from "@/lib/site/structured-data";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
@@ -51,6 +53,18 @@ export default async function DestinationPage({
 
   return (
     <main>
+      <JsonLd
+        schemas={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Destinations", path: "/destinations" },
+            {
+              name: destination.shortLabel,
+              path: `/destinations/${destination.slug}`,
+            },
+          ]),
+        ]}
+      />
       <PageHeader
         eyebrow={destination.label}
         title={destination.shortLabel}
