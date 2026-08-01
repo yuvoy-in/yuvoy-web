@@ -19,6 +19,7 @@ Type: Poppins (display) + Inter (body) + IBM Plex Mono (labels) — Brand Kit v2
 
 - FE consumes `yuvoy-api` through a **versioned OpenAPI contract**; build against generated types + MSW mocks until an endpoint lands.
 - When work needs backend support, **raise a GitHub issue** to Hima per [docs/backend-team-issue-rulebook.md](docs/backend-team-issue-rulebook.md) — never hack around it. `Refs #`, never `Closes #`, across repos.
+- **Issues and PRs raised by an agent follow [docs/agent-issue-rulebook.md](docs/agent-issue-rulebook.md)** — structure, labels, when _not_ to open an issue, and the rule that a verification claim must quote the command and its result. (Proposed; awaiting ratification on #24.)
 - `yuvoy-api` may be checked out here only as a **read-only reference** (gitignored). Never push/commit/PR to its remote.
 
 ## Code standards (always active)
