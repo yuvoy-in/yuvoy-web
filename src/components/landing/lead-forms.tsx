@@ -96,12 +96,29 @@ type ProviderValues = z.infer<typeof providerSchema>;
  * produce — recorded, updated, invalid, rate-limited, unavailable, offline —
  * has its own truthful UI state.
  */
-export function LeadForms({ context }: { context: LeadContext }) {
-  const [audience, setAudience] = React.useState<LeadAudience>("traveller");
+export function LeadForms({
+  context,
+  initialAudience = "traveller",
+  heading = "Join the waitlist",
+  headingLevel = 2,
+}: {
+  context: LeadContext;
+  /**
+   * Which tab opens first. `/waitlist?audience=provider` — the shape printed
+   * on operator materials — resolves to "provider" here.
+   */
+  initialAudience?: LeadAudience;
+  heading?: string;
+  /** `/waitlist` renders this as the page's h1; the homepage as an h2. */
+  headingLevel?: 1 | 2;
+}) {
+  const [audience, setAudience] = React.useState<LeadAudience>(initialAudience);
+  const Heading = headingLevel === 1 ? "h1" : "h2";
 
-  // #providers deep-links straight onto the provider tab — from the hero CTA,
-  // the footer, and any external link. Hash navigation alone can't switch a
-  // React tab, so listen for it.
+  // #providers deep-links straight onto the provider tab. Those anchors are
+  // kept working indefinitely: /waitlist used to be a permanent (308) redirect
+  // to them, and browsers cache 308s forever, so a visitor who hit the old URL
+  // before the real page shipped still lands somewhere coherent.
   React.useEffect(() => {
     function syncFromHash() {
       if (window.location.hash === "#providers") setAudience("provider");
@@ -114,74 +131,76 @@ export function LeadForms({ context }: { context: LeadContext }) {
   return (
     <section
       id="register"
-      className="scroll-mt-10 px-6 py-20 sm:px-10"
+      className="bg-teal text-cream scroll-mt-16"
       aria-labelledby="register-heading"
     >
       {/* Always-present anchor: the target must exist even while the provider
           panel is hidden, or the browser has nothing to scroll to. */}
       <span id="providers" className="block scroll-mt-24" aria-hidden />
-      <div className="mx-auto max-w-xl">
-        <div className="text-center">
-          <p className="label text-terra-deep">Register interest</p>
-          <h2
-            id="register-heading"
-            className="font-display text-teal mt-3 text-3xl sm:text-4xl"
-          >
-            Be there when it opens.
-          </h2>
-          <p className="text-teal/70 mt-4">
-            Tell us who you are and we&rsquo;ll be in touch as the season takes
-            shape. No queue positions, no spam — a person will read this.
-          </p>
-        </div>
-
-        <div
-          role="tablist"
-          aria-label="I am a"
-          className="border-cream-line bg-cream-deep/50 mt-10 flex rounded-full border p-1"
-        >
-          {(
-            [
-              ["traveller", "I'm travelling"],
-              ["provider", "I run experiences"],
-            ] as const
-          ).map(([value, tabLabel]) => (
-            <button
-              key={value}
-              role="tab"
-              id={`tab-${value}`}
-              aria-selected={audience === value}
-              aria-controls={`panel-${value}`}
-              onClick={() => setAudience(value)}
-              className={cn(
-                "focus-visible:ring-terra-deep flex-1 rounded-full px-4 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none",
-                audience === value
-                  ? "bg-teal text-cream"
-                  : "text-teal/75 hover:text-teal",
-              )}
+      <div className="container-page py-20 sm:py-28">
+        <div className="mx-auto max-w-xl">
+          <div>
+            <p className="eyebrow text-terra-soft">Get first access</p>
+            <Heading
+              id="register-heading"
+              className="font-display mt-6 text-[clamp(1.875rem,4.5vw,3rem)] leading-[1.05] font-extrabold tracking-tight text-balance"
             >
-              {tabLabel}
-            </button>
-          ))}
-        </div>
+              {heading}
+            </Heading>
+            <p className="text-cream/70 mt-6 text-lg leading-relaxed">
+              Tell us who you are and we&rsquo;ll message you when the first
+              Andaman experiences are ready. No spam, and no payment required.
+            </p>
+          </div>
 
-        <div
-          role="tabpanel"
-          id="panel-traveller"
-          aria-labelledby="tab-traveller"
-          hidden={audience !== "traveller"}
-          className="mt-8"
-        >
-          <TravellerForm context={context} />
-        </div>
-        <div
-          role="tabpanel"
-          id="panel-provider"
-          aria-labelledby="tab-provider"
-          hidden={audience !== "provider"}
-          className="mt-8"
-        >
-          <ProviderForm context={context} />
+          <div
+            role="tablist"
+            aria-label="I am a"
+            className="border-cream/20 rounded-edge mt-10 flex border p-1"
+          >
+            {(
+              [
+                ["traveller", "I'm travelling"],
+                ["provider", "I run experiences"],
+              ] as const
+            ).map(([value, tabLabel]) => (
+              <button
+                key={value}
+                role="tab"
+                id={`tab-${value}`}
+                aria-selected={audience === value}
+                aria-controls={`panel-${value}`}
+                onClick={() => setAudience(value)}
+                className={cn(
+                  "focus-visible:ring-terra-soft rounded-edge flex-1 px-4 py-2.5 text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none",
+                  audience === value
+                    ? "bg-cream text-teal"
+                    : "text-cream/70 hover:text-cream",
+                )}
+              >
+                {tabLabel}
+              </button>
+            ))}
+          </div>
+
+          <div
+            role="tabpanel"
+            id="panel-traveller"
+            aria-labelledby="tab-traveller"
+            hidden={audience !== "traveller"}
+            className="mt-10"
+          >
+            <TravellerForm context={context} />
+          </div>
+          <div
+            role="tabpanel"
+            id="panel-provider"
+            aria-labelledby="tab-provider"
+            hidden={audience !== "provider"}
+            className="mt-10"
+          >
+            <ProviderForm context={context} />
+          </div>
         </div>
       </div>
     </section>
@@ -216,17 +235,16 @@ function OutcomeNotice({
   }[result.kind];
 
   return (
-    <div
-      role="alert"
-      className="border-terra-deep/30 bg-terra/5 rounded-3xl border p-6 text-center"
-    >
-      <p className="font-display text-teal text-xl">{copy.title}</p>
-      <p className="text-teal/70 mt-2 text-sm">{copy.body}</p>
+    <div role="alert" className="border-terra-soft/40 rounded-edge border p-6">
+      <p className="font-display text-xl font-bold tracking-tight">
+        {copy.title}
+      </p>
+      <p className="text-cream/70 mt-2 text-sm">{copy.body}</p>
       <Button
         type="button"
-        variant="outline"
+        variant="outlineOnDark"
         size="sm"
-        className="mt-4"
+        className="mt-5"
         onClick={onRetry}
       >
         Try again
@@ -243,23 +261,31 @@ function SuccessNotice({
   audience: LeadAudience;
 }) {
   return (
-    <div
-      role="status"
-      className="border-cream-line bg-cream-deep/50 rounded-3xl border p-8 text-center"
-    >
-      <p className="label text-terra-deep">
-        {updated ? "Details updated" : "You're registered"}
+    <div role="status" className="border-cream/20 rounded-edge border p-8">
+      <p className="eyebrow text-terra-soft">
+        {updated ? "Details updated" : "You’re on the list"}
       </p>
-      <p className="font-display text-teal mt-4 text-2xl">
+      {/*
+        The confirmation heading is owner-approved canon (#27) and is quoted
+        verbatim. The post-submit line is too — note it promises a message
+        later, never an email now: there is no visitor-facing autoresponder,
+        so "check your inbox" would be a lie.
+      */}
+      <p className="font-display mt-6 text-2xl font-bold tracking-tight text-balance">
         {updated
           ? "We already had you — your preferences are updated."
-          : "Thank you. A person will read this."}
+          : "You’re on the Yuvoy waitlist"}
       </p>
-      <p className="text-teal/70 mt-3 text-sm">
-        {audience === "provider"
-          ? "Someone from Yuvoy will reach out on WhatsApp to talk through what you offer."
-          : "We'll be in touch as the season takes shape. Until then — don't be a tourist."}
+      <p className="text-cream/70 mt-4 leading-relaxed">
+        We&rsquo;ll message you when the first Andaman experiences are ready. No
+        spam, and no payment required.
       </p>
+      {audience === "provider" && (
+        <p className="text-cream/70 mt-3 leading-relaxed">
+          Someone from Yuvoy will reach out on WhatsApp to talk through what you
+          offer.
+        </p>
+      )}
     </div>
   );
 }
@@ -267,7 +293,7 @@ function SuccessNotice({
 function FieldError({ id, message }: { id: string; message?: string }) {
   if (!message) return null;
   return (
-    <p id={id} role="alert" className="text-terra-deep px-5 text-sm">
+    <p id={id} role="alert" className="text-terra-soft text-sm">
       {message}
     </p>
   );
@@ -285,35 +311,38 @@ function ConsentFields({
   return (
     <fieldset className="flex flex-col gap-3">
       <legend className="sr-only">Consent</legend>
-      <label className="text-teal/70 flex items-start gap-3 text-sm">
+      <label className="text-cream/70 flex items-start gap-3 text-sm">
         <input
           type="checkbox"
           {...registerPrivacy}
           aria-invalid={!!privacyError}
-          className="accent-teal mt-0.5 size-4 shrink-0"
+          className="accent-terra-deep mt-0.5 size-4 shrink-0"
         />
         <span>
           I agree to the{" "}
-          <a href="/privacy" className="text-teal underline underline-offset-2">
+          <a
+            href="/privacy"
+            className="text-cream underline underline-offset-2"
+          >
             Privacy Policy
           </a>{" "}
           and{" "}
-          <a href="/terms" className="text-teal underline underline-offset-2">
+          <a href="/terms" className="text-cream underline underline-offset-2">
             Terms
           </a>
           , and to Yuvoy contacting me about my registration.
         </span>
       </label>
       <FieldError id="privacy-error" message={privacyError} />
-      <label className="text-teal/70 flex items-start gap-3 text-sm">
+      <label className="text-cream/70 flex items-start gap-3 text-sm">
         <input
           type="checkbox"
           {...registerMarketing}
-          className="accent-teal mt-0.5 size-4 shrink-0"
+          className="accent-terra-deep mt-0.5 size-4 shrink-0"
         />
         <span>
-          Also send me occasional updates about Yuvoy. Optional — you can
-          register without this.
+          Also send me occasional updates about Yuvoy. Optional — you can join
+          the waitlist without this.
         </span>
       </label>
     </fieldset>
@@ -398,10 +427,11 @@ function TravellerForm({ context }: { context: LeadContext }) {
       )}
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="t-name" className="label text-teal/75 px-5">
+        <label htmlFor="t-name" className="label text-cream/70">
           Name
         </label>
         <Input
+          tone="onDark"
           id="t-name"
           {...register("contactName")}
           autoComplete="name"
@@ -412,10 +442,11 @@ function TravellerForm({ context }: { context: LeadContext }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="t-whatsapp" className="label text-teal/75 px-5">
+        <label htmlFor="t-whatsapp" className="label text-cream/70">
           WhatsApp number
         </label>
         <Input
+          tone="onDark"
           id="t-whatsapp"
           {...register("whatsapp")}
           type="tel"
@@ -429,10 +460,11 @@ function TravellerForm({ context }: { context: LeadContext }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="t-email" className="label text-teal/75 px-5">
+        <label htmlFor="t-email" className="label text-cream/70">
           Email <span className="normal-case">(optional)</span>
         </label>
         <Input
+          tone="onDark"
           id="t-email"
           {...register("email")}
           type="email"
@@ -445,13 +477,13 @@ function TravellerForm({ context }: { context: LeadContext }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="t-destination" className="label text-teal/75 px-5">
+        <label htmlFor="t-destination" className="label text-cream/70">
           Where are you headed first?
         </label>
         <select
           id="t-destination"
           {...register("primaryDestinationKey")}
-          className="border-teal/20 bg-cream-deep text-teal focus-visible:border-terra-deep focus-visible:ring-terra-deep/30 h-11 w-full rounded-full border px-5 text-sm focus-visible:ring-2 focus-visible:outline-none"
+          className="border-cream/20 bg-cream/5 text-cream focus-visible:border-terra-soft focus-visible:ring-terra-soft/40 rounded-edge h-12 w-full border px-4 text-sm transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
           aria-invalid={!!errors.primaryDestinationKey}
         >
           {LAUNCH_MARKET.destinations.map((d) => (
@@ -467,14 +499,14 @@ function TravellerForm({ context }: { context: LeadContext }) {
       </div>
 
       <fieldset>
-        <legend className="label text-teal/75 px-5">
+        <legend className="label text-cream/70">
           What draws you? <span className="normal-case">(up to three)</span>
         </legend>
         <div className="mt-2 flex flex-wrap gap-2 px-1">
           {INTERESTS.map((interest) => (
             <label
               key={interest.key}
-              className="border-cream-line bg-cream-deep/60 text-teal/80 has-checked:bg-teal has-checked:text-cream cursor-pointer rounded-full border px-4 py-2 text-sm transition-colors"
+              className="border-cream/20 text-cream/80 has-checked:bg-cream has-checked:text-teal has-checked:border-cream rounded-edge has-focus-visible:ring-terra-soft cursor-pointer border px-4 py-2 text-sm transition-colors duration-200 has-focus-visible:ring-2"
             >
               <input
                 type="checkbox"
@@ -499,7 +531,7 @@ function TravellerForm({ context }: { context: LeadContext }) {
       />
 
       <Button type="submit" size="lg" disabled={isSubmitting}>
-        {isSubmitting ? "Sending…" : "Register interest"}
+        {isSubmitting ? "Sending…" : "Join the waitlist"}
       </Button>
     </form>
   );
@@ -564,10 +596,11 @@ function ProviderForm({ context }: { context: LeadContext }) {
       )}
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="p-name" className="label text-teal/75 px-5">
+        <label htmlFor="p-name" className="label text-cream/70">
           Your name
         </label>
         <Input
+          tone="onDark"
           id="p-name"
           {...register("contactName")}
           autoComplete="name"
@@ -577,10 +610,11 @@ function ProviderForm({ context }: { context: LeadContext }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="p-business" className="label text-teal/75 px-5">
+        <label htmlFor="p-business" className="label text-cream/70">
           Business name
         </label>
         <Input
+          tone="onDark"
           id="p-business"
           {...register("businessName")}
           autoComplete="organization"
@@ -593,10 +627,11 @@ function ProviderForm({ context }: { context: LeadContext }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="p-whatsapp" className="label text-teal/75 px-5">
+        <label htmlFor="p-whatsapp" className="label text-cream/70">
           WhatsApp number
         </label>
         <Input
+          tone="onDark"
           id="p-whatsapp"
           {...register("whatsapp")}
           type="tel"
@@ -609,10 +644,11 @@ function ProviderForm({ context }: { context: LeadContext }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="p-email" className="label text-teal/75 px-5">
+        <label htmlFor="p-email" className="label text-cream/70">
           Email <span className="normal-case">(optional)</span>
         </label>
         <Input
+          tone="onDark"
           id="p-email"
           {...register("email")}
           type="email"
@@ -624,12 +660,12 @@ function ProviderForm({ context }: { context: LeadContext }) {
       </div>
 
       <fieldset>
-        <legend className="label text-teal/75 px-5">Where you operate</legend>
+        <legend className="label text-cream/70">Where you operate</legend>
         <div className="mt-2 flex flex-wrap gap-2 px-1">
           {LAUNCH_MARKET.destinations.map((d) => (
             <label
               key={d.key}
-              className="border-cream-line bg-cream-deep/60 text-teal/80 has-checked:bg-teal has-checked:text-cream cursor-pointer rounded-full border px-4 py-2 text-sm transition-colors"
+              className="border-cream/20 text-cream/80 has-checked:bg-cream has-checked:text-teal has-checked:border-cream rounded-edge has-focus-visible:ring-terra-soft cursor-pointer border px-4 py-2 text-sm transition-colors duration-200 has-focus-visible:ring-2"
             >
               <input
                 type="checkbox"
@@ -648,14 +684,12 @@ function ProviderForm({ context }: { context: LeadContext }) {
       </fieldset>
 
       <fieldset>
-        <legend className="label text-teal/75 px-5">
-          What you mainly offer
-        </legend>
+        <legend className="label text-cream/70">What you mainly offer</legend>
         <div className="mt-2 flex flex-wrap gap-2 px-1">
           {INTERESTS.map((interest) => (
             <label
               key={interest.key}
-              className="border-cream-line bg-cream-deep/60 text-teal/80 has-checked:bg-teal has-checked:text-cream cursor-pointer rounded-full border px-4 py-2 text-sm transition-colors"
+              className="border-cream/20 text-cream/80 has-checked:bg-cream has-checked:text-teal has-checked:border-cream rounded-edge has-focus-visible:ring-terra-soft cursor-pointer border px-4 py-2 text-sm transition-colors duration-200 has-focus-visible:ring-2"
             >
               <input
                 type="radio"
@@ -680,10 +714,10 @@ function ProviderForm({ context }: { context: LeadContext }) {
       />
 
       <Button type="submit" size="lg" disabled={isSubmitting}>
-        {isSubmitting ? "Sending…" : "Register my business"}
+        {isSubmitting ? "Sending…" : "Join the waitlist"}
       </Button>
 
-      <p className="text-teal/75 text-center text-xs">
+      <p className="text-cream/70 text-xs">
         Pricing, capacity and listings come later, in conversation — this just
         opens the door.
       </p>

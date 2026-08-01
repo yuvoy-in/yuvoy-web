@@ -2,7 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 /** Routes that exist today and must all render inside the shell. */
-const SHELL_ROUTES = ["/", "/go/ferry", "/privacy", "/terms"];
+const SHELL_ROUTES = ["/", "/waitlist", "/go/ferry", "/privacy", "/terms"];
 
 const MOBILE = { width: 390, height: 844 };
 

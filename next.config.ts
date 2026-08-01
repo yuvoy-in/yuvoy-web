@@ -20,19 +20,10 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
-  async redirects() {
-    return [
-      // The old waitlist page is folded into the landing's register section.
-      // Provider QRs/links that carried ?audience=provider land on that tab.
-      {
-        source: "/waitlist",
-        has: [{ type: "query", key: "audience", value: "provider" }],
-        destination: "/#providers",
-        permanent: true,
-      },
-      { source: "/waitlist", destination: "/#register", permanent: true },
-    ];
-  },
+  // No redirects. /waitlist used to be two permanent (308) redirects onto
+  // homepage anchors; it is now a real page. The anchors it pointed at are
+  // kept alive on the homepage anyway, because browsers cache a 308 forever
+  // and operator materials are printed with ?audience=provider on them.
 };
 
 export default nextConfig;
