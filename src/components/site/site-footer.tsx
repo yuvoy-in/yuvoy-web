@@ -30,13 +30,16 @@ export function SiteFooter() {
         <div className="container-page border-cream/12 grid grid-cols-2 gap-x-8 gap-y-10 border-b py-14 sm:grid-cols-3 lg:grid-cols-4">
           {FOOTER_COLUMNS.map((column) => (
             <div key={column.key}>
-              <h3 className="label text-terra-soft">{column.title}</h3>
-              <ul className="mt-5 flex flex-col gap-3">
+              {/* h2, not h3: these are top-level footer sections, siblings of the
+                  page's own sections. As h3 they skipped a level on pages whose
+                  main content has no h2 (e.g. /waitlist). */}
+              <h2 className="label text-terra-soft">{column.title}</h2>
+              <ul className="mt-4 flex flex-col gap-1">
                 {column.items.map((item) => (
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className="text-cream/70 hover:text-cream text-sm transition-colors duration-200"
+                      className="tap-target text-cream/70 hover:text-cream text-sm transition-colors duration-200"
                     >
                       {item.label}
                     </Link>
@@ -48,13 +51,13 @@ export function SiteFooter() {
 
           {CONTACT_CHANNELS.length > 0 && (
             <div>
-              <h3 className="label text-terra-soft">Contact</h3>
-              <ul className="mt-5 flex flex-col gap-3">
+              <h2 className="label text-terra-soft">Contact</h2>
+              <ul className="mt-4 flex flex-col gap-1">
                 {CONTACT_CHANNELS.map((channel) => (
                   <li key={channel.href}>
                     <a
                       href={channel.href}
-                      className="text-cream/70 hover:text-cream text-sm transition-colors duration-200"
+                      className="tap-target text-cream/70 hover:text-cream text-sm transition-colors duration-200"
                     >
                       {channel.label}
                     </a>

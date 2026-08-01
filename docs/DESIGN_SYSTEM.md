@@ -117,6 +117,7 @@ WCAG 2.2 AA, enforced not assumed:
 
 - Contrast pairings come from §1's measured table and the opacity floors. Nothing ships on an unmeasured pairing.
 - Keyboard-complete flows; visible focus (`focus-visible:ring-terra-deep`).
+- **Tap targets: `tap-target` on any standalone small link.** A 16px `label` link is a 16px pointer target, below the 24px SC 2.5.8 minimum — the utility lifts it to 28px. Links inside a sentence are exempt (the criterion's inline exception) and should not use it. Enforced per route in `e2e/shell.spec.ts`; axe does not catch this.
 - `aria-invalid` + `role="alert"` on form errors.
 - The mobile menu is a native `<dialog>` opened with `showModal()` — the browser provides the focus trap, Escape handling and background inerting, so they cannot drift out of sync with the markup.
 - axe runs in CI against every route.

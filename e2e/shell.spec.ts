@@ -87,6 +87,100 @@ test.describe("site shell", () => {
     // A contact row ships only when a real, monitored channel is confirmed.
     expect(footer).not.toMatch(/@|mailto:|wa\.me/i);
   });
+
+  /*
+    Two whole-page structural checks that a screenshot cannot make for you,
+    and that axe's WCAG-tagged rules do not cover.
+  */
+  for (const path of SHELL_ROUTES) {
+    test(`${path} has sound structure at every breakpoint`, async ({
+      page,
+    }) => {
+      const problems: string[] = [];
+
+      for (const viewport of [
+        { name: "mobile", width: 390, height: 844 },
+        { name: "tablet", width: 834, height: 1112 },
+        { name: "desktop", width: 1440, height: 900 },
+      ]) {
+        await page.setViewportSize(viewport);
+        await page.goto(path, { waitUntil: "networkidle" });
+
+        // Horizontal overflow — the classic mobile defect, invisible in tests
+        // that only assert on content.
+        const overflow = await page.evaluate(
+          () =>
+            document.documentElement.scrollWidth -
+            document.documentElement.clientWidth,
+        );
+        if (overflow > 1) {
+          problems.push(
+            `${viewport.name}: overflows horizontally by ${overflow}px`,
+          );
+        }
+
+        // Exactly one h1, and heading levels never skip on the way down.
+        const levels = await page.evaluate(() =>
+          [...document.querySelectorAll("h1,h2,h3,h4,h5,h6")].map((el) =>
+            Number(el.tagName.substring(1)),
+          ),
+        );
+        const h1Count = levels.filter((level) => level === 1).length;
+        if (h1Count !== 1) {
+          problems.push(`${viewport.name}: ${h1Count} h1 elements, expected 1`);
+        }
+        for (let i = 1; i < levels.length; i++) {
+          if (levels[i] - levels[i - 1] > 1) {
+            problems.push(
+              `${viewport.name}: heading level skips h${levels[i - 1]} → h${levels[i]}`,
+            );
+          }
+        }
+      }
+
+      expect(problems.join("\n")).toBe("");
+    });
+  }
+
+  /*
+    WCAG 2.2 SC 2.5.8 — pointer targets are at least 24×24 CSS px.
+
+    axe does not flag this, so without a test a 16px `label` link ships as a
+    16px tap target and nobody notices until someone tries to hit it on a
+    phone. The `tap-target` utility exists for exactly this.
+
+    Two documented exemptions, both from the success criterion itself:
+    links inside a sentence (their size is constrained by surrounding text),
+    and off-screen elements like the skip link, which is full-size on focus.
+  */
+  for (const path of SHELL_ROUTES) {
+    test(`${path} has no undersized tap target`, async ({ page }) => {
+      await page.setViewportSize(MOBILE);
+      await page.goto(path, { waitUntil: "networkidle" });
+
+      const undersized = await page.evaluate(() =>
+        [...document.querySelectorAll("a,button")]
+          .filter((el) => {
+            const rect = el.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) return false;
+            if (rect.height >= 24) return false;
+            // Inline exception: the parent holds text beyond this link.
+            const parentText = (el.parentElement?.textContent ?? "").trim();
+            const ownText = (el.textContent ?? "").trim();
+            if (parentText.length > ownText.length + 3) return false;
+            // Off-screen (the skip link until focused).
+            if (rect.width <= 1 || rect.height <= 1) return false;
+            return true;
+          })
+          .map(
+            (el) =>
+              `${Math.round(el.getBoundingClientRect().height)}px "${(el.textContent ?? "").trim().slice(0, 30)}"`,
+          ),
+      );
+
+      expect(undersized.join("\n")).toBe("");
+    });
+  }
 });
 
 test.describe("mobile menu", () => {

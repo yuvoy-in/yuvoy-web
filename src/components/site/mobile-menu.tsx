@@ -207,7 +207,7 @@ export function MobileMenu() {
                     <Link
                       href={item.href}
                       onClick={() => close(false)}
-                      className="label text-teal/75 hover:text-teal"
+                      className="label tap-target text-teal/75 hover:text-teal"
                     >
                       {item.label}
                     </Link>
