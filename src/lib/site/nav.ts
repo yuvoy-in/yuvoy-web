@@ -26,6 +26,24 @@ export interface SiteRoute {
  */
 export const SITE_ROUTES: SiteRoute[] = [
   // Yuvoy column.
+  {
+    href: "/how-it-works",
+    label: "How it works",
+    inHeader: true,
+    footer: "yuvoy",
+  },
+  {
+    href: "/travellers",
+    label: "For travellers",
+    inHeader: true,
+    footer: "yuvoy",
+  },
+  {
+    href: "/operators",
+    label: "For operators",
+    inHeader: true,
+    footer: "yuvoy",
+  },
   { href: "/waitlist", label: "Join the waitlist", footer: "yuvoy" },
   // Trust column.
   { href: "/privacy", label: "Privacy", footer: "trust" },
