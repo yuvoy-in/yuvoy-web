@@ -65,16 +65,23 @@ test("hero CTAs lead to the waitlist page for each audience", async ({
   ).toHaveAttribute("aria-selected", "true");
 });
 
-test("the homepage still registers in place, and its anchors still resolve", async ({
-  page,
-}) => {
-  // /waitlist used to be a permanent redirect onto these anchors. Browsers
-  // cache 308s indefinitely, so they must keep working even now that the real
-  // page exists — and campaign traffic converts on the page it lands on.
-  await page.goto("/#register");
-  const panel = page.getByRole("tabpanel", { name: /travelling/i });
-  await expect(panel).toBeVisible();
+/*
+  /waitlist used to be a permanent redirect onto these anchors. Browsers cache
+  308s indefinitely, so both must keep working even now that the real page
+  exists — and campaign traffic converts on the page it lands on.
 
+  Each anchor gets its own test, and therefore its own fresh page. Visiting
+  them one after another in a single test is a same-document navigation, which
+  is not the path a visitor following a cached redirect actually takes.
+*/
+test("the homepage still registers in place at #register", async ({ page }) => {
+  await page.goto("/#register");
+  await expect(
+    page.getByRole("tabpanel", { name: /travelling/i }),
+  ).toBeVisible();
+});
+
+test("#providers still opens the operator form", async ({ page }) => {
   await page.goto("/#providers");
   await expect(
     page.getByRole("tab", { name: /run experiences/i }),
