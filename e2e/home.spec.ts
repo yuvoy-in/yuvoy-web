@@ -179,14 +179,13 @@ test("retired routes answer 410, not 404", async ({ request }) => {
   for (const path of [
     "/experiences/sunrise-scuba-dive",
     "/experiences/anything-else",
-    "/journal",
-    "/journal/some-old-post",
     "/philosophy",
   ]) {
     const res = await request.get(path);
     expect(res.status(), path).toBe(410);
   }
 
-  // ...and the index page itself is emphatically not 410 any more.
+  // ...and the index pages themselves are emphatically not 410 any more.
   expect((await request.get("/experiences")).status()).toBe(200);
+  expect((await request.get("/journal")).status()).toBe(200);
 });
