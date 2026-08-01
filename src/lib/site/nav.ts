@@ -25,6 +25,19 @@ export interface SiteRoute {
  * shown in the header and within each footer column.
  */
 export const SITE_ROUTES: SiteRoute[] = [
+  // Discover column.
+  {
+    href: "/experiences",
+    label: "Experiences",
+    inHeader: true,
+    footer: "discover",
+  },
+  {
+    href: "/destinations",
+    label: "Destinations",
+    inHeader: true,
+    footer: "discover",
+  },
   // Yuvoy column.
   {
     href: "/how-it-works",

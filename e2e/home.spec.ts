@@ -165,13 +165,21 @@ test("campaign route renders with noindex and canonical to home", async ({
 });
 
 test("retired routes answer 410, not 404", async ({ request }) => {
+  // /experiences is a real page again, but the seeded detail slugs it used to
+  // publish — which carried invented prices and review counts, and are still
+  // in Google's index — must keep answering 410 so they get dropped rather
+  // than recrawled. /journal and /philosophy remain retired entirely.
   for (const path of [
-    "/experiences",
     "/experiences/sunrise-scuba-dive",
+    "/experiences/anything-else",
     "/journal",
+    "/journal/some-old-post",
     "/philosophy",
   ]) {
     const res = await request.get(path);
     expect(res.status(), path).toBe(410);
   }
+
+  // ...and the index page itself is emphatically not 410 any more.
+  expect((await request.get("/experiences")).status()).toBe(200);
 });
