@@ -82,7 +82,7 @@ export default function PrivacyPage() {
       </div>
       <Link
         href="/"
-        className="label text-teal/75 hover:text-teal mt-10 inline-block"
+        className="label tap-target text-teal/75 hover:text-teal mt-10"
       >
         ← Back home
       </Link>

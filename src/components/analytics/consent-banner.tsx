@@ -89,7 +89,7 @@ export function PrivacyChoices() {
     <button
       type="button"
       onClick={openPrompt}
-      className="label text-cream/70 hover:text-cream text-left transition-colors duration-200"
+      className="label tap-target text-cream/70 hover:text-cream text-left transition-colors duration-200"
     >
       Privacy choices
     </button>

@@ -122,6 +122,19 @@
   }
 }
 
+/**
+ * Guarantees a pointer target of at least 24px (WCAG 2.2 SC 2.5.8), which
+ * small text links do not reach on their own — a 16px `label` link is a 16px
+ * tap target. Set to 28px for comfort rather than the bare minimum.
+ *
+ * Not needed for links inside a sentence: SC 2.5.8 exempts inline targets
+ * whose size is constrained by the surrounding text's line-height.
+ */
+@utility tap-target {
+  @apply inline-flex items-center;
+  min-height: 1.75rem;
+}
+
 /* ----------------------------------------------------------------- layout */
 
 /** The standard page measure and gutters. Every section uses this. */

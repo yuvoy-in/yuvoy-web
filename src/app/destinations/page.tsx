@@ -52,7 +52,7 @@ export default function DestinationsPage() {
               </p>
               <Link
                 href={destinationHref(destination)}
-                className="label text-terra-deep hover:text-teal mt-6 inline-block underline underline-offset-4"
+                className="label tap-target text-terra-deep hover:text-teal mt-6 underline underline-offset-4"
               >
                 About {destination.shortLabel}
               </Link>
