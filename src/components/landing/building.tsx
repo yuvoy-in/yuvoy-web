@@ -29,7 +29,7 @@ export function Building() {
               key={interest.key}
               className="border-cream-line bg-cream-deep/40 rounded-3xl border p-8"
             >
-              <span className="label text-teal/40">0{i + 1}</span>
+              <span className="label text-teal/75">0{i + 1}</span>
               <h3 className="font-display text-teal mt-4 text-2xl">
                 {interest.label}
               </h3>
@@ -39,7 +39,7 @@ export function Building() {
             </div>
           ))}
         </div>
-        <p className="text-teal/45 mt-6 text-sm">
+        <p className="text-teal/75 mt-6 text-sm">
           Categories we&rsquo;re curating for the first season. Individual
           experiences appear once their operators are on board.
         </p>
@@ -53,7 +53,7 @@ export function Building() {
         <div className="mx-auto mt-12 grid max-w-4xl grid-cols-1 gap-8 text-left sm:grid-cols-3">
           {JOURNEY.map((step, i) => (
             <div key={step.title}>
-              <span className="label text-cream/40">0{i + 1}</span>
+              <span className="label text-cream/70">0{i + 1}</span>
               <h3 className="font-display text-cream mt-3 text-xl">
                 {step.title}
               </h3>
@@ -61,7 +61,7 @@ export function Building() {
             </div>
           ))}
         </div>
-        <p className="text-cream/45 mx-auto mt-10 max-w-xl text-sm">
+        <p className="text-cream/70 mx-auto mt-10 max-w-xl text-sm">
           This is the journey we&rsquo;re building — not one you can take today.
           Register below and you&rsquo;ll hear from us as it opens.
         </p>

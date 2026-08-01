@@ -1,8 +1,10 @@
 # Yuvoy Design System
 
-Single source of truth for visual design. **Every color, font, and spacing value used in the app must map to a token here.** Never invent a value that falls between tokens — add a token (with review) instead.
+Single source of truth for visual design. **Every color, font, radius and tracking value used in the app must map to a token here.** Never invent a value that falls between tokens — add a token (with review) instead.
 
-Direction: cinematic minimalism — full-screen frames, atmospheric imagery, film grain, generous space, slow considered motion. Cream editorial surfaces; Ink immersive scenes.
+Direction: **editorial, rectangular, confident.** Heavy geometric display type against wide-tracked mono labels; cream editorial surfaces alternating with teal/ink immersive ones; hairline rules doing the work that boxes and shadows do elsewhere. Generous space, fast interactions, slow entrances.
+
+> **Brand Kit v2** (ratified 2026-08-01) supersedes v1. v1 was Fraunces + pill geometry on a warmer cream; v2 moves to Poppins + IBM Plex Mono and a rectangular geometry, retuning the palette to match. Rationale and the full contrast table are in §1.
 
 ## 0. Architecture rule
 
@@ -12,59 +14,125 @@ Direction: cinematic minimalism — full-screen frames, atmospheric imagery, fil
 
 ## 1. Color tokens
 
-Brand Kit v1 (ratified 2026-07-31). Contrast ratios measured against WCAG 2.2.
+Brand Kit v2. Every ratio below is measured (sRGB relative luminance, WCAG 2.2) — not estimated.
 
-| Token / utility | Hex       | Role                                                            |
-| --------------- | --------- | --------------------------------------------------------------- |
-| `cream`         | `#F5F2EC` | Canvas — default page background                                |
-| `cream-deep`    | `#EDE8DE` | Raised surfaces, inputs, cards on cream                         |
-| `cream-line`    | `#DBD2BF` | Hairline borders on cream                                       |
-| `teal`          | `#0F4C5C` | Primary ink — text, headings, wordmark, primary buttons (8.5:1) |
-| `terra`         | `#C96A3D` | Accent — enso dot, LARGE display accents only (3.3:1 on cream)  |
-| `terra-deep`    | `#8F4522` | Text-capable accent — labels, errors, accent buttons (6.2:1)    |
-| `terra-soft`    | `#D98C63` | Accent for labels on `ink` surfaces (6.0:1 on ink)              |
-| `ink`           | `#1C2321` | Immersive scenes — night, depth backgrounds (14.3:1 vs cream)   |
+| Token        | Hex       | Role                                                     |
+| ------------ | --------- | -------------------------------------------------------- |
+| `cream`      | `#F4EFE4` | Canvas — default page background                         |
+| `cream-deep` | `#ECE5D6` | Raised surfaces — cards, inputs, panels on cream         |
+| `cream-line` | `#E5DCC9` | Hairline borders on cream                                |
+| `teal`       | `#0D3B3E` | Primary ink; dark section backgrounds (10.70:1 on cream) |
+| `ink`        | `#22302E` | Deepest sections — night, depth (11.97:1 on cream)       |
+| `terra`      | `#BE7149` | Accent — decoration and LARGE display text only (3.24:1) |
+| `terra-deep` | `#985028` | Text-capable accent + primary CTA fill (5.21:1 on cream) |
+| `terra-soft` | `#D89772` | Accent text on dark (5.02:1 on teal, 5.61:1 on ink)      |
 
-**The terra rule:** `terra` fails AA for normal-size text on cream (3.3:1). It
-may appear only as decoration or at large-text sizes (≥24px / ≥18.7px bold).
-Anything a visitor reads at body/label size uses `terra-deep` on cream and
-`terra-soft` on ink. Accent buttons are `bg-terra-deep text-cream`.
+### Measured contrast
 
-Muted/secondary shades come from **opacity modifiers on `teal`**, not new tokens: `text-teal/70` (secondary), `/55` (tertiary/labels), `/45` (faint), `/20`–`/12` (borders/fills).
+| Pairing                      | Ratio   | Verdict                     |
+| ---------------------------- | ------- | --------------------------- |
+| `teal` on `cream`            | 10.70:1 | AA + AAA body               |
+| `ink` on `cream`             | 11.97:1 | AA + AAA body               |
+| `terra-deep` on `cream`      | 5.21:1  | AA body                     |
+| `terra-deep` on `cream-deep` | 4.77:1  | AA body                     |
+| `terra` on `cream`           | 3.24:1  | **large text only** (≥24px) |
+| `cream` on `terra-deep`      | 5.21:1  | AA body — the primary CTA   |
+| `cream` on `teal`            | 10.70:1 | AA + AAA body               |
+| `terra-soft` on `teal`       | 5.02:1  | AA body                     |
+| `terra-soft` on `ink`        | 5.61:1  | AA body                     |
+
+### The terra rule (read before using an accent on text)
+
+`terra` is **decoration and large display text only**. At 3.24:1 it clears AA
+for large text (≥24px, or ≥18.66px bold) and nothing else. It may never be used
+for body copy, labels, nav, or button text.
+
+- Accent text at body/label size **on cream** → `terra-deep`.
+- Accent text **on teal/ink** → `terra-soft`.
+- Accent **fills** (the primary CTA) → `bg-terra-deep text-cream`. A `terra`
+  fill with any text on it fails AA; this is why the CTA is the deeper tone.
+
+### The opacity ladder (measured, not guessed)
+
+Muted and secondary text comes from **opacity modifiers on `teal` / `cream`**, not new tokens. The rendered composite decides whether it passes, so the safe floors are fixed:
+
+| Usage                         | Floor           | Composite ratio |
+| ----------------------------- | --------------- | --------------- |
+| Body/secondary text on cream  | `text-teal/70`  | 4.63:1          |
+| Labels + small text on cream  | `text-teal/75`  | 5.31:1          |
+| Body text on teal             | `text-cream/60` | 4.90:1          |
+| Comfortable secondary on dark | `text-cream/70` | 6.08:1          |
+
+**Anything below `teal/70` on cream, or `cream/60` on dark, is decoration only** — never text. (`teal/55`, the v1 default for labels, renders 3.12:1 and fails; it was swept out of the codebase when v2 landed.)
+
+Borders and fills are exempt from these floors — `border-teal/20`, `bg-teal/5`, `border-cream/12` are all fine.
 
 ## 2. Typography
 
-- **Display — Fraunces** (`font-display`). Italic reserved for expressive headlines. Loaded via `next/font` with `normal` + `italic`.
+- **Display — Poppins** (`font-display`), weights 600/700/800. Headlines are heavy and tight (`font-extrabold tracking-tight`). **Italic is reserved for the second line of a headline** — the terracotta "turn" that is the brand's most recognisable typographic move. Do not use italic display type for anything else.
 - **UI / body — Inter** (`font-sans`, the default).
-- **Label** — the `label` utility: uppercase, `text-xs`, `font-medium`, `tracking-label` (0.22em). The brand's editorial voice for eyebrows and nav.
-- **Wordmark** — `tracking-wordmark` (0.38em) on display caps; see `<Wordmark />`.
+- **Label — IBM Plex Mono** (`font-mono`) via the `label` utility: uppercase, `text-xs`, `font-medium`, `tracking-label` (0.18em). Eyebrows, nav, stats, metadata, button labels. The editorial counterweight to Poppins' mass.
+- **`eyebrow` utility** — the `label` preceded by a short terracotta rule (a 1.75rem hairline). This is the section-opening gesture; **use it once per section**, at the top.
+- **Wordmark** — `tracking-wordmark` (0.34em) on display caps; see `<Wordmark />`, which also carries the tile mark and the "Experience more." kicker.
 
-Scale: use Tailwind's type scale (`text-sm`…`text-7xl`). Headlines `font-display`; everything else inherits Inter.
+Scale: Tailwind's type scale. Headlines `font-display`; everything else inherits Inter unless it is a label.
 
 ## 3. Motion
 
-- Token: `--ease-cinematic` (`cubic-bezier(0.22,1,0.36,0.16)`).
-- CSS entrance: the `rise` utility (opacity + translateY, 1s). Prefer this for above-the-fold (zero JS).
-- JS motion: **Motion** (`motion/react`) via the `<Reveal>` component for scroll-reveal. All motion is wrapped in `<MotionConfig reducedMotion="user">` (providers) — **never bypass it**. Every animation must degrade cleanly under `prefers-reduced-motion`.
-- Smooth scroll (Lenis): queued — mount guarded by reduced-motion.
+Two budgets, and they are not the same thing — this is the ruling that resolves "fast, responsive UI" against "slow, considered entrances".
 
-## 4. Radius, spacing, sizing
+| Class of motion                                                                 | Budget     | Easing               |
+| ------------------------------------------------------------------------------- | ---------- | -------------------- |
+| **Interaction feedback** — menu open/close, hover, tab switch, accordion, focus | **≤250ms** | `--ease-interaction` |
+| **Entrance** — scroll reveals, the `rise` utility, `<Reveal>`                   | ~700ms     | `--ease-cinematic`   |
 
-- Radius: pills (`rounded-full`) for buttons/inputs/chips — the brand's soft register. Cards use `rounded-2xl`/`rounded-3xl`.
+- Tokens: `--ease-interaction` (`cubic-bezier(0.32,0.72,0,1)`), `--ease-cinematic` (`cubic-bezier(0.22,1,0.36,0.16)`).
+- CSS entrance: the `rise` utility (opacity + translateY, 700ms). Prefer this above the fold — it ships zero JS.
+- JS motion: **Motion** (`motion/react`) via `<Reveal>`. All motion is wrapped in `<MotionConfig reducedMotion="user">` (providers) — **never bypass it**.
+- **Reduced motion is handled globally**, once, in `globals.css`: a `prefers-reduced-motion: reduce` block neutralises every animation and transition. Individual components must not add their own reduced-motion branch — if a component needs one, the global rule is wrong and should be fixed instead.
+- Smooth scroll: **not implemented, and out of scope.** Lenis was removed in v2 rather than left as a dependency implying a feature that did not exist.
+
+## 4. Radius, spacing, sizing, grid
+
+- **Radius: `rounded-edge` (2px) — the editorial near-square.** Buttons, inputs, cards and panels all share it. **Pills are not part of the system** (v1 used them; v2 does not).
 - Spacing: Tailwind v4 dynamic scale (multiples of `0.25rem`). Stay on the scale.
-- Control heights: `sm` 36px (`h-9`), `md` 44px (`h-11`), `lg` 52px (`h-13`).
+- Control heights: `sm` 36px (`h-9`), `md` 44px (`h-11`), `lg` 52px (`h-13`). Inputs are 48px (`h-12`).
+- **Page measure: `container-page`** — `max-w-page` (70rem) with `px-6 sm:px-10` gutters. Every full-width section uses it; prose pages may narrow further (`max-w-2xl`).
+- **Editorial grid: `grid-page`** — 4 columns on mobile, 8 from `sm`, 12 from `lg`, with responsive gutters. Place children with `col-span-*` per breakpoint. Use it for content-heavy pages (destinations, journal, comparison layouts); simple stacked sections do not need it.
 
 ## 5. Components (current)
 
-- `Button` — variants `primary | accent | outline | ghost`, sizes `sm | md | lg`. Use `buttonVariants()` to style a `<Link>` as a button.
-- `Input` — pill field on `cream-deep`, terra focus ring.
-- `Wordmark` — YUVOY caps + terra enso dot.
+- **`Button`** — variants `primary | outline | ink | ghost | outlineOnDark`, sizes `sm | md | lg`. Labels are uppercase mono.
+  - **`primary` and `outline` are the first-class pair.** Every screen should use those two; a page with three competing button styles is a bug.
+  - `ink` (solid teal), `ghost` (text-only) and `outlineOnDark` (secondary on teal/ink sections) are **situational** — allowed, but justify them in review.
+  - Use `buttonVariants()` to style a `<Link>` as a button; `<ButtonArrow />` for the trailing arrow on a forward action.
+- **`Input`** — `rounded-edge` field on `cream-deep`, terra-deep focus ring.
+- **`Wordmark`** / **`WaveMark`** — tile + wave glyph, wordmark, "Experience more." kicker. `tone="onDark"` for teal/ink surfaces.
+- **`SiteHeader`** / **`SiteFooter`** / **`MobileMenu`** — the shell, rendered by the root layout on every route. All navigation comes from the registry (§7).
 - Growing set: ExperienceCard, FeedPlayer, AvailabilityPicker, PriceBreakdown (as screens land).
 
 ## 6. Accessibility (release gate)
 
-WCAG 2.2 AA. Keyboard-complete flows; visible focus (`focus-visible:ring-terra-deep`); `aria-invalid` + `role="alert"` on form errors; contrast-checked pairings (terra only at large sizes; readable accents use terra-deep (cream) / terra-soft (ink)). axe runs in CI.
+WCAG 2.2 AA, enforced not assumed:
 
-## 7. Figma / prototype → code
+- Contrast pairings come from §1's measured table and the opacity floors. Nothing ships on an unmeasured pairing.
+- Keyboard-complete flows; visible focus (`focus-visible:ring-terra-deep`).
+- `aria-invalid` + `role="alert"` on form errors.
+- The mobile menu is a native `<dialog>` opened with `showModal()` — the browser provides the focus trap, Escape handling and background inerting, so they cannot drift out of sync with the markup.
+- axe runs in CI against every route.
 
-No Figma yet — the [prototype](https://claude.ai/public/artifacts/024b0d79-4fb0-44aa-a4ed-c9ec4d36ef5f) + brand docs are reference. Any pasted export is oversized vs. real scale: calibrate the ratio, snap every value to a token, re-express with flex/grid, mobile-first. See `.claude/commands/figma.md`.
+## 7. Navigation registry
+
+`src/lib/site/nav.ts` is the single source of truth for every navigable route. The header, the mobile menu and the footer are all derived from it.
+
+- **A route is added to the registry in the same PR that ships its page** — never before. This makes a link to a non-existent page structurally impossible.
+- Footer columns with no entries are dropped rather than rendered empty.
+- `CONTACT_CHANNELS` is empty by design: an unmonitored address is worse than none, so the footer omits the whole row until a real channel is confirmed.
+
+## 8. Figma / prototype → code
+
+No Figma. The reference is the [pre-launch landing artifact](https://claude.ai/public/artifacts/b099d827-a565-4679-91c2-38d242feeed7) plus the brand docs.
+
+**The artifact is a visual reference, not a content one.** Its layout, density, type treatment and motion are the target. Its copy is not: it shows prices, live availability, named listings and completed-booking screens, none of which exist. Those are barred by the project's truthfulness rules (see `CLAUDE.md` and issue #32) and several of its own colour pairings fail AA — the palette in §1 is the corrected version, not a transcription.
+
+Any pasted export is oversized vs. real scale: calibrate the ratio, snap every value to a token, re-express with flex/grid, mobile-first.
