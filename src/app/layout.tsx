@@ -13,26 +13,26 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Yuvoy — Don't be a tourist.",
+    default: "Yuvoy — See the experience. Feel if it's right. Then book.",
     template: "%s · Yuvoy",
   },
   description:
-    "Yuvoy is building a marketplace for real local experiences — opening this season in the Andaman Islands, designed for the world. Register interest as a traveller or an experience provider.",
+    "Yuvoy brings local dives, boat days, food and culture to life through honest video from the people who run them. Join the waitlist for first access in Havelock, Neil and Port Blair.",
   applicationName: "Yuvoy",
   robots: IS_PRODUCTION ? undefined : { index: false, follow: false },
   openGraph: {
     type: "website",
     siteName: "Yuvoy",
-    title: "Yuvoy — Don't be a tourist.",
+    title: "Yuvoy — See the experience. Feel if it's right. Then book.",
     description:
-      "Real local experiences, starting in the Andaman Islands this season. Register interest as a traveller or a provider.",
+      "Local dives, boat days, food and culture in the Andaman Islands, shown in honest video by the people who run them. Join the waitlist for first access.",
     url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Yuvoy — Don't be a tourist.",
+    title: "Yuvoy — See the experience. Feel if it's right. Then book.",
     description:
-      "Real local experiences, starting in the Andaman Islands this season.",
+      "Local experiences in the Andaman Islands, shown in honest video by the people who run them. Join the waitlist.",
   },
 };
 

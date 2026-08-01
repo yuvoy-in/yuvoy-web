@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/brand/wordmark";
-import { buttonVariants, ButtonArrow } from "@/components/ui/button";
-import { cn } from "@/lib/cn";
+import { FooterCta } from "@/components/site/footer-cta";
 import {
   CONTACT_CHANNELS,
   FOOTER_COLUMNS,
   LAUNCH_STATUS,
-  PRIMARY_CTA,
 } from "@/lib/site/nav";
 
 /**
@@ -19,32 +17,12 @@ import {
  * publishing none).
  */
 export function SiteFooter() {
+  // The top hairline matters: on routes that end in the registration form
+  // (also teal) the footer would otherwise run straight on from it with no
+  // seam at all.
   return (
-    <footer className="bg-teal text-cream">
-      {/* Closing call to action. */}
-      <div className="container-page border-cream/12 border-b py-20 sm:py-24">
-        <p className="eyebrow text-terra-soft">Experience more.</p>
-        <h2 className="font-display mt-6 max-w-3xl text-4xl leading-[1.05] font-extrabold tracking-tight text-balance sm:text-5xl">
-          The islands first.{" "}
-          <em className="text-terra-soft not-italic">
-            Then everywhere worth going.
-          </em>
-        </h2>
-        <p className="text-cream/70 mt-6 max-w-xl text-lg">
-          Join the waitlist and we&rsquo;ll message you when the first Andaman
-          experiences are ready.
-        </p>
-        <Link
-          href={PRIMARY_CTA.href}
-          className={cn(
-            buttonVariants({ size: "lg" }),
-            "focus-visible:ring-offset-teal mt-10 flex w-full sm:inline-flex sm:w-auto",
-          )}
-        >
-          {PRIMARY_CTA.label}
-          <ButtonArrow />
-        </Link>
-      </div>
+    <footer className="bg-teal text-cream border-cream/12 border-t">
+      <FooterCta />
 
       {/* Site map. */}
       {FOOTER_COLUMNS.length > 0 && (
@@ -95,8 +73,8 @@ export function SiteFooter() {
             The experience commerce platform. First stop: the Andaman Islands.
           </p>
         </div>
-        <div className="flex flex-col gap-3 lg:items-end lg:text-right">
-          <p className="label text-cream/70">{LAUNCH_STATUS}</p>
+        <div className="flex max-w-sm flex-col gap-3 lg:items-end lg:text-right">
+          <p className="label text-cream/70 leading-relaxed">{LAUNCH_STATUS}</p>
           <p className="label text-cream/60">
             © {new Date().getFullYear()} Yuvoy · Andaman Islands, India
           </p>
