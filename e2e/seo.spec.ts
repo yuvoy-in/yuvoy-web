@@ -53,9 +53,10 @@ test.describe("metadata", () => {
 
       // The staging bug this guards against: SITE_URL falling back to
       // localhost when no explicit origin is configured, which silently
-      // publishes localhost canonicals and OG image URLs.
-      const origin = new URL(baseURL ?? "http://localhost:3000").origin;
-      if (origin !== "http://localhost:3000") {
+      // publishes localhost canonicals and OG image URLs. Only meaningful
+      // against a deployed environment — locally the origin *is* localhost.
+      const origin = new URL(baseURL ?? "http://localhost").origin;
+      if (!origin.startsWith("http://localhost")) {
         expect(
           canonical,
           `${path} canonical points at localhost`,
