@@ -155,9 +155,16 @@ export function MobileMenu() {
             </button>
           </div>
 
+          {/*
+            Only the link list scrolls. The call to action and the legal links
+            are pinned below it, so they stay reachable however many routes the
+            registry grows to — and cannot be scrolled underneath the panel,
+            which is both a usability problem and what made an automated
+            contrast check resolve them against the wrong background.
+          */}
           <nav
             aria-label="Site"
-            className="flex-1 overflow-y-auto overscroll-contain px-6 py-8"
+            className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-6"
           >
             {NAV_ITEMS.length > 0 && (
               <ul className="flex flex-col">
@@ -170,7 +177,7 @@ export function MobileMenu() {
                         aria-current={current ? "page" : undefined}
                         onClick={() => close(false)}
                         className={cn(
-                          "font-display block py-5 text-2xl font-bold tracking-tight",
+                          "font-display block py-4 text-xl font-bold tracking-tight",
                           current ? "text-terra-deep" : "text-teal",
                         )}
                       >
@@ -181,18 +188,20 @@ export function MobileMenu() {
                 })}
               </ul>
             )}
+          </nav>
 
+          <div className="border-cream-line bg-cream shrink-0 border-t px-6 py-6">
             <Link
               href={PRIMARY_CTA.href}
               onClick={() => close(false)}
-              className={cn(buttonVariants({ size: "lg" }), "mt-8 flex w-full")}
+              className={cn(buttonVariants({ size: "lg" }), "flex w-full")}
             >
               {PRIMARY_CTA.label}
               <ButtonArrow />
             </Link>
 
             {legalLinks.length > 0 && (
-              <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2">
+              <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
                 {legalLinks.map((item) => (
                   <li key={item.href}>
                     <Link
@@ -206,7 +215,7 @@ export function MobileMenu() {
                 ))}
               </ul>
             )}
-          </nav>
+          </div>
         </div>
       </dialog>
     </>

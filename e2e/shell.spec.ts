@@ -167,6 +167,27 @@ test.describe("mobile menu", () => {
     await expect(page.getByRole("dialog")).toBeHidden();
   });
 
+  /*
+    The call to action and the legal links are pinned below the scrolling link
+    list, so they stay on screen however many routes the registry grows to.
+    Before this was pinned, a longer nav pushed them out of view — reachable
+    only by scrolling, and resolved against the wrong background by axe.
+  */
+  test("the call to action stays visible without scrolling as the nav grows", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await openMenu(page);
+
+    const dialog = page.getByRole("dialog", { name: "Site menu" });
+    await expect(
+      dialog.getByRole("link", { name: /join waitlist/i }),
+    ).toBeInViewport();
+    for (const label of ["Privacy", "Terms"]) {
+      await expect(dialog.getByRole("link", { name: label })).toBeInViewport();
+    }
+  });
+
   test("has no motion under prefers-reduced-motion", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
