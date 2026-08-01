@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/brand/wordmark";
 import { FooterCta } from "@/components/site/footer-cta";
+import { PrivacyChoices } from "@/components/analytics/consent-banner";
 import {
   CONTACT_CHANNELS,
   FOOTER_COLUMNS,
@@ -74,6 +75,8 @@ export function SiteFooter() {
           </p>
         </div>
         <div className="flex max-w-sm flex-col gap-3 lg:items-end lg:text-right">
+          {/* Consent must be as easy to withdraw as it was to give. */}
+          <PrivacyChoices />
           <p className="label text-cream/70 leading-relaxed">{LAUNCH_STATUS}</p>
           <p className="label text-cream/60">
             © {new Date().getFullYear()} Yuvoy · Andaman Islands, India

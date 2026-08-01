@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { LeadForms } from "@/components/landing/lead-forms";
-import { DEFAULT_DESTINATION, type LeadAudience } from "@/lib/leads/registry";
+import { LandingView } from "@/components/analytics/landing-view";
+import {
+  DEFAULT_DESTINATION,
+  LAUNCH_MARKET,
+  type LeadAudience,
+} from "@/lib/leads/registry";
 
 export const metadata: Metadata = {
   title: "Join the waitlist",
@@ -37,6 +42,12 @@ export default async function WaitlistPage({
 
   return (
     <main>
+      <LandingView
+        routeType="waitlist"
+        source="web"
+        marketKey={LAUNCH_MARKET.key}
+        destinationKey={DEFAULT_DESTINATION.key}
+      />
       <LeadForms
         context={{ source: "web", destinationKey: DEFAULT_DESTINATION.key }}
         initialAudience={initialAudience}

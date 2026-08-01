@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import { poppins, inter, plexMono } from "@/lib/fonts";
 import { Providers } from "@/components/providers";
 import { SITE_URL, IS_PRODUCTION } from "@/lib/site";
-import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { ConsentBanner } from "@/components/analytics/consent-banner";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { StagingBanner } from "@/components/site/staging-banner";
@@ -58,8 +58,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <SiteFooter />
           </div>
         </Providers>
-        <Analytics />
+        {/*
+          Speed Insights only. It is production-gated, carries no visitor
+          identity or profile, and exists to verify Core Web Vitals — the
+          same performance bar this rebuild is answering. Product analytics
+          lives behind the consent prompt instead.
+        */}
         {IS_PRODUCTION && <SpeedInsights />}
+        <ConsentBanner />
         <StagingBanner />
       </body>
     </html>
