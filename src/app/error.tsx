@@ -18,7 +18,7 @@ export default function Error({
 
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
-      <p className="label text-terra">Something broke</p>
+      <p className="label text-terra-deep">Something broke</p>
       <h1 className="font-display text-teal mt-5 text-4xl">
         A small wave, not a storm.
       </h1>

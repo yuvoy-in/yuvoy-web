@@ -157,7 +157,7 @@ export function LeadForms({ context }: { context: LeadContext }) {
                 "focus-visible:ring-terra-deep flex-1 rounded-full px-4 py-2.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:outline-none",
                 audience === value
                   ? "bg-teal text-cream"
-                  : "text-teal/60 hover:text-teal",
+                  : "text-teal/75 hover:text-teal",
               )}
             >
               {tabLabel}
@@ -398,7 +398,7 @@ function TravellerForm({ context }: { context: LeadContext }) {
       )}
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="t-name" className="label text-teal/55 px-5">
+        <label htmlFor="t-name" className="label text-teal/75 px-5">
           Name
         </label>
         <Input
@@ -412,7 +412,7 @@ function TravellerForm({ context }: { context: LeadContext }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="t-whatsapp" className="label text-teal/55 px-5">
+        <label htmlFor="t-whatsapp" className="label text-teal/75 px-5">
           WhatsApp number
         </label>
         <Input
@@ -429,7 +429,7 @@ function TravellerForm({ context }: { context: LeadContext }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="t-email" className="label text-teal/55 px-5">
+        <label htmlFor="t-email" className="label text-teal/75 px-5">
           Email <span className="normal-case">(optional)</span>
         </label>
         <Input
@@ -445,7 +445,7 @@ function TravellerForm({ context }: { context: LeadContext }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="t-destination" className="label text-teal/55 px-5">
+        <label htmlFor="t-destination" className="label text-teal/75 px-5">
           Where are you headed first?
         </label>
         <select
@@ -467,7 +467,7 @@ function TravellerForm({ context }: { context: LeadContext }) {
       </div>
 
       <fieldset>
-        <legend className="label text-teal/55 px-5">
+        <legend className="label text-teal/75 px-5">
           What draws you? <span className="normal-case">(up to three)</span>
         </legend>
         <div className="mt-2 flex flex-wrap gap-2 px-1">
@@ -564,7 +564,7 @@ function ProviderForm({ context }: { context: LeadContext }) {
       )}
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="p-name" className="label text-teal/55 px-5">
+        <label htmlFor="p-name" className="label text-teal/75 px-5">
           Your name
         </label>
         <Input
@@ -577,7 +577,7 @@ function ProviderForm({ context }: { context: LeadContext }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="p-business" className="label text-teal/55 px-5">
+        <label htmlFor="p-business" className="label text-teal/75 px-5">
           Business name
         </label>
         <Input
@@ -593,7 +593,7 @@ function ProviderForm({ context }: { context: LeadContext }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="p-whatsapp" className="label text-teal/55 px-5">
+        <label htmlFor="p-whatsapp" className="label text-teal/75 px-5">
           WhatsApp number
         </label>
         <Input
@@ -609,7 +609,7 @@ function ProviderForm({ context }: { context: LeadContext }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="p-email" className="label text-teal/55 px-5">
+        <label htmlFor="p-email" className="label text-teal/75 px-5">
           Email <span className="normal-case">(optional)</span>
         </label>
         <Input
@@ -624,7 +624,7 @@ function ProviderForm({ context }: { context: LeadContext }) {
       </div>
 
       <fieldset>
-        <legend className="label text-teal/55 px-5">Where you operate</legend>
+        <legend className="label text-teal/75 px-5">Where you operate</legend>
         <div className="mt-2 flex flex-wrap gap-2 px-1">
           {LAUNCH_MARKET.destinations.map((d) => (
             <label
@@ -648,7 +648,7 @@ function ProviderForm({ context }: { context: LeadContext }) {
       </fieldset>
 
       <fieldset>
-        <legend className="label text-teal/55 px-5">
+        <legend className="label text-teal/75 px-5">
           What you mainly offer
         </legend>
         <div className="mt-2 flex flex-wrap gap-2 px-1">
@@ -683,7 +683,7 @@ function ProviderForm({ context }: { context: LeadContext }) {
         {isSubmitting ? "Sending…" : "Register my business"}
       </Button>
 
-      <p className="text-teal/45 text-center text-xs">
+      <p className="text-teal/75 text-center text-xs">
         Pricing, capacity and listings come later, in conversation — this just
         opens the door.
       </p>

@@ -8,10 +8,19 @@ describe("Button", () => {
     expect(screen.getByRole("button", { name: "Book" })).toBeInTheDocument();
   });
 
-  it("applies the accent variant", () => {
-    render(<Button variant="accent">Go</Button>);
+  it("defaults to the primary variant, filled with terra-deep", () => {
+    // terra-deep, not terra: cream on terra would be 3.4:1 and fail AA at
+    // label size. If this ever flips to `bg-terra`, contrast regresses.
+    render(<Button>Go</Button>);
     expect(screen.getByRole("button", { name: "Go" }).className).toContain(
-      "bg-terra",
+      "bg-terra-deep",
+    );
+  });
+
+  it("applies the outline variant as the secondary action", () => {
+    render(<Button variant="outline">Later</Button>);
+    expect(screen.getByRole("button", { name: "Later" }).className).toContain(
+      "border-teal/25",
     );
   });
 

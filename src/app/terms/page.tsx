@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Wordmark } from "@/components/brand/wordmark";
 
 export const metadata: Metadata = {
   title: "Terms",
@@ -16,11 +15,10 @@ export const metadata: Metadata = {
  */
 export default function TermsPage() {
   return (
-    <main className="mx-auto max-w-2xl px-6 py-16 sm:px-10">
-      <Link href="/" aria-label="Yuvoy home">
-        <Wordmark />
-      </Link>
-      <h1 className="font-display text-teal mt-10 text-4xl">Terms</h1>
+    <main className="mx-auto max-w-2xl px-6 py-16 sm:px-10 sm:py-24">
+      <h1 className="font-display text-teal text-4xl font-extrabold tracking-tight">
+        Terms
+      </h1>
       <div className="text-teal/70 mt-6 flex flex-col gap-4 text-sm leading-relaxed">
         <p>
           Yuvoy&rsquo;s full Terms of Service will be published here before
@@ -43,7 +41,7 @@ export default function TermsPage() {
       </div>
       <Link
         href="/"
-        className="label text-teal/55 hover:text-teal mt-10 inline-block"
+        className="label text-teal/75 hover:text-teal mt-10 inline-block"
       >
         ← Back home
       </Link>

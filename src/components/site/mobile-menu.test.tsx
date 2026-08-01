@@ -1,0 +1,51 @@
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { describe, it, expect, vi } from "vitest";
+import { MobileMenu } from "./mobile-menu";
+
+vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
+
+// jsdom's `<dialog>` and matchMedia gaps are shimmed in vitest.setup.ts.
+// Escape, the focus trap and focus restoration need a real browser and are
+// asserted in e2e/shell.spec.ts instead.
+
+describe("MobileMenu", () => {
+  it("starts closed and announces that to assistive tech", () => {
+    render(<MobileMenu />);
+    expect(screen.getByRole("button", { name: "Open menu" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+  });
+
+  it("opens on the trigger and flips aria-expanded", async () => {
+    const user = userEvent.setup();
+    render(<MobileMenu />);
+    const trigger = screen.getByRole("button", { name: "Open menu" });
+
+    await user.click(trigger);
+
+    expect(trigger).toHaveAttribute("aria-expanded", "true");
+    expect(screen.getByRole("button", { name: "Close menu" })).toBeVisible();
+  });
+
+  it("closes again from the close button", async () => {
+    const user = userEvent.setup();
+    render(<MobileMenu />);
+    const trigger = screen.getByRole("button", { name: "Open menu" });
+
+    await user.click(trigger);
+    await user.click(screen.getByRole("button", { name: "Close menu" }));
+
+    expect(trigger).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("offers the primary call to action while open", async () => {
+    const user = userEvent.setup();
+    render(<MobileMenu />);
+
+    await user.click(screen.getByRole("button", { name: "Open menu" }));
+
+    expect(screen.getByRole("link", { name: /join waitlist/i })).toBeVisible();
+  });
+});
