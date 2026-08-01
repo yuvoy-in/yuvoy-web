@@ -8,9 +8,23 @@ export type LeadAcceptance = components["schemas"]["LeadAcceptance"];
  * deployed — submission then reports `unavailable` truthfully instead of
  * pretending to succeed. Read at call time: Next inlines NEXT_PUBLIC_* values
  * either way, and tests can stub the env per case.
+ *
+ * **The scheme is added if it is missing, and that is not cosmetic.** A value
+ * of `api.yuvoy.in` (no scheme) makes `fetch()` treat the URL as a *relative
+ * path*, so every submission silently posts to
+ * `https://<this-site>/api.yuvoy.in/v1/leads` and 404s. It looks exactly like
+ * an API outage, and it reached production once. A misconfigured env var must
+ * not be able to quietly convert a working form into a dead one.
  */
 function apiBaseUrl(): string {
-  return (process.env.NEXT_PUBLIC_API_BASE_URL ?? "").replace(/\/$/, "");
+  const configured = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "").trim();
+  if (!configured) return "";
+
+  const withScheme = /^https?:\/\//i.test(configured)
+    ? configured
+    : `https://${configured}`;
+
+  return withScheme.replace(/\/+$/, "");
 }
 
 /** Every way a submission can conclude. The form renders each one honestly. */
