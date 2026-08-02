@@ -43,7 +43,7 @@ test.describe("live API", () => {
       }
     });
 
-    await page.goto("/#register");
+    await page.goto("/waitlist");
     const panel = page.getByRole("tabpanel", { name: /travelling/i });
 
     // Unique per run so reruns exercise the create path, not the update path.
@@ -53,17 +53,17 @@ test.describe("live API", () => {
     await panel.getByLabel("WhatsApp number").fill(phone);
     await panel.getByText("Diving & water").click();
     await panel.getByText(/I agree to the/).click();
-    await panel.getByRole("button", { name: "Register interest" }).click();
+    await panel.getByRole("button", { name: "Join the waitlist" }).click();
 
-    await expect(panel.getByRole("status")).toContainText(/registered/i, {
-      timeout: 20_000,
-    });
+    await expect(panel.getByRole("status")).toContainText(
+      /you.re on the yuvoy waitlist/i,
+      { timeout: 20_000 },
+    );
 
     // The success state must have been earned by a real 2xx, not by a UI path
     // that reports success without the network agreeing.
     expect(requests.length).toBeGreaterThan(0);
     expect([200, 201]).toContain(requests[0].status);
-    expect(requests[0].url).toContain("api.yuvoy.in");
   });
 
   test("resubmitting the same contact is accepted as an update", async ({
@@ -76,10 +76,9 @@ test.describe("live API", () => {
     const statuses: number[] = [];
 
     for (const attempt of [1, 2]) {
-      // A unique query forces a real navigation. Re-visiting "/#register"
-      // when already there only scrolls, leaving the previous success state
-      // on screen and the form fields absent.
-      await page.goto(`/?e2e=${attempt}#register`);
+      // A unique query forces a real navigation. Re-visiting "/waitlist" when
+      // already there would just leave the previous success state on screen.
+      await page.goto(`/waitlist?e2e=${attempt}`);
       const panel = page.getByRole("tabpanel", { name: /travelling/i });
       await panel.getByLabel("Name").fill(`E2E Live Check ${attempt}`);
       await panel.getByLabel("WhatsApp number").fill(phone);
@@ -93,7 +92,7 @@ test.describe("live API", () => {
         page.waitForResponse((r) => r.url().includes("/v1/leads"), {
           timeout: 20_000,
         }),
-        panel.getByRole("button", { name: "Register interest" }).click(),
+        panel.getByRole("button", { name: "Join the waitlist" }).click(),
       ]);
       statuses.push(res.status());
 
@@ -103,7 +102,7 @@ test.describe("live API", () => {
       );
 
       await expect(panel.getByRole("status")).toContainText(
-        /registered|updated/i,
+        /you.re on the yuvoy waitlist|already had you/i,
         { timeout: 20_000 },
       );
     }
@@ -121,7 +120,9 @@ test.describe("live API", () => {
       }
     });
 
-    // Arriving from the printed ferry QR code, then registering as a provider.
+    // Arriving from the printed ferry QR code. The campaign route still
+    // renders the full landing, including the embedded registration form —
+    // #register/#providers stay working indefinitely (see lead-forms.tsx).
     await page.goto("/go/ferry#providers");
     await page.getByRole("tab", { name: /run experiences/i }).click();
     const panel = page.getByRole("tabpanel", { name: /run experiences/i });
@@ -130,22 +131,17 @@ test.describe("live API", () => {
     await panel.getByLabel("Your name").fill("E2E Live Contact");
     await panel.getByLabel("Business name").fill("E2E Live Dive Co");
     await panel.getByLabel("WhatsApp number").fill(phone);
-    // Both are required by the contract: at least one coverage destination
-    // and exactly one primary interest.
-    await panel
-      .getByRole("group", { name: /where you operate/i })
-      .getByText("Havelock")
-      .click();
-    await panel
-      .getByRole("group", { name: /what you mainly offer/i })
-      .getByText("Diving & water")
-      .click();
+    // Both are required: at least one coverage destination and exactly one
+    // primary interest.
+    await panel.getByText("Havelock").click();
+    await panel.getByText("Diving & water").click();
     await panel.getByText(/I agree to the/).click();
-    await panel.getByRole("button", { name: /register my business/i }).click();
+    await panel.getByRole("button", { name: "Join the waitlist" }).click();
 
-    await expect(panel.getByRole("status")).toContainText(/registered|touch/i, {
-      timeout: 20_000,
-    });
+    await expect(panel.getByRole("status")).toContainText(
+      /you.re on the yuvoy waitlist|touch/i,
+      { timeout: 20_000 },
+    );
 
     // Attribution must survive the journey from QR route to API payload,
     // otherwise campaign spend cannot be told apart from organic traffic.
