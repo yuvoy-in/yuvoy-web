@@ -177,7 +177,7 @@ export function MobileMenu() {
                         aria-current={current ? "page" : undefined}
                         onClick={() => close(false)}
                         className={cn(
-                          "font-display block py-4 text-xl font-bold tracking-tight",
+                          "font-display block py-4 text-xl font-normal tracking-tight",
                           current ? "text-terra-deep" : "text-forest",
                         )}
                       >

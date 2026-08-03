@@ -83,7 +83,7 @@ export default function OperatorsPage() {
           {OFFER.map((item, i) => (
             <li key={item.title} className="pt-10 sm:pr-10">
               <span className="label text-forest/75">0{i + 1}</span>
-              <h3 className="font-display text-forest mt-5 text-xl font-bold tracking-tight">
+              <h3 className="font-display text-forest mt-5 text-xl font-normal tracking-tight">
                 {item.title}
               </h3>
               <p className="text-forest/75 mt-3 leading-relaxed">{item.body}</p>

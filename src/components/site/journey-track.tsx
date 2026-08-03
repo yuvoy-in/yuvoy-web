@@ -37,7 +37,7 @@ export function JourneyTrack({ journey }: { journey: Journey }) {
         </p>
         <h2
           id={headingId}
-          className="font-display mt-6 max-w-3xl text-[clamp(1.875rem,4.5vw,3rem)] leading-[1.05] font-extrabold tracking-tight text-balance"
+          className="font-display mt-6 max-w-3xl text-[clamp(1.875rem,4.5vw,3rem)] leading-[1.05] font-normal tracking-tight text-balance"
         >
           {journey.title}{" "}
           <em
@@ -90,7 +90,7 @@ export function JourneyTrack({ journey }: { journey: Journey }) {
                 <StatusChip status={step.status} tone={journey.key} />
               </div>
               <div className="sm:col-span-9">
-                <h3 className="font-display text-lg font-bold tracking-tight">
+                <h3 className="font-display text-lg font-normal tracking-tight">
                   {step.title}
                 </h3>
                 <p
