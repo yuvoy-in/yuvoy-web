@@ -2,9 +2,11 @@
 
 Single source of truth for visual design. **Every color, font, radius and tracking value used in the app must map to a token here.** Never invent a value that falls between tokens — add a token (with review) instead.
 
-Direction: **editorial, rectangular, confident.** Heavy geometric display type against wide-tracked mono labels; cream editorial surfaces alternating with teal/ink immersive ones; hairline rules doing the work that boxes and shadows do elsewhere. Generous space, fast interactions, slow entrances.
+Direction: **editorial, rectangular, confident.** Heavy geometric display type against wide-tracked mono labels; cream editorial surfaces alternating with forest immersive ones; hairline rules doing the work that boxes and shadows do elsewhere. Generous space, fast interactions, slow entrances.
 
 > **Brand Kit v2** (ratified 2026-08-01) supersedes v1. v1 was Fraunces + pill geometry on a warmer cream; v2 moves to Poppins + IBM Plex Mono and a rectangular geometry, retuning the palette to match. Rationale and the full contrast table are in §1.
+>
+> **v2.1 (2026-08-03)** replaces the two darks, `teal` `#0D3B3E` and `ink` `#22302E`, with a single `forest` `#16362E`. Nothing else changed.
 
 ## 0. Architecture rule
 
@@ -16,30 +18,48 @@ Direction: **editorial, rectangular, confident.** Heavy geometric display type a
 
 Brand Kit v2. Every ratio below is measured (sRGB relative luminance, WCAG 2.2) — not estimated.
 
-| Token        | Hex       | Role                                                     |
-| ------------ | --------- | -------------------------------------------------------- |
-| `cream`      | `#F4EFE4` | Canvas — default page background                         |
-| `cream-deep` | `#ECE5D6` | Raised surfaces — cards, inputs, panels on cream         |
-| `cream-line` | `#E5DCC9` | Hairline borders on cream                                |
-| `teal`       | `#0D3B3E` | Primary ink; dark section backgrounds (10.70:1 on cream) |
-| `ink`        | `#22302E` | Deepest sections — night, depth (11.97:1 on cream)       |
-| `terra`      | `#BE7149` | Accent — decoration and LARGE display text only (3.24:1) |
-| `terra-deep` | `#985028` | Text-capable accent + primary CTA fill (5.21:1 on cream) |
-| `terra-soft` | `#D89772` | Accent text on dark (5.02:1 on teal, 5.61:1 on ink)      |
+| Token        | Hex       | Role                                                      |
+| ------------ | --------- | --------------------------------------------------------- |
+| `cream`      | `#F4EFE4` | Canvas — default page background                          |
+| `cream-deep` | `#ECE5D6` | Raised surfaces — cards, inputs, panels on cream          |
+| `cream-line` | `#E5DCC9` | Hairline borders on cream                                 |
+| `forest`     | `#16362E` | Primary ink **and** every dark surface (11.44:1 on cream) |
+| `terra`      | `#BE7149` | Accent — decoration and LARGE display text only (3.24:1)  |
+| `terra-deep` | `#985028` | Text-capable accent + primary CTA fill (5.21:1 on cream)  |
+| `terra-soft` | `#D89772` | Accent text on forest (5.36:1)                            |
 
 ### Measured contrast
 
 | Pairing                      | Ratio   | Verdict                     |
 | ---------------------------- | ------- | --------------------------- |
-| `teal` on `cream`            | 10.70:1 | AA + AAA body               |
-| `ink` on `cream`             | 11.97:1 | AA + AAA body               |
+| `forest` on `cream`          | 11.44:1 | AA + AAA body               |
 | `terra-deep` on `cream`      | 5.21:1  | AA body                     |
 | `terra-deep` on `cream-deep` | 4.77:1  | AA body                     |
 | `terra` on `cream`           | 3.24:1  | **large text only** (≥24px) |
 | `cream` on `terra-deep`      | 5.21:1  | AA body — the primary CTA   |
-| `cream` on `teal`            | 10.70:1 | AA + AAA body               |
-| `terra-soft` on `teal`       | 5.02:1  | AA body                     |
-| `terra-soft` on `ink`        | 5.61:1  | AA body                     |
+| `cream` on `forest`          | 11.44:1 | AA + AAA body               |
+| `terra-soft` on `forest`     | 5.36:1  | AA body                     |
+
+### There is one dark surface
+
+**`forest` is the only dark background on the site** — sections, the
+registration block, and the footer alike. It is also the colour of all body
+text on cream. `Section`'s `tone` is `"cream" | "ink"`, and `ink` paints
+`forest`; there is no second dark to choose between.
+
+There used to be. `teal` (`#0D3B3E`) and `ink` (`#22302E`) differed in hue —
+184° against 171° — and in saturation — 65% against 17% — so one read as a
+cyan and the other as a grey. Nobody scrolling a page tracks which block is
+structural; they see two dark fields in two colours and conclude one of them
+was a mistake. It was reported as a bug three times before it was fixed as one.
+
+`#16362E` is a forest green with a teal undertone (hue 165°, saturation 42%,
+lightness 15%). Two things made it the pick over the lighter `#1B4138` that was
+also on the table: it holds **five times the contrast headroom** on the
+tightest pairing (terracotta accent on dark clears the 4.5 floor by 0.86 rather
+than 0.12, so a later tweak to the accent cannot silently break it), and at 15%
+lightness it matches the depth of the darks it replaced, so the change reads as
+_the greens became one_ rather than _the site got lighter_.
 
 ### The terra rule (read before using an accent on text)
 
@@ -48,24 +68,24 @@ for large text (≥24px, or ≥18.66px bold) and nothing else. It may never be u
 for body copy, labels, nav, or button text.
 
 - Accent text at body/label size **on cream** → `terra-deep`.
-- Accent text **on teal/ink** → `terra-soft`.
+- Accent text **on forest** → `terra-soft`.
 - Accent **fills** (the primary CTA) → `bg-terra-deep text-cream`. A `terra`
   fill with any text on it fails AA; this is why the CTA is the deeper tone.
 
 ### The opacity ladder (measured, not guessed)
 
-Muted and secondary text comes from **opacity modifiers on `teal` / `cream`**, not new tokens. The rendered composite decides whether it passes, so the safe floors are fixed:
+Muted and secondary text comes from **opacity modifiers on `forest` / `cream`**, not new tokens. The rendered composite decides whether it passes, so the safe floors are fixed:
 
-| Usage                         | Floor           | Composite ratio |
-| ----------------------------- | --------------- | --------------- |
-| Body/secondary text on cream  | `text-teal/70`  | 4.63:1          |
-| Labels + small text on cream  | `text-teal/75`  | 5.31:1          |
-| Body text on teal             | `text-cream/60` | 4.90:1          |
-| Comfortable secondary on dark | `text-cream/70` | 6.08:1          |
+| Usage                         | Floor            | Composite ratio |
+| ----------------------------- | ---------------- | --------------- |
+| Body/secondary text on cream  | `text-forest/70` | 4.77:1          |
+| Labels + small text on cream  | `text-forest/75` | 5.55:1          |
+| Body text on forest           | `text-cream/60`  | 5.15:1          |
+| Comfortable secondary on dark | `text-cream/70`  | 6.45:1          |
 
-**Anything below `teal/70` on cream, or `cream/60` on dark, is decoration only** — never text. (`teal/55`, the v1 default for labels, renders 3.12:1 and fails; it was swept out of the codebase when v2 landed.)
+**Anything below `forest/70` on cream, or `cream/60` on dark, is decoration only** — never text. Every rung above held when the darks merged: `forest` is deeper than the `teal` it replaced, so each pairing gained margin rather than losing it.
 
-Borders and fills are exempt from these floors — `border-teal/20`, `bg-teal/5`, `border-cream/12` are all fine.
+Borders and fills are exempt from these floors — `border-forest/20`, `bg-forest/5`, `border-cream/12` are all fine.
 
 ## 2. Typography
 
@@ -104,10 +124,10 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 
 - **`Button`** — variants `primary | outline | ink | ghost | outlineOnDark`, sizes `sm | md | lg`. Labels are uppercase mono.
   - **`primary` and `outline` are the first-class pair.** Every screen should use those two; a page with three competing button styles is a bug.
-  - `ink` (solid teal), `ghost` (text-only) and `outlineOnDark` (secondary on teal/ink sections) are **situational** — allowed, but justify them in review.
+  - `ink` (solid forest), `ghost` (text-only) and `outlineOnDark` (secondary on forest sections) are **situational** — allowed, but justify them in review.
   - Use `buttonVariants()` to style a `<Link>` as a button; `<ButtonArrow />` for the trailing arrow on a forward action.
 - **`Input`** — `rounded-edge` field on `cream-deep`, terra-deep focus ring.
-- **`Wordmark`** / **`WaveMark`** — tile + wave glyph, wordmark, "Experience more." kicker. `tone="onDark"` for teal/ink surfaces.
+- **`Wordmark`** / **`WaveMark`** — tile + wave glyph, wordmark, "Experience more." kicker. `tone="onDark"` for forest surfaces.
 - **`SiteHeader`** / **`SiteFooter`** / **`MobileMenu`** — the shell, rendered by the root layout on every route. All navigation comes from the registry (§7).
 - Growing set: ExperienceCard, FeedPlayer, AvailabilityPicker, PriceBreakdown (as screens land).
 

@@ -47,18 +47,18 @@ export default async function JournalPage() {
                 className="group grid grid-cols-1 gap-x-8 gap-y-3 py-8 sm:grid-cols-12"
               >
                 <div className="sm:col-span-3">
-                  <p className="label text-teal/75">
+                  <p className="label text-forest/75">
                     {formatPublished(post.publishedAt)}
                   </p>
                 </div>
                 <div className="sm:col-span-9">
-                  <h3 className="font-display text-teal group-hover:text-terra-deep text-2xl font-bold tracking-tight transition-colors duration-200">
+                  <h3 className="font-display text-forest group-hover:text-terra-deep text-2xl font-bold tracking-tight transition-colors duration-200">
                     {post.title}
                   </h3>
-                  <p className="text-teal/75 mt-3 max-w-2xl leading-relaxed">
+                  <p className="text-forest/75 mt-3 max-w-2xl leading-relaxed">
                     {post.description}
                   </p>
-                  <p className="label text-teal/75 mt-4">
+                  <p className="label text-forest/75 mt-4">
                     {post.readingMinutes} min read
                   </p>
                 </div>

@@ -35,7 +35,7 @@ export function SafetyTeaser() {
             strokeWidth={1.25}
             className="text-terra-deep size-7"
           />
-          <p className="text-teal/75 mt-6 leading-relaxed">
+          <p className="text-forest/75 mt-6 leading-relaxed">
             Experiences involving diving or open water will only ever be listed
             with operators who run them properly, and we will always be explicit
             about what a day requires of you — before you commit, not at the

@@ -18,11 +18,11 @@ import {
  * publishing none).
  */
 export function SiteFooter() {
-  // The top hairline matters: on routes that end in the registration form
-  // (also teal) the footer would otherwise run straight on from it with no
-  // seam at all.
+  // The top hairline matters: every dark surface is the same forest now, so on
+  // a route that ends in one — the registration form, a closing section — the
+  // footer would otherwise run straight on from it with no seam at all.
   return (
-    <footer className="bg-teal text-cream border-cream/12 border-t">
+    <footer className="bg-forest text-cream border-cream/12 border-t">
       <FooterCta />
 
       {/* Site map. */}

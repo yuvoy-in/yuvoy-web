@@ -10,10 +10,10 @@ import { DESTINATIONS } from "@/lib/site/destinations";
  */
 export function DestinationsTeaser() {
   return (
-    <Section tone="teal" aria-labelledby="destinations-heading">
+    <Section tone="ink" aria-labelledby="destinations-heading">
       <SectionHeading
         id="destinations-heading"
-        tone="teal"
+        tone="ink"
         eyebrow="Where we start"
         title="Three islands,"
         accent="done properly."

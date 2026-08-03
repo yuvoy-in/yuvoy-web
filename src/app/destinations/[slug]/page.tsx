@@ -94,8 +94,8 @@ export default async function DestinationPage({
         <ul className="border-cream-line mt-12 grid grid-cols-1 gap-px border-t sm:grid-cols-3">
           {destination.focus.map((item, i) => (
             <li key={item} className="pt-8 sm:pr-8">
-              <span className="label text-teal/75">0{i + 1}</span>
-              <p className="font-display text-teal mt-4 text-lg font-bold tracking-tight">
+              <span className="label text-forest/75">0{i + 1}</span>
+              <p className="font-display text-forest mt-4 text-lg font-bold tracking-tight">
                 {item}
               </p>
             </li>
@@ -103,10 +103,10 @@ export default async function DestinationPage({
         </ul>
       </Section>
 
-      <Section tone="teal" aria-labelledby="cta-heading">
+      <Section tone="ink" aria-labelledby="cta-heading">
         <SectionHeading
           id="cta-heading"
-          tone="teal"
+          tone="ink"
           eyebrow="Heading here?"
           title={`Tell us you're going to`}
           accent={`${destination.shortLabel}.`}
@@ -117,7 +117,7 @@ export default async function DestinationPage({
             href="/waitlist"
             className={cn(
               buttonVariants({ size: "lg" }),
-              "focus-visible:ring-offset-teal w-full sm:w-auto",
+              "focus-visible:ring-offset-forest w-full sm:w-auto",
             )}
           >
             Join the traveller waitlist

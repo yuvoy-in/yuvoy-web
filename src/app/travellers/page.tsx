@@ -82,20 +82,20 @@ export default function TravellersPage() {
         <ul className="border-cream-line mt-14 grid grid-cols-1 gap-px border-t md:grid-cols-3">
           {GETS.map((item, i) => (
             <li key={item.title} className="pt-10 md:pr-8">
-              <span className="label text-teal/75">0{i + 1}</span>
-              <h3 className="font-display text-teal mt-5 text-xl font-bold tracking-tight">
+              <span className="label text-forest/75">0{i + 1}</span>
+              <h3 className="font-display text-forest mt-5 text-xl font-bold tracking-tight">
                 {item.title}
               </h3>
-              <p className="text-teal/75 mt-3 leading-relaxed">{item.body}</p>
+              <p className="text-forest/75 mt-3 leading-relaxed">{item.body}</p>
             </li>
           ))}
         </ul>
       </Section>
 
-      <Section tone="teal" aria-labelledby="hesitations-heading">
+      <Section tone="ink" aria-labelledby="hesitations-heading">
         <SectionHeading
           id="hesitations-heading"
-          tone="teal"
+          tone="ink"
           eyebrow="The fair questions"
           title="What you are probably"
           accent="thinking."
@@ -125,11 +125,11 @@ export default function TravellersPage() {
         <ul className="border-cream-line mt-14 grid grid-cols-1 gap-px border-t md:grid-cols-3">
           {DESTINATIONS.map((destination) => (
             <li key={destination.key} className="pt-10 md:pr-8">
-              <h3 className="font-display text-teal text-xl font-bold tracking-tight">
+              <h3 className="font-display text-forest text-xl font-bold tracking-tight">
                 {destination.shortLabel}
               </h3>
-              <p className="label text-teal/75 mt-2">{destination.label}</p>
-              <p className="text-teal/75 mt-4 leading-relaxed">
+              <p className="label text-forest/75 mt-2">{destination.label}</p>
+              <p className="text-forest/75 mt-4 leading-relaxed">
                 {destination.blurb}
               </p>
             </li>

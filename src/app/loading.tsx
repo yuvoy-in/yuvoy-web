@@ -13,7 +13,7 @@ export default function Loading() {
       role="status"
       className="bg-cream flex min-h-dvh flex-col items-center justify-center gap-4"
     >
-      <span className="label text-teal/75">Loading Yuvoy</span>
+      <span className="label text-forest/75">Loading Yuvoy</span>
       <span
         aria-hidden
         className="bg-terra/70 h-px w-16 origin-left animate-pulse"

@@ -52,16 +52,16 @@ export function JourneysTeaser() {
             className="border-cream-line border-t pt-10 lg:pr-12"
           >
             <p className="label text-terra-deep">{journey.audience}</p>
-            <h3 className="font-display text-teal mt-5 text-2xl font-bold tracking-tight">
+            <h3 className="font-display text-forest mt-5 text-2xl font-bold tracking-tight">
               {journey.title}
             </h3>
             <ol className="mt-8 flex flex-col">
               {journey.steps.map((step, i) => (
                 <li
                   key={step}
-                  className="border-cream-line text-teal/75 flex gap-5 border-b py-4 last:border-b-0"
+                  className="border-cream-line text-forest/75 flex gap-5 border-b py-4 last:border-b-0"
                 >
-                  <span className="label text-teal/75 shrink-0 pt-1">
+                  <span className="label text-forest/75 shrink-0 pt-1">
                     0{i + 1}
                   </span>
                   <span className="leading-relaxed">{step}</span>
@@ -72,7 +72,7 @@ export function JourneysTeaser() {
         ))}
       </div>
 
-      <p className="text-teal/75 border-cream-line mt-12 border-t pt-6 text-sm">
+      <p className="text-forest/75 border-cream-line mt-12 border-t pt-6 text-sm">
         This is the journey we&rsquo;re building — not one you can take today.
         Join the waitlist and you&rsquo;ll hear from us as it opens.
       </p>

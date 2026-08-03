@@ -1,10 +1,10 @@
 import { cn } from "@/lib/cn";
 
 /**
- * The Yuvoy mark — a teal tile carrying the terracotta wave, the wide-tracked
+ * The Yuvoy mark — a forest tile carrying the terracotta wave, the wide-tracked
  * wordmark, and the "Experience more." kicker.
  *
- * `tone="onDark"` flips it for teal/ink surfaces. `kicker={false}` and
+ * `tone="onDark"` flips it for forest surfaces. `kicker={false}` and
  * `mark={false}` strip it back for tight contexts (inline in body copy, the
  * mobile menu bar, a favicon-sized slot).
  */
@@ -27,7 +27,7 @@ export function Wordmark({
         <span
           className={cn(
             "font-display tracking-wordmark text-sm font-bold",
-            onDark ? "text-cream" : "text-teal",
+            onDark ? "text-cream" : "text-forest",
           )}
         >
           YUVOY
@@ -61,7 +61,7 @@ export function WaveMark({
       aria-hidden
       className={cn(
         "rounded-edge inline-flex size-8 shrink-0 items-center justify-center",
-        onDark ? "bg-cream/10" : "bg-teal",
+        onDark ? "bg-cream/10" : "bg-forest",
         className,
       )}
     >

@@ -23,7 +23,7 @@ export function Breadcrumbs({ trail }: { trail: Crumb[] }) {
               {crumb.href && !last ? (
                 <Link
                   href={crumb.href}
-                  className="label tap-target text-teal/75 hover:text-teal transition-colors duration-200"
+                  className="label tap-target text-forest/75 hover:text-forest transition-colors duration-200"
                 >
                   {crumb.label}
                 </Link>
@@ -33,7 +33,7 @@ export function Breadcrumbs({ trail }: { trail: Crumb[] }) {
                 </span>
               )}
               {!last && (
-                <span aria-hidden className="text-teal/75 text-xs">
+                <span aria-hidden className="text-forest/75 text-xs">
                   /
                 </span>
               )}
