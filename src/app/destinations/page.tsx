@@ -21,7 +21,7 @@ export default function DestinationsPage() {
         eyebrow="Destinations"
         title="One market,"
         accent="covered properly."
-        lede={`Yuvoy opens in the ${LAUNCH_MARKET.label} — three islands, run through a full season, before we go anywhere else. Andaman is the first market, not the shape of the product.`}
+        lede={`Yuvoy opens in the ${LAUNCH_MARKET.label}: three islands, run through a full season, before we go anywhere else. Andaman is the first market, not the shape of the product.`}
       />
 
       <Section aria-labelledby="islands-heading">
@@ -38,7 +38,7 @@ export default function DestinationsPage() {
               className="border-cream-line border-t pt-10 lg:pr-10"
             >
               <span className="label text-forest/75">0{i + 1}</span>
-              <h3 className="font-display text-forest mt-5 text-2xl font-bold tracking-tight">
+              <h3 className="font-display text-forest mt-5 text-2xl font-normal tracking-tight">
                 <Link
                   href={destinationHref(destination)}
                   className="hover:text-terra-deep transition-colors duration-200"
@@ -68,7 +68,7 @@ export default function DestinationsPage() {
           eyebrow="After the Andamans"
           title="A second market is"
           accent="a decision, not a date."
-          body="We would rather run one destination properly through a full season than open three badly. When a second market is decided, it will be announced here — not hinted at beforehand."
+          body="We would rather run one destination properly through a full season than open three badly. When a second market is decided, it will be announced here, not hinted at beforehand."
         />
         <Link
           href="/waitlist"

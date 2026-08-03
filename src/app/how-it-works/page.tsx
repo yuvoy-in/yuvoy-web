@@ -7,7 +7,7 @@ import { TRAVELLER_JOURNEY, OPERATOR_JOURNEY } from "@/lib/site/journeys";
 export const metadata: Metadata = {
   title: "How it works",
   description:
-    "The two Yuvoy journeys, step by step and kept separate: what a traveller will do, and what an operator will do. Marked honestly — almost all of it is still being built.",
+    "The two Yuvoy journeys, step by step and kept separate: what a traveller will do, and what an operator will do. Marked honestly: almost all of it is still being built.",
   alternates: { canonical: "/how-it-works" },
 };
 
@@ -48,14 +48,14 @@ export default function HowItWorksPage() {
       <Section aria-labelledby="status-heading">
         <h2
           id="status-heading"
-          className="font-display max-w-3xl text-2xl font-bold tracking-tight text-balance"
+          className="font-display max-w-3xl text-2xl font-normal tracking-tight text-balance"
         >
           What you can actually do today
         </h2>
         <p className="text-forest/75 mt-5 max-w-2xl leading-relaxed">
           Join the waitlist as a traveller, or apply as a founding operator.
           That is the whole list. There is no booking, no payment, no account
-          and no catalogue — and we would rather say so plainly than dress up a
+          and no catalogue, and we would rather say so plainly than dress up a
           pre-launch page as a product.
         </p>
       </Section>

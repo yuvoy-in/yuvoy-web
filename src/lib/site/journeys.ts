@@ -33,12 +33,12 @@ export const TRAVELLER_JOURNEY: Journey = {
   audience: "For travellers",
   title: "From watching",
   accent: "to going.",
-  lede: "Eight steps from opening the app to stepping off the boat. Only the last part of this is built — everything below is the journey we are building, described honestly.",
+  lede: "Eight steps from opening the app to stepping off the boat. Only the last part of this is built; everything below is the journey we are building, described honestly.",
   cta: { label: "Join the traveller waitlist", href: "/waitlist" },
   steps: [
     {
       title: "Watch short experience videos",
-      body: "A feed of real days on the water, in kitchens and along trails — filmed by the people who run them.",
+      body: "A feed of real days on the water, in kitchens and along trails, filmed by the people who run them.",
       status: "planned",
     },
     {
@@ -68,7 +68,7 @@ export const TRAVELLER_JOURNEY: Journey = {
     },
     {
       title: "Get directions, reminders and support",
-      body: "Meeting point, timings and a person to contact — planned to arrive before the day, not on the morning.",
+      body: "Meeting point, timings and a person to contact, planned to arrive before the day, not on the morning.",
       status: "planned",
     },
     {
@@ -84,7 +84,7 @@ export const OPERATOR_JOURNEY: Journey = {
   audience: "For operators",
   title: "From applying",
   accent: "to running full days.",
-  lede: "The first step is open right now. The rest is what we are building with the operators who join before launch — including the commercial detail, which is not set and will be agreed with you rather than announced at you.",
+  lede: "The first step is open right now. The rest is what we are building with the operators who join before launch, including the commercial detail, which is not set and will be agreed with you rather than announced at you.",
   cta: {
     label: "Apply as a founding operator",
     href: "/waitlist?audience=provider",
@@ -112,7 +112,7 @@ export const OPERATOR_JOURNEY: Journey = {
     },
     {
       title: "Set pricing, availability and capacity",
-      body: "Your prices, your calendar, your limits. The tooling for this is being built — you set nothing on Yuvoy today.",
+      body: "Your prices, your calendar, your limits. The tooling for this is being built; you set nothing on Yuvoy today.",
       status: "planned",
     },
     {

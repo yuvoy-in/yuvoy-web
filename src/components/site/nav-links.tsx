@@ -7,7 +7,7 @@ import { NAV_ITEMS } from "@/lib/site/nav";
 
 /**
  * Desktop primary navigation. Client-side only so the current route can carry
- * `aria-current="page"` — the rest of the header stays a server component.
+ * `aria-current="page"`; the rest of the header stays a server component.
  */
 export function NavLinks() {
   const pathname = usePathname();

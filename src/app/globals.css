@@ -5,7 +5,9 @@
   No hex, font, or tracking value may exist outside this @theme block.
 
   Palette: Brand Kit v2.1 (dark green unified 2026-08-03) — Forest,
-  Terracotta, Cream. Every pairing below is measured against WCAG 2.2 AA; the
+  Terracotta, Cream. Type: Brand Kit v2.2 (2026-08-03) — editorial serif
+  display, sans body, mono labels. Every pairing below is measured against
+  WCAG 2.2 AA; the
   ratios and the terra / terra-deep / terra-soft usage rule live in
   docs/DESIGN_SYSTEM.md §1. Read that rule before using an accent on text —
   `terra` is NOT body-safe.
@@ -26,8 +28,13 @@
   --color-terra-soft: #d89772; /* accent text on forest (5.36:1) */
 
   /* ----------------------------------------------------------------- type */
-  --font-display: var(--font-poppins); /* headlines — heavy, geometric */
-  --font-sans: var(--font-inter); /* body + UI */
+  /* v2.2: the display face is an editorial serif set large and light — mass
+     comes from size and leading, never weight (the face has no bold). The
+     wordmark deliberately stays on the sans so the mark reads engineered. */
+  --font-display: var(
+    --font-instrument-serif
+  ); /* headlines — editorial serif */
+  --font-sans: var(--font-inter); /* body + UI + wordmark */
   --font-mono: var(--font-plex-mono); /* eyebrows, nav, stats, metadata */
 
   /* --------------------------------------------------------------- layout */
@@ -37,8 +44,15 @@
      and panels all share this single radius. Pills are not part of the system. */
   --radius-edge: 2px;
 
+  /* The one rounded object in the system: the product-preview phone frame.
+     It depicts hardware, not UI — nothing else may use it. */
+  --radius-device: 2.25rem;
+
   /* --------------------------------------------------------------- motion */
-  --ease-cinematic: cubic-bezier(0.22, 1, 0.36, 0.16); /* entrances */
+  /* Entrances. The second control point ends at 1: it used to be 0.16, which
+     made the curve climb to full, sag back toward a sixth of the way, then
+     climb again — a wobble halfway through every entrance on the site. */
+  --ease-cinematic: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-interaction: cubic-bezier(0.32, 0.72, 0, 1); /* interaction feedback */
 
   /* ------------------------------------------------------------- tracking */
@@ -158,20 +172,36 @@
 
 /* ----------------------------------------------------------------- motion */
 
-/* Cinematic entrance — CSS-only so above-the-fold content ships zero JS. */
-@keyframes yuvoy-rise {
+/*
+  The cover's entrance: the composition surfaces from depth rather than
+  sliding up. Three things move at once — it comes toward the viewer (scale),
+  it settles (translate), and it pulls into focus (blur) — which reads as a
+  camera finding its subject instead of a panel animating in.
+
+  The blur clears at 65%, before the movement finishes, so the type is sharp
+  while it is still settling; letting both land together looks like a
+  mis-timed transition. CSS-only, so above-the-fold content ships zero JS.
+*/
+@keyframes yuvoy-emerge {
   from {
     opacity: 0;
-    transform: translateY(1.25rem);
+    transform: translateY(1.75rem) scale(0.94);
+    filter: blur(8px);
   }
+
+  65% {
+    filter: blur(0);
+  }
+
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    filter: blur(0);
   }
 }
 
-@utility rise {
-  animation: yuvoy-rise 700ms var(--ease-cinematic) both;
+@utility emerge {
+  animation: yuvoy-emerge 1100ms var(--ease-cinematic) both;
 }
 
 /* Mobile menu panel — interaction feedback, so it stays inside the 250ms budget. */
@@ -188,4 +218,138 @@
 
 @utility menu-in {
   animation: yuvoy-menu-in 220ms var(--ease-interaction) both;
+}
+
+/* ------------------------------------------------- the product preview */
+
+/*
+  Illustrated "footage" for the Season One preview phone. Real footage is
+  deliberately not used — these are moving colour fields built entirely from
+  brand tokens via color-mix, so the preview is unmistakably an illustration
+  wearing the palette, never a fake photograph.
+
+  `film` is the moving canvas; `film-a/b/c/d` are the four scenes (dawn dive,
+  shallows, night water, market sunrise). `caustics` lays drifting light over
+  a scene. All of it is neutralised globally by prefers-reduced-motion.
+*/
+@keyframes yuvoy-film-pan {
+  from {
+    transform: scale(1.06) translate(0, 0);
+  }
+  to {
+    transform: scale(1.16) translate(-2%, -3%);
+  }
+}
+
+@keyframes yuvoy-film-drift {
+  from {
+    transform: translate(-4%, 2%);
+  }
+  to {
+    transform: translate(5%, -4%);
+  }
+}
+
+@keyframes yuvoy-film-sweep {
+  from {
+    transform: translateX(-10%);
+  }
+  to {
+    transform: translateX(10%);
+  }
+}
+
+@utility film {
+  position: absolute;
+  inset: -8%;
+  animation: yuvoy-film-pan 18s ease-in-out infinite alternate;
+}
+
+@utility film-a {
+  /* Dawn dive — light water giving way to depth. */
+  background: linear-gradient(
+    165deg,
+    color-mix(in oklab, var(--color-forest) 45%, var(--color-cream)) 0%,
+    color-mix(in oklab, var(--color-forest) 76%, var(--color-cream)) 48%,
+    var(--color-forest) 100%
+  );
+}
+
+@utility film-b {
+  /* Shallows — the reef walk, sunlit from above. */
+  background: linear-gradient(
+    170deg,
+    color-mix(in oklab, var(--color-forest) 28%, var(--color-cream)) 0%,
+    color-mix(in oklab, var(--color-forest) 58%, var(--color-cream)) 55%,
+    color-mix(in oklab, var(--color-forest) 88%, var(--color-cream)) 100%
+  );
+}
+
+@utility film-c {
+  /* Night water — near-dark, an ember of warmth at the horizon. */
+  background: linear-gradient(
+    160deg,
+    color-mix(in oklab, var(--color-forest) 90%, var(--color-cream)) 0%,
+    var(--color-forest) 55%,
+    color-mix(in oklab, var(--color-forest) 78%, var(--color-terra)) 100%
+  );
+}
+
+@utility film-d {
+  /* Market sunrise — terracotta warmth settling into forest. */
+  background: linear-gradient(
+    160deg,
+    color-mix(in oklab, var(--color-terra) 72%, var(--color-forest)) 0%,
+    color-mix(in oklab, var(--color-terra) 42%, var(--color-forest)) 42%,
+    var(--color-forest) 100%
+  );
+}
+
+@utility caustics {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: -30%;
+    background:
+      radial-gradient(
+        50% 38% at 22% 24%,
+        color-mix(in srgb, var(--color-cream) 16%, transparent),
+        transparent 65%
+      ),
+      radial-gradient(
+        44% 34% at 78% 68%,
+        color-mix(in srgb, var(--color-cream) 10%, transparent),
+        transparent 65%
+      );
+    animation: yuvoy-film-drift 11s ease-in-out infinite alternate;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -30%;
+    background: repeating-linear-gradient(
+      115deg,
+      color-mix(in srgb, var(--color-cream) 7%, transparent) 0 2px,
+      transparent 2px 26px
+    );
+    animation: yuvoy-film-sweep 8s ease-in-out infinite alternate;
+    opacity: 0.7;
+  }
+}
+
+/*
+  Filmic grain for immersive dark sections. Colourless by construction — the
+  turbulence is desaturated, so it adds texture without adding a colour.
+*/
+@utility grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }

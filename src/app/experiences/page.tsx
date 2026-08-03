@@ -12,7 +12,7 @@ import { DESTINATIONS, destinationHref } from "@/lib/site/destinations";
 export const metadata: Metadata = {
   title: "Experiences",
   description:
-    "The kinds of day Yuvoy is curating for its first Andaman season — diving and water, boats and island days, food and culture. No listings yet, and nothing bookable.",
+    "The kinds of day Yuvoy is curating for its first Andaman season: diving and water, boats and island days, food and culture. No listings yet, and nothing bookable.",
   alternates: { canonical: "/experiences" },
 };
 
@@ -54,7 +54,7 @@ const DETAIL: Record<
   },
   food_culture: {
     icon: UtensilsCrossed,
-    body: "What the islands actually eat, cook and remember — well beyond the resort menu.",
+    body: "What the islands actually eat, cook and remember, well beyond the resort menu.",
     examples: [
       "Home and market kitchens",
       "Fish, from boat to plate",
@@ -86,7 +86,7 @@ export default function ExperiencesPage() {
               around. They describe the kind of day, not a list you can browse.
             </p>
             <p className="mt-4">
-              There are no listings on Yuvoy yet — no operators published, no
+              There are no listings on Yuvoy yet: no operators published, no
               dates, nothing bookable. Individual experiences appear here only
               once the operator is on board and the content is real.
             </p>
@@ -128,7 +128,7 @@ export default function ExperiencesPage() {
                     className="text-terra-deep size-6"
                   />
                 </div>
-                <h3 className="font-display text-forest mt-6 text-2xl font-bold tracking-tight">
+                <h3 className="font-display text-forest mt-6 text-2xl font-normal tracking-tight">
                   {interest.label}
                 </h3>
                 <p className="text-forest/75 mt-3 leading-relaxed">{body}</p>
@@ -163,7 +163,7 @@ export default function ExperiencesPage() {
         <ul className="border-cream/12 mt-14 grid grid-cols-1 gap-px border-t md:grid-cols-3">
           {DESTINATIONS.map((destination) => (
             <li key={destination.key} className="pt-10 md:pr-8">
-              <h3 className="font-display text-2xl font-bold tracking-tight">
+              <h3 className="font-display text-2xl font-normal tracking-tight">
                 <Link
                   href={destinationHref(destination)}
                   className="hover:text-terra-soft transition-colors duration-200"

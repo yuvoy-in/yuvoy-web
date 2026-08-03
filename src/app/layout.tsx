@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { poppins, inter, plexMono } from "@/lib/fonts";
+import { instrumentSerif, inter, plexMono } from "@/lib/fonts";
 import { Providers } from "@/components/providers";
 import { SITE_URL, IS_PRODUCTION } from "@/lib/site";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -13,7 +13,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Yuvoy — See the experience. Feel if it's right. Then book.",
+    default: "Yuvoy · See the experience. Feel if it's right. Then book.",
     template: "%s · Yuvoy",
   },
   description:
@@ -23,14 +23,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Yuvoy",
-    title: "Yuvoy — See the experience. Feel if it's right. Then book.",
+    title: "Yuvoy · See the experience. Feel if it's right. Then book.",
     description:
       "Local dives, boat days, food and culture in the Andaman Islands, shown in honest video by the people who run them. Join the waitlist for first access.",
     url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Yuvoy — See the experience. Feel if it's right. Then book.",
+    title: "Yuvoy · See the experience. Feel if it's right. Then book.",
     description:
       "Local experiences in the Andaman Islands, shown in honest video by the people who run them. Join the waitlist.",
   },
@@ -40,7 +40,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${poppins.variable} ${inter.variable} ${plexMono.variable} h-full`}
+      className={`${instrumentSerif.variable} ${inter.variable} ${plexMono.variable} h-full`}
     >
       <body className="min-h-full">
         <a

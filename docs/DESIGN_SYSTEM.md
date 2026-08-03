@@ -7,6 +7,8 @@ Direction: **editorial, rectangular, confident.** Heavy geometric display type a
 > **Brand Kit v2** (ratified 2026-08-01) supersedes v1. v1 was Fraunces + pill geometry on a warmer cream; v2 moves to Poppins + IBM Plex Mono and a rectangular geometry, retuning the palette to match. Rationale and the full contrast table are in §1.
 >
 > **v2.1 (2026-08-03)** replaces the two darks, `teal` `#0D3B3E` and `ink` `#22302E`, with a single `forest` `#16362E`. Nothing else changed.
+>
+> **v2.2 (2026-08-03, owner-directed)** replaces the display face: Poppins → **Instrument Serif**, the editorial serif the narrative-landing rebuild is set in. Owner brief: anything but the palette may change in service of a more premium register. The serif ships one weight (400 + italic), so display type is `font-normal` always — mass comes from size and leading, and there is no faux-bold to reach for. The wordmark deliberately stays on the sans (Inter semibold) so the mark reads engineered against the serif's warmth. Palette untouched. Adds `--radius-device` (§4) and the preview-surface rule (§8).
 
 ## 0. Architecture rule
 
@@ -36,6 +38,7 @@ Brand Kit v2. Every ratio below is measured (sRGB relative luminance, WCAG 2.2) 
 | `terra-deep` on `cream`      | 5.21:1  | AA body                     |
 | `terra-deep` on `cream-deep` | 4.77:1  | AA body                     |
 | `terra` on `cream`           | 3.24:1  | **large text only** (≥24px) |
+| `terra` on `cream-deep`      | 2.96:1  | **fails everything**        |
 | `cream` on `terra-deep`      | 5.21:1  | AA body — the primary CTA   |
 | `cream` on `forest`          | 11.44:1 | AA + AAA body               |
 | `terra-soft` on `forest`     | 5.36:1  | AA body                     |
@@ -69,6 +72,13 @@ for body copy, labels, nav, or button text.
 
 - Accent text at body/label size **on cream** → `terra-deep`.
 - Accent text **on forest** → `terra-soft`.
+- **`terra` text may only sit on `cream`, never on `cream-deep`.** Its headroom
+  over the large-text floor is 0.24, so the raised surface alone spends it:
+  3.24:1 becomes 2.96:1 and the same headline that passes on the canvas fails
+  on a panel. A section that paints `cream-deep` and then uses `SectionHeading`
+  gets a failing accent with no warning, which is exactly what happened to the
+  operators section — put the section on `cream` and raise its inner panels to
+  `cream-deep` instead, which is how that section is now built.
 - Accent **fills** (the primary CTA) → `bg-terra-deep text-cream`. A `terra`
   fill with any text on it fails AA; this is why the CTA is the deeper tone.
 
@@ -89,11 +99,14 @@ Borders and fills are exempt from these floors — `border-forest/20`, `bg-fores
 
 ## 2. Typography
 
-- **Display — Poppins** (`font-display`), weights 600/700/800. Headlines are heavy and tight (`font-extrabold tracking-tight`). **Italic is reserved for the second line of a headline** — the terracotta "turn" that is the brand's most recognisable typographic move. Do not use italic display type for anything else.
-- **UI / body — Inter** (`font-sans`, the default).
-- **Label — IBM Plex Mono** (`font-mono`) via the `label` utility: uppercase, `text-xs`, `font-medium`, `tracking-label` (0.18em). Eyebrows, nav, stats, metadata, button labels. The editorial counterweight to Poppins' mass.
-- **`eyebrow` utility** — the `label` preceded by a short terracotta rule (a 1.75rem hairline). This is the section-opening gesture; **use it once per section**, at the top.
-- **Wordmark** — `tracking-wordmark` (0.34em) on display caps; see `<Wordmark />`, which also carries the tile mark and the "Experience more." kicker.
+- **Display — Instrument Serif** (`font-display`), single weight 400 + italic. Headlines are set large, light and tight (`font-normal tracking-tight`, leading ≈1.0) — the serif carries mass through **size**, never weight. `font-bold`/`font-extrabold` must never appear with `font-display`: the face has no bold, and the browser would synthesise an ugly one. **Italic is reserved for the terracotta "turn"** — the second thought of a headline — which stays the brand's most recognisable typographic move. Do not use italic display type for anything else.
+- **UI / body — Inter** (`font-sans`, the default). Bold weights live here.
+- **Label — IBM Plex Mono** (`font-mono`) via the `label` utility: uppercase, `text-xs`, `font-medium`, `tracking-label` (0.18em). Eyebrows, nav, stats, metadata, button labels. The engineered counterweight to the serif's warmth.
+- **`eyebrow` utility** — the `label` preceded by a short terracotta rule (a 1.75rem hairline). This is the section-opening gesture; **use it once per section**, at the top. Eyebrows are plain phrases: no act numbering (owner direction 2026-08-03).
+- **Wordmark** — `tracking-wordmark` (0.34em) on **sans** semibold caps (v2.2): the serif is the site's voice, the sans mark is the object that signs it. See `<Wordmark />`, which also carries the official mark and the "Experience more." kicker.
+- **Punctuation** — rendered copy never uses an em dash. Prefer a period, a colon, a comma or a parenthetical; ranges and pairings use a middot (owner direction 2026-08-03). Code comments are exempt.
+- **Launch timing** — never name a month. The season is described evocatively ("opening when the water clears", "when the sea turns to glass").
+- **The mark** — the official ensō (white brush ring + terracotta dot), always on its **forest tile**. The delivered source (`public/yuvoy-logo.png`) has an opaque black field, so the committed display assets are derived by `scripts/generate-brand-assets.py` (screen-blend onto forest, glow soft-knee, auto-crop): `public/brand/yuvoy-mark.png` (UI + OG), `src/app/icon.png` and `src/app/favicon.ico`. Re-run the script if the source logo is ever replaced; never hand-edit the derived files.
 
 Scale: Tailwind's type scale. Headlines `font-display`; everything else inherits Inter unless it is a label.
 
@@ -104,17 +117,19 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 | Class of motion                                                                 | Budget     | Easing               |
 | ------------------------------------------------------------------------------- | ---------- | -------------------- |
 | **Interaction feedback** — menu open/close, hover, tab switch, accordion, focus | **≤250ms** | `--ease-interaction` |
-| **Entrance** — scroll reveals, the `rise` utility, `<Reveal>`                   | ~700ms     | `--ease-cinematic`   |
+| **Entrance** — the `emerge` utility, on first paint only                        | ~1100ms    | `--ease-cinematic`   |
 
-- Tokens: `--ease-interaction` (`cubic-bezier(0.32,0.72,0,1)`), `--ease-cinematic` (`cubic-bezier(0.22,1,0.36,0.16)`).
-- CSS entrance: the `rise` utility (opacity + translateY, 700ms). Prefer this above the fold — it ships zero JS.
-- JS motion: **Motion** (`motion/react`) via `<Reveal>`. All motion is wrapped in `<MotionConfig reducedMotion="user">` (providers) — **never bypass it**.
+- Tokens: `--ease-interaction` (`cubic-bezier(0.32,0.72,0,1)`), `--ease-cinematic` (`cubic-bezier(0.22,1,0.36,1)`). The cinematic curve's second control point was `0.16` until 2026-08-04, which made every entrance climb to full, sag back and climb again — a wobble halfway through the motion. If an entrance ever looks unsettled, check this number first.
+- CSS entrance: the `emerge` utility, used **only** for the homepage cover's first paint. It moves three properties at once — scale (toward the viewer), translate (settling) and blur (pulling into focus) — so the composition surfaces from depth rather than sliding up, and the blur clears at 65% so the type is sharp while it is still settling. It ships zero JS.
+- **No scroll-triggered motion.** Sections render in place, fully visible, the moment they are reached. The `<Reveal>` component and the operator grid's draw-on-scroll strike were both removed on owner direction (2026-08-03): content that animates itself into view reads as decoration, and on a pitch page it delays the thing the reader came for. Do not reintroduce either without that decision being revisited.
+- JS motion: **none.** `motion/react` has no consumers, and `<MotionConfig>` was removed with its last one. If a genuine need for JS animation returns, restore `<MotionConfig reducedMotion="user">` in `providers.tsx` in the same change — it is what makes Motion honour the OS preference, which CSS-level reduced-motion cannot do for it.
 - **Reduced motion is handled globally**, once, in `globals.css`: a `prefers-reduced-motion: reduce` block neutralises every animation and transition. Individual components must not add their own reduced-motion branch — if a component needs one, the global rule is wrong and should be fixed instead.
 - Smooth scroll: **not implemented, and out of scope.** Lenis was removed in v2 rather than left as a dependency implying a feature that did not exist.
 
 ## 4. Radius, spacing, sizing, grid
 
 - **Radius: `rounded-edge` (2px) — the editorial near-square.** Buttons, inputs, cards and panels all share it. **Pills are not part of the system** (v1 used them; v2 does not).
+- **`--radius-device` (2.25rem) — the one rounded object in the system**: the Season One phone-preview frame. It depicts hardware, not UI; nothing else may use it. (Tiny `rounded-full` dots inside the preview depict hardware/avatars and share this exemption.)
 - Spacing: Tailwind v4 dynamic scale (multiples of `0.25rem`). Stay on the scale.
 - Control heights: `sm` 36px (`h-9`), `md` 44px (`h-11`), `lg` 52px (`h-13`). Inputs are 48px (`h-12`).
 - **Page measure: `container-page`** — `max-w-page` (70rem) with `px-6 sm:px-10` gutters. Every full-width section uses it; prose pages may narrow further (`max-w-2xl`).
@@ -127,7 +142,8 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
   - `ink` (solid forest), `ghost` (text-only) and `outlineOnDark` (secondary on forest sections) are **situational** — allowed, but justify them in review.
   - Use `buttonVariants()` to style a `<Link>` as a button; `<ButtonArrow />` for the trailing arrow on a forward action.
 - **`Input`** — `rounded-edge` field on `cream-deep`, terra-deep focus ring.
-- **`Wordmark`** / **`WaveMark`** — tile + wave glyph, wordmark, "Experience more." kicker. `tone="onDark"` for forest surfaces.
+- **`WaveMotif`** — the three-line wave glyph, the island signature. Decorative accent only, at most once per section; tone follows the surface.
+- **`Wordmark`** / **`WaveMark`** — the official ensō mark on its forest tile, wordmark, "Experience more." kicker. `tone="onDark"` adds a hairline ring so the tile stays legible on forest surfaces.
 - **`SiteHeader`** / **`SiteFooter`** / **`MobileMenu`** — the shell, rendered by the root layout on every route. All navigation comes from the registry (§7).
 - Growing set: ExperienceCard, FeedPlayer, AvailabilityPicker, PriceBreakdown (as screens land).
 
@@ -155,5 +171,13 @@ WCAG 2.2 AA, enforced not assumed:
 No Figma. The reference is the [pre-launch landing artifact](https://claude.ai/public/artifacts/b099d827-a565-4679-91c2-38d242feeed7) plus the brand docs.
 
 **The artifact is a visual reference, not a content one.** Its layout, density, type treatment and motion are the target. Its copy is not: it shows prices, live availability, named listings and completed-booking screens, none of which exist. Those are barred by the project's truthfulness rules (see `CLAUDE.md` and issue #32) and several of its own colour pairings fail AA — the palette in §1 is the corrected version, not a transcription.
+
+### The preview surface (owner-approved exception, 2026-08-03)
+
+The homepage's **Season One phone preview** is the one place illustrative product content may appear — prices, seat counts, operator lines — under three conditions, all enforced:
+
+1. The frame is **visibly labelled** ("Season One preview") and its wrapper carries `data-preview`; the homepage e2e guard bans invented numbers everywhere _outside_ that wrapper.
+2. Its "footage" is **moving colour built from brand tokens** (`film-*` + `caustics` utilities, `color-mix` only) — unmistakably an illustration, never a fake photograph or a real-looking screenshot.
+3. Claims **outside** the preview stay literally true (e.g. the "3 founding operators signed" count is owner-confirmed and must track reality).
 
 Any pasted export is oversized vs. real scale: calibrate the ratio, snap every value to a token, re-express with flex/grid, mobile-first.

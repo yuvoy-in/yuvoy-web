@@ -1,8 +1,10 @@
+import Image from "next/image";
 import { cn } from "@/lib/cn";
 
 /**
- * The Yuvoy mark — a forest tile carrying the terracotta wave, the wide-tracked
- * wordmark, and the "Experience more." kicker.
+ * The Yuvoy mark — the official ensō (white brush ring + terracotta dot) on
+ * its forest tile, beside the wide-tracked wordmark and the "Experience
+ * more." kicker.
  *
  * `tone="onDark"` flips it for forest surfaces. `kicker={false}` and
  * `mark={false}` strip it back for tight contexts (inline in body copy, the
@@ -24,16 +26,28 @@ export function Wordmark({
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       {mark && <WaveMark tone={tone} />}
       <span className="inline-flex flex-col leading-none">
+        {/*
+          The wordmark stays on the sans (v2.2): the serif is the site's
+          editorial voice, the mark is the engineered object it signs.
+        */}
         <span
           className={cn(
-            "font-display tracking-wordmark text-sm font-bold",
+            "tracking-wordmark font-sans text-sm font-semibold",
             onDark ? "text-cream" : "text-forest",
           )}
         >
           YUVOY
         </span>
+        {/*
+          The kicker is a decorative flourish: the mark and the wordmark carry
+          the identity, and wherever the Wordmark is a link the link carries
+          its own accessible name. aria-hidden also keeps axe's colour checks
+          off an 8px ornament whose background it mis-attributes through the
+          mobile menu's top layer.
+        */}
         {kicker && (
           <span
+            aria-hidden
             className={cn(
               "label mt-1 text-[0.5rem] leading-none",
               onDark ? "text-terra-soft" : "text-terra-deep",
@@ -47,7 +61,17 @@ export function Wordmark({
   );
 }
 
-/** The tile + wave glyph, on its own — for favicons, OG frames and tight slots. */
+/**
+ * The mark on its own — the official ensō on its forest tile, for the header,
+ * footer and tight slots.
+ *
+ * The asset is `public/brand/yuvoy-mark.png`, derived from the delivered logo
+ * by `scripts/generate-brand-assets.py` (the source PNG has an opaque black
+ * field; the script screen-blends it onto forest, which is why no CSS blend
+ * tricks are needed here). The favicon and app icon are the same object. On
+ * forest surfaces the tile matches its background, so a hairline ring keeps
+ * the square legible.
+ */
 export function WaveMark({
   tone = "onLight",
   className,
@@ -60,19 +84,18 @@ export function WaveMark({
     <span
       aria-hidden
       className={cn(
-        "rounded-edge inline-flex size-8 shrink-0 items-center justify-center",
-        onDark ? "bg-cream/10" : "bg-forest",
+        "rounded-edge bg-forest inline-flex size-8 shrink-0 overflow-hidden",
+        onDark && "ring-cream/20 ring-1",
         className,
       )}
     >
-      <svg viewBox="0 0 28 28" fill="none" className="size-5">
-        <path
-          d="M5 16q4.5-7 9 0t9 0"
-          stroke={onDark ? "var(--color-terra-soft)" : "var(--color-terra)"}
-          strokeWidth="2.25"
-          strokeLinecap="round"
-        />
-      </svg>
+      <Image
+        src="/brand/yuvoy-mark.png"
+        alt=""
+        width={64}
+        height={64}
+        className="size-full"
+      />
     </span>
   );
 }

@@ -1,7 +1,19 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { ImageResponse } from "next/og";
 
 export const OG_SIZE = { width: 1200, height: 630 };
 export const OG_CONTENT_TYPE = "image/png";
+
+/**
+ * The official mark on its forest tile (see scripts/generate-brand-assets.py),
+ * inlined as a data URI because satori fetches nothing. Read via
+ * process.cwd() so Next's file tracing bundles the asset for the dynamic
+ * OG routes; the static ones bake it in at build.
+ */
+const MARK_DATA_URI = `data:image/png;base64,${readFileSync(
+  join(process.cwd(), "public", "brand", "yuvoy-mark.png"),
+).toString("base64")}`;
 
 /**
  * Brand-styled Open Graph card (1200×630).
@@ -68,17 +80,27 @@ export function renderOg({
           justifyContent: "space-between",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            fontSize: 34,
-            fontWeight: 600,
-            letterSpacing: "0.34em",
-            color: OG.forest,
-          }}
-        >
-          <span style={{ display: "flex" }}>YUVOY</span>
-          <span style={{ display: "flex", color: OG.terraDeep }}>.</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 22 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element -- satori renders plain img */}
+          <img
+            src={MARK_DATA_URI}
+            alt=""
+            width={76}
+            height={76}
+            style={{ borderRadius: 6 }}
+          />
+          <div
+            style={{
+              display: "flex",
+              fontSize: 34,
+              fontWeight: 600,
+              letterSpacing: "0.34em",
+              color: OG.forest,
+            }}
+          >
+            <span style={{ display: "flex" }}>YUVOY</span>
+            <span style={{ display: "flex", color: OG.terraDeep }}>.</span>
+          </div>
         </div>
         <div
           style={{

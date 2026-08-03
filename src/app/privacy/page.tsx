@@ -48,7 +48,7 @@ export default function PrivacyPage() {
           <strong className="text-forest font-semibold">
             If you join as a traveller:
           </strong>{" "}
-          your name, and one way to reach you — a WhatsApp number, an email
+          your name, and one way to reach you: a WhatsApp number, an email
           address, or both. Optionally, which island you are headed to and up to
           three things that interest you.
         </p>
@@ -68,7 +68,7 @@ export default function PrivacyPage() {
 
       <LegalSection heading="Why we collect it">
         <p>
-          To contact you about Yuvoy opening, and — for operators — to have a
+          To contact you about Yuvoy opening and, for operators, to have a
           conversation about what you offer. That is the whole purpose.
         </p>
         <p>
@@ -91,7 +91,7 @@ export default function PrivacyPage() {
         <p>
           When you submit the form, an internal notification is sent to the
           Yuvoy team so a person sees it. That notification goes to us, not to
-          you — there is no automatic reply, and you should not expect an email
+          you; there is no automatic reply, and you should not expect an email
           confirming your registration.
         </p>
         <p>

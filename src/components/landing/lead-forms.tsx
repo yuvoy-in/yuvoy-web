@@ -104,6 +104,7 @@ export function LeadForms({
   initialAudience = "traveller",
   heading = "Join the waitlist",
   headingLevel = 2,
+  aside,
 }: {
   context: LeadContext;
   /**
@@ -114,6 +115,13 @@ export function LeadForms({
   heading?: string;
   /** `/waitlist` renders this as the page's h1; the homepage as an h2. */
   headingLevel?: 1 | 2;
+  /**
+   * Optional narrative column. When present the section renders as a split
+   * layout — aside left, forms right — and the aside **must** contain an
+   * element with `id="register-heading"` (see JoinAside), because it takes
+   * over the heading this component otherwise renders itself.
+   */
+  aside?: React.ReactNode;
 }) {
   const [audience, setAudience] = React.useState<LeadAudience>(initialAudience);
   const Heading = headingLevel === 1 ? "h1" : "h2";
@@ -158,6 +166,59 @@ export function LeadForms({
     return () => window.removeEventListener("hashchange", syncFromHash);
   }, [capture]);
 
+  const tabsAndPanels = (
+    <>
+      <div
+        role="tablist"
+        aria-label="I am a"
+        className="border-cream/20 rounded-edge flex border p-1"
+      >
+        {(
+          [
+            ["traveller", "I'm travelling"],
+            ["provider", "I run experiences"],
+          ] as const
+        ).map(([value, tabLabel]) => (
+          <button
+            key={value}
+            role="tab"
+            id={`tab-${value}`}
+            aria-selected={audience === value}
+            aria-controls={`panel-${value}`}
+            onClick={() => selectAudience(value, "tab")}
+            className={cn(
+              "focus-visible:ring-terra-soft rounded-edge flex-1 px-4 py-2.5 text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none",
+              audience === value
+                ? "bg-cream text-forest"
+                : "text-cream/70 hover:text-cream",
+            )}
+          >
+            {tabLabel}
+          </button>
+        ))}
+      </div>
+
+      <div
+        role="tabpanel"
+        id="panel-traveller"
+        aria-labelledby="tab-traveller"
+        hidden={audience !== "traveller"}
+        className="mt-10"
+      >
+        <TravellerForm context={context} />
+      </div>
+      <div
+        role="tabpanel"
+        id="panel-provider"
+        aria-labelledby="tab-provider"
+        hidden={audience !== "provider"}
+        className="mt-10"
+      >
+        <ProviderForm context={context} />
+      </div>
+    </>
+  );
+
   return (
     <section
       id="register"
@@ -168,70 +229,32 @@ export function LeadForms({
           panel is hidden, or the browser has nothing to scroll to. */}
       <span id="providers" className="block scroll-mt-24" aria-hidden />
       <div className="container-page py-20 sm:py-28">
-        <div className="mx-auto max-w-xl">
-          <div>
-            <p className="eyebrow text-terra-soft">Get first access</p>
-            <Heading
-              id="register-heading"
-              className="font-display mt-6 text-[clamp(1.875rem,4.5vw,3rem)] leading-[1.05] font-extrabold tracking-tight text-balance"
-            >
-              {heading}
-            </Heading>
-            <p className="text-cream/70 mt-6 text-lg leading-relaxed">
-              Tell us who you are and we&rsquo;ll message you when the first
-              Andaman experiences are ready. No spam, and no payment required.
-            </p>
+        {aside ? (
+          /* Split layout — narrative left (carrying #register-heading), forms
+             right. Used by the homepage's Act 05. */
+          <div className="grid grid-cols-1 gap-14 lg:grid-cols-2 lg:gap-20">
+            <div>{aside}</div>
+            <div>{tabsAndPanels}</div>
           </div>
-
-          <div
-            role="tablist"
-            aria-label="I am a"
-            className="border-cream/20 rounded-edge mt-10 flex border p-1"
-          >
-            {(
-              [
-                ["traveller", "I'm travelling"],
-                ["provider", "I run experiences"],
-              ] as const
-            ).map(([value, tabLabel]) => (
-              <button
-                key={value}
-                role="tab"
-                id={`tab-${value}`}
-                aria-selected={audience === value}
-                aria-controls={`panel-${value}`}
-                onClick={() => selectAudience(value, "tab")}
-                className={cn(
-                  "focus-visible:ring-terra-soft rounded-edge flex-1 px-4 py-2.5 text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none",
-                  audience === value
-                    ? "bg-cream text-forest"
-                    : "text-cream/70 hover:text-cream",
-                )}
+        ) : (
+          <div className="mx-auto max-w-xl">
+            <div>
+              <p className="eyebrow text-terra-soft">Get first access</p>
+              <Heading
+                id="register-heading"
+                className="font-display mt-6 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-normal tracking-tight text-balance"
               >
-                {tabLabel}
-              </button>
-            ))}
-          </div>
+                {heading}
+              </Heading>
+              <p className="text-cream/70 mt-6 text-lg leading-relaxed">
+                Tell us who you are and we&rsquo;ll message you when the first
+                Andaman experiences are ready. No spam, and no payment required.
+              </p>
+            </div>
 
-          <div
-            role="tabpanel"
-            id="panel-traveller"
-            aria-labelledby="tab-traveller"
-            hidden={audience !== "traveller"}
-            className="mt-10"
-          >
-            <TravellerForm context={context} />
+            <div className="mt-10">{tabsAndPanels}</div>
           </div>
-          <div
-            role="tabpanel"
-            id="panel-provider"
-            aria-labelledby="tab-provider"
-            hidden={audience !== "provider"}
-            className="mt-10"
-          >
-            <ProviderForm context={context} />
-          </div>
-        </div>
+        )}
       </div>
     </section>
   );
@@ -252,21 +275,21 @@ function OutcomeNotice({
   const copy = {
     rate_limited: {
       title: "Too many attempts just now.",
-      body: "Give it a minute and try again — your details weren't saved yet.",
+      body: "Give it a minute and try again; your details weren't saved yet.",
     },
     unavailable: {
       title: "We couldn't save that.",
-      body: "Something on our side isn't answering. Nothing was recorded — please try again shortly.",
+      body: "Something on our side isn't answering. Nothing was recorded, so please try again shortly.",
     },
     offline: {
       title: "You look offline.",
-      body: "Check your connection and try again — nothing was sent.",
+      body: "Check your connection and try again; nothing was sent.",
     },
   }[result.kind];
 
   return (
     <div role="alert" className="border-terra-soft/40 rounded-edge border p-6">
-      <p className="font-display text-xl font-bold tracking-tight">
+      <p className="font-display text-xl font-normal tracking-tight">
         {copy.title}
       </p>
       <p className="text-cream/70 mt-2 text-sm">{copy.body}</p>
@@ -301,9 +324,9 @@ function SuccessNotice({
         later, never an email now: there is no visitor-facing autoresponder,
         so "check your inbox" would be a lie.
       */}
-      <p className="font-display mt-6 text-2xl font-bold tracking-tight text-balance">
+      <p className="font-display mt-6 text-2xl font-normal tracking-tight text-balance">
         {updated
-          ? "We already had you — your preferences are updated."
+          ? "We already had you; your preferences are updated."
           : "You’re on the Yuvoy waitlist"}
       </p>
       <p className="text-cream/70 mt-4 leading-relaxed">
@@ -371,7 +394,7 @@ function ConsentFields({
           className="accent-terra-deep mt-0.5 size-4 shrink-0"
         />
         <span>
-          Also send me occasional updates about Yuvoy. Optional — you can join
+          Also send me occasional updates about Yuvoy. Optional: you can join
           the waitlist without this.
         </span>
       </label>
@@ -780,7 +803,7 @@ function ProviderForm({ context }: { context: LeadContext }) {
       </Button>
 
       <p className="text-cream/70 text-xs">
-        Pricing, capacity and listings come later, in conversation — this just
+        Pricing, capacity and listings come later, in conversation. This just
         opens the door.
       </p>
     </form>

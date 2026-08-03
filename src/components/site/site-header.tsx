@@ -7,11 +7,16 @@ import { cn } from "@/lib/cn";
 import { PRIMARY_CTA } from "@/lib/site/nav";
 
 /**
- * The site header — sticky, compact, present on every route.
+ * The site header: sticky, compact, present on every route.
  *
  * Deliberately short (64px) so it costs almost no viewport on scroll, and
  * translucent over a blur so long editorial pages read as one surface rather
  * than sliding under a hard bar.
+ *
+ * It stays a server component and looks identical on every route. An adaptive
+ * variant that turned forest over the homepage cover and carried a reading
+ * progress bar was tried and reverted (owner direction, 2026-08-03): the
+ * plain bar is the one that reads as considered.
  */
 export function SiteHeader() {
   return (
@@ -19,7 +24,7 @@ export function SiteHeader() {
       <div className="container-page flex h-16 items-center justify-between gap-6">
         <Link
           href="/"
-          aria-label="Yuvoy — home"
+          aria-label="Yuvoy home"
           className="rounded-edge shrink-0"
         >
           <Wordmark />

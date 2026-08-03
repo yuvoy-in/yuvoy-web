@@ -1,12 +1,9 @@
 import { Hero } from "@/components/landing/hero";
-import { TrustStrip } from "@/components/landing/trust-strip";
-import { WatchFeelBook } from "@/components/landing/watch-feel-book";
-import { Categories } from "@/components/landing/categories";
-import { DestinationsTeaser } from "@/components/landing/destinations-teaser";
-import { JourneysTeaser } from "@/components/landing/journeys-teaser";
-import { SafetyTeaser } from "@/components/landing/safety-teaser";
-import { OperatorInvitation } from "@/components/landing/operator-invitation";
-import { Faq } from "@/components/landing/faq";
+import { Insight } from "@/components/landing/insight";
+import { Answer } from "@/components/landing/answer";
+import { Strategy } from "@/components/landing/strategy";
+import { Engine } from "@/components/landing/engine";
+import { JoinAside } from "@/components/landing/join-aside";
 import { LeadForms, type LeadContext } from "@/components/landing/lead-forms";
 import { LandingView } from "@/components/analytics/landing-view";
 import { LAUNCH_MARKET } from "@/lib/leads/registry";
@@ -16,21 +13,23 @@ import { LAUNCH_MARKET } from "@/lib/leads/registry";
  * /go/<source> campaign routes render it with their attribution context.
  * Header and footer come from the root layout.
  *
- * The section order is pinned by issue #27 and answers the reviewer's five
- * ten-second questions in sequence: what Yuvoy is (hero), where it stands
- * today (trust strip), how it works (watch/feel/book), what you can discover
- * (categories, destinations), how the two journeys differ, how we treat the
- * water, why operators should care — then the honest answers, then the form.
+ * The page is a six-act pitch, and the acts are written to pass the billboard
+ * test: reading only the headlines tells the whole story.
  *
- * The page ends in the registration form rather than another call to action:
- * a visitor who read this far should not need one more click, and campaign
- * traffic arriving from a printed QR code converts on the page it lands on.
- * The `#register` and `#providers` anchors live there and stay working
+ *   Cover     "Every trip starts with one question."   the hook, island horizon
+ *   Insight   "The hard part was never booking."       the observation
+ *   Answer    "Scroll. Watch. Book."                   the product, running live
+ *   Strategy  "One destination, done completely."      the wedge
+ *   Engine    "You run a business across six apps."    operators (+3 signed)
+ *   Ask       "Be there when it opens."                the form
+ *
+ * (Acts are deliberately unnumbered on the page itself, per owner direction.)
+ * The Season One phone preview runs inside the answer act, beside the steps
+ * it demonstrates. The page still ends in the registration form: a visitor
+ * who read this far should not need one more click, and campaign traffic
+ * arriving from a printed QR code converts on the page it lands on. The
+ * `#register` and `#providers` anchors live there and stay working
  * indefinitely (see LeadForms for why).
- *
- * The founder-story teaser that would sit between the operator invitation and
- * the FAQ is deliberately absent: it needs owner-supplied copy, and inventing
- * a founder story is exactly the class of thing this rebuild is undoing.
  */
 export function Landing({ context }: { context: LeadContext }) {
   return (
@@ -42,15 +41,11 @@ export function Landing({ context }: { context: LeadContext }) {
         destinationKey={context.destinationKey}
       />
       <Hero />
-      <TrustStrip />
-      <WatchFeelBook />
-      <Categories />
-      <DestinationsTeaser />
-      <JourneysTeaser />
-      <SafetyTeaser />
-      <OperatorInvitation />
-      <Faq />
-      <LeadForms context={context} />
+      <Insight />
+      <Answer />
+      <Strategy />
+      <Engine />
+      <LeadForms context={context} aside={<JoinAside />} />
     </main>
   );
 }

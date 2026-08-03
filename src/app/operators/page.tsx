@@ -31,7 +31,7 @@ const OFFER = [
   },
   {
     title: "Shape how it works",
-    body: "The tooling is being designed now. What you tell us about running real days — weather, capacity, no-shows, gear — is what it gets built around.",
+    body: "The tooling is being designed now. What you tell us about running real days (weather, capacity, no-shows, gear) is what it gets built around.",
   },
   {
     title: "Help with the content",
@@ -58,7 +58,7 @@ export default function OperatorsPage() {
         eyebrow="For operators"
         title="You already run something people love."
         accent="Show it properly."
-        lede="If you run dives, boat days, kitchens or walks across Havelock, Neil or Port Blair, we would like to talk before we open — while the decisions that will affect you are still being made."
+        lede="If you run dives, boat days, kitchens or walks across Havelock, Neil or Port Blair, we would like to talk before we open, while the decisions that will affect you are still being made."
       >
         <Link
           href="/waitlist?audience=provider"
@@ -83,7 +83,7 @@ export default function OperatorsPage() {
           {OFFER.map((item, i) => (
             <li key={item.title} className="pt-10 sm:pr-10">
               <span className="label text-forest/75">0{i + 1}</span>
-              <h3 className="font-display text-forest mt-5 text-xl font-bold tracking-tight">
+              <h3 className="font-display text-forest mt-5 text-xl font-normal tracking-tight">
                 {item.title}
               </h3>
               <p className="text-forest/75 mt-3 leading-relaxed">{item.body}</p>
@@ -123,7 +123,7 @@ export default function OperatorsPage() {
           eyebrow="Applying"
           title="What we ask for,"
           accent="and why."
-          body="Your name, your business, a WhatsApp number, the islands you cover and what you mainly run. The number is required because onboarding conversations happen there — not because we intend to message you about anything else."
+          body="Your name, your business, a WhatsApp number, the islands you cover and what you mainly run. The number is required because onboarding conversations happen there, not because we intend to message you about anything else."
         />
         <Link
           href="/waitlist?audience=provider"

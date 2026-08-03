@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 const GETS = [
   {
     title: "First access when the season opens",
-    body: "Waitlist members hear from us before the site opens to everyone. That is the whole of the advantage — there is no queue position and nothing to buy.",
+    body: "Waitlist members hear from us before the site opens to everyone. That is the whole of the advantage; there is no queue position and nothing to buy.",
   },
   {
     title: "Days chosen for you, not listed at you",
@@ -38,7 +38,7 @@ const GETS = [
 
 const HESITATIONS = [
   {
-    q: "There is nothing to book — so what am I joining?",
+    q: "There is nothing to book, so what am I joining?",
     a: "A list of people we will message when the first Andaman experiences are ready. That is deliberately unglamorous. Booking, payment and availability are not built, and we are not going to imply otherwise to make a signup feel bigger than it is.",
   },
   {
@@ -47,7 +47,7 @@ const HESITATIONS = [
   },
   {
     q: "How do I know this is not another abandoned waitlist?",
-    a: "You do not, yet — and no badge on this page could prove it. What we can do is not overstate where we are. Everything on this site is marked as either open now or planned, and today only two things are open: joining as a traveller, and applying as an operator.",
+    a: "You do not, yet, and no badge on this page could prove it. What we can do is not overstate where we are. Everything on this site is marked as either open now or planned, and today only two things are open: joining as a traveller, and applying as an operator.",
   },
 ];
 
@@ -83,7 +83,7 @@ export default function TravellersPage() {
           {GETS.map((item, i) => (
             <li key={item.title} className="pt-10 md:pr-8">
               <span className="label text-forest/75">0{i + 1}</span>
-              <h3 className="font-display text-forest mt-5 text-xl font-bold tracking-tight">
+              <h3 className="font-display text-forest mt-5 text-xl font-normal tracking-tight">
                 {item.title}
               </h3>
               <p className="text-forest/75 mt-3 leading-relaxed">{item.body}</p>
@@ -103,7 +103,7 @@ export default function TravellersPage() {
         <dl className="border-cream/12 mt-14 border-t">
           {HESITATIONS.map((item) => (
             <div key={item.q} className="border-cream/12 border-b py-8">
-              <dt className="font-display text-xl font-bold tracking-tight">
+              <dt className="font-display text-xl font-normal tracking-tight">
                 {item.q}
               </dt>
               <dd className="text-cream/70 mt-3 max-w-3xl leading-relaxed">
@@ -125,7 +125,7 @@ export default function TravellersPage() {
         <ul className="border-cream-line mt-14 grid grid-cols-1 gap-px border-t md:grid-cols-3">
           {DESTINATIONS.map((destination) => (
             <li key={destination.key} className="pt-10 md:pr-8">
-              <h3 className="font-display text-forest text-xl font-bold tracking-tight">
+              <h3 className="font-display text-forest text-xl font-normal tracking-tight">
                 {destination.shortLabel}
               </h3>
               <p className="label text-forest/75 mt-2">{destination.label}</p>

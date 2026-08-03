@@ -52,13 +52,13 @@ export async function generateMetadata({
 const components = {
   h2: (props: React.ComponentProps<"h2">) => (
     <h2
-      className="font-display text-forest mt-12 text-2xl font-bold tracking-tight first:mt-0"
+      className="font-display text-forest mt-12 text-2xl font-normal tracking-tight first:mt-0"
       {...props}
     />
   ),
   h3: (props: React.ComponentProps<"h3">) => (
     <h3
-      className="font-display text-forest mt-8 text-xl font-bold tracking-tight"
+      className="font-display text-forest mt-8 text-xl font-normal tracking-tight"
       {...props}
     />
   ),
