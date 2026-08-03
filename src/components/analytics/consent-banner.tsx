@@ -36,8 +36,8 @@ export function ConsentBanner() {
         </h2>
         <p className="text-forest/75 mt-3 text-sm leading-relaxed">
           We&rsquo;d like to measure which parts of this site lead people to
-          join the waitlist. It is anonymous — no name, email or number is ever
-          sent — and nothing runs unless you say yes. Read the{" "}
+          join the waitlist. It is anonymous (no name, email or number is ever
+          sent) and nothing runs unless you say yes. Read the{" "}
           <Link
             href="/privacy"
             className="text-forest underline underline-offset-2"

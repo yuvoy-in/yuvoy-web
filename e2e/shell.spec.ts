@@ -44,7 +44,7 @@ test.describe("site shell", () => {
       const header = page.getByRole("banner");
       await expect(header).toBeVisible();
       await expect(
-        header.getByRole("link", { name: "Yuvoy — home" }),
+        header.getByRole("link", { name: "Yuvoy home" }),
       ).toBeVisible();
 
       // Sticky: still on screen after scrolling to the bottom of the document.

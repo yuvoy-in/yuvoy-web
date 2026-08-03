@@ -1,28 +1,29 @@
 import { Section, SectionHeading } from "@/components/ui/section";
 import { Reveal } from "@/components/motion/reveal";
+import { WaveMotif } from "@/components/brand/wave-motif";
 
 /**
- * Act 03 — the strategy. Investors and sharp-eyed visitors read a narrow
- * launch as either a limitation or a wedge; this act states it as the wedge
- * it is, backed by the three facts that are true today. Numbers are nouns
- * here — every figure is real and owner-confirmed, and must stay that way.
+ * The strategy act. Investors and sharp-eyed visitors read a narrow launch as
+ * either a limitation or a wedge; this act states it as the wedge it is,
+ * backed by facts that are true today. Numbers are nouns here: every figure
+ * is real or a stated design rule, and must stay that way.
  */
 const FACTS = [
   {
     figure: "3",
     caption: "launch islands",
-    detail: "Havelock, Neil and Port Blair — one market, covered properly.",
+    detail: "Havelock, Neil and Port Blair. One market, covered properly.",
   },
   {
-    figure: "Oct–May",
-    caption: "the season we open with",
-    detail: "Booking opens with Season One and follows the water.",
+    figure: "1",
+    caption: "sharp season",
+    detail: "We open when the water clears, and cover the season end to end.",
   },
   {
-    figure: "6 yrs",
-    caption: "on Havelock water",
+    figure: "100%",
+    caption: "operator-filmed",
     detail:
-      "Yuvoy grows out of a dive school that has run these seas for six years.",
+      "Every experience is shown as real footage from the people who run it. That is the rule the feed is built on.",
   },
 ];
 
@@ -32,10 +33,10 @@ export function Strategy() {
       <Reveal>
         <SectionHeading
           id="strategy-heading"
-          eyebrow="03 — The first market"
+          eyebrow="The first market"
           title="One destination, done"
           accent="completely."
-          body="We would rather cover the Andamans entirely than fifty places thinly. Concentrated supply, a sharp season, operators who all know each other — the right shape for a marketplace to start, and the model for every destination after it."
+          body="We would rather cover the Andamans entirely than fifty places thinly. Concentrated supply, a sharp season, operators who all know each other: the right shape for a marketplace to start, and the model for every destination after it."
         />
       </Reveal>
 
@@ -57,12 +58,15 @@ export function Strategy() {
         ))}
       </ul>
 
-      {/* The manifesto line — the one sentence the page should be quoted by. */}
+      {/* The manifesto line: the one sentence the page should be quoted by. */}
       <Reveal>
-        <p className="font-display border-cream-line text-forest mt-20 border-y py-14 text-center text-[clamp(1.875rem,4.5vw,3rem)] leading-tight tracking-tight text-balance">
-          Don&rsquo;t be a tourist.{" "}
-          <em className="text-terra italic">Experience more.</em>
-        </p>
+        <div className="border-cream-line mt-20 flex flex-col items-center border-y py-14 text-center">
+          <WaveMotif />
+          <p className="font-display text-forest mt-6 text-[clamp(1.875rem,4.5vw,3rem)] leading-tight tracking-tight text-balance">
+            Don&rsquo;t be a tourist.{" "}
+            <em className="text-terra italic">Experience more.</em>
+          </p>
+        </div>
       </Reveal>
     </Section>
   );

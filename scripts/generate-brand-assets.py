@@ -42,12 +42,14 @@ FOREST = (0x16, 0x36, 0x2E)
 BBOX_THRESHOLD = 140
 BBOX_PAD = 0.14
 
-# The source halo is huge — untreated it fills the tile and turns the favicon
-# into a fuzzy blob. This soft knee compresses everything below KNEE_HIGH
-# (quadratically, from KNEE_LOW) so the wide glow becomes a close aura while
-# the bright ring and the dot pass through untouched.
-KNEE_LOW = 70
-KNEE_HIGH = 210
+# The source surrounds the mark with a huge radial halo. The halo is bright,
+# but only the brush strokes themselves reach near-pure white, so a tight
+# luminance window (MASK_LOW..MASK_HIGH, smoothstepped) isolates the strokes
+# with a naturally anti-aliased edge and drops every trace of glow. The
+# terracotta dot is not white, so a chroma mask carries it through unchanged.
+# Owner direction 2026-08-03: the mark must be crisp, no glow.
+MASK_LOW = 235
+MASK_HIGH = 250
 
 
 # --------------------------------------------------------------- PNG decode
@@ -166,19 +168,26 @@ def write_png(path: Path, width: int, height: int, rgb: bytearray) -> None:
 # --------------------------------------------------------------- transforms
 
 
-def attenuate_glow(rgb: bytearray) -> bytearray:
-    """Scale each pixel by a soft knee on its brightest channel."""
-    span = KNEE_HIGH - KNEE_LOW
-    factor = []
-    for level in range(256):
-        t = min(1.0, max(0.0, (level - KNEE_LOW) / span))
-        factor.append(t * t)
+def smoothstep(value: float, low: float, high: float) -> float:
+    t = min(1.0, max(0.0, (value - low) / (high - low)))
+    return t * t * (3 - 2 * t)
+
+
+def extract_mark(rgb: bytearray, width: int, height: int) -> bytearray:
+    """Keep near-white strokes and the warm dot; drop the halo entirely."""
+    n = width * height
     out = bytearray(len(rgb))
-    for i in range(0, len(rgb), 3):
-        f = factor[max(rgb[i], rgb[i + 1], rgb[i + 2])]
-        out[i] = int(rgb[i] * f + 0.5)
-        out[i + 1] = int(rgb[i + 1] * f + 0.5)
-        out[i + 2] = int(rgb[i + 2] * f + 0.5)
+    for i in range(n):
+        r, g, b = rgb[i * 3], rgb[i * 3 + 1], rgb[i * 3 + 2]
+        stroke = smoothstep(max(r, g, b), MASK_LOW, MASK_HIGH)
+        white = int(255 * stroke)
+        # The dot: strongly warm and bright. The window is tight so the warm
+        # glow around the dot is dropped along with the white halo, leaving
+        # only the solid disc with a softly stepped edge.
+        dot = smoothstep(r - b, 55, 75) * smoothstep(r, 180, 210)
+        out[i * 3] = int(white + (r - white) * dot)
+        out[i * 3 + 1] = int(white + (g - white) * dot)
+        out[i * 3 + 2] = int(white + (b - white) * dot)
     return out
 
 
@@ -274,7 +283,7 @@ def write_ico(path: Path, png_bytes: bytes, size: int) -> None:
 
 def main() -> None:
     width, height, rgb = read_png(SOURCE)
-    toned = attenuate_glow(rgb)
+    toned = extract_mark(rgb, width, height)
     composited = screen_blend(toned, FOREST)
     x0, y0, window = square_crop_bounds(
         mark_bbox(width, height, toned), width, height

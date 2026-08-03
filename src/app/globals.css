@@ -335,6 +335,32 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/*
+  The island horizon — the hero's water. Three stroked wave lines sway
+  horizontally at different, very slow rates; the movement should be felt
+  rather than seen. Neutralised globally by prefers-reduced-motion.
+*/
+@keyframes yuvoy-sway {
+  from {
+    transform: translateX(-16px);
+  }
+  to {
+    transform: translateX(16px);
+  }
+}
+
+@utility sway-a {
+  animation: yuvoy-sway 22s ease-in-out infinite alternate;
+}
+
+@utility sway-b {
+  animation: yuvoy-sway 31s ease-in-out infinite alternate-reverse;
+}
+
+@utility sway-c {
+  animation: yuvoy-sway 40s ease-in-out infinite alternate;
+}
+
 /* The hero's scroll cue — a slow falling thread of terracotta. */
 @keyframes yuvoy-cue {
   0% {

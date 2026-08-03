@@ -26,7 +26,7 @@ export function Insight() {
         <Reveal className="lg:col-span-5">
           <SectionHeading
             id="insight-heading"
-            eyebrow="01 — The real problem"
+            eyebrow="The real problem"
             title="The hard part was never"
             accent="booking."
           />
@@ -35,7 +35,7 @@ export function Insight() {
         <Reveal delay={0.12} className="lg:col-span-7 lg:pt-2">
           <p className="text-forest/75 max-w-xl text-lg leading-relaxed">
             It&rsquo;s knowing what a place even offers. Nobody hands you that
-            list — so you go hunting for it across platforms that were never
+            list, so you go hunting for it across platforms that were never
             built to answer the question.
           </p>
 
@@ -54,7 +54,7 @@ export function Insight() {
           </ul>
 
           <p className="font-display border-cream-line text-forest mt-10 border-t pt-8 text-[clamp(1.375rem,2.4vw,1.75rem)] leading-snug">
-            Hours later you have a shortlist — and{" "}
+            Hours later you have a shortlist, and{" "}
             <em className="text-terra-deep italic">still no idea</em> what you
             missed.
           </p>

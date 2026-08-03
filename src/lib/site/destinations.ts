@@ -37,7 +37,7 @@ const CONTENT: Record<string, Omit<DestinationContent, keyof Destination>> = {
     blurb:
       "The island most people picture: long beaches, established dive operations, and the widest range of days on the water.",
     body: [
-      "Havelock — Swaraj Dweep on the ferry timetable — is where most visitors to the Andamans spend their days on the water. It has the longest-running dive operations in the islands, the widest choice of boats, and beaches that carry a reputation well beyond India.",
+      "Havelock, Swaraj Dweep on the ferry timetable, is where most visitors to the Andamans spend their days on the water. It has the longest-running dive operations in the islands, the widest choice of boats, and beaches that carry a reputation well beyond India.",
       "It is also where the gap we are building for is most obvious. There is genuinely excellent diving and boat work here, run by people who have been doing it for years, and almost none of it can be found or arranged before you arrive.",
     ],
     focus: [
@@ -52,7 +52,7 @@ const CONTENT: Record<string, Omit<DestinationContent, keyof Destination>> = {
     blurb:
       "Smaller and slower, with shallow reefs and a pace that rewards staying put rather than moving through.",
     body: [
-      "Neil — Shaheed Dweep — is the quieter island, and the one people most often wish they had given more time. It is small enough to cross in an afternoon, with shallow reefs that suit snorkelling and first dives.",
+      "Neil, Shaheed Dweep, is the quieter island, and the one people most often wish they had given more time. It is small enough to cross in an afternoon, with shallow reefs that suit snorkelling and first dives.",
       "Because it is smaller, it is also where a single well-run day makes the most difference to a trip. That is the kind of day we want to be able to show you before you commit to it.",
     ],
     focus: [
@@ -65,7 +65,7 @@ const CONTENT: Record<string, Omit<DestinationContent, keyof Destination>> = {
     shortLabel: "Port Blair",
     slug: "port-blair",
     blurb:
-      "Where nearly everyone arrives — and where the islands' history, markets and ferry connections all meet.",
+      "Where nearly everyone arrives, and where the islands' history, markets and ferry connections all meet.",
     body: [
       "Port Blair is the arrival point: the airport, the harbour, and the ferries onward. Most itineraries treat it as a night to get through rather than a place to spend time in.",
       "It is also where the islands' history and food actually live. The days we are most interested in here are the ones people currently skip because nobody told them the day existed.",

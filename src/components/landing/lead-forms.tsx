@@ -275,15 +275,15 @@ function OutcomeNotice({
   const copy = {
     rate_limited: {
       title: "Too many attempts just now.",
-      body: "Give it a minute and try again — your details weren't saved yet.",
+      body: "Give it a minute and try again; your details weren't saved yet.",
     },
     unavailable: {
       title: "We couldn't save that.",
-      body: "Something on our side isn't answering. Nothing was recorded — please try again shortly.",
+      body: "Something on our side isn't answering. Nothing was recorded, so please try again shortly.",
     },
     offline: {
       title: "You look offline.",
-      body: "Check your connection and try again — nothing was sent.",
+      body: "Check your connection and try again; nothing was sent.",
     },
   }[result.kind];
 
@@ -326,7 +326,7 @@ function SuccessNotice({
       */}
       <p className="font-display mt-6 text-2xl font-normal tracking-tight text-balance">
         {updated
-          ? "We already had you — your preferences are updated."
+          ? "We already had you; your preferences are updated."
           : "You’re on the Yuvoy waitlist"}
       </p>
       <p className="text-cream/70 mt-4 leading-relaxed">
@@ -394,7 +394,7 @@ function ConsentFields({
           className="accent-terra-deep mt-0.5 size-4 shrink-0"
         />
         <span>
-          Also send me occasional updates about Yuvoy. Optional — you can join
+          Also send me occasional updates about Yuvoy. Optional: you can join
           the waitlist without this.
         </span>
       </label>
@@ -803,7 +803,7 @@ function ProviderForm({ context }: { context: LeadContext }) {
       </Button>
 
       <p className="text-cream/70 text-xs">
-        Pricing, capacity and listings come later, in conversation — this just
+        Pricing, capacity and listings come later, in conversation. This just
         opens the door.
       </p>
     </form>

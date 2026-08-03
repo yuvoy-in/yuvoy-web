@@ -5,16 +5,23 @@ import { Reveal } from "@/components/motion/reveal";
 import { AppStack } from "@/components/landing/app-stack";
 
 /**
- * Act 04 — the engine. Operators are the supply side of the flywheel and the
- * harder side to win, so they get the page's second product story: the
- * six-app stack they run today, struck through and replaced.
+ * The engine act, staged as a transformation: the improvised six-app stack an
+ * operator juggles today on the left, the one system that replaces it on the
+ * right, and between them a single connector that reads "becomes". Below it,
+ * the Season One roster shows real momentum.
  *
- * The signed-operators row is real momentum: **3 founding operators is a true
- * count, confirmed by the owner (2026-08-03).** The three slot cards describe
- * those real signings; the dashed fourth is the invitation. Update these only
- * to match reality.
+ * **3 signed founding operators is a true count, confirmed by the owner
+ * (2026-08-03).** The three roster cards describe those real signings; the
+ * dashed fourth is the invitation. Update these only to match reality.
  */
-const SIGNED_SLOTS = [
+const CAPABILITIES = [
+  "Your footage is the listing. Nothing to write.",
+  "Calendar, seats and availability in one place.",
+  "Bookings and payments in the same flow.",
+  "A planner for the whole season.",
+];
+
+const ROSTER = [
   { what: "Dive centre", where: "Havelock" },
   { what: "Sea walk & snorkel", where: "Neil" },
   { what: "Boats & island days", where: "Port Blair" },
@@ -32,100 +39,128 @@ export function Engine() {
           <Reveal className="lg:col-span-7">
             <SectionHeading
               id="engine-heading"
-              eyebrow="04 — For operators"
+              eyebrow="For operators"
               title="You run a business across"
               accent="six apps."
             />
           </Reveal>
           <Reveal delay={0.12} className="lg:col-span-5">
             <p className="text-forest/75 text-lg leading-relaxed">
-              Dive centres, boat crews, guides, kitchens — everyone has stitched
+              Dive centres, boat crews, guides, kitchens: everyone has stitched
               together the same improvised stack. Yuvoy replaces it, and brings
               the travellers to fill it.
             </p>
           </Reveal>
         </div>
 
-        <Reveal className="mt-14">
-          <AppStack />
-        </Reveal>
+        {/* The transformation: today's juggling act becomes one system. */}
+        <div className="mt-14 grid grid-cols-1 items-stretch gap-5 lg:grid-cols-[1fr_auto_1fr]">
+          <Reveal className="flex">
+            <div className="border-cream-line bg-cream rounded-edge flex w-full flex-col border p-7">
+              <p className="label text-forest/75">Today: the juggling act</p>
+              <div className="mt-6">
+                <AppStack />
+              </div>
+              <p className="text-forest/75 mt-auto pt-6 text-sm leading-relaxed">
+                Six logins, none of them talking to each other, and no way for a
+                traveller to find you in any of it.
+              </p>
+            </div>
+          </Reveal>
 
-        <Reveal>
-          <div className="my-8 flex items-center gap-4">
-            <span aria-hidden className="bg-cream-line h-px flex-1" />
-            <p className="label text-terra-deep">Replaced by</p>
-            <span aria-hidden className="bg-cream-line h-px flex-1" />
-          </div>
-        </Reveal>
+          <Reveal
+            delay={0.1}
+            aria-hidden
+            className="flex items-center justify-center gap-3 px-2 lg:flex-col"
+          >
+            <span className="bg-cream-line h-px w-10 lg:h-10 lg:w-px" />
+            <span className="label text-terra-deep">becomes</span>
+            <span className="bg-cream-line h-px w-10 lg:h-10 lg:w-px" />
+          </Reveal>
 
-        <Reveal>
-          <div className="bg-forest text-cream rounded-edge relative overflow-hidden p-8 sm:p-10">
-            <div aria-hidden className="grain" />
-            <div className="relative flex flex-wrap items-center justify-between gap-8">
-              <div className="max-w-xl">
-                <h3 className="font-display text-3xl tracking-tight">
+          <Reveal delay={0.2} className="flex">
+            <div className="bg-forest text-cream rounded-edge relative w-full overflow-hidden p-7">
+              <div aria-hidden className="grain" />
+              <div className="relative flex h-full flex-col">
+                <p className="label text-terra-soft">
+                  With Yuvoy: one Experience OS
+                </p>
+                <h3 className="font-display mt-5 text-3xl tracking-tight">
                   One place to run it all.
                 </h3>
-                <p className="text-cream/70 mt-3 leading-relaxed">
-                  Listings, calendar, bookings, payments and a season planner —
-                  and travellers who arrive ready to pay. Your footage{" "}
-                  <em className="italic">is</em> the listing, so there is
-                  nothing to write.
-                </p>
-              </div>
-              {/* Native anchor: #providers must fire hashchange (see Hero). */}
-              <a
-                href="#providers"
-                className={cn(
-                  buttonVariants({ size: "lg" }),
-                  "focus-visible:ring-offset-forest w-full sm:w-auto",
-                )}
-              >
-                Apply as a founding operator
-                <ButtonArrow />
-              </a>
-            </div>
-          </div>
-        </Reveal>
-
-        {/* Real momentum: three signed, one open door. */}
-        <Reveal>
-          <div className="border-cream-line mt-14 flex flex-wrap items-center gap-x-12 gap-y-8 border-t pt-10">
-            <div className="flex items-center gap-5">
-              <p className="font-display text-terra text-[clamp(3.5rem,6vw,5rem)] leading-none">
-                3
-              </p>
-              <p className="text-forest/75 max-w-[16ch] text-sm leading-snug">
-                <strong className="text-forest block text-base font-semibold">
-                  already signed on
-                </strong>
-                Founding operators for Season One.
-              </p>
-            </div>
-            <ul className="flex min-w-64 flex-1 flex-wrap gap-2.5">
-              {SIGNED_SLOTS.map((slot) => (
-                <li
-                  key={slot.what}
-                  className="border-cream-line bg-cream rounded-edge min-w-36 flex-1 border px-4 py-3.5"
+                <ul className="mt-6 flex flex-col gap-3.5">
+                  {CAPABILITIES.map((capability) => (
+                    <li key={capability} className="flex items-start gap-3">
+                      <svg
+                        aria-hidden
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        className="text-terra-soft mt-1 size-4 shrink-0"
+                      >
+                        <path
+                          d="M4 10.5l4 4 8-8.5"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <span className="text-cream/80 text-[15px] leading-relaxed">
+                        {capability}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                {/* Native anchor: #providers must fire hashchange (see Hero). */}
+                <a
+                  href="#providers"
+                  className={cn(
+                    buttonVariants({ size: "lg" }),
+                    "focus-visible:ring-offset-forest mt-8 w-full sm:w-auto",
+                  )}
                 >
-                  <p className="text-forest text-sm font-semibold">
-                    {slot.what}
-                  </p>
-                  <p className="text-forest/75 mt-0.5 text-xs">{slot.where}</p>
-                </li>
-              ))}
-              <li className="border-terra-deep/50 rounded-edge min-w-36 flex-1 border border-dashed px-4 py-3.5">
-                <p className="text-terra-deep text-sm font-semibold">
-                  Your spot
-                </p>
-                <p className="text-forest/75 mt-0.5 text-xs">
-                  Applications open
-                </p>
-              </li>
-            </ul>
+                  Apply as a founding operator
+                  <ButtonArrow />
+                </a>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+
+        {/* Real momentum: the Season One roster. */}
+        <Reveal>
+          <div className="mt-16 flex flex-wrap items-baseline justify-between gap-x-10 gap-y-2">
+            <p className="label text-forest/75">Season One roster</p>
+            <p className="label text-terra-deep">
+              3 signed · applications open
+            </p>
           </div>
+          <ul className="mt-5 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+            {ROSTER.map((slot) => (
+              <li
+                key={slot.what}
+                className="border-cream-line bg-cream rounded-edge border p-5"
+              >
+                <p className="label text-terra-deep flex items-center gap-2 text-[9px]">
+                  <span aria-hidden className="bg-terra size-1" />
+                  Signed
+                </p>
+                <p className="text-forest mt-3 text-sm font-semibold">
+                  {slot.what}
+                </p>
+                <p className="text-forest/75 mt-0.5 text-xs">{slot.where}</p>
+              </li>
+            ))}
+            <li className="border-terra-deep/50 rounded-edge border border-dashed p-5">
+              <p className="label text-terra-deep text-[9px]">Open</p>
+              <p className="text-terra-deep mt-3 text-sm font-semibold">
+                Your spot
+              </p>
+              <p className="text-forest/75 mt-0.5 text-xs">Applications open</p>
+            </li>
+          </ul>
           <p className="text-forest/75 mt-8 max-w-2xl text-sm leading-relaxed">
-            Founding operators join by conversation, not contract — no listing
+            Founding operators join by conversation, not contract: no listing
             fee, and terms agreed with you before anything goes live.
           </p>
         </Reveal>

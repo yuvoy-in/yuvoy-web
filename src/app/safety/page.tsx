@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 const COMMITMENTS = [
   {
     title: "We will say what a day actually asks of you",
-    body: "Fitness, experience level, certification, swimming ability and conditions — stated before you commit, not discovered at the jetty. This is how we intend every listing to read.",
+    body: "Fitness, experience level, certification, swimming ability and conditions, stated before you commit, not discovered at the jetty. This is how we intend every listing to read.",
   },
   {
     title: "We will not list an operator we would not go out with",
@@ -63,7 +63,7 @@ export default function SafetyPage() {
           <>
             <p>
               Diving and open water are not activities to be casual about. This
-              page sets out where we actually stand before launch — including,
+              page sets out where we actually stand before launch, including,
               plainly, what we have not built.
             </p>
             <p className="mt-4">
@@ -137,7 +137,7 @@ export default function SafetyPage() {
               </p>
               <p className="mt-4">
                 If you have a question about how we intend to handle any of
-                this, ask us when we get in touch — the answer will be the same
+                this, ask us when we get in touch; the answer will be the same
                 as what is written here.
               </p>
             </>

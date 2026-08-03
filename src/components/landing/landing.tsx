@@ -14,22 +14,22 @@ import { LAUNCH_MARKET } from "@/lib/leads/registry";
  * Header and footer come from the root layout.
  *
  * The page is a six-act pitch, and the acts are written to pass the billboard
- * test — reading only the headlines tells the whole story:
+ * test: reading only the headlines tells the whole story.
  *
- *   Cover  — "Every trip starts with one question."   the hook + the product
- *   01     — "The hard part was never booking."        the insight
- *   02     — "Scroll. Watch. Book."                    the answer
- *   03     — "One destination, done completely."       the strategy
- *   04     — "You run a business across six apps."     the engine (+3 signed)
- *   05     — "Be there when it opens."                 the ask
+ *   Cover     "Every trip starts with one question."   the hook, island horizon
+ *   Insight   "The hard part was never booking."       the observation
+ *   Answer    "Scroll. Watch. Book."                   the product, running live
+ *   Strategy  "One destination, done completely."      the wedge
+ *   Engine    "You run a business across six apps."    operators (+3 signed)
+ *   Ask       "Be there when it opens."                the form
  *
- * The product itself runs on the cover (the Season One phone preview) rather
- * than three sections deep — nobody should have to read to see the thing.
- * The page still ends in the registration form: a visitor who read this far
- * should not need one more click, and campaign traffic arriving from a
- * printed QR code converts on the page it lands on. The `#register` and
- * `#providers` anchors live there and stay working indefinitely (see
- * LeadForms for why).
+ * (Acts are deliberately unnumbered on the page itself, per owner direction.)
+ * The Season One phone preview runs inside the answer act, beside the steps
+ * it demonstrates. The page still ends in the registration form: a visitor
+ * who read this far should not need one more click, and campaign traffic
+ * arriving from a printed QR code converts on the page it lands on. The
+ * `#register` and `#providers` anchors live there and stay working
+ * indefinitely (see LeadForms for why).
  */
 export function Landing({ context }: { context: LeadContext }) {
   return (

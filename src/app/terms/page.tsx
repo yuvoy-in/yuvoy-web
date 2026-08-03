@@ -41,8 +41,8 @@ export default function TermsPage() {
           specific experience, price, date or availability.
         </p>
         <p>
-          Everything described as planned is exactly that — a description of
-          what we intend to build, not a commitment to a date or a feature.
+          Everything described as planned is exactly that: a description of what
+          we intend to build, not a commitment to a date or a feature.
         </p>
       </LegalSection>
 
@@ -50,7 +50,7 @@ export default function TermsPage() {
         <p>
           It means we may contact you about Yuvoy opening. It creates no
           booking, no payment obligation, no queue position and no guarantee of
-          availability or priority — for travellers or for operators.
+          availability or priority, for travellers or for operators.
         </p>
         <p>
           You can ask to be removed at any time. See the{" "}
@@ -109,7 +109,7 @@ export default function TermsPage() {
       <LegalSection heading="Changes">
         <p>
           These terms will be replaced by a fuller agreement before booking
-          opens — one that covers payments, cancellations and the operator
+          opens, one that covers payments, cancellations and the operator
           relationship, none of which exist yet. Until then, the date at the top
           tells you when this was last revised.
         </p>

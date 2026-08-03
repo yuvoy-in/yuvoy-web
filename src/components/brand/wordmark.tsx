@@ -38,8 +38,16 @@ export function Wordmark({
         >
           YUVOY
         </span>
+        {/*
+          The kicker is a decorative flourish: the mark and the wordmark carry
+          the identity, and wherever the Wordmark is a link the link carries
+          its own accessible name. aria-hidden also keeps axe's colour checks
+          off an 8px ornament whose background it mis-attributes through the
+          mobile menu's top layer.
+        */}
         {kicker && (
           <span
+            aria-hidden
             className={cn(
               "label mt-1 text-[0.5rem] leading-none",
               onDark ? "text-terra-soft" : "text-terra-deep",

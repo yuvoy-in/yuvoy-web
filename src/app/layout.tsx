@@ -13,7 +13,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Yuvoy — See the experience. Feel if it's right. Then book.",
+    default: "Yuvoy · See the experience. Feel if it's right. Then book.",
     template: "%s · Yuvoy",
   },
   description:
@@ -23,14 +23,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Yuvoy",
-    title: "Yuvoy — See the experience. Feel if it's right. Then book.",
+    title: "Yuvoy · See the experience. Feel if it's right. Then book.",
     description:
       "Local dives, boat days, food and culture in the Andaman Islands, shown in honest video by the people who run them. Join the waitlist for first access.",
     url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Yuvoy — See the experience. Feel if it's right. Then book.",
+    title: "Yuvoy · See the experience. Feel if it's right. Then book.",
     description:
       "Local experiences in the Andaman Islands, shown in honest video by the people who run them. Join the waitlist.",
   },

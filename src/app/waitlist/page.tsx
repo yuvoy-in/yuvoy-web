@@ -10,7 +10,7 @@ import {
 export const metadata: Metadata = {
   title: "Join the waitlist",
   description:
-    "Join the Yuvoy waitlist for first access to local dives, boat days, food and culture in Havelock, Neil and Port Blair — or apply as a founding operator.",
+    "Join the Yuvoy waitlist for first access to local dives, boat days, food and culture in Havelock, Neil and Port Blair, or apply as a founding operator.",
   alternates: { canonical: "/waitlist" },
 };
 
