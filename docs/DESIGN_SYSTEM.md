@@ -109,11 +109,12 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 | Class of motion                                                                 | Budget     | Easing               |
 | ------------------------------------------------------------------------------- | ---------- | -------------------- |
 | **Interaction feedback** — menu open/close, hover, tab switch, accordion, focus | **≤250ms** | `--ease-interaction` |
-| **Entrance** — scroll reveals, the `rise` utility, `<Reveal>`                   | ~700ms     | `--ease-cinematic`   |
+| **Entrance** — the `rise` utility, on first paint only                          | ~700ms     | `--ease-cinematic`   |
 
 - Tokens: `--ease-interaction` (`cubic-bezier(0.32,0.72,0,1)`), `--ease-cinematic` (`cubic-bezier(0.22,1,0.36,0.16)`).
-- CSS entrance: the `rise` utility (opacity + translateY, 700ms). Prefer this above the fold — it ships zero JS.
-- JS motion: **Motion** (`motion/react`) via `<Reveal>`. All motion is wrapped in `<MotionConfig reducedMotion="user">` (providers) — **never bypass it**.
+- CSS entrance: the `rise` utility (opacity + translateY, 700ms), used **only** for the homepage cover's first paint. It ships zero JS.
+- **No scroll-triggered motion.** Sections render in place, fully visible, the moment they are reached. The `<Reveal>` component and the operator grid's draw-on-scroll strike were both removed on owner direction (2026-08-03): content that animates itself into view reads as decoration, and on a pitch page it delays the thing the reader came for. Do not reintroduce either without that decision being revisited.
+- JS motion: **none.** `motion/react` has no consumers, and `<MotionConfig>` was removed with its last one. If a genuine need for JS animation returns, restore `<MotionConfig reducedMotion="user">` in `providers.tsx` in the same change — it is what makes Motion honour the OS preference, which CSS-level reduced-motion cannot do for it.
 - **Reduced motion is handled globally**, once, in `globals.css`: a `prefers-reduced-motion: reduce` block neutralises every animation and transition. Individual components must not add their own reduced-motion branch — if a component needs one, the global rule is wrong and should be fixed instead.
 - Smooth scroll: **not implemented, and out of scope.** Lenis was removed in v2 rather than left as a dependency implying a feature that did not exist.
 

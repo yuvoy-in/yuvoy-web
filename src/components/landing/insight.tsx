@@ -1,14 +1,13 @@
 import { Section, SectionHeading } from "@/components/ui/section";
-import { Reveal } from "@/components/motion/reveal";
 
 /**
- * Act 01 — the insight the company is built on, stated the way a founder
- * would state it to an investor: not "travel planning is hard" but the
- * sharper observation that discovery, not booking, is the unsolved half.
+ * The insight act: the observation the company is built on, stated the way a
+ * founder would state it to an investor. Not "travel planning is hard" but
+ * the sharper point that discovery, not booking, is the unsolved half.
  *
- * The chips are the evidence — the improvised stack every traveller actually
- * uses today. Real product names, no logos: this is reportage, not
- * endorsement.
+ * The chips are the evidence: the improvised stack every traveller actually
+ * uses today. Real product names, no logos, because this is reportage rather
+ * than endorsement.
  */
 const STACK = [
   "Instagram",
@@ -23,16 +22,16 @@ export function Insight() {
   return (
     <Section id="problem" aria-labelledby="insight-heading">
       <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
-        <Reveal className="lg:col-span-5">
+        <div className="lg:col-span-5">
           <SectionHeading
             id="insight-heading"
             eyebrow="The real problem"
             title="The hard part was never"
             accent="booking."
           />
-        </Reveal>
+        </div>
 
-        <Reveal delay={0.12} className="lg:col-span-7 lg:pt-2">
+        <div className="lg:col-span-7 lg:pt-2">
           <p className="text-forest/75 max-w-xl text-lg leading-relaxed">
             It&rsquo;s knowing what a place even offers. Nobody hands you that
             list, so you go hunting for it across platforms that were never
@@ -58,7 +57,7 @@ export function Insight() {
             <em className="text-terra-deep italic">still no idea</em> what you
             missed.
           </p>
-        </Reveal>
+        </div>
       </div>
     </Section>
   );

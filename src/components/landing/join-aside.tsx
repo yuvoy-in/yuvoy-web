@@ -1,4 +1,3 @@
-import { Reveal } from "@/components/motion/reveal";
 import { WaveMotif } from "@/components/brand/wave-motif";
 
 /**
@@ -36,7 +35,7 @@ const ANSWERS = [
 
 export function JoinAside() {
   return (
-    <Reveal>
+    <>
       <p className="eyebrow text-terra-soft">Join Season One</p>
       <h2
         id="register-heading"
@@ -77,6 +76,6 @@ export function JoinAside() {
           </details>
         ))}
       </div>
-    </Reveal>
+    </>
   );
 }
