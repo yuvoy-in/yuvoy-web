@@ -140,7 +140,7 @@ export function MobileMenu({
         }}
         className="bg-cream m-0 h-dvh max-h-dvh w-screen max-w-none p-0 backdrop:cursor-pointer"
       >
-        <div className="menu-in flex h-full flex-col">
+        <div className="menu-in bg-cream flex h-full flex-col">
           <div className="border-cream-line flex h-16 shrink-0 items-center justify-between border-b px-6">
             <Wordmark />
             <button
