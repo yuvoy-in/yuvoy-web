@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 const GETS = [
   {
     title: "First access when the season opens",
-    body: "Waitlist members hear from us before the site opens to everyone. That is the whole of the advantage — there is no queue position and nothing to buy.",
+    body: "Waitlist members hear from us before the site opens to everyone. That is the whole of the advantage; there is no queue position and nothing to buy.",
   },
   {
     title: "Days chosen for you, not listed at you",
@@ -38,7 +38,7 @@ const GETS = [
 
 const HESITATIONS = [
   {
-    q: "There is nothing to book — so what am I joining?",
+    q: "There is nothing to book, so what am I joining?",
     a: "A list of people we will message when the first Andaman experiences are ready. That is deliberately unglamorous. Booking, payment and availability are not built, and we are not going to imply otherwise to make a signup feel bigger than it is.",
   },
   {
@@ -47,7 +47,7 @@ const HESITATIONS = [
   },
   {
     q: "How do I know this is not another abandoned waitlist?",
-    a: "You do not, yet — and no badge on this page could prove it. What we can do is not overstate where we are. Everything on this site is marked as either open now or planned, and today only two things are open: joining as a traveller, and applying as an operator.",
+    a: "You do not, yet, and no badge on this page could prove it. What we can do is not overstate where we are. Everything on this site is marked as either open now or planned, and today only two things are open: joining as a traveller, and applying as an operator.",
   },
 ];
 

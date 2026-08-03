@@ -8,7 +8,7 @@ import { getJournalPosts, formatPublished } from "@/lib/journal/posts";
 export const metadata: Metadata = {
   title: "Journal",
   description:
-    "Field notes from building Yuvoy — why we are starting where we are, and what we are learning from the islands.",
+    "Field notes from building Yuvoy: why we are starting where we are, and what we are learning from the islands.",
   alternates: { canonical: "/journal" },
 };
 

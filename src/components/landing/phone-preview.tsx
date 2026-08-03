@@ -215,7 +215,7 @@ export function PhonePreview() {
         <div
           className="bg-forest relative aspect-[9/17.4] w-[clamp(280px,24vw,330px)] overflow-hidden rounded-[calc(var(--radius-device)-0.5rem)]"
           role="group"
-          aria-label="Preview of the Yuvoy app — illustrative, nothing is bookable yet"
+          aria-label="Preview of the Yuvoy app. Illustrative: nothing is bookable yet"
         >
           <div
             ref={feedRef}
@@ -286,7 +286,7 @@ export function PhonePreview() {
                     <button
                       type="button"
                       onClick={() => book(scene)}
-                      aria-label={`Book ${scene.title} — preview only`}
+                      aria-label={`Book ${scene.title} (preview only)`}
                       className="bg-terra-deep text-cream rounded-edge hover:bg-terra-deep/90 focus-visible:ring-terra-soft px-4 py-2 font-mono text-[10px] font-semibold tracking-widest uppercase transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                     >
                       Book

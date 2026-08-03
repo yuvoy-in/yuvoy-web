@@ -21,7 +21,12 @@ import { NAV_ITEMS, PRIMARY_CTA, SITE_ROUTES } from "@/lib/site/nav";
  * state (so `aria-expanded` never goes stale), locking background scroll, and
  * deciding when returning focus to the trigger is the right thing to do.
  */
-export function MobileMenu() {
+export function MobileMenu({
+  tone = "onLight",
+}: {
+  /** Follows the header surface the trigger sits on. */
+  tone?: "onLight" | "onDark";
+}) {
   const [open, setOpen] = React.useState(false);
   const dialogRef = React.useRef<HTMLDialogElement>(null);
   const triggerRef = React.useRef<HTMLButtonElement>(null);
@@ -100,7 +105,12 @@ export function MobileMenu() {
         aria-expanded={open}
         aria-controls="mobile-menu"
         aria-haspopup="dialog"
-        className="text-forest hover:bg-forest/5 focus-visible:ring-terra-deep rounded-edge -mr-2 inline-flex size-11 items-center justify-center transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none lg:hidden"
+        className={cn(
+          "rounded-edge -mr-2 inline-flex size-11 items-center justify-center transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none lg:hidden",
+          tone === "onDark"
+            ? "text-cream hover:bg-cream/10 focus-visible:ring-terra-soft"
+            : "text-forest hover:bg-forest/5 focus-visible:ring-terra-deep",
+        )}
       >
         <span className="sr-only">Open menu</span>
         <svg aria-hidden viewBox="0 0 24 24" fill="none" className="size-6">

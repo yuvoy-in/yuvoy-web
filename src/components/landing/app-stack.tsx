@@ -53,12 +53,12 @@ export function AppStack() {
     <ul
       ref={ref}
       data-in={seen || undefined}
-      className="group grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6"
+      className="group grid grid-cols-2 gap-2 sm:grid-cols-3"
     >
       {STACK.map((app, i) => (
         <li
           key={app.tool}
-          className={`border-cream-line bg-cream rounded-edge after:bg-terra relative border px-3 py-4 text-center after:absolute after:top-[42%] after:right-[12%] after:left-[12%] after:h-px after:origin-left after:scale-x-0 after:transition-transform after:duration-500 after:ease-[var(--ease-cinematic)] group-data-[in]:after:scale-x-100 ${STRIKE_DELAYS[i]}`}
+          className={`border-cream-line bg-cream-deep rounded-edge after:bg-terra relative border px-3 py-4 text-center after:absolute after:top-[42%] after:right-[12%] after:left-[12%] after:h-px after:origin-left after:scale-x-0 after:transition-transform after:duration-500 after:ease-[var(--ease-cinematic)] group-data-[in]:after:scale-x-100 ${STRIKE_DELAYS[i]}`}
         >
           <p className="text-forest truncate text-sm font-medium">{app.tool}</p>
           <p className="label text-forest/75 mt-1.5 text-[9px]">{app.job}</p>

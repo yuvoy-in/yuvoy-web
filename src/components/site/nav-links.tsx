@@ -7,11 +7,16 @@ import { NAV_ITEMS } from "@/lib/site/nav";
 
 /**
  * Desktop primary navigation. Client-side only so the current route can carry
- * `aria-current="page"` — the rest of the header stays a server component.
+ * `aria-current="page"`. `tone` follows the header surface it sits on.
  */
-export function NavLinks() {
+export function NavLinks({
+  tone = "onLight",
+}: {
+  tone?: "onLight" | "onDark";
+}) {
   const pathname = usePathname();
   if (NAV_ITEMS.length === 0) return null;
+  const onDark = tone === "onDark";
 
   return (
     <nav aria-label="Primary" className="hidden items-center gap-8 lg:flex">
@@ -25,7 +30,13 @@ export function NavLinks() {
             aria-current={current ? "page" : undefined}
             className={cn(
               "label tap-target transition-colors duration-200",
-              current ? "text-terra-deep" : "text-forest/75 hover:text-forest",
+              current
+                ? onDark
+                  ? "text-terra-soft"
+                  : "text-terra-deep"
+                : onDark
+                  ? "text-cream/70 hover:text-cream"
+                  : "text-forest/75 hover:text-forest",
             )}
           >
             {item.label}

@@ -1,4 +1,5 @@
 import { Reveal } from "@/components/motion/reveal";
+import { WaveMotif } from "@/components/brand/wave-motif";
 
 /**
  * Act 05 — the ask, narrated. Rendered by LeadForms as the left column of the
@@ -15,28 +16,28 @@ import { Reveal } from "@/components/motion/reveal";
 const ANSWERS = [
   {
     q: "Can I book something today?",
-    a: "No — and we won't pretend otherwise. Joining tells us where you're headed and what draws you; we message you as experiences open, before booking opens anywhere else.",
+    a: "No, and we won't pretend otherwise. Joining tells us where you're headed and what draws you; we message you as experiences open, before booking opens anywhere else.",
   },
   {
     q: "What does joining cost?",
-    a: "Nothing. No fee, no card, no spam — we only ever message you about Yuvoy.",
+    a: "Nothing. No fee, no card, no spam. We only ever message you about Yuvoy.",
   },
   {
-    q: "I run experiences — what happens after I apply?",
+    q: "I run experiences. What happens after I apply?",
     a: "A real person reaches out on WhatsApp for a conversation about what you run. No listing fee, and terms are agreed with you before anything goes live.",
   },
   {
     q: "A word on the water",
     // The second half of this sentence is a cross-surface promise: /safety
     // makes it too, and an e2e test fails if either page drops or softens it.
-    a: "The sea deserves respect. Water experiences will only ever be listed with operators who run them properly — we would rather lose a booking than overstate anyone's readiness.",
+    a: "The sea deserves respect. Water experiences will only ever be listed with operators who run them properly. We would rather lose a booking than overstate anyone's readiness.",
   },
 ];
 
 export function JoinAside() {
   return (
     <Reveal>
-      <p className="eyebrow text-terra-soft">05 — Join Season One</p>
+      <p className="eyebrow text-terra-soft">Join Season One</p>
       <h2
         id="register-heading"
         className="font-display mt-6 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-normal tracking-tight text-balance"
@@ -44,14 +45,16 @@ export function JoinAside() {
         Be there when it <em className="text-terra-soft italic">opens.</em>
       </h2>
       <p className="text-cream/70 mt-6 max-w-md text-lg leading-relaxed">
-        The waitlist hears first — travellers get first access as experiences go
+        The waitlist hears first: travellers get first access as experiences go
         live, and operators get a conversation before launch.
       </p>
 
-      <p className="label text-cream/70 border-cream/12 mt-8 flex flex-wrap items-center gap-x-3 gap-y-1 border-t pt-6">
+      <WaveMotif tone="onDark" className="mt-8" />
+
+      <p className="label text-cream/70 border-cream/12 mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 border-t pt-6">
         <span className="text-terra-soft">Season One</span>
         <span aria-hidden>·</span>
-        October – May
+        When the sea turns to glass
         <span aria-hidden>·</span>
         Andaman &amp; Nicobar Islands
       </p>

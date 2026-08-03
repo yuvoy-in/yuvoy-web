@@ -10,7 +10,7 @@ export default function NotFound() {
         This path leads nowhere.
       </h1>
       <p className="text-forest/70 mt-4 max-w-md">
-        The page you&rsquo;re looking for isn&rsquo;t here — like a cove that
+        The page you&rsquo;re looking for isn&rsquo;t here, like a cove that
         moved with the tide.
       </p>
       <Link href="/" className={cn(buttonVariants(), "mt-8")}>

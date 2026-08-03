@@ -38,7 +38,7 @@ const PRINCIPLES = [
   },
   {
     title: "Premium through intimacy and craft",
-    body: "Quiet, considered and personal — not flashy. Small numbers of people, run properly, beats volume every time.",
+    body: "Quiet, considered and personal, not flashy. Small numbers of people, run properly, beats volume every time.",
   },
   {
     title: "Earned, not borrowed",
@@ -56,11 +56,10 @@ export default function AboutPage() {
         lede={
           <>
             <p>
-              Yuvoy — <em className="not-italic">yoo-voy</em> — is built from
-              two words:{" "}
-              <strong className="text-forest font-semibold">you</strong> and{" "}
-              <strong className="text-forest font-semibold">voyage</strong>. It
-              is a platform for finding and booking real-world experiences,
+              Yuvoy, <em className="not-italic">yoo-voy</em>, is built from two
+              words: <strong className="text-forest font-semibold">you</strong>{" "}
+              and <strong className="text-forest font-semibold">voyage</strong>.
+              It is a platform for finding and booking real-world experiences,
               opening first in the Andaman Islands.
             </p>
             <p className="mt-4">
@@ -84,7 +83,7 @@ export default function AboutPage() {
             <>
               <p>
                 Yuvoy is built around an established diving operation in
-                Havelock — its own boats, its own crew, and years of guests
+                Havelock: its own boats, its own crew, and years of guests
                 already behind it. That is the foundation the rest is being
                 built on.
               </p>
@@ -165,8 +164,8 @@ export default function AboutPage() {
               <p>
                 There is nothing to book on Yuvoy today. No prices, no
                 availability, no listings. The site says that on every page it
-                comes up, because the alternative — implying a product that does
-                not exist — is how trust gets spent before it is earned.
+                comes up, because the alternative, implying a product that does
+                not exist, is how trust gets spent before it is earned.
               </p>
               <p className="mt-4">
                 What is open is the waitlist, and the door for operators who

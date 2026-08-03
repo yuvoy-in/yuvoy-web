@@ -89,7 +89,7 @@ export default async function DestinationPage({
           eyebrow="The first season"
           title="What we are"
           accent="looking for here."
-          body="The kinds of day we are curating on this island. Not a catalogue — no experience on Yuvoy is listed or bookable yet."
+          body="The kinds of day we are curating on this island. Not a catalogue: no experience on Yuvoy is listed or bookable yet."
         />
         <ul className="border-cream-line mt-12 grid grid-cols-1 gap-px border-t sm:grid-cols-3">
           {destination.focus.map((item, i) => (
