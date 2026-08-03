@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { SectionHeading } from "@/components/ui/section";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
@@ -74,7 +73,8 @@ export function Engine() {
                   nothing to write.
                 </p>
               </div>
-              <Link
+              {/* Native anchor: #providers must fire hashchange (see Hero). */}
+              <a
                 href="#providers"
                 className={cn(
                   buttonVariants({ size: "lg" }),
@@ -83,7 +83,7 @@ export function Engine() {
               >
                 Apply as a founding operator
                 <ButtonArrow />
-              </Link>
+              </a>
             </div>
           </div>
         </Reveal>

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { PhonePreview } from "@/components/landing/phone-preview";
@@ -60,7 +59,13 @@ export function Hero() {
               className="rise mt-10 flex flex-col gap-3 sm:flex-row"
               style={{ animationDelay: "0.45s" }}
             >
-              <Link
+              {/*
+                Native anchors, not next/link: hash-only hrefs pushed through
+                the router use history.pushState, which never fires the
+                hashchange event LeadForms listens on. A plain anchor sets
+                location.hash natively, which both scrolls and fires it.
+              */}
+              <a
                 href="#register"
                 className={cn(
                   buttonVariants({ size: "lg" }),
@@ -69,8 +74,8 @@ export function Hero() {
               >
                 Join the waitlist
                 <ButtonArrow />
-              </Link>
-              <Link
+              </a>
+              <a
                 href="#how"
                 className={cn(
                   buttonVariants({ variant: "outlineOnDark", size: "lg" }),
@@ -78,7 +83,7 @@ export function Hero() {
                 )}
               >
                 How it works
-              </Link>
+              </a>
             </div>
 
             {/* Scroll cue — a falling thread. */}
