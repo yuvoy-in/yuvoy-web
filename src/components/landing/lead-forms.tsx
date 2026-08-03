@@ -161,7 +161,7 @@ export function LeadForms({
   return (
     <section
       id="register"
-      className="bg-teal text-cream scroll-mt-16"
+      className="bg-forest text-cream scroll-mt-16"
       aria-labelledby="register-heading"
     >
       {/* Always-present anchor: the target must exist even while the provider
@@ -204,7 +204,7 @@ export function LeadForms({
                 className={cn(
                   "focus-visible:ring-terra-soft rounded-edge flex-1 px-4 py-2.5 text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none",
                   audience === value
-                    ? "bg-cream text-teal"
+                    ? "bg-cream text-forest"
                     : "text-cream/70 hover:text-cream",
                 )}
               >
@@ -555,7 +555,7 @@ function TravellerForm({ context }: { context: LeadContext }) {
           {INTERESTS.map((interest) => (
             <label
               key={interest.key}
-              className="border-cream/20 text-cream/80 has-checked:bg-cream has-checked:text-teal has-checked:border-cream rounded-edge has-focus-visible:ring-terra-soft cursor-pointer border px-4 py-2 text-sm transition-colors duration-200 has-focus-visible:ring-2"
+              className="border-cream/20 text-cream/80 has-checked:bg-cream has-checked:text-forest has-checked:border-cream rounded-edge has-focus-visible:ring-terra-soft cursor-pointer border px-4 py-2 text-sm transition-colors duration-200 has-focus-visible:ring-2"
             >
               <input
                 type="checkbox"
@@ -727,7 +727,7 @@ function ProviderForm({ context }: { context: LeadContext }) {
           {LAUNCH_MARKET.destinations.map((d) => (
             <label
               key={d.key}
-              className="border-cream/20 text-cream/80 has-checked:bg-cream has-checked:text-teal has-checked:border-cream rounded-edge has-focus-visible:ring-terra-soft cursor-pointer border px-4 py-2 text-sm transition-colors duration-200 has-focus-visible:ring-2"
+              className="border-cream/20 text-cream/80 has-checked:bg-cream has-checked:text-forest has-checked:border-cream rounded-edge has-focus-visible:ring-terra-soft cursor-pointer border px-4 py-2 text-sm transition-colors duration-200 has-focus-visible:ring-2"
             >
               <input
                 type="checkbox"
@@ -751,7 +751,7 @@ function ProviderForm({ context }: { context: LeadContext }) {
           {INTERESTS.map((interest) => (
             <label
               key={interest.key}
-              className="border-cream/20 text-cream/80 has-checked:bg-cream has-checked:text-teal has-checked:border-cream rounded-edge has-focus-visible:ring-terra-soft cursor-pointer border px-4 py-2 text-sm transition-colors duration-200 has-focus-visible:ring-2"
+              className="border-cream/20 text-cream/80 has-checked:bg-cream has-checked:text-forest has-checked:border-cream rounded-edge has-focus-visible:ring-terra-soft cursor-pointer border px-4 py-2 text-sm transition-colors duration-200 has-focus-visible:ring-2"
             >
               <input
                 type="radio"

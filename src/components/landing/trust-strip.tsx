@@ -19,7 +19,7 @@ export function TrustStrip() {
           {FACTS.map((fact) => (
             <li
               key={fact}
-              className="label text-teal/75 flex items-center justify-center gap-3 py-5 text-center"
+              className="label text-forest/75 flex items-center justify-center gap-3 py-5 text-center"
             >
               <span aria-hidden className="bg-terra size-1 shrink-0" />
               {fact}

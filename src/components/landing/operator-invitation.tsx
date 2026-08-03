@@ -57,7 +57,7 @@ export function OperatorInvitation() {
         href="/waitlist?audience=provider"
         className={cn(
           buttonVariants({ size: "lg" }),
-          "focus-visible:ring-offset-ink mt-14 flex w-full sm:inline-flex sm:w-auto",
+          "focus-visible:ring-offset-forest mt-14 flex w-full sm:inline-flex sm:w-auto",
         )}
       >
         Apply as a founding operator

@@ -52,7 +52,7 @@ export default function HowItWorksPage() {
         >
           What you can actually do today
         </h2>
-        <p className="text-teal/75 mt-5 max-w-2xl leading-relaxed">
+        <p className="text-forest/75 mt-5 max-w-2xl leading-relaxed">
           Join the waitlist as a traveller, or apply as a founding operator.
           That is the whole list. There is no booking, no payment, no account
           and no catalogue — and we would rather say so plainly than dress up a

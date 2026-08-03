@@ -25,12 +25,12 @@ const button = cva(
         // and fail AA at label size, which is why the CTA fill is terra-deep.
         primary: "bg-terra-deep text-cream hover:bg-terra-deep/90",
         outline:
-          "border-teal/25 text-teal hover:border-teal/45 hover:bg-teal/5 border",
-        ink: "bg-teal text-cream hover:bg-teal/90",
-        ghost: "text-teal hover:bg-teal/5",
-        // Secondary action on teal/ink sections.
+          "border-forest/25 text-forest hover:border-forest/45 hover:bg-forest/5 border",
+        ink: "bg-forest text-cream hover:bg-forest/90",
+        ghost: "text-forest hover:bg-forest/5",
+        // Secondary action on a forest section.
         outlineOnDark:
-          "border-cream/30 text-cream hover:border-cream/50 hover:bg-cream/10 focus-visible:ring-offset-teal border",
+          "border-cream/30 text-cream hover:border-cream/50 hover:bg-cream/10 focus-visible:ring-offset-forest border",
       },
       size: {
         sm: "h-9 px-4",

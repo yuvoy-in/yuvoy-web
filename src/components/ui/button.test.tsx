@@ -20,7 +20,7 @@ describe("Button", () => {
   it("applies the outline variant as the secondary action", () => {
     render(<Button variant="outline">Later</Button>);
     expect(screen.getByRole("button", { name: "Later" }).className).toContain(
-      "border-teal/25",
+      "border-forest/25",
     );
   });
 

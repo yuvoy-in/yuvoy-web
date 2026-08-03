@@ -34,7 +34,7 @@ export function PageHeader({
           )}
         </h1>
         {lede && (
-          <div className="text-teal/75 mt-8 max-w-2xl text-lg leading-relaxed">
+          <div className="text-forest/75 mt-8 max-w-2xl text-lg leading-relaxed">
             {lede}
           </div>
         )}

@@ -56,7 +56,7 @@ export default function TermsPage() {
           You can ask to be removed at any time. See the{" "}
           <Link
             href="/privacy"
-            className="text-teal underline underline-offset-2"
+            className="text-forest underline underline-offset-2"
           >
             Privacy page
           </Link>

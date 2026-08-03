@@ -19,10 +19,10 @@ export default function Error({
   return (
     <main className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
       <p className="label text-terra-deep">Something broke</p>
-      <h1 className="font-display text-teal mt-5 text-4xl">
+      <h1 className="font-display text-forest mt-5 text-4xl">
         A small wave, not a storm.
       </h1>
-      <p className="text-teal/70 mt-4 max-w-md">
+      <p className="text-forest/70 mt-4 max-w-md">
         An unexpected error occurred on our side. You can try again, or head
         back to safe harbour.
       </p>

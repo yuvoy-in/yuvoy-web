@@ -32,7 +32,7 @@ export function FooterCta() {
         href={PRIMARY_CTA.href}
         className={cn(
           buttonVariants({ size: "lg" }),
-          "focus-visible:ring-offset-teal mt-10 flex w-full sm:inline-flex sm:w-auto",
+          "focus-visible:ring-offset-forest mt-10 flex w-full sm:inline-flex sm:w-auto",
         )}
       >
         {PRIMARY_CTA.label}

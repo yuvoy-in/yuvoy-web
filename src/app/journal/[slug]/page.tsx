@@ -52,30 +52,30 @@ export async function generateMetadata({
 const components = {
   h2: (props: React.ComponentProps<"h2">) => (
     <h2
-      className="font-display text-teal mt-12 text-2xl font-bold tracking-tight first:mt-0"
+      className="font-display text-forest mt-12 text-2xl font-bold tracking-tight first:mt-0"
       {...props}
     />
   ),
   h3: (props: React.ComponentProps<"h3">) => (
     <h3
-      className="font-display text-teal mt-8 text-xl font-bold tracking-tight"
+      className="font-display text-forest mt-8 text-xl font-bold tracking-tight"
       {...props}
     />
   ),
   p: (props: React.ComponentProps<"p">) => (
-    <p className="text-teal/75 mt-5 leading-relaxed" {...props} />
+    <p className="text-forest/75 mt-5 leading-relaxed" {...props} />
   ),
   ul: (props: React.ComponentProps<"ul">) => (
     <ul
-      className="text-teal/75 mt-5 flex list-disc flex-col gap-2 pl-5 leading-relaxed"
+      className="text-forest/75 mt-5 flex list-disc flex-col gap-2 pl-5 leading-relaxed"
       {...props}
     />
   ),
   a: (props: React.ComponentProps<"a">) => (
-    <a className="text-teal underline underline-offset-2" {...props} />
+    <a className="text-forest underline underline-offset-2" {...props} />
   ),
   strong: (props: React.ComponentProps<"strong">) => (
-    <strong className="text-teal font-semibold" {...props} />
+    <strong className="text-forest font-semibold" {...props} />
   ),
 };
 
@@ -120,7 +120,7 @@ export default async function JournalArticlePage({
         </article>
         <Link
           href="/journal"
-          className="label tap-target text-terra-deep hover:text-teal mt-14 underline underline-offset-4"
+          className="label tap-target text-terra-deep hover:text-forest mt-14 underline underline-offset-4"
         >
           ← All field notes
         </Link>

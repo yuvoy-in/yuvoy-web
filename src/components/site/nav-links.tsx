@@ -25,7 +25,7 @@ export function NavLinks() {
             aria-current={current ? "page" : undefined}
             className={cn(
               "label tap-target transition-colors duration-200",
-              current ? "text-terra-deep" : "text-teal/75 hover:text-teal",
+              current ? "text-terra-deep" : "text-forest/75 hover:text-forest",
             )}
           >
             {item.label}
