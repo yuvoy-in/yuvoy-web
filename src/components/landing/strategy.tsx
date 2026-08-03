@@ -1,5 +1,4 @@
 import { Section, SectionHeading } from "@/components/ui/section";
-import { Reveal } from "@/components/motion/reveal";
 import { WaveMotif } from "@/components/brand/wave-motif";
 
 /**
@@ -30,21 +29,19 @@ const FACTS = [
 export function Strategy() {
   return (
     <Section aria-labelledby="strategy-heading">
-      <Reveal>
-        <SectionHeading
-          id="strategy-heading"
-          eyebrow="The first market"
-          title="One destination, done"
-          accent="completely."
-          body="We would rather cover the Andamans entirely than fifty places thinly. Concentrated supply, a sharp season, operators who all know each other: the right shape for a marketplace to start, and the model for every destination after it."
-        />
-      </Reveal>
+      <SectionHeading
+        id="strategy-heading"
+        eyebrow="The first market"
+        title="One destination, done"
+        accent="completely."
+        body="We would rather cover the Andamans entirely than fifty places thinly. Concentrated supply, a sharp season, operators who all know each other: the right shape for a marketplace to start, and the model for every destination after it."
+      />
 
-      {/* A plain list, not a <dl>: the motion wrappers would sit between the
-          <dl> and its items, which axe rightly rejects. */}
+      {/* A plain list, not a <dl>: a description list may only contain
+          dt/dd pairs, and these entries pair a figure with prose. */}
       <ul className="border-cream-line mt-16 grid grid-cols-1 gap-x-10 gap-y-10 border-t pt-10 sm:grid-cols-3">
-        {FACTS.map((fact, i) => (
-          <Reveal as="li" key={fact.caption} delay={i * 0.12}>
+        {FACTS.map((fact) => (
+          <li key={fact.caption}>
             <p className="flex items-baseline gap-3">
               <span className="font-display text-terra text-[clamp(3rem,5vw,4.25rem)] leading-none tracking-tight">
                 {fact.figure}
@@ -54,20 +51,18 @@ export function Strategy() {
             <p className="text-forest/75 mt-4 max-w-xs leading-relaxed">
               {fact.detail}
             </p>
-          </Reveal>
+          </li>
         ))}
       </ul>
 
       {/* The manifesto line: the one sentence the page should be quoted by. */}
-      <Reveal>
-        <div className="border-cream-line mt-20 flex flex-col items-center border-y py-14 text-center">
-          <WaveMotif />
-          <p className="font-display text-forest mt-6 text-[clamp(1.875rem,4.5vw,3rem)] leading-tight tracking-tight text-balance">
-            Don&rsquo;t be a tourist.{" "}
-            <em className="text-terra italic">Experience more.</em>
-          </p>
-        </div>
-      </Reveal>
+      <div className="border-cream-line mt-20 flex flex-col items-center border-y py-14 text-center">
+        <WaveMotif />
+        <p className="font-display text-forest mt-6 text-[clamp(1.875rem,4.5vw,3rem)] leading-tight tracking-tight text-balance">
+          Don&rsquo;t be a tourist.{" "}
+          <em className="text-terra italic">Experience more.</em>
+        </p>
+      </div>
     </Section>
   );
 }

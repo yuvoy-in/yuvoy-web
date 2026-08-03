@@ -1,14 +1,10 @@
-"use client";
-
-import * as React from "react";
-
 /**
- * The improvised stack every operator runs today, struck through one by one
- * as the grid scrolls into view. The strike is the argument — six tools,
- * each about to be unnecessary — so it draws once, left to right, and stays.
+ * The improvised stack every operator runs today, each tool struck through.
  *
- * CSS transitions only (neutralised globally by reduced-motion); the
- * component's JS just flips a data attribute when the grid is seen.
+ * The strike is the argument: six tools, each about to be unnecessary. It was
+ * previously drawn on scroll; it is now simply there (owner direction,
+ * 2026-08-03, removing scroll-triggered motion), which also makes this a
+ * server component with no client JavaScript at all.
  */
 const STACK = [
   { tool: "Instagram", job: "Marketing" },
@@ -19,46 +15,13 @@ const STACK = [
   { tool: "Canva", job: "Content" },
 ];
 
-/** Left-to-right stagger; dynamic delay utilities, one per column. */
-const STRIKE_DELAYS = [
-  "after:delay-0",
-  "after:delay-100",
-  "after:delay-200",
-  "after:delay-300",
-  "after:delay-400",
-  "after:delay-500",
-];
-
 export function AppStack() {
-  const ref = React.useRef<HTMLUListElement>(null);
-  const [seen, setSeen] = React.useState(false);
-
-  React.useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setSeen(true);
-          io.disconnect();
-        }
-      },
-      { threshold: 0.4 },
-    );
-    io.observe(element);
-    return () => io.disconnect();
-  }, []);
-
   return (
-    <ul
-      ref={ref}
-      data-in={seen || undefined}
-      className="group grid grid-cols-2 gap-2 sm:grid-cols-3"
-    >
-      {STACK.map((app, i) => (
+    <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      {STACK.map((app) => (
         <li
           key={app.tool}
-          className={`border-cream-line bg-cream-deep rounded-edge after:bg-terra relative border px-3 py-4 text-center after:absolute after:top-[42%] after:right-[12%] after:left-[12%] after:h-px after:origin-left after:scale-x-0 after:transition-transform after:duration-500 after:ease-[var(--ease-cinematic)] group-data-[in]:after:scale-x-100 ${STRIKE_DELAYS[i]}`}
+          className="border-cream-line bg-cream rounded-edge after:bg-terra relative border px-3 py-4 text-center after:absolute after:top-[42%] after:right-[12%] after:left-[12%] after:h-px"
         >
           <p className="text-forest truncate text-sm font-medium">{app.tool}</p>
           <p className="label text-forest/75 mt-1.5 text-[9px]">{app.job}</p>

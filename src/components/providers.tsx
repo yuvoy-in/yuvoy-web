@@ -2,13 +2,18 @@
 
 import * as React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { MotionConfig } from "motion/react";
 import { AnalyticsProvider } from "@/components/analytics/analytics-provider";
 
 /**
  * App-wide client providers. Children remain server components — only this
- * boundary is client. TanStack Query for server state; MotionConfig makes all
- * animation respect the user's reduced-motion preference.
+ * boundary is client. TanStack Query for server state.
+ *
+ * `<MotionConfig reducedMotion="user">` used to wrap these; it went when the
+ * last `motion/react` component did (see docs/DESIGN_SYSTEM.md §3). All
+ * remaining animation is CSS, which the global `prefers-reduced-motion` block
+ * in globals.css already neutralises. **Restore MotionConfig in the same
+ * change that reintroduces any Motion component** — it is what makes Motion
+ * itself honour the preference.
  */
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = React.useState(
@@ -22,9 +27,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MotionConfig reducedMotion="user">
-        <AnalyticsProvider>{children}</AnalyticsProvider>
-      </MotionConfig>
+      <AnalyticsProvider>{children}</AnalyticsProvider>
     </QueryClientProvider>
   );
 }

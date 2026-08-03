@@ -1,5 +1,4 @@
 import { Section, SectionHeading } from "@/components/ui/section";
-import { Reveal } from "@/components/motion/reveal";
 import { PhonePreview } from "@/components/landing/phone-preview";
 
 /**
@@ -34,54 +33,48 @@ export function Answer() {
     <Section id="how" tone="ink" aria-labelledby="answer-heading">
       <div className="grid grid-cols-1 items-center gap-14 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-20">
         <div>
-          <Reveal>
-            <SectionHeading
-              id="answer-heading"
-              tone="ink"
-              eyebrow="What Yuvoy does"
-              title="Scroll. Watch."
-              accent="Book."
-              body="One feed of everything a destination offers, filmed by the people who run it. The booking happens right where the watching does."
-            />
-          </Reveal>
+          <SectionHeading
+            id="answer-heading"
+            tone="ink"
+            eyebrow="What Yuvoy does"
+            title="Scroll. Watch."
+            accent="Book."
+            body="One feed of everything a destination offers, filmed by the people who run it. The booking happens right where the watching does."
+          />
 
-          <Reveal delay={0.1}>
-            <ol className="border-cream/12 mt-12 border-t">
-              {STEPS.map((step) => (
-                <li
-                  key={step.n}
-                  className="border-cream/12 grid grid-cols-[2.5rem_1fr] items-baseline gap-x-5 border-b py-6"
+          <ol className="border-cream/12 mt-12 border-t">
+            {STEPS.map((step) => (
+              <li
+                key={step.n}
+                className="border-cream/12 grid grid-cols-[2.5rem_1fr] items-baseline gap-x-5 border-b py-6"
+              >
+                <span
+                  aria-hidden
+                  className="font-display text-terra-soft text-2xl leading-none"
                 >
-                  <span
-                    aria-hidden
-                    className="font-display text-terra-soft text-2xl leading-none"
-                  >
-                    {step.n}
-                  </span>
-                  <div>
-                    <h3 className="font-display text-xl tracking-tight">
-                      {step.title}
-                    </h3>
-                    <p className="text-cream/70 mt-1.5 text-[15px] leading-relaxed">
-                      {step.body}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </Reveal>
+                  {step.n}
+                </span>
+                <div>
+                  <h3 className="font-display text-xl tracking-tight">
+                    {step.title}
+                  </h3>
+                  <p className="text-cream/70 mt-1.5 text-[15px] leading-relaxed">
+                    {step.body}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
 
-          <Reveal delay={0.15}>
-            <p className="border-terra-soft/40 text-cream mt-10 border-l-2 py-1 pl-6 text-lg">
-              Booking opens after the first curated collection is ready. The
-              waitlist hears first.
-            </p>
-          </Reveal>
+          <p className="border-terra-soft/40 text-cream mt-10 border-l-2 py-1 pl-6 text-lg">
+            Booking opens after the first curated collection is ready. The
+            waitlist hears first.
+          </p>
         </div>
 
-        <Reveal delay={0.15} className="justify-self-center">
+        <div className="justify-self-center">
           <PhonePreview />
-        </Reveal>
+        </div>
       </div>
     </Section>
   );

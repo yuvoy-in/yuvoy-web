@@ -38,6 +38,7 @@ Brand Kit v2. Every ratio below is measured (sRGB relative luminance, WCAG 2.2) 
 | `terra-deep` on `cream`      | 5.21:1  | AA body                     |
 | `terra-deep` on `cream-deep` | 4.77:1  | AA body                     |
 | `terra` on `cream`           | 3.24:1  | **large text only** (≥24px) |
+| `terra` on `cream-deep`      | 2.96:1  | **fails everything**        |
 | `cream` on `terra-deep`      | 5.21:1  | AA body — the primary CTA   |
 | `cream` on `forest`          | 11.44:1 | AA + AAA body               |
 | `terra-soft` on `forest`     | 5.36:1  | AA body                     |
@@ -71,6 +72,13 @@ for body copy, labels, nav, or button text.
 
 - Accent text at body/label size **on cream** → `terra-deep`.
 - Accent text **on forest** → `terra-soft`.
+- **`terra` text may only sit on `cream`, never on `cream-deep`.** Its headroom
+  over the large-text floor is 0.24, so the raised surface alone spends it:
+  3.24:1 becomes 2.96:1 and the same headline that passes on the canvas fails
+  on a panel. A section that paints `cream-deep` and then uses `SectionHeading`
+  gets a failing accent with no warning, which is exactly what happened to the
+  operators section — put the section on `cream` and raise its inner panels to
+  `cream-deep` instead, which is how that section is now built.
 - Accent **fills** (the primary CTA) → `bg-terra-deep text-cream`. A `terra`
   fill with any text on it fails AA; this is why the CTA is the deeper tone.
 
@@ -109,11 +117,12 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 | Class of motion                                                                 | Budget     | Easing               |
 | ------------------------------------------------------------------------------- | ---------- | -------------------- |
 | **Interaction feedback** — menu open/close, hover, tab switch, accordion, focus | **≤250ms** | `--ease-interaction` |
-| **Entrance** — scroll reveals, the `rise` utility, `<Reveal>`                   | ~700ms     | `--ease-cinematic`   |
+| **Entrance** — the `rise` utility, on first paint only                          | ~700ms     | `--ease-cinematic`   |
 
 - Tokens: `--ease-interaction` (`cubic-bezier(0.32,0.72,0,1)`), `--ease-cinematic` (`cubic-bezier(0.22,1,0.36,0.16)`).
-- CSS entrance: the `rise` utility (opacity + translateY, 700ms). Prefer this above the fold — it ships zero JS.
-- JS motion: **Motion** (`motion/react`) via `<Reveal>`. All motion is wrapped in `<MotionConfig reducedMotion="user">` (providers) — **never bypass it**.
+- CSS entrance: the `rise` utility (opacity + translateY, 700ms), used **only** for the homepage cover's first paint. It ships zero JS.
+- **No scroll-triggered motion.** Sections render in place, fully visible, the moment they are reached. The `<Reveal>` component and the operator grid's draw-on-scroll strike were both removed on owner direction (2026-08-03): content that animates itself into view reads as decoration, and on a pitch page it delays the thing the reader came for. Do not reintroduce either without that decision being revisited.
+- JS motion: **none.** `motion/react` has no consumers, and `<MotionConfig>` was removed with its last one. If a genuine need for JS animation returns, restore `<MotionConfig reducedMotion="user">` in `providers.tsx` in the same change — it is what makes Motion honour the OS preference, which CSS-level reduced-motion cannot do for it.
 - **Reduced motion is handled globally**, once, in `globals.css`: a `prefers-reduced-motion: reduce` block neutralises every animation and transition. Individual components must not add their own reduced-motion branch — if a component needs one, the global rule is wrong and should be fixed instead.
 - Smooth scroll: **not implemented, and out of scope.** Lenis was removed in v2 rather than left as a dependency implying a feature that did not exist.
 
