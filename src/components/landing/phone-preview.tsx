@@ -3,7 +3,8 @@
 import * as React from "react";
 
 /**
- * The Season One phone preview — the product, on the cover of the site.
+ * The Season One phone preview: the product, running beside the three steps
+ * it demonstrates in the answer act.
  *
  * A self-running illustration of the Yuvoy loop: a vertical feed of
  * experiences that advances on its own, and a Book tap that lands on a
@@ -15,9 +16,10 @@ import * as React from "react";
  * numbers rule while allowing them here, inside the labelled screen.
  *
  * Motion rules: the feed only auto-advances while on screen, pauses for a
- * while whenever the visitor touches it (WCAG 2.2.2 — the visitor can always
- * take over), and never starts for visitors who prefer reduced motion. CSS
- * animations inside are neutralised by the global reduced-motion rule.
+ * while whenever the visitor takes it over on a screen where it can be
+ * scrolled (WCAG 2.2.2), and never starts for visitors who prefer reduced
+ * motion. CSS animations inside are neutralised by the global reduced-motion
+ * rule.
  */
 
 interface Scene {
@@ -161,8 +163,12 @@ export function PhonePreview() {
     };
     feed.addEventListener("scroll", onScroll, { passive: true });
 
-    // The visitor taking over pauses the choreography for a while.
+    // The visitor taking over pauses the choreography for a while. Only
+    // meaningful where the feed actually accepts scrolling: below md it is
+    // overflow-hidden, and a touch there is the page being scrolled past the
+    // phone, which must not freeze the demo.
     const onEngage = () => {
+      if (getComputedStyle(feed).overflowY === "hidden") return;
       paused = true;
       clearTimeout(timer);
       clearTimeout(resume);
@@ -212,14 +218,28 @@ export function PhonePreview() {
           className="bg-cream/20 absolute top-3.5 left-1/2 z-10 size-1.5 -translate-x-1/2 rounded-full"
         />
 
+        {/*
+          Width is min(), not clamp(): the old clamp held a 280px floor, which
+          with the frame's padding overflowed the gutters on a 320px screen.
+          This tracks the viewport down to the smallest phone and still caps
+          at the intended size on desktop.
+        */}
         <div
-          className="bg-forest relative aspect-[9/17.4] w-[clamp(280px,24vw,330px)] overflow-hidden rounded-[calc(var(--radius-device)-0.5rem)]"
+          className="bg-forest relative aspect-[9/17.4] w-[min(72vw,330px)] overflow-hidden rounded-[calc(var(--radius-device)-0.5rem)]"
           role="group"
           aria-label="Preview of the Yuvoy app. Illustrative: nothing is bookable yet"
         >
+          {/*
+            The feed only takes touch scrolling from md up. On a phone it is a
+            tall element in the middle of the page, so making it scrollable
+            would swallow the swipe that was meant to scroll the page past it.
+            Below md it plays itself and the page scrolls normally; the
+            auto-advance drives it either way, since scrollTo() works on an
+            overflow-hidden element.
+          */}
           <div
             ref={feedRef}
-            className="absolute inset-0 snap-y snap-mandatory scrollbar-none overflow-y-auto overscroll-contain"
+            className="absolute inset-0 scrollbar-none overflow-hidden md:snap-y md:snap-mandatory md:overflow-y-auto md:overscroll-contain"
           >
             {SCENES.map((scene) => (
               <article
@@ -352,7 +372,7 @@ export function PhonePreview() {
       </div>
 
       <p className="label text-cream/60 mt-5 text-center text-[10px]">
-        Swipe the feed · tap book
+        <span className="hidden md:inline">Swipe the feed · </span>Tap book
       </p>
     </div>
   );

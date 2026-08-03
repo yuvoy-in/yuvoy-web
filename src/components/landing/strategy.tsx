@@ -55,10 +55,15 @@ export function Strategy() {
         ))}
       </ul>
 
-      {/* The manifesto line: the one sentence the page should be quoted by. */}
-      <div className="border-cream-line mt-20 flex flex-col items-center border-y py-14 text-center">
-        <WaveMotif />
-        <p className="font-display text-forest mt-6 text-[clamp(1.875rem,4.5vw,3rem)] leading-tight tracking-tight text-balance">
+      {/*
+        The manifesto line: the one sentence the page should be quoted by. It
+        closes the section rather than forming a band of its own — the rules
+        above and below it, and the padding inside them, left it floating in
+        its own room (owner direction, 2026-08-04).
+      */}
+      <div className="mt-16 flex flex-col items-center text-center">
+        <WaveMotif className="h-4 w-11" />
+        <p className="font-display text-forest mt-5 text-[clamp(1.875rem,4.5vw,3rem)] leading-tight tracking-tight text-balance">
           Don&rsquo;t be a tourist.{" "}
           <em className="text-terra italic">Experience more.</em>
         </p>
