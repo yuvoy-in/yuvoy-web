@@ -31,7 +31,7 @@ export function Engine() {
     <section
       id="operators"
       aria-labelledby="engine-heading"
-      className="bg-cream-deep border-cream-line scroll-mt-16 border-y"
+      className="bg-cream border-cream-line scroll-mt-16 border-y"
     >
       <div className="container-page py-20 sm:py-28">
         <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-12">
@@ -52,7 +52,7 @@ export function Engine() {
 
         {/* The transformation: today's juggling act becomes one system. */}
         <div className="mt-14 grid grid-cols-1 items-stretch gap-5 lg:grid-cols-[1fr_auto_1fr]">
-          <div className="border-cream-line bg-cream rounded-edge flex w-full flex-col border p-7">
+          <div className="border-cream-line bg-cream-deep rounded-edge flex w-full flex-col border p-7">
             <p className="label text-forest/75">Today: the juggling act</p>
             <div className="mt-6">
               <AppStack />
@@ -128,7 +128,7 @@ export function Engine() {
           {ROSTER.map((slot) => (
             <li
               key={slot.what}
-              className="border-cream-line bg-cream rounded-edge border p-5"
+              className="border-cream-line bg-cream-deep rounded-edge border p-5"
             >
               <p className="label text-terra-deep flex items-center gap-2 text-[9px]">
                 <span aria-hidden className="bg-terra size-1" />

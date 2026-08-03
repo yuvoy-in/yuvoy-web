@@ -38,6 +38,7 @@ Brand Kit v2. Every ratio below is measured (sRGB relative luminance, WCAG 2.2) 
 | `terra-deep` on `cream`      | 5.21:1  | AA body                     |
 | `terra-deep` on `cream-deep` | 4.77:1  | AA body                     |
 | `terra` on `cream`           | 3.24:1  | **large text only** (≥24px) |
+| `terra` on `cream-deep`      | 2.96:1  | **fails everything**        |
 | `cream` on `terra-deep`      | 5.21:1  | AA body — the primary CTA   |
 | `cream` on `forest`          | 11.44:1 | AA + AAA body               |
 | `terra-soft` on `forest`     | 5.36:1  | AA body                     |
@@ -71,6 +72,13 @@ for body copy, labels, nav, or button text.
 
 - Accent text at body/label size **on cream** → `terra-deep`.
 - Accent text **on forest** → `terra-soft`.
+- **`terra` text may only sit on `cream`, never on `cream-deep`.** Its headroom
+  over the large-text floor is 0.24, so the raised surface alone spends it:
+  3.24:1 becomes 2.96:1 and the same headline that passes on the canvas fails
+  on a panel. A section that paints `cream-deep` and then uses `SectionHeading`
+  gets a failing accent with no warning, which is exactly what happened to the
+  operators section — put the section on `cream` and raise its inner panels to
+  `cream-deep` instead, which is how that section is now built.
 - Accent **fills** (the primary CTA) → `bg-terra-deep text-cream`. A `terra`
   fill with any text on it fails AA; this is why the CTA is the deeper tone.
 
