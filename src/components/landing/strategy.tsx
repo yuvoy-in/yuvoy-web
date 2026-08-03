@@ -39,22 +39,23 @@ export function Strategy() {
         />
       </Reveal>
 
-      <dl className="border-cream-line mt-16 grid grid-cols-1 gap-x-10 gap-y-10 border-t pt-10 sm:grid-cols-3">
+      {/* A plain list, not a <dl>: the motion wrappers would sit between the
+          <dl> and its items, which axe rightly rejects. */}
+      <ul className="border-cream-line mt-16 grid grid-cols-1 gap-x-10 gap-y-10 border-t pt-10 sm:grid-cols-3">
         {FACTS.map((fact, i) => (
-          <Reveal key={fact.caption} delay={i * 0.12}>
-            <div className="flex items-baseline gap-3">
-              <dt className="sr-only">{fact.caption}</dt>
-              <dd className="font-display text-terra text-[clamp(3rem,5vw,4.25rem)] leading-none tracking-tight">
+          <Reveal as="li" key={fact.caption} delay={i * 0.12}>
+            <p className="flex items-baseline gap-3">
+              <span className="font-display text-terra text-[clamp(3rem,5vw,4.25rem)] leading-none tracking-tight">
                 {fact.figure}
-              </dd>
-              <dd className="label text-forest/75">{fact.caption}</dd>
-            </div>
-            <dd className="text-forest/75 mt-4 max-w-xs leading-relaxed">
+              </span>
+              <span className="label text-forest/75">{fact.caption}</span>
+            </p>
+            <p className="text-forest/75 mt-4 max-w-xs leading-relaxed">
               {fact.detail}
-            </dd>
+            </p>
           </Reveal>
         ))}
-      </dl>
+      </ul>
 
       {/* The manifesto line — the one sentence the page should be quoted by. */}
       <Reveal>

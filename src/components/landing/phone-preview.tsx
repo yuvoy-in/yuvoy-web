@@ -269,9 +269,12 @@ export function PhonePreview() {
                     />
                     {scene.filmedBy}
                   </p>
-                  <h3 className="font-display text-cream mt-1.5 text-[22px] leading-[1.1] tracking-tight">
+                  {/* Not a heading: the card is illustration content inside
+                      the hero, and an h3 here would skip the document's
+                      h1 → h2 order. */}
+                  <p className="font-display text-cream mt-1.5 text-[22px] leading-[1.1] tracking-tight">
                     {scene.title}
-                  </h3>
+                  </p>
                   <p className="text-cream/70 mt-1 text-[10px]">{scene.meta}</p>
                   <div className="mt-3 flex items-center justify-between gap-3">
                     <p className="text-cream text-lg font-semibold">

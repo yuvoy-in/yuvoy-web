@@ -25,6 +25,12 @@ const ANSWERS = [
     q: "I run experiences — what happens after I apply?",
     a: "A real person reaches out on WhatsApp for a conversation about what you run. No listing fee, and terms are agreed with you before anything goes live.",
   },
+  {
+    q: "A word on the water",
+    // The second half of this sentence is a cross-surface promise: /safety
+    // makes it too, and an e2e test fails if either page drops or softens it.
+    a: "The sea deserves respect. Water experiences will only ever be listed with operators who run them properly — we would rather lose a booking than overstate anyone's readiness.",
+  },
 ];
 
 export function JoinAside() {
