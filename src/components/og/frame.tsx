@@ -13,9 +13,9 @@ export const OG_CONTENT_TYPE = "image/png";
  */
 const OG = {
   cream: "#F4EFE4",
-  teal: "#0D3B3E",
+  forest: "#16362E",
   terraDeep: "#985028",
-  muted: "rgba(13,59,62,0.65)",
+  muted: "rgba(22,54,46,0.68)",
 } as const;
 export function renderOg({
   eyebrow,
@@ -55,7 +55,7 @@ export function renderOg({
           display: "flex",
           fontSize: 68,
           lineHeight: 1.04,
-          color: OG.teal,
+          color: OG.forest,
           maxWidth: 980,
         }}
       >
@@ -74,7 +74,7 @@ export function renderOg({
             fontSize: 34,
             fontWeight: 600,
             letterSpacing: "0.34em",
-            color: OG.teal,
+            color: OG.forest,
           }}
         >
           <span style={{ display: "flex" }}>YUVOY</span>

@@ -58,10 +58,10 @@ export default function AboutPage() {
             <p>
               Yuvoy — <em className="not-italic">yoo-voy</em> — is built from
               two words:{" "}
-              <strong className="text-teal font-semibold">you</strong> and{" "}
-              <strong className="text-teal font-semibold">voyage</strong>. It is
-              a platform for finding and booking real-world experiences, opening
-              first in the Andaman Islands.
+              <strong className="text-forest font-semibold">you</strong> and{" "}
+              <strong className="text-forest font-semibold">voyage</strong>. It
+              is a platform for finding and booking real-world experiences,
+              opening first in the Andaman Islands.
             </p>
             <p className="mt-4">
               The idea underneath it is one most people have felt without
@@ -100,10 +100,10 @@ export default function AboutPage() {
         />
       </Section>
 
-      <Section tone="teal" aria-labelledby="problem-heading">
+      <Section tone="ink" aria-labelledby="problem-heading">
         <SectionHeading
           id="problem-heading"
-          tone="teal"
+          tone="ink"
           eyebrow="What we are fixing"
           title="The supply is real."
           accent="The way you find it is broken."
@@ -141,11 +141,11 @@ export default function AboutPage() {
         <ul className="border-cream-line mt-14 grid grid-cols-1 gap-px border-t sm:grid-cols-2">
           {PRINCIPLES.map((principle, i) => (
             <li key={principle.title} className="pt-10 sm:pr-10">
-              <span className="label text-teal/75">0{i + 1}</span>
-              <h3 className="font-display text-teal mt-5 text-xl font-bold tracking-tight">
+              <span className="label text-forest/75">0{i + 1}</span>
+              <h3 className="font-display text-forest mt-5 text-xl font-bold tracking-tight">
                 {principle.title}
               </h3>
-              <p className="text-teal/75 mt-3 leading-relaxed">
+              <p className="text-forest/75 mt-3 leading-relaxed">
                 {principle.body}
               </p>
             </li>
@@ -180,7 +180,7 @@ export default function AboutPage() {
             href="/waitlist"
             className={cn(
               buttonVariants({ size: "lg" }),
-              "focus-visible:ring-offset-ink w-full sm:w-auto",
+              "focus-visible:ring-offset-forest w-full sm:w-auto",
             )}
           >
             Join the waitlist

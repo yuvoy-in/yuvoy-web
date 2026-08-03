@@ -82,11 +82,11 @@ export default function OperatorsPage() {
         <ul className="border-cream-line mt-14 grid grid-cols-1 gap-px border-t sm:grid-cols-2">
           {OFFER.map((item, i) => (
             <li key={item.title} className="pt-10 sm:pr-10">
-              <span className="label text-teal/75">0{i + 1}</span>
-              <h3 className="font-display text-teal mt-5 text-xl font-bold tracking-tight">
+              <span className="label text-forest/75">0{i + 1}</span>
+              <h3 className="font-display text-forest mt-5 text-xl font-bold tracking-tight">
                 {item.title}
               </h3>
-              <p className="text-teal/75 mt-3 leading-relaxed">{item.body}</p>
+              <p className="text-forest/75 mt-3 leading-relaxed">{item.body}</p>
             </li>
           ))}
         </ul>

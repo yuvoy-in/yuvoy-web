@@ -48,7 +48,7 @@ export function Hero() {
 
         <div className="mt-12 flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
           <p
-            className="rise text-teal/75 max-w-xl text-lg leading-relaxed"
+            className="rise text-forest/75 max-w-xl text-lg leading-relaxed"
             style={{ animationDelay: "0.3s" }}
           >
             Yuvoy brings local dives, boat days, food and culture to life
@@ -84,7 +84,7 @@ export function Hero() {
           className="rise border-cream-line mt-16 border-t pt-6"
           style={{ animationDelay: "0.6s" }}
         >
-          <p className="label text-teal/75">
+          <p className="label text-forest/75">
             {LAUNCH_MARKET.destinations.map((d) => d.label).join(" · ")}
           </p>
         </div>

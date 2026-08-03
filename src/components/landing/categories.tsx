@@ -52,17 +52,17 @@ export function Categories() {
               className="border-cream-line flex flex-col pt-10 sm:pr-8 lg:border-r lg:last:border-r-0"
             >
               <div className="flex items-center gap-4">
-                <span className="label text-teal/75">0{i + 1}</span>
+                <span className="label text-forest/75">0{i + 1}</span>
                 <Icon
                   aria-hidden
                   strokeWidth={1.25}
                   className="text-terra-deep size-6"
                 />
               </div>
-              <h3 className="font-display text-teal mt-6 text-xl font-bold tracking-tight">
+              <h3 className="font-display text-forest mt-6 text-xl font-bold tracking-tight">
                 {interest.label}
               </h3>
-              <p className="text-teal/75 mt-3 text-sm leading-relaxed">
+              <p className="text-forest/75 mt-3 text-sm leading-relaxed">
                 {body}
               </p>
             </li>
@@ -70,7 +70,7 @@ export function Categories() {
         })}
       </ul>
 
-      <p className="text-teal/75 border-cream-line mt-12 border-t pt-6 text-sm">
+      <p className="text-forest/75 border-cream-line mt-12 border-t pt-6 text-sm">
         Categories we&rsquo;re curating for the first season. Individual
         experiences appear here only once their operators are on board and their
         content is real.

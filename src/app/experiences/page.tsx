@@ -121,22 +121,22 @@ export default function ExperiencesPage() {
                 className="border-cream-line border-t pt-10 lg:pr-12"
               >
                 <div className="flex items-center gap-4">
-                  <span className="label text-teal/75">0{i + 1}</span>
+                  <span className="label text-forest/75">0{i + 1}</span>
                   <Icon
                     aria-hidden
                     strokeWidth={1.25}
                     className="text-terra-deep size-6"
                   />
                 </div>
-                <h3 className="font-display text-teal mt-6 text-2xl font-bold tracking-tight">
+                <h3 className="font-display text-forest mt-6 text-2xl font-bold tracking-tight">
                   {interest.label}
                 </h3>
-                <p className="text-teal/75 mt-3 leading-relaxed">{body}</p>
+                <p className="text-forest/75 mt-3 leading-relaxed">{body}</p>
                 <ul className="mt-6 flex flex-wrap gap-2">
                   {examples.map((example) => (
                     <li
                       key={example}
-                      className="label border-cream-line text-teal/75 rounded-edge border px-3 py-1.5"
+                      className="label border-cream-line text-forest/75 rounded-edge border px-3 py-1.5"
                     >
                       {example}
                     </li>
@@ -146,16 +146,16 @@ export default function ExperiencesPage() {
             );
           })}
         </div>
-        <p className="text-teal/75 border-cream-line mt-14 border-t pt-6 text-sm">
+        <p className="text-forest/75 border-cream-line mt-14 border-t pt-6 text-sm">
           Examples describe the kind of day in each category. They are not
           listings, they name no operator, and none of them can be booked.
         </p>
       </Section>
 
-      <Section tone="teal" aria-labelledby="where-heading">
+      <Section tone="ink" aria-labelledby="where-heading">
         <SectionHeading
           id="where-heading"
-          tone="teal"
+          tone="ink"
           eyebrow="Where"
           title="Three islands"
           accent="to begin with."

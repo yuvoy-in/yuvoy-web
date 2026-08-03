@@ -30,17 +30,17 @@ export function ConsentBanner() {
       <div className="border-cream-line bg-cream rounded-edge mx-auto max-w-3xl border p-6 shadow-lg sm:p-8">
         <h2
           id={headingId}
-          className="font-display text-teal text-lg font-bold tracking-tight"
+          className="font-display text-forest text-lg font-bold tracking-tight"
         >
           Help us understand what&rsquo;s working?
         </h2>
-        <p className="text-teal/75 mt-3 text-sm leading-relaxed">
+        <p className="text-forest/75 mt-3 text-sm leading-relaxed">
           We&rsquo;d like to measure which parts of this site lead people to
           join the waitlist. It is anonymous — no name, email or number is ever
           sent — and nothing runs unless you say yes. Read the{" "}
           <Link
             href="/privacy"
-            className="text-teal underline underline-offset-2"
+            className="text-forest underline underline-offset-2"
           >
             Privacy Policy
           </Link>

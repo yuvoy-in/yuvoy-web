@@ -4,21 +4,26 @@
   Yuvoy design tokens — the single source of truth for color, type and rhythm.
   No hex, font, or tracking value may exist outside this @theme block.
 
-  Palette: Brand Kit v2 (ratified 2026-08-01) — Deep Teal, Terracotta, Cream,
-  Ink. Every pairing below is measured against WCAG 2.2 AA; the ratios and the
-  terra / terra-deep / terra-soft usage rule live in docs/DESIGN_SYSTEM.md §1.
-  Read that rule before using an accent on text — `terra` is NOT body-safe.
+  Palette: Brand Kit v2.1 (dark green unified 2026-08-03) — Forest,
+  Terracotta, Cream. Every pairing below is measured against WCAG 2.2 AA; the
+  ratios and the terra / terra-deep / terra-soft usage rule live in
+  docs/DESIGN_SYSTEM.md §1. Read that rule before using an accent on text —
+  `terra` is NOT body-safe.
+
+  `forest` replaced two darks, `teal` #0D3B3E and `ink` #22302E. They differed
+  in hue (184° vs 171°) and in saturation (65% vs 17%), so one read as a cyan
+  and the other as a grey, and every page that used both looked like one of
+  them was a mistake. There is one dark now, and no judgement to make.
 */
 @theme {
   /* ---------------------------------------------------------------- color */
   --color-cream: #f4efe4; /* canvas — editorial surfaces */
   --color-cream-deep: #ece5d6; /* raised surface on cream — cards, inputs */
   --color-cream-line: #e5dcc9; /* hairline borders on cream */
-  --color-teal: #0d3b3e; /* primary ink; dark sections (10.70:1 on cream) */
-  --color-ink: #22302e; /* deepest sections — night, depth (11.97:1) */
+  --color-forest: #16362e; /* primary ink AND every dark surface (11.44:1) */
   --color-terra: #be7149; /* accent — decoration + LARGE display text (3.24:1) */
   --color-terra-deep: #985028; /* text-capable accent + CTA fill (5.21:1) */
-  --color-terra-soft: #d89772; /* accent text on dark (5.02:1 teal / 5.61:1 ink) */
+  --color-terra-soft: #d89772; /* accent text on forest (5.36:1) */
 
   /* ----------------------------------------------------------------- type */
   --font-display: var(--font-poppins); /* headlines — heavy, geometric */
@@ -48,7 +53,7 @@
   }
 
   body {
-    @apply bg-cream text-teal font-sans antialiased;
+    @apply bg-cream text-forest font-sans antialiased;
     text-rendering: optimizeLegibility;
     overflow-x: clip; /* guard against accidental horizontal scroll on mobile */
   }
@@ -71,7 +76,7 @@
     to work around.
   */
   dialog[data-menu]::backdrop {
-    background-color: color-mix(in srgb, var(--color-ink) 72%, transparent);
+    background-color: color-mix(in srgb, var(--color-forest) 78%, transparent);
     backdrop-filter: blur(3px);
   }
 
@@ -96,9 +101,9 @@
 
 /**
  * Wide-tracked uppercase mono label — the brand's editorial voice.
- * On cream use `text-terra-deep` or `text-teal/75`; on dark use
+ * On cream use `text-terra-deep` or `text-forest/75`; on forest use
  * `text-terra-soft` or `text-cream/70`. Never `text-terra` (fails AA at this
- * size), and never below `text-teal/70` on cream.
+ * size), and never below `text-forest/70` on cream.
  */
 @utility label {
   @apply font-mono text-xs font-medium uppercase;

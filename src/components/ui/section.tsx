@@ -1,39 +1,41 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-type Tone = "cream" | "teal" | "ink";
+/**
+ * A section is light or it is dark. `ink` is the name of the *tone*; `forest`
+ * is the colour it paints. The site briefly carried two darks and the second
+ * one was read as a mistake wherever it appeared, so there is exactly one, and
+ * no third option to reach for.
+ */
+type Tone = "cream" | "ink";
 
 const SURFACE: Record<Tone, string> = {
-  cream: "bg-cream text-teal",
-  teal: "bg-teal text-cream",
-  ink: "bg-ink text-cream",
+  cream: "bg-cream text-forest",
+  ink: "bg-forest text-cream",
 };
 
 /** Accent colour that clears AA against each surface. */
 const ACCENT: Record<Tone, string> = {
   cream: "text-terra",
-  teal: "text-terra-soft",
   ink: "text-terra-soft",
 };
 
 const EYEBROW: Record<Tone, string> = {
   cream: "text-terra-deep",
-  teal: "text-terra-soft",
   ink: "text-terra-soft",
 };
 
 const BODY: Record<Tone, string> = {
-  cream: "text-teal/75",
-  teal: "text-cream/70",
+  cream: "text-forest/75",
   ink: "text-cream/70",
 };
 
 /**
- * A full-width page section on one of the three brand surfaces.
+ * A full-width page section, on cream or on forest.
  *
- * Sections alternate cream and teal/ink down a page — that rhythm is what
- * makes long editorial pages readable, so prefer alternating over stacking
- * two of the same tone.
+ * Sections alternate light and dark down a page — that rhythm is what makes
+ * long editorial pages readable, so prefer alternating over stacking two of
+ * the same tone.
  */
 export function Section({
   tone = "cream",

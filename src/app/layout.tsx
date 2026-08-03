@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="min-h-full">
         <a
           href="#content"
-          className="focus:bg-teal focus:text-cream label rounded-edge sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-3"
+          className="focus:bg-forest focus:text-cream label rounded-edge sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-3"
         >
           Skip to content
         </a>

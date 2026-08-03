@@ -20,7 +20,9 @@ export function JourneyTrack({ journey }: { journey: Journey }) {
       aria-labelledby={headingId}
       className={cn(
         "scroll-mt-16",
-        journey.key === "operator" ? "bg-ink text-cream" : "bg-cream text-teal",
+        journey.key === "operator"
+          ? "bg-forest text-cream"
+          : "bg-cream text-forest",
       )}
       id={journey.key === "operator" ? "operators" : "travellers"}
     >
@@ -50,7 +52,7 @@ export function JourneyTrack({ journey }: { journey: Journey }) {
         <p
           className={cn(
             "mt-6 max-w-2xl text-lg leading-relaxed",
-            journey.key === "operator" ? "text-cream/70" : "text-teal/75",
+            journey.key === "operator" ? "text-cream/70" : "text-forest/75",
           )}
         >
           {journey.lede}
@@ -80,7 +82,7 @@ export function JourneyTrack({ journey }: { journey: Journey }) {
                     "label",
                     journey.key === "operator"
                       ? "text-cream/60"
-                      : "text-teal/75",
+                      : "text-forest/75",
                   )}
                 >
                   {String(i + 1).padStart(2, "0")}
@@ -96,7 +98,7 @@ export function JourneyTrack({ journey }: { journey: Journey }) {
                     "mt-2 leading-relaxed",
                     journey.key === "operator"
                       ? "text-cream/70"
-                      : "text-teal/75",
+                      : "text-forest/75",
                   )}
                 >
                   {step.body}
@@ -111,7 +113,7 @@ export function JourneyTrack({ journey }: { journey: Journey }) {
           className={cn(
             buttonVariants({ size: "lg" }),
             "mt-12 flex w-full sm:inline-flex sm:w-auto",
-            journey.key === "operator" && "focus-visible:ring-offset-ink",
+            journey.key === "operator" && "focus-visible:ring-offset-forest",
           )}
         >
           {journey.cta.label}
@@ -150,7 +152,7 @@ function StatusChip({
         "label rounded-edge border px-2 py-1",
         onDark
           ? "border-cream/25 text-cream/60"
-          : "border-teal/25 text-teal/75",
+          : "border-forest/25 text-forest/75",
       )}
     >
       Planned

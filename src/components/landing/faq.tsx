@@ -20,7 +20,7 @@ export function Faq() {
       <div className="border-cream-line mt-14 border-t">
         {FAQS.map((faq) => (
           <details key={faq.q} className="group border-cream-line border-b">
-            <summary className="font-display text-teal flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-lg font-bold tracking-tight marker:content-none">
+            <summary className="font-display text-forest flex cursor-pointer list-none items-center justify-between gap-6 py-6 text-lg font-bold tracking-tight marker:content-none">
               {faq.q}
               <span
                 aria-hidden
@@ -29,7 +29,7 @@ export function Faq() {
                 +
               </span>
             </summary>
-            <p className="text-teal/75 max-w-3xl pb-6 leading-relaxed">
+            <p className="text-forest/75 max-w-3xl pb-6 leading-relaxed">
               {faq.a}
             </p>
           </details>

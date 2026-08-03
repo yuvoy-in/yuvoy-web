@@ -37,8 +37,8 @@ export default function DestinationsPage() {
               key={destination.key}
               className="border-cream-line border-t pt-10 lg:pr-10"
             >
-              <span className="label text-teal/75">0{i + 1}</span>
-              <h3 className="font-display text-teal mt-5 text-2xl font-bold tracking-tight">
+              <span className="label text-forest/75">0{i + 1}</span>
+              <h3 className="font-display text-forest mt-5 text-2xl font-bold tracking-tight">
                 <Link
                   href={destinationHref(destination)}
                   className="hover:text-terra-deep transition-colors duration-200"
@@ -46,13 +46,13 @@ export default function DestinationsPage() {
                   {destination.shortLabel}
                 </Link>
               </h3>
-              <p className="label text-teal/75 mt-2">{destination.label}</p>
-              <p className="text-teal/75 mt-4 leading-relaxed">
+              <p className="label text-forest/75 mt-2">{destination.label}</p>
+              <p className="text-forest/75 mt-4 leading-relaxed">
                 {destination.blurb}
               </p>
               <Link
                 href={destinationHref(destination)}
-                className="label tap-target text-terra-deep hover:text-teal mt-6 underline underline-offset-4"
+                className="label tap-target text-terra-deep hover:text-forest mt-6 underline underline-offset-4"
               >
                 About {destination.shortLabel}
               </Link>
@@ -61,10 +61,10 @@ export default function DestinationsPage() {
         </ul>
       </Section>
 
-      <Section tone="teal" aria-labelledby="next-heading">
+      <Section tone="ink" aria-labelledby="next-heading">
         <SectionHeading
           id="next-heading"
-          tone="teal"
+          tone="ink"
           eyebrow="After the Andamans"
           title="A second market is"
           accent="a decision, not a date."
@@ -74,7 +74,7 @@ export default function DestinationsPage() {
           href="/waitlist"
           className={cn(
             buttonVariants({ size: "lg" }),
-            "focus-visible:ring-offset-teal mt-12 flex w-full sm:inline-flex sm:w-auto",
+            "focus-visible:ring-offset-forest mt-12 flex w-full sm:inline-flex sm:w-auto",
           )}
         >
           Join the waitlist

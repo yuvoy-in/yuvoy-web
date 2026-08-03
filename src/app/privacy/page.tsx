@@ -45,7 +45,7 @@ export default function PrivacyPage() {
       <LegalSection heading="What we collect">
         <p>Only what you enter. Nothing is gathered in the background.</p>
         <p>
-          <strong className="text-teal font-semibold">
+          <strong className="text-forest font-semibold">
             If you join as a traveller:
           </strong>{" "}
           your name, and one way to reach you — a WhatsApp number, an email
@@ -53,7 +53,7 @@ export default function PrivacyPage() {
           three things that interest you.
         </p>
         <p>
-          <strong className="text-teal font-semibold">
+          <strong className="text-forest font-semibold">
             If you apply as an operator:
           </strong>{" "}
           your name, your business name, a WhatsApp number, the destinations you
@@ -110,7 +110,7 @@ export default function PrivacyPage() {
 
       <LegalSection heading="Analytics">
         <p>
-          <strong className="text-teal font-semibold">
+          <strong className="text-forest font-semibold">
             No product analytics are running on this site.
           </strong>{" "}
           Nothing tracks what you click or how you move through the pages, and

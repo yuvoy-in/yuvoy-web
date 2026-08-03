@@ -100,7 +100,7 @@ export function MobileMenu() {
         aria-expanded={open}
         aria-controls="mobile-menu"
         aria-haspopup="dialog"
-        className="text-teal hover:bg-teal/5 focus-visible:ring-terra-deep rounded-edge -mr-2 inline-flex size-11 items-center justify-center transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none lg:hidden"
+        className="text-forest hover:bg-forest/5 focus-visible:ring-terra-deep rounded-edge -mr-2 inline-flex size-11 items-center justify-center transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none lg:hidden"
       >
         <span className="sr-only">Open menu</span>
         <svg aria-hidden viewBox="0 0 24 24" fill="none" className="size-6">
@@ -136,7 +136,7 @@ export function MobileMenu() {
             <button
               type="button"
               onClick={() => close()}
-              className="text-teal hover:bg-teal/5 focus-visible:ring-terra-deep rounded-edge -mr-2 inline-flex size-11 items-center justify-center transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
+              className="text-forest hover:bg-forest/5 focus-visible:ring-terra-deep rounded-edge -mr-2 inline-flex size-11 items-center justify-center transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
             >
               <span className="sr-only">Close menu</span>
               <svg
@@ -178,7 +178,7 @@ export function MobileMenu() {
                         onClick={() => close(false)}
                         className={cn(
                           "font-display block py-4 text-xl font-bold tracking-tight",
-                          current ? "text-terra-deep" : "text-teal",
+                          current ? "text-terra-deep" : "text-forest",
                         )}
                       >
                         {item.label}
@@ -207,7 +207,7 @@ export function MobileMenu() {
                     <Link
                       href={item.href}
                       onClick={() => close(false)}
-                      className="label tap-target text-teal/75 hover:text-teal"
+                      className="label tap-target text-forest/75 hover:text-forest"
                     >
                       {item.label}
                     </Link>
