@@ -95,7 +95,8 @@ Borders and fills are exempt from these floors — `border-forest/20`, `bg-fores
 - **UI / body — Inter** (`font-sans`, the default). Bold weights live here.
 - **Label — IBM Plex Mono** (`font-mono`) via the `label` utility: uppercase, `text-xs`, `font-medium`, `tracking-label` (0.18em). Eyebrows, nav, stats, metadata, button labels. The engineered counterweight to the serif's warmth.
 - **`eyebrow` utility** — the `label` preceded by a short terracotta rule (a 1.75rem hairline). This is the section-opening gesture; **use it once per section**, at the top. On the homepage the eyebrow also carries the act number (`01 — The real problem`), making the page's narrative structure visible.
-- **Wordmark** — `tracking-wordmark` (0.34em) on **sans** semibold caps (v2.2): the serif is the site's voice, the sans mark is the object that signs it. See `<Wordmark />`, which also carries the tile mark and the "Experience more." kicker.
+- **Wordmark** — `tracking-wordmark` (0.34em) on **sans** semibold caps (v2.2): the serif is the site's voice, the sans mark is the object that signs it. See `<Wordmark />`, which also carries the official mark and the "Experience more." kicker.
+- **The mark** — the official ensō (white brush ring + terracotta dot), always on its **forest tile**. The delivered source (`public/yuvoy-logo.png`) has an opaque black field, so the committed display assets are derived by `scripts/generate-brand-assets.py` (screen-blend onto forest, glow soft-knee, auto-crop): `public/brand/yuvoy-mark.png` (UI + OG), `src/app/icon.png` and `src/app/favicon.ico`. Re-run the script if the source logo is ever replaced; never hand-edit the derived files.
 
 Scale: Tailwind's type scale. Headlines `font-display`; everything else inherits Inter unless it is a label.
 
@@ -130,7 +131,7 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
   - `ink` (solid forest), `ghost` (text-only) and `outlineOnDark` (secondary on forest sections) are **situational** — allowed, but justify them in review.
   - Use `buttonVariants()` to style a `<Link>` as a button; `<ButtonArrow />` for the trailing arrow on a forward action.
 - **`Input`** — `rounded-edge` field on `cream-deep`, terra-deep focus ring.
-- **`Wordmark`** / **`WaveMark`** — tile + wave glyph, wordmark, "Experience more." kicker. `tone="onDark"` for forest surfaces.
+- **`Wordmark`** / **`WaveMark`** — the official ensō mark on its forest tile, wordmark, "Experience more." kicker. `tone="onDark"` adds a hairline ring so the tile stays legible on forest surfaces.
 - **`SiteHeader`** / **`SiteFooter`** / **`MobileMenu`** — the shell, rendered by the root layout on every route. All navigation comes from the registry (§7).
 - Growing set: ExperienceCard, FeedPlayer, AvailabilityPicker, PriceBreakdown (as screens land).
 
