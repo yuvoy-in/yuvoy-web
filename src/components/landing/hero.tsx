@@ -2,10 +2,12 @@ import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 
 /**
- * The cover: a full-viewport statement on forest, lit by a single low
- * terracotta glow and filmic grain. Nothing moves here. An animated wave
- * horizon was tried and removed (owner direction, 2026-08-03); the type and
- * the light carry the register on their own.
+ * The cover: a full-viewport statement on a flat forest field, textured only
+ * by filmic grain. The scene is still; the only motion is the composition
+ * surfacing from depth once, on first paint (the `emerge` utility). An
+ * animated wave horizon and a terracotta corner glow were both tried and
+ * removed (owner direction, 2026-08-03 and 2026-08-04); the type carries the
+ * register on its own.
  *
  * The product preview lives in the next act, so the cover's only job is the
  * question.
@@ -24,24 +26,25 @@ const FACTS = [
 export function Hero() {
   return (
     <section className="bg-forest text-cream relative overflow-hidden">
-      {/* The light: a warm horizon glow low in the frame, and grain over it. */}
+      {/* Nothing but grain: a flat forest field, so the type is the whole
+          composition. The terracotta corner glow that used to sit here went
+          with the waves (owner direction, 2026-08-04). */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <div className="from-terra/16 absolute right-[6%] bottom-[-10%] size-[62vmin] rounded-full bg-radial to-transparent to-70% blur-3xl" />
         <div className="grain" />
       </div>
 
       <div className="container-page relative flex min-h-[calc(100dvh-4rem)] flex-col justify-center py-16 sm:py-20">
         <div className="flex flex-col items-center text-center">
           <p
-            className="eyebrow text-terra-soft rise"
+            className="eyebrow text-terra-soft emerge"
             style={{ animationDelay: "0.05s" }}
           >
-            Season One · Andaman Islands · Opening when the water clears
+            Season One · Opening when the water clears
           </p>
 
           <h1
-            className="font-display rise mt-9 max-w-4xl text-[clamp(3rem,8.5vw,6rem)] leading-[0.98] font-normal tracking-tight text-balance"
-            style={{ animationDelay: "0.15s" }}
+            className="font-display emerge mt-9 max-w-4xl text-[clamp(3rem,8.5vw,6rem)] leading-[0.98] font-normal tracking-tight text-balance"
+            style={{ animationDelay: "0.14s" }}
           >
             Every trip starts with one question.
             <span className="text-terra-soft mt-3 block italic">
@@ -50,16 +53,16 @@ export function Hero() {
           </h1>
 
           <p
-            className="text-cream/70 rise mt-9 max-w-2xl text-lg leading-relaxed"
-            style={{ animationDelay: "0.3s" }}
+            className="text-cream/70 emerge mt-9 max-w-2xl text-lg leading-relaxed"
+            style={{ animationDelay: "0.26s" }}
           >
             Yuvoy answers it. Everything a place actually offers, on honest
             video from the people who run it, booked in the same scroll.
           </p>
 
           <div
-            className="rise mt-11 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row"
-            style={{ animationDelay: "0.45s" }}
+            className="emerge mt-11 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row"
+            style={{ animationDelay: "0.38s" }}
           >
             {/*
               Native anchors, not next/link: hash-only hrefs pushed through
@@ -91,10 +94,10 @@ export function Hero() {
 
         {/* The momentum line: three true facts, and the three islands. */}
         <div
-          className="rise border-cream/12 mt-20 flex flex-wrap items-center justify-between gap-x-10 gap-y-3 border-t pt-6"
-          style={{ animationDelay: "0.6s" }}
+          className="emerge border-cream/12 mt-16 flex flex-col items-center gap-4 border-t pt-6 text-center sm:mt-20 sm:flex-row sm:justify-between sm:gap-x-10 sm:text-left"
+          style={{ animationDelay: "0.5s" }}
         >
-          <ul className="flex flex-wrap items-center gap-x-8 gap-y-2">
+          <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 sm:justify-start">
             {FACTS.map((fact) => (
               <li
                 key={fact}

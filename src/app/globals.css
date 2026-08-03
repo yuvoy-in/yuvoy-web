@@ -49,7 +49,10 @@
   --radius-device: 2.25rem;
 
   /* --------------------------------------------------------------- motion */
-  --ease-cinematic: cubic-bezier(0.22, 1, 0.36, 0.16); /* entrances */
+  /* Entrances. The second control point ends at 1: it used to be 0.16, which
+     made the curve climb to full, sag back toward a sixth of the way, then
+     climb again — a wobble halfway through every entrance on the site. */
+  --ease-cinematic: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-interaction: cubic-bezier(0.32, 0.72, 0, 1); /* interaction feedback */
 
   /* ------------------------------------------------------------- tracking */
@@ -169,20 +172,36 @@
 
 /* ----------------------------------------------------------------- motion */
 
-/* Cinematic entrance — CSS-only so above-the-fold content ships zero JS. */
-@keyframes yuvoy-rise {
+/*
+  The cover's entrance: the composition surfaces from depth rather than
+  sliding up. Three things move at once — it comes toward the viewer (scale),
+  it settles (translate), and it pulls into focus (blur) — which reads as a
+  camera finding its subject instead of a panel animating in.
+
+  The blur clears at 65%, before the movement finishes, so the type is sharp
+  while it is still settling; letting both land together looks like a
+  mis-timed transition. CSS-only, so above-the-fold content ships zero JS.
+*/
+@keyframes yuvoy-emerge {
   from {
     opacity: 0;
-    transform: translateY(1.25rem);
+    transform: translateY(1.75rem) scale(0.94);
+    filter: blur(8px);
   }
+
+  65% {
+    filter: blur(0);
+  }
+
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    filter: blur(0);
   }
 }
 
-@utility rise {
-  animation: yuvoy-rise 700ms var(--ease-cinematic) both;
+@utility emerge {
+  animation: yuvoy-emerge 1100ms var(--ease-cinematic) both;
 }
 
 /* Mobile menu panel — interaction feedback, so it stays inside the 250ms budget. */
