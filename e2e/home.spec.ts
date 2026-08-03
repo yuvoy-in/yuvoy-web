@@ -1,34 +1,56 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 
-/** Nothing on the site may claim a price, a rating or a review count. */
+/**
+ * Nothing on the page may claim a price, a rating or a review count — with
+ * one owner-approved exception: the Season One phone preview, which is
+ * visibly labelled as a preview and carries `data-preview` on its wrapper
+ * (see docs/DESIGN_SYSTEM.md §8). The guard therefore asserts two things:
+ * the rule holds everywhere *outside* that wrapper, and the label that
+ * justifies the exception is actually present.
+ */
 const FABRICATED = /₹|\breviews?\b|\bratings?\b/i;
 
-test("landing renders every section", async ({ page }) => {
+async function textOutsidePreview(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const clone = document.body.cloneNode(true) as HTMLElement;
+    clone.querySelectorAll("[data-preview]").forEach((n) => n.remove());
+    return clone.textContent ?? "";
+  });
+}
+
+test("landing tells the six-act story in headlines", async ({ page }) => {
   await page.goto("/");
+
+  // The billboard test: the acts, readable as headings alone.
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "See the experience",
+    "Every trip starts with one question",
   );
   await expect(
-    page.getByRole("heading", { name: /watch\. feel\. book\./i }),
+    page.getByRole("heading", { name: /the hard part was never booking/i }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: /chosen by feeling/i }),
+    page.getByRole("heading", { name: /scroll\. watch\. book\./i }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: /three islands/i }),
+    page.getByRole("heading", { name: /one destination, done completely/i }),
   ).toBeVisible();
+  await expect(page.getByRole("heading", { name: /six apps/i })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: /two different questions/i }),
+    page.getByRole("heading", { name: /be there when it opens/i }),
   ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: /asked and answered/i }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: /join the waitlist/i }),
-  ).toBeVisible();
+});
 
-  // No fabricated social proof anywhere on the page.
-  expect(await page.textContent("body")).not.toMatch(FABRICATED);
+test("the preview is labelled and invented numbers stay inside it", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  // The exception must announce itself…
+  await expect(page.getByText("Season One preview")).toBeVisible();
+  await expect(page.locator("[data-preview]")).toHaveCount(1);
+
+  // …and the rule holds everywhere else.
+  expect(await textOutsidePreview(page)).not.toMatch(FABRICATED);
 });
 
 test("the honest booking caveat is stated verbatim", async ({ page }) => {
@@ -42,24 +64,36 @@ test("the honest booking caveat is stated verbatim", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("hero CTAs lead to the waitlist page for each audience", async ({
+test("the cover's momentum line states only true facts", async ({ page }) => {
+  await page.goto("/");
+  // The signed-operator count is a real, owner-confirmed number (2026-08-03).
+  // If this fails because reality changed, update BOTH the page and this
+  // assertion to the new true number — never delete the check.
+  await expect(page.getByText("3 founding operators signed")).toBeVisible();
+});
+
+test("the cover CTA lands on the registration form without leaving the page", async ({
   page,
 }) => {
   await page.goto("/");
 
-  await page.getByRole("link", { name: "Join the traveller waitlist" }).click();
-  await expect(page).toHaveURL(/\/waitlist$/);
-  await expect(page.getByRole("tab", { name: /travelling/i })).toHaveAttribute(
-    "aria-selected",
-    "true",
-  );
+  const cover = page.locator("main > section").first();
+  await cover.getByRole("link", { name: "Join the waitlist" }).click();
+  await expect(page).toHaveURL(/#register$/);
+  await expect(
+    page.getByRole("tabpanel", { name: /travelling/i }),
+  ).toBeInViewport();
+});
 
+test("the operator CTA opens the provider form via #providers", async ({
+  page,
+}) => {
   await page.goto("/");
+
   await page
     .getByRole("link", { name: "Apply as a founding operator" })
-    .first()
     .click();
-  await expect(page).toHaveURL(/\/waitlist\?audience=provider$/);
+  await expect(page).toHaveURL(/#providers$/);
   await expect(
     page.getByRole("tab", { name: /run experiences/i }),
   ).toHaveAttribute("aria-selected", "true");
@@ -159,7 +193,7 @@ test("campaign route renders with noindex and canonical to home", async ({
 }) => {
   await page.goto("/go/ferry");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "See the experience",
+    "Every trip starts with one question",
   );
   await expect(page.locator('meta[name="robots"]').first()).toHaveAttribute(
     "content",

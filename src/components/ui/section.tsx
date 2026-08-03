@@ -92,13 +92,18 @@ export function SectionHeading({
   return (
     <div className={cn("max-w-3xl", className)}>
       {eyebrow && <p className={cn("eyebrow", EYEBROW[tone])}>{eyebrow}</p>}
+      {/*
+        v2.2: the serif carries mass through size, not weight — there is no
+        bold in the face, so headlines are font-normal and a step larger than
+        the sans scale they replaced.
+      */}
       <Heading
         id={id}
         className={cn(
-          "font-display mt-6 font-extrabold tracking-tight text-balance",
+          "font-display mt-6 font-normal tracking-tight text-balance",
           level === 1
-            ? "text-[clamp(2.25rem,7vw,4rem)] leading-[1.02]"
-            : "text-[clamp(1.875rem,4.5vw,3rem)] leading-[1.05]",
+            ? "text-[clamp(2.5rem,7vw,4.5rem)] leading-none"
+            : "text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04]",
         )}
       >
         {title}

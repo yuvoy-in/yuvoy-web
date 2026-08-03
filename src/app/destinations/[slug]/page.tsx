@@ -95,7 +95,7 @@ export default async function DestinationPage({
           {destination.focus.map((item, i) => (
             <li key={item} className="pt-8 sm:pr-8">
               <span className="label text-forest/75">0{i + 1}</span>
-              <p className="font-display text-forest mt-4 text-lg font-bold tracking-tight">
+              <p className="font-display text-forest mt-4 text-lg font-normal tracking-tight">
                 {item}
               </p>
             </li>

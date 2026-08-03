@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { poppins, inter, plexMono } from "@/lib/fonts";
+import { instrumentSerif, inter, plexMono } from "@/lib/fonts";
 import { Providers } from "@/components/providers";
 import { SITE_URL, IS_PRODUCTION } from "@/lib/site";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -40,7 +40,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${poppins.variable} ${inter.variable} ${plexMono.variable} h-full`}
+      className={`${instrumentSerif.variable} ${inter.variable} ${plexMono.variable} h-full`}
     >
       <body className="min-h-full">
         <a

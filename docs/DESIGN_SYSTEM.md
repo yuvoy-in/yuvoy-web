@@ -7,6 +7,8 @@ Direction: **editorial, rectangular, confident.** Heavy geometric display type a
 > **Brand Kit v2** (ratified 2026-08-01) supersedes v1. v1 was Fraunces + pill geometry on a warmer cream; v2 moves to Poppins + IBM Plex Mono and a rectangular geometry, retuning the palette to match. Rationale and the full contrast table are in §1.
 >
 > **v2.1 (2026-08-03)** replaces the two darks, `teal` `#0D3B3E` and `ink` `#22302E`, with a single `forest` `#16362E`. Nothing else changed.
+>
+> **v2.2 (2026-08-03, owner-directed)** replaces the display face: Poppins → **Instrument Serif**, the editorial serif the narrative-landing rebuild is set in. Owner brief: anything but the palette may change in service of a more premium register. The serif ships one weight (400 + italic), so display type is `font-normal` always — mass comes from size and leading, and there is no faux-bold to reach for. The wordmark deliberately stays on the sans (Inter semibold) so the mark reads engineered against the serif's warmth. Palette untouched. Adds `--radius-device` (§4) and the preview-surface rule (§8).
 
 ## 0. Architecture rule
 
@@ -89,11 +91,11 @@ Borders and fills are exempt from these floors — `border-forest/20`, `bg-fores
 
 ## 2. Typography
 
-- **Display — Poppins** (`font-display`), weights 600/700/800. Headlines are heavy and tight (`font-extrabold tracking-tight`). **Italic is reserved for the second line of a headline** — the terracotta "turn" that is the brand's most recognisable typographic move. Do not use italic display type for anything else.
-- **UI / body — Inter** (`font-sans`, the default).
-- **Label — IBM Plex Mono** (`font-mono`) via the `label` utility: uppercase, `text-xs`, `font-medium`, `tracking-label` (0.18em). Eyebrows, nav, stats, metadata, button labels. The editorial counterweight to Poppins' mass.
-- **`eyebrow` utility** — the `label` preceded by a short terracotta rule (a 1.75rem hairline). This is the section-opening gesture; **use it once per section**, at the top.
-- **Wordmark** — `tracking-wordmark` (0.34em) on display caps; see `<Wordmark />`, which also carries the tile mark and the "Experience more." kicker.
+- **Display — Instrument Serif** (`font-display`), single weight 400 + italic. Headlines are set large, light and tight (`font-normal tracking-tight`, leading ≈1.0) — the serif carries mass through **size**, never weight. `font-bold`/`font-extrabold` must never appear with `font-display`: the face has no bold, and the browser would synthesise an ugly one. **Italic is reserved for the terracotta "turn"** — the second thought of a headline — which stays the brand's most recognisable typographic move. Do not use italic display type for anything else.
+- **UI / body — Inter** (`font-sans`, the default). Bold weights live here.
+- **Label — IBM Plex Mono** (`font-mono`) via the `label` utility: uppercase, `text-xs`, `font-medium`, `tracking-label` (0.18em). Eyebrows, nav, stats, metadata, button labels. The engineered counterweight to the serif's warmth.
+- **`eyebrow` utility** — the `label` preceded by a short terracotta rule (a 1.75rem hairline). This is the section-opening gesture; **use it once per section**, at the top. On the homepage the eyebrow also carries the act number (`01 — The real problem`), making the page's narrative structure visible.
+- **Wordmark** — `tracking-wordmark` (0.34em) on **sans** semibold caps (v2.2): the serif is the site's voice, the sans mark is the object that signs it. See `<Wordmark />`, which also carries the tile mark and the "Experience more." kicker.
 
 Scale: Tailwind's type scale. Headlines `font-display`; everything else inherits Inter unless it is a label.
 
@@ -115,6 +117,7 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 ## 4. Radius, spacing, sizing, grid
 
 - **Radius: `rounded-edge` (2px) — the editorial near-square.** Buttons, inputs, cards and panels all share it. **Pills are not part of the system** (v1 used them; v2 does not).
+- **`--radius-device` (2.25rem) — the one rounded object in the system**: the Season One phone-preview frame. It depicts hardware, not UI; nothing else may use it. (Tiny `rounded-full` dots inside the preview depict hardware/avatars and share this exemption.)
 - Spacing: Tailwind v4 dynamic scale (multiples of `0.25rem`). Stay on the scale.
 - Control heights: `sm` 36px (`h-9`), `md` 44px (`h-11`), `lg` 52px (`h-13`). Inputs are 48px (`h-12`).
 - **Page measure: `container-page`** — `max-w-page` (70rem) with `px-6 sm:px-10` gutters. Every full-width section uses it; prose pages may narrow further (`max-w-2xl`).
@@ -155,5 +158,13 @@ WCAG 2.2 AA, enforced not assumed:
 No Figma. The reference is the [pre-launch landing artifact](https://claude.ai/public/artifacts/b099d827-a565-4679-91c2-38d242feeed7) plus the brand docs.
 
 **The artifact is a visual reference, not a content one.** Its layout, density, type treatment and motion are the target. Its copy is not: it shows prices, live availability, named listings and completed-booking screens, none of which exist. Those are barred by the project's truthfulness rules (see `CLAUDE.md` and issue #32) and several of its own colour pairings fail AA — the palette in §1 is the corrected version, not a transcription.
+
+### The preview surface (owner-approved exception, 2026-08-03)
+
+The homepage's **Season One phone preview** is the one place illustrative product content may appear — prices, seat counts, operator lines — under three conditions, all enforced:
+
+1. The frame is **visibly labelled** ("Season One preview") and its wrapper carries `data-preview`; the homepage e2e guard bans invented numbers everywhere _outside_ that wrapper.
+2. Its "footage" is **moving colour built from brand tokens** (`film-*` + `caustics` utilities, `color-mix` only) — unmistakably an illustration, never a fake photograph or a real-looking screenshot.
+3. Claims **outside** the preview stay literally true (e.g. the "3 founding operators signed" count is owner-confirmed and must track reality).
 
 Any pasted export is oversized vs. real scale: calibrate the ratio, snap every value to a token, re-express with flex/grid, mobile-first.
