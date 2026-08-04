@@ -113,8 +113,12 @@ test.describe("/destinations", () => {
 
 test("the discover routes appear in the site navigation", async ({ page }) => {
   await page.goto("/");
-  const nav = page.getByRole("navigation", { name: "Primary" });
+  // Navigation is the menu now: the header names only the operator page.
+  await page.getByRole("button", { name: "Open menu" }).click();
+  const nav = page.getByRole("dialog", { name: "Site menu" });
   for (const label of ["Experiences", "Destinations"]) {
-    await expect(nav.getByRole("link", { name: label })).toBeVisible();
+    await expect(
+      nav.getByRole("link", { name: label, exact: true }),
+    ).toBeVisible();
   }
 });

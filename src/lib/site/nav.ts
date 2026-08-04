@@ -12,10 +12,8 @@ export type FooterColumn = "discover" | "yuvoy" | "trust";
 
 export interface SiteRoute {
   href: string;
-  /** Label used in the header nav and the footer column. */
+  /** Label used in the site menu and the footer column. */
   label: string;
-  /** Show in the primary header nav (and the mobile menu). */
-  inHeader?: boolean;
   /** Footer column placement; omit to keep the route out of the footer. */
   footer?: FooterColumn;
 }
@@ -29,13 +27,11 @@ export const SITE_ROUTES: SiteRoute[] = [
   {
     href: "/experiences",
     label: "Experiences",
-    inHeader: true,
     footer: "discover",
   },
   {
     href: "/destinations",
     label: "Destinations",
-    inHeader: true,
     footer: "discover",
   },
   { href: "/journal", label: "Journal", footer: "discover" },
@@ -43,19 +39,16 @@ export const SITE_ROUTES: SiteRoute[] = [
   {
     href: "/how-it-works",
     label: "How it works",
-    inHeader: true,
     footer: "yuvoy",
   },
   {
     href: "/travellers",
     label: "For travellers",
-    inHeader: true,
     footer: "yuvoy",
   },
   {
     href: "/operators",
     label: "For operators",
-    inHeader: true,
     footer: "yuvoy",
   },
   { href: "/about", label: "About", footer: "yuvoy" },
@@ -67,12 +60,25 @@ export const SITE_ROUTES: SiteRoute[] = [
 ];
 
 /**
- * Primary navigation, as consumed by `SiteHeader` and the mobile menu.
- * Kept as a plain `{href, label}[]` so adding a route is a one-line change.
+ * What the site menu lists, in registry order.
+ *
+ * The menu is the whole of navigation now, so this is every route except the
+ * two that are already on screen while it is open: the legal links, pinned
+ * along the bottom of the panel, and the waitlist, which is the panel's call
+ * to action.
  */
-export const NAV_ITEMS: { href: string; label: string }[] = SITE_ROUTES.filter(
-  (r) => r.inHeader,
+export const MENU_ITEMS: { href: string; label: string }[] = SITE_ROUTES.filter(
+  (r) => r.footer !== "trust" && r.href !== "/waitlist",
 ).map(({ href, label }) => ({ href, label }));
+
+/**
+ * The one route the header names outright. Travellers are the homepage's
+ * audience, so operators get a permanent, centred way out to their own page.
+ */
+export const OPERATOR_NAV = {
+  href: "/operators",
+  label: "For operators",
+} as const;
 
 export const FOOTER_COLUMN_TITLES: Record<FooterColumn, string> = {
   discover: "Discover",
@@ -118,7 +124,10 @@ export const PRIMARY_CTA = {
  */
 export function endsWithLeadForm(pathname: string): boolean {
   return (
-    pathname === "/" || pathname === "/waitlist" || pathname.startsWith("/go/")
+    pathname === "/" ||
+    pathname === "/waitlist" ||
+    pathname === "/operators" ||
+    pathname.startsWith("/go/")
   );
 }
 

@@ -84,14 +84,22 @@
   }
 
   /*
-    The mobile menu is a native <dialog> opened with showModal(), so it lives
-    in the top layer — it can never be clipped by an ancestor's overflow or
+    The site menu is a native <dialog> opened with showModal(), so it lives in
+    the top layer — it can never be clipped by an ancestor's overflow or
     stacking context, which is the failure mode a portal was previously needed
     to work around.
+
+    Its backdrop is deliberately empty: no tint, no blur. A backdrop is not
+    animatable alongside the dialog's own dismissal, so whatever it paints
+    vanishes in one frame when the dialog closes — the page appeared to snap
+    from blurred to sharp, which read as a glitch rather than as an effect
+    (owner report, 2026-08-04). With nothing painted there is no state to
+    snap: the shutter simply rolls back and reveals the page it was covering.
+    Declared rather than deleted, because the UA stylesheet paints its own
+    translucent backdrop if we say nothing.
   */
   dialog[data-menu]::backdrop {
-    background-color: color-mix(in srgb, var(--color-forest) 78%, transparent);
-    backdrop-filter: blur(3px);
+    background: transparent;
   }
 
   /*
@@ -202,22 +210,6 @@
 
 @utility emerge {
   animation: yuvoy-emerge 1100ms var(--ease-cinematic) both;
-}
-
-/* Mobile menu panel — interaction feedback, so it stays inside the 250ms budget. */
-@keyframes yuvoy-menu-in {
-  from {
-    opacity: 0;
-    transform: translateY(-0.75rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@utility menu-in {
-  animation: yuvoy-menu-in 220ms var(--ease-interaction) both;
 }
 
 /* ------------------------------------------------- the product preview */
@@ -339,6 +331,74 @@
     );
     animation: yuvoy-film-sweep 8s ease-in-out infinite alternate;
     opacity: 0.7;
+  }
+}
+
+/*
+  The header sliding out of the way on the way down the page, and back on the
+  way up. HeaderShell sets the data attribute; the movement lives here so every
+  motion definition stays in one file.
+
+  250ms is the interaction budget (§3): this answers a gesture, so it has to
+  feel like a response rather than a performance.
+
+  The hide is inside a `no-preference` query rather than being switched off in
+  JavaScript. A header that teleports in and out is worse than one that stays
+  put, so under reduced motion it simply never moves — and the decision lives
+  in CSS with every other motion decision, which is the rule.
+
+  Not an `@utility`: this needs a companion attribute rule and a media query
+  around one of them, which reads better as plain CSS than as nesting.
+*/
+.header-slide {
+  /* The colours are in the same declaration as the transform on purpose: a
+     Tailwind `transition-*` utility would set the `transition` shorthand and
+     silently drop whichever of the two was declared first. */
+  transition:
+    transform 250ms var(--ease-interaction),
+    background-color 300ms var(--ease-interaction),
+    border-color 300ms var(--ease-interaction);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .header-slide[data-hidden="true"] {
+    transform: translateY(-100%);
+  }
+}
+
+/*
+  The site menu opening like a shutter: the panel unrolls from its top edge to
+  the bottom, and rolls back up to close. clip-path rather than a transform, so
+  the contents are revealed where they already are instead of sliding in behind
+  the frame.
+
+  This is an entrance, not interaction feedback — it is a whole surface
+  arriving — so it sits above the 250ms budget. Closing is quicker than
+  opening: waiting on a dismissal you already asked for feels like lag.
+*/
+@keyframes yuvoy-shutter-open {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes yuvoy-shutter-close {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+@utility menu-shutter {
+  animation: yuvoy-shutter-open 420ms var(--ease-cinematic) both;
+
+  &[data-state="closing"] {
+    animation: yuvoy-shutter-close 320ms var(--ease-interaction) both;
   }
 }
 

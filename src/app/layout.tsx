@@ -40,6 +40,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
+      /*
+        Declares the `scroll-behavior: smooth` set in globals.css. Without it
+        Next warns, and more to the point it cannot suppress the smooth scroll
+        on a route change — every navigation would glide to the top of the new
+        page instead of arriving at it.
+      */
+      data-scroll-behavior="smooth"
       className={`${instrumentSerif.variable} ${inter.variable} ${plexMono.variable} h-full`}
     >
       <body className="min-h-full">

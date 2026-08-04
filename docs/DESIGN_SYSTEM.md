@@ -106,7 +106,10 @@ Borders and fills are exempt from these floors — `border-forest/20`, `bg-fores
 - **Wordmark** — `tracking-wordmark` (0.34em) on **sans** semibold caps (v2.2): the serif is the site's voice, the sans mark is the object that signs it. See `<Wordmark />`, which also carries the official mark and the "Experience more." kicker.
 - **Punctuation** — rendered copy never uses an em dash. Prefer a period, a colon, a comma or a parenthetical; ranges and pairings use a middot (owner direction 2026-08-03). Code comments are exempt.
 - **Launch timing** — never name a month. The season is described evocatively ("opening when the water clears", "when the sea turns to glass").
-- **The mark** — the official ensō (white brush ring + terracotta dot), always on its **forest tile**. The delivered source (`public/yuvoy-logo.png`) has an opaque black field, so the committed display assets are derived by `scripts/generate-brand-assets.py` (screen-blend onto forest, glow soft-knee, auto-crop): `public/brand/yuvoy-mark.png` (UI + OG), `src/app/icon.png` and `src/app/favicon.ico`. Re-run the script if the source logo is ever replaced; never hand-edit the derived files.
+- **The mark** — the official ensō (brush ring + terracotta dot), **cut out, never tiled**. The delivered source (`public/yuvoy-logo.png`) is white strokes on an opaque black field, so every display asset is derived by `scripts/generate-brand-assets.py`; never hand-edit them, and re-run it if the source is replaced.
+  - `yuvoy-mark-on-light.png` / `yuvoy-mark-on-dark.png` — transparent cut-outs, forest and cream strokes. **These are what the UI uses.** Two files rather than one recoloured file because a cream ensō is invisible on cream and a forest one is invisible on forest. `WaveMark` renders both and cross-fades on opacity, so the header's colour change never waits on a fetch.
+  - `yuvoy-mark.png`, `src/app/icon.png`, `src/app/favicon.ico` — the forest-tiled version, used only where an icon needs a body: favicon, app icon, OG card. **A tile must never appear in the page itself**; on a forest section it draws a green box around the mark.
+  - The script resamples by **area averaging, not bilinear**. Bilinear is a magnifying filter; shrinking with it discards most of the source pixels and is what made the mark look coarse and its brush strokes break up. Masks are measured off the source, not guessed.
 
 Scale: Tailwind's type scale. Headlines `font-display`; everything else inherits Inter unless it is a label.
 
@@ -121,7 +124,10 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 
 - Tokens: `--ease-interaction` (`cubic-bezier(0.32,0.72,0,1)`), `--ease-cinematic` (`cubic-bezier(0.22,1,0.36,1)`). The cinematic curve's second control point was `0.16` until 2026-08-04, which made every entrance climb to full, sag back and climb again — a wobble halfway through the motion. If an entrance ever looks unsettled, check this number first.
 - CSS entrance: the `emerge` utility, used **only** for the homepage cover's first paint. It moves three properties at once — scale (toward the viewer), translate (settling) and blur (pulling into focus) — so the composition surfaces from depth rather than sliding up, and the blur clears at 65% so the type is sharp while it is still settling. It ships zero JS.
-- **No scroll-triggered motion.** Sections render in place, fully visible, the moment they are reached. The `<Reveal>` component and the operator grid's draw-on-scroll strike were both removed on owner direction (2026-08-03): content that animates itself into view reads as decoration, and on a pitch page it delays the thing the reader came for. Do not reintroduce either without that decision being revisited.
+- **The site menu opens like a shutter**: `menu-shutter` unrolls the panel from its top edge with `clip-path` (420ms, cinematic) and rolls it back up to close (320ms, quicker — waiting on a dismissal you already asked for reads as lag). `SiteMenu` holds the dialog open until the closing shutter has run, and skips that wait under reduced motion, where there is nothing to wait for.
+- **The header wears the cover's colours at the very top** of a route whose first section is dark (`data-dark-hero`, currently `/` and `/go/*`): transparent bar, cream contents. Any scroll away from the top returns the solid bar (owner's choice, 2026-08-04, over tracking the whole cover). The swap is invisible in practice because it happens while the header is hidden — the only cross-fade seen is the deliberate one at the top edge. The cover carries `-mt-14` so it reaches up behind the bar; without that, "transparent" would show the page background rather than the cover.
+- **The header is the one exception to the no-scroll-motion rule** (owner direction, 2026-08-04): it slides out of the way going down the page and returns going up, via the `header-slide` utility and `HeaderShell`. It answers a gesture rather than decorating an arrival, which is why it sits in the interaction budget (250ms) and not the entrance one. It never hides near the top, always returns on focus, and does not run at all under reduced motion.
+- **No other scroll-triggered motion.** Sections render in place, fully visible, the moment they are reached. The `<Reveal>` component and the operator grid's draw-on-scroll strike were both removed on owner direction (2026-08-03): content that animates itself into view reads as decoration, and on a pitch page it delays the thing the reader came for. Do not reintroduce either without that decision being revisited.
 - JS motion: **none.** `motion/react` has no consumers, and `<MotionConfig>` was removed with its last one. If a genuine need for JS animation returns, restore `<MotionConfig reducedMotion="user">` in `providers.tsx` in the same change — it is what makes Motion honour the OS preference, which CSS-level reduced-motion cannot do for it.
 - **Reduced motion is handled globally**, once, in `globals.css`: a `prefers-reduced-motion: reduce` block neutralises every animation and transition. Individual components must not add their own reduced-motion branch — if a component needs one, the global rule is wrong and should be fixed instead.
 - Smooth scroll: **not implemented, and out of scope.** Lenis was removed in v2 rather than left as a dependency implying a feature that did not exist.
@@ -132,6 +138,7 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 - **`--radius-device` (2.25rem) — the one rounded object in the system**: the Season One phone-preview frame. It depicts hardware, not UI; nothing else may use it. (Tiny `rounded-full` dots inside the preview depict hardware/avatars and share this exemption.)
 - Spacing: Tailwind v4 dynamic scale (multiples of `0.25rem`). Stay on the scale.
 - Control heights: `sm` 36px (`h-9`), `md` 44px (`h-11`), `lg` 52px (`h-13`). Inputs are 48px (`h-12`).
+- **The header is 56px (`h-14`)**, and the menu panel's top bar matches it exactly — same height, same `container-page` gutters, same negative margin on the button — so the close button lands on the pixel the trigger occupied. Anything that offsets for the header (`scroll-mt-14`, the cover's `100dvh-3.5rem`) follows this number; change them together.
 - **Page measure: `container-page`** — `max-w-page` (70rem) with `px-6 sm:px-10` gutters. Every full-width section uses it; prose pages may narrow further (`max-w-2xl`).
 - **Editorial grid: `grid-page`** — 4 columns on mobile, 8 from `sm`, 12 from `lg`, with responsive gutters. Place children with `col-span-*` per breakpoint. Use it for content-heavy pages (destinations, journal, comparison layouts); simple stacked sections do not need it.
 
@@ -144,7 +151,7 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 - **`Input`** — `rounded-edge` field on `cream-deep`, terra-deep focus ring.
 - **`WaveMotif`** — the three-line wave glyph, the island signature. Decorative accent only, at most once per section; tone follows the surface.
 - **`Wordmark`** / **`WaveMark`** — the official ensō mark on its forest tile, wordmark, "Experience more." kicker. `tone="onDark"` adds a hairline ring so the tile stays legible on forest surfaces.
-- **`SiteHeader`** / **`SiteFooter`** / **`MobileMenu`** — the shell, rendered by the root layout on every route. All navigation comes from the registry (§7).
+- **`SiteHeader`** / **`SiteFooter`** / **`SiteMenu`** — the shell, rendered by the root layout on every route. All navigation comes from the registry (§7).
 - Growing set: ExperienceCard, FeedPlayer, AvailabilityPicker, PriceBreakdown (as screens land).
 
 ## 6. Accessibility (release gate)
@@ -160,9 +167,11 @@ WCAG 2.2 AA, enforced not assumed:
 
 ## 7. Navigation registry
 
-`src/lib/site/nav.ts` is the single source of truth for every navigable route. The header, the mobile menu and the footer are all derived from it.
+`src/lib/site/nav.ts` is the single source of truth for every navigable route. The header, the site menu and the footer are all derived from it.
 
 - **A route is added to the registry in the same PR that ships its page** — never before. This makes a link to a non-existent page structurally impossible.
+- **The header names three things and no more** (owner direction, 2026-08-04): the mark, `OPERATOR_NAV`, and `PRIMARY_CTA`. Every other route is in `MENU_ITEMS`, reached through the menu — on desktop as well as on a phone. Adding a fourth item to the header is a design change, not a routing one, so it goes through review rather than through the registry.
+- **The site is addressed to travellers by default.** The homepage, and any future page that does not say otherwise, speaks to them; operator-facing content belongs on `/operators`, which the header link exists to reach. A page that pitches both audiences at once ends up asking the visitor to self-identify before it has earned the right to (see `LeadForms`' `audiences` prop, which is how a page commits to one).
 - Footer columns with no entries are dropped rather than rendered empty.
 - `CONTACT_CHANNELS` is empty by design: an unmonitored address is worse than none, so the footer omits the whole row until a real channel is confirmed.
 

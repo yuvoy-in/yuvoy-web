@@ -94,36 +94,59 @@ type ProviderValues = z.infer<typeof providerSchema>;
 /* ------------------------------------------------------------------- shell */
 
 /**
- * Dual-audience registration. One section, two tabs, both forms posting to
- * POST /v1/leads with the audience discriminator. Every outcome the API can
- * produce — recorded, updated, invalid, rate-limited, unavailable, offline —
- * has its own truthful UI state.
+ * Registration, for one audience or both. Every form posts to POST /v1/leads
+ * with the audience discriminator, and every outcome the API can produce —
+ * recorded, updated, invalid, rate-limited, unavailable, offline — has its own
+ * truthful UI state.
+ *
+ * `audiences` decides the shape. With both, this is the tabbed picker
+ * `/waitlist` uses. With one, there is nothing to pick, so no tablist renders
+ * and the form is not a tabpanel: the homepage speaks to travellers and
+ * `/operators` speaks to operators, and neither should show the other's door.
  */
+const BOTH_AUDIENCES = ["traveller", "provider"] as const;
+
 export function LeadForms({
   context,
   initialAudience = "traveller",
   heading = "Join the waitlist",
   headingLevel = 2,
   aside,
+  audiences = BOTH_AUDIENCES,
+  sectionId = "register",
+  eyebrow = "Get first access",
+  intro,
 }: {
   context: LeadContext;
   /**
-   * Which tab opens first. `/waitlist?audience=provider` — the shape printed
-   * on operator materials — resolves to "provider" here.
+   * Which tab opens first, when there are tabs.
+   * `/waitlist?audience=provider` — the shape printed on operator materials —
+   * resolves to "provider" here.
    */
   initialAudience?: LeadAudience;
   heading?: string;
-  /** `/waitlist` renders this as the page's h1; the homepage as an h2. */
+  /** `/waitlist` renders this as the page's h1; a section on a page as an h2. */
   headingLevel?: 1 | 2;
   /**
    * Optional narrative column. When present the section renders as a split
-   * layout — aside left, forms right — and the aside **must** contain an
-   * element with `id="register-heading"` (see JoinAside), because it takes
+   * layout — aside left, form right — and the aside **must** contain an
+   * element with `id="${sectionId}-heading"` (see JoinAside), because it takes
    * over the heading this component otherwise renders itself.
    */
   aside?: React.ReactNode;
+  /** Which audiences this instance offers. One of them hides the picker. */
+  audiences?: readonly LeadAudience[];
+  /** The section's anchor id; its heading is `<id>-heading`. */
+  sectionId?: string;
+  eyebrow?: string;
+  intro?: React.ReactNode;
 }) {
-  const [audience, setAudience] = React.useState<LeadAudience>(initialAudience);
+  const offersProvider = audiences.includes("provider");
+  const single = audiences.length === 1 ? audiences[0] : null;
+  const headingId = `${sectionId}-heading`;
+  const [audience, setAudience] = React.useState<LeadAudience>(
+    single ?? initialAudience,
+  );
   const Heading = headingLevel === 1 ? "h1" : "h2";
   const { capture } = useAnalytics();
 
@@ -152,6 +175,7 @@ export function LeadForms({
   // to them, and browsers cache 308s forever, so a visitor who hit the old URL
   // before the real page shipped still lands somewhere coherent.
   React.useEffect(() => {
+    if (!offersProvider) return;
     function syncFromHash() {
       if (window.location.hash === "#providers")
         setAudience((current) => {
@@ -164,9 +188,20 @@ export function LeadForms({
     syncFromHash();
     window.addEventListener("hashchange", syncFromHash);
     return () => window.removeEventListener("hashchange", syncFromHash);
-  }, [capture]);
+  }, [capture, offersProvider]);
 
-  const tabsAndPanels = (
+  /**
+   * One audience: the form on its own. Two: the picker above them. A single
+   * form is deliberately not a tabpanel — a tabpanel with no tablist is a
+   * promise to assistive tech that there is somewhere else to go.
+   */
+  const forms = single ? (
+    single === "traveller" ? (
+      <TravellerForm context={context} />
+    ) : (
+      <ProviderForm context={context} />
+    )
+  ) : (
     <>
       <div
         role="tablist"
@@ -221,38 +256,47 @@ export function LeadForms({
 
   return (
     <section
-      id="register"
-      className="bg-forest text-cream scroll-mt-16"
-      aria-labelledby="register-heading"
+      id={sectionId}
+      className="bg-forest text-cream scroll-mt-14"
+      aria-labelledby={headingId}
     >
-      {/* Always-present anchor: the target must exist even while the provider
-          panel is hidden, or the browser has nothing to scroll to. */}
-      <span id="providers" className="block scroll-mt-24" aria-hidden />
+      {/* The legacy operator anchor, wherever a provider form actually lives.
+          It must exist even while the provider panel is hidden, or the browser
+          has nothing to scroll to. The homepage no longer offers that form and
+          redirects the anchor instead (see LegacyProviderAnchor). */}
+      {offersProvider && (
+        <span id="providers" className="block scroll-mt-20" aria-hidden />
+      )}
       <div className="container-page py-20 sm:py-28">
         {aside ? (
-          /* Split layout — narrative left (carrying #register-heading), forms
-             right. Used by the homepage's Act 05. */
+          /* Split layout: narrative left (carrying the section heading), form
+             right. Used by the homepage's closing act. */
           <div className="grid grid-cols-1 gap-14 lg:grid-cols-2 lg:gap-20">
             <div>{aside}</div>
-            <div>{tabsAndPanels}</div>
+            <div>{forms}</div>
           </div>
         ) : (
           <div className="mx-auto max-w-xl">
             <div>
-              <p className="eyebrow text-terra-soft">Get first access</p>
+              <p className="eyebrow text-terra-soft">{eyebrow}</p>
               <Heading
-                id="register-heading"
+                id={headingId}
                 className="font-display mt-6 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-normal tracking-tight text-balance"
               >
                 {heading}
               </Heading>
-              <p className="text-cream/70 mt-6 text-lg leading-relaxed">
-                Tell us who you are and we&rsquo;ll message you when the first
-                Andaman experiences are ready. No spam, and no payment required.
-              </p>
+              <div className="text-cream/70 mt-6 text-lg leading-relaxed">
+                {intro ?? (
+                  <p>
+                    Tell us who you are and we&rsquo;ll message you when the
+                    first Andaman experiences are ready. No spam, and no payment
+                    required.
+                  </p>
+                )}
+              </div>
             </div>
 
-            <div className="mt-10">{tabsAndPanels}</div>
+            <div className="mt-10">{forms}</div>
           </div>
         )}
       </div>

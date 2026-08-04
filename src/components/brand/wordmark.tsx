@@ -2,13 +2,19 @@ import Image from "next/image";
 import { cn } from "@/lib/cn";
 
 /**
- * The Yuvoy mark — the official ensō (white brush ring + terracotta dot) on
- * its forest tile, beside the wide-tracked wordmark and the "Experience
- * more." kicker.
+ * The Yuvoy mark — the official ensō (brush ring + terracotta dot), beside
+ * the wide-tracked wordmark and the "Experience more." kicker.
  *
  * `tone="onDark"` flips it for forest surfaces. `kicker={false}` and
  * `mark={false}` strip it back for tight contexts (inline in body copy, the
- * mobile menu bar, a favicon-sized slot).
+ * menu bar, a favicon-sized slot).
+ *
+ * **Give it a flex or grid parent.** It is `inline-flex`, so in a plain block
+ * or inline container it sits on a line box's baseline and the strut reserves
+ * descender space beneath it — dead space inside the parent that makes the
+ * mark look high and its container bottom-heavy. That is exactly what was
+ * reported of the header on 2026-08-04; the fix was `flex` on the link, not a
+ * nudge on the mark. Pass `className="flex"` where the parent cannot change.
  */
 export function Wordmark({
   className,
@@ -62,16 +68,25 @@ export function Wordmark({
 }
 
 /**
- * The mark on its own — the official ensō on its forest tile, for the header,
- * footer and tight slots.
+ * The mark on its own — the official ensō, cut out of its background, for the
+ * header, footer and tight slots.
  *
- * The asset is `public/brand/yuvoy-mark.png`, derived from the delivered logo
- * by `scripts/generate-brand-assets.py` (the source PNG has an opaque black
- * field; the script screen-blends it onto forest, which is why no CSS blend
- * tricks are needed here). The favicon and app icon are the same object. On
- * forest surfaces the tile matches its background, so a hairline ring keeps
- * the square legible.
+ * **No tile.** The delivered logo is a white ensō on an opaque black field, so
+ * the first version of this baked that field into forest and shipped a square.
+ * On a forest section that square was a green box drawn around a logo that
+ * should have had none. `scripts/generate-brand-assets.py` now cuts the mark
+ * out instead, producing one file per surface — the strokes cannot be a single
+ * colour, because a cream ensō is invisible on cream and a forest one is
+ * invisible on forest. The tiled version survives only where an icon genuinely
+ * needs a body: the favicon, the app icon and the OG card.
+ *
+ * **Both files render, and opacity does the switching.** Swapping the `src`
+ * would send the browser to fetch the other file at the moment the header
+ * changes colour, which is the one moment it must not blink. They cross-fade
+ * with the bar instead.
  */
+const MARK_SIZE = 128; // 4× the 32px it draws at, so it stays crisp at 3× DPR.
+
 export function WaveMark({
   tone = "onLight",
   className,
@@ -83,19 +98,30 @@ export function WaveMark({
   return (
     <span
       aria-hidden
-      className={cn(
-        "rounded-edge bg-forest inline-flex size-8 shrink-0 overflow-hidden",
-        onDark && "ring-cream/20 ring-1",
-        className,
-      )}
+      className={cn("relative block size-8 shrink-0", className)}
     >
-      <Image
-        src="/brand/yuvoy-mark.png"
-        alt=""
-        width={64}
-        height={64}
-        className="size-full"
-      />
+      {(
+        [
+          ["/brand/yuvoy-mark-on-light.png", !onDark],
+          ["/brand/yuvoy-mark-on-dark.png", onDark],
+        ] as const
+      ).map(([src, shown]) => (
+        <Image
+          key={src}
+          src={src}
+          alt=""
+          width={MARK_SIZE}
+          height={MARK_SIZE}
+          // A logo is not a photograph: re-encoding it lossily is exactly the
+          // "downgraded" look the optimiser's default quality produces.
+          quality={100}
+          priority
+          className={cn(
+            "absolute inset-0 size-full transition-opacity duration-300",
+            shown ? "opacity-100" : "opacity-0",
+          )}
+        />
+      ))}
     </span>
   );
 }

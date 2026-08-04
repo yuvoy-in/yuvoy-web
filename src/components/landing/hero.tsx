@@ -25,7 +25,17 @@ const FACTS = [
 
 export function Hero() {
   return (
-    <section className="bg-forest text-cream relative overflow-hidden">
+    /*
+      `-mt-14` pulls the cover up behind the header's own 56px of flow, and the
+      inner `pt-14` puts the content back exactly where it was. Without this a
+      transparent header would show the page background above the cover, not
+      the cover itself. `data-dark-hero` is how the header knows this page has
+      one.
+    */
+    <section
+      data-dark-hero
+      className="bg-forest text-cream relative -mt-14 overflow-hidden"
+    >
       {/* Nothing but grain: a flat forest field, so the type is the whole
           composition. The terracotta corner glow that used to sit here went
           with the waves (owner direction, 2026-08-04). */}
@@ -33,7 +43,10 @@ export function Hero() {
         <div className="grain" />
       </div>
 
-      <div className="container-page relative flex min-h-[calc(100dvh-4rem)] flex-col justify-center py-16 sm:py-20">
+      {/* Top padding is the header (3.5rem) plus the section's own, so the
+          composition lands exactly where it did before the cover was pulled
+          up behind the bar. */}
+      <div className="container-page relative flex min-h-dvh flex-col justify-center pt-30 pb-16 sm:pt-34 sm:pb-20">
         <div className="flex flex-col items-center text-center">
           <p
             className="eyebrow text-terra-soft emerge"

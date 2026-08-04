@@ -1,22 +1,31 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PageHeader } from "@/components/site/page-header";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
+import { OperatorSystem } from "@/components/operators/operator-system";
+import { LeadForms } from "@/components/landing/lead-forms";
+import { DEFAULT_DESTINATION } from "@/lib/leads/registry";
 
 export const metadata: Metadata = {
   title: "For operators",
   description:
-    "Applying as a founding operator on Yuvoy: what it is, what it is not, and what has and has not been decided about commercial terms.",
+    "What Yuvoy replaces for a dive centre, boat crew, guide or kitchen in the Andamans, what founding-operator status is, what it is not, and how to apply.",
   alternates: { canonical: "/operators" },
 };
 
 /**
- * The operator page.
+ * The operator page: the whole operator case, and the application at the end
+ * of it.
  *
  * Framed as an **application**, not a signup — an operator is agreeing to a
  * conversation, not to terms. That distinction is the whole page.
+ *
+ * As of 2026-08-04 this is the only place the operator story is told. The
+ * homepage used to carry a version of it, which meant travellers read a pitch
+ * aimed at someone else and operators got a summary that then sent them
+ * elsewhere to act on it. Now the header names this page from every screen,
+ * and an operator who arrives can read the case and apply without leaving.
  *
  * The "what this is not" section is deliberately as prominent as the offer.
  * Commission, settlement, payouts and self-serve tooling do not exist and no
@@ -60,8 +69,10 @@ export default function OperatorsPage() {
         accent="Show it properly."
         lede="If you run dives, boat days, kitchens or walks across Havelock, Neil or Port Blair, we would like to talk before we open, while the decisions that will affect you are still being made."
       >
-        <Link
-          href="/waitlist?audience=provider"
+        {/* Native anchor: a hash-only href through the router uses pushState,
+            which does not move the page the way setting location.hash does. */}
+        <a
+          href="#apply"
           className={cn(
             buttonVariants({ size: "lg" }),
             "flex w-full sm:inline-flex sm:w-auto",
@@ -69,8 +80,10 @@ export default function OperatorsPage() {
         >
           Apply as a founding operator
           <ButtonArrow />
-        </Link>
+        </a>
       </PageHeader>
+
+      <OperatorSystem />
 
       <Section aria-labelledby="offer-heading">
         <SectionHeading
@@ -117,25 +130,27 @@ export default function OperatorsPage() {
         </ul>
       </Section>
 
-      <Section aria-labelledby="apply-heading">
-        <SectionHeading
-          id="apply-heading"
-          eyebrow="Applying"
-          title="What we ask for,"
-          accent="and why."
-          body="Your name, your business, a WhatsApp number, the islands you cover and what you mainly run. The number is required because onboarding conversations happen there, not because we intend to message you about anything else."
-        />
-        <Link
-          href="/waitlist?audience=provider"
-          className={cn(
-            buttonVariants({ size: "lg" }),
-            "mt-12 flex w-full sm:inline-flex sm:w-auto",
-          )}
-        >
-          Apply as a founding operator
-          <ButtonArrow />
-        </Link>
-      </Section>
+      {/*
+        The application itself, on the page that argues for it. `#providers`
+        rides along inside LeadForms wherever a provider form exists, so the
+        long-lived operator anchor keeps resolving to a real form.
+      */}
+      <LeadForms
+        context={{ source: "web", destinationKey: DEFAULT_DESTINATION.key }}
+        audiences={["provider"]}
+        initialAudience="provider"
+        sectionId="apply"
+        eyebrow="Applying"
+        heading="Apply as a founding operator"
+        intro={
+          <p>
+            Your name, your business, a WhatsApp number, the islands you cover
+            and what you mainly run. The number is required because onboarding
+            conversations happen there, not because we intend to message you
+            about anything else.
+          </p>
+        }
+      />
     </main>
   );
 }

@@ -47,8 +47,11 @@ test.describe("site shell", () => {
         header.getByRole("link", { name: "Yuvoy home" }),
       ).toBeVisible();
 
-      // Sticky: still on screen after scrolling to the bottom of the document.
-      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      // Sticky: after moving down the page and back up, it is on screen
+      // again. The directional hide has its own describe below, where the
+      // motion preference is emulated explicitly rather than inherited.
+      await page.mouse.wheel(0, 800);
+      await page.mouse.wheel(0, -800);
       await expect(header).toBeInViewport();
 
       await expect(page.getByRole("contentinfo")).toBeVisible();
@@ -185,6 +188,163 @@ test.describe("site shell", () => {
       expect(undersized.join("\n")).toBe("");
     });
   }
+});
+
+/*
+  The header gets out of the way on the way down the page and returns on the
+  way up. What makes or breaks this pattern is the edge cases, so they are
+  what is asserted: it never hides near the top, it comes back on the
+  smallest upward movement, and focus always brings it back — a focus ring
+  parked off-screen is a WCAG 2.4.11 failure, and closing the menu returns
+  focus to a trigger that lives in this bar.
+*/
+test.describe("header on scroll", () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  // Emulated explicitly: the hide lives behind a `no-preference` media query,
+  // and headless runtimes do not agree on what the default should be.
+  test.beforeEach(async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+  });
+
+  const header = (page: Page) => page.getByRole("banner");
+
+  const TRANSPARENT = "rgba(0, 0, 0, 0)";
+
+  test("stays put at the very top of the page", async ({ page }) => {
+    await page.goto("/");
+    await page.mouse.wheel(0, 4);
+    await expect(header(page)).toBeInViewport();
+  });
+
+  /*
+    At the top of a page whose first section is a dark cover the bar is
+    transparent, so the cover reads as one field; anywhere else it is solid.
+    The change happens while the header is hidden, so the only cross-fade a
+    visitor sees is the deliberate one at the top edge.
+  */
+  test("wears the cover at the top and the bar once you leave it", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
+
+    // Down past the cover, then back up far enough to reveal the bar.
+    await page.mouse.wheel(0, 1200);
+    await page.mouse.wheel(0, -400);
+    await expect(header(page)).toBeInViewport();
+    await expect(header(page)).not.toHaveCSS("background-color", TRANSPARENT);
+
+    // All the way home: it returns to the cover's colours.
+    await page.mouse.wheel(0, -2000);
+    await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
+  });
+
+  test("is solid at the top of a page with no cover", async ({ page }) => {
+    await page.goto("/about");
+    await expect(header(page)).not.toHaveCSS("background-color", TRANSPARENT);
+  });
+
+  test("hides going down and returns going up", async ({ page }) => {
+    await page.goto("/");
+
+    await page.mouse.wheel(0, 900);
+    await expect(header(page)).not.toBeInViewport();
+
+    await page.mouse.wheel(0, -120);
+    await expect(header(page)).toBeInViewport();
+  });
+
+  test("comes back when focus enters it", async ({ page }) => {
+    await page.goto("/");
+    await page.mouse.wheel(0, 900);
+    await expect(header(page)).not.toBeInViewport();
+
+    await header(page).getByRole("button", { name: "Open menu" }).focus();
+    await expect(header(page)).toBeInViewport();
+  });
+
+  test("stays put entirely under prefers-reduced-motion", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    // Belt and braces: emulateMedia overrides the describe-level preference.
+    await page.goto("/");
+
+    await page.mouse.wheel(0, 900);
+    // Not "hidden without a transition" — for these visitors it never hides.
+    await expect(header(page)).toBeInViewport();
+  });
+});
+
+/*
+  The header carries three things and no more: the mark, the one link to the
+  other audience, and the call to action. Everything else lives in the menu,
+  on a desktop exactly as on a phone — which is what lets the homepage drop
+  the operator pitch without stranding an operator who lands there.
+*/
+test.describe("header", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  test("carries only the mark, the operator link and the call to action", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const header = page.getByRole("banner");
+
+    await expect(
+      header.getByRole("link", { name: "Yuvoy home" }),
+    ).toBeVisible();
+    await expect(
+      header.getByRole("link", { name: "For operators" }),
+    ).toBeVisible();
+    await expect(
+      header.getByRole("link", { name: /join waitlist/i }),
+    ).toBeVisible();
+    await expect(header.getByRole("link")).toHaveCount(3);
+  });
+
+  test("centres the mark in the bar", async ({ page }) => {
+    await page.goto("/");
+    const bar = page.getByRole("banner");
+    const mark = bar.getByRole("link", { name: "Yuvoy home" });
+
+    const barBox = (await bar.boundingBox())!;
+    const markBox = (await mark.boundingBox())!;
+    const above = markBox.y - barBox.y;
+    const below = barBox.y + barBox.height - (markBox.y + markBox.height);
+
+    // Within a pixel, allowing for the bar's own bottom border. This once sat
+    // several pixels low because the link was not a flex container, so the
+    // mark inherited a line box and the strut's descender space under it.
+    expect(
+      Math.abs(above - below),
+      `mark is off centre: ${above}px above, ${below}px below`,
+    ).toBeLessThanOrEqual(1.5);
+  });
+
+  test("keeps the menu on desktop, holding every other route", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const trigger = page.getByRole("button", { name: "Open menu" });
+    await expect(trigger).toBeVisible();
+
+    await trigger.click();
+    const dialog = page.getByRole("dialog", { name: "Site menu" });
+    await expect(dialog).toBeVisible();
+
+    for (const label of [
+      "Experiences",
+      "Destinations",
+      "Journal",
+      "How it works",
+      "For travellers",
+      "About",
+    ]) {
+      await expect(
+        dialog.getByRole("link", { name: label, exact: true }),
+      ).toBeVisible();
+    }
+  });
 });
 
 test.describe("mobile menu", () => {
