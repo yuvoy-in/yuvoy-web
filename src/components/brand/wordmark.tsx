@@ -31,7 +31,7 @@ export function Wordmark({
   const onDark = tone === "onDark";
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
-      {mark && <WaveMark tone={tone} />}
+      {mark && <WaveMark />}
       <span className="inline-flex flex-col leading-none">
         {/*
           The wordmark stays on the sans (v2.2): the serif is the site's
@@ -75,24 +75,22 @@ export function Wordmark({
  * The asset is `public/brand/yuvoy-mark.png`, derived from the delivered logo
  * by `scripts/generate-brand-assets.py` (the source PNG has an opaque black
  * field; the script screen-blends it onto forest, which is why no CSS blend
- * tricks are needed here). The favicon and app icon are the same object. On
- * forest surfaces the tile matches its background, so a hairline ring keeps
- * the square legible.
+ * tricks are needed here). The favicon and app icon are the same object.
+ *
+ * **There is no tone.** The tile is forest on every surface, and the asset's
+ * own background is the same forest, so on a dark surface the tile simply
+ * disappears and the ensō is left drawn on the section itself. It used to
+ * carry a hairline ring there to "keep the square legible", which had it
+ * exactly backwards: the square is packaging, not part of the mark, and
+ * outlining it on green drew a box around a logo that should have had none
+ * (owner report, 2026-08-05).
  */
-export function WaveMark({
-  tone = "onLight",
-  className,
-}: {
-  tone?: "onLight" | "onDark";
-  className?: string;
-}) {
-  const onDark = tone === "onDark";
+export function WaveMark({ className }: { className?: string }) {
   return (
     <span
       aria-hidden
       className={cn(
         "rounded-edge bg-forest inline-flex size-8 shrink-0 overflow-hidden",
-        onDark && "ring-cream/20 ring-1",
         className,
       )}
     >
