@@ -47,9 +47,25 @@ test.describe("site shell", () => {
         header.getByRole("link", { name: "Yuvoy home" }),
       ).toBeVisible();
 
-      // Sticky: still on screen after scrolling to the bottom of the document.
-      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-      await expect(header).toBeInViewport();
+      // It gets out of the way going down, and comes back on the way up.
+      // Short pages never scroll far enough to hide it, so the hiding half of
+      // the assertion only applies where there is room for it.
+      await page.evaluate(() =>
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: "instant",
+        }),
+      );
+      const scrollable = await page.evaluate(
+        () => document.documentElement.scrollHeight > window.innerHeight + 400,
+      );
+      if (scrollable) {
+        await expect(header).not.toBeInViewport();
+        await page.mouse.wheel(0, -400);
+        await expect(header).toBeInViewport();
+      } else {
+        await expect(header).toBeInViewport();
+      }
 
       await expect(page.getByRole("contentinfo")).toBeVisible();
     });
@@ -185,6 +201,54 @@ test.describe("site shell", () => {
       expect(undersized.join("\n")).toBe("");
     });
   }
+});
+
+/*
+  The header gets out of the way on the way down the page and returns on the
+  way up. What makes or breaks this pattern is the edge cases, so they are
+  what is asserted: it never hides near the top, it comes back on the
+  smallest upward movement, and focus always brings it back — a focus ring
+  parked off-screen is a WCAG 2.4.11 failure, and closing the menu returns
+  focus to a trigger that lives in this bar.
+*/
+test.describe("header on scroll", () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  const header = (page: Page) => page.getByRole("banner");
+
+  test("stays put near the top of the page", async ({ page }) => {
+    await page.goto("/");
+    await page.mouse.wheel(0, 60);
+    await expect(header(page)).toBeInViewport();
+  });
+
+  test("hides going down and returns going up", async ({ page }) => {
+    await page.goto("/");
+
+    await page.mouse.wheel(0, 900);
+    await expect(header(page)).not.toBeInViewport();
+
+    await page.mouse.wheel(0, -120);
+    await expect(header(page)).toBeInViewport();
+  });
+
+  test("comes back when focus enters it", async ({ page }) => {
+    await page.goto("/");
+    await page.mouse.wheel(0, 900);
+    await expect(header(page)).not.toBeInViewport();
+
+    await header(page).getByRole("button", { name: "Open menu" }).focus();
+    await expect(header(page)).toBeInViewport();
+  });
+
+  test("stays put entirely under prefers-reduced-motion", async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+
+    await page.mouse.wheel(0, 900);
+    // Not "hidden without a transition" — for these visitors it never hides.
+    await expect(header(page)).toBeInViewport();
+  });
 });
 
 /*

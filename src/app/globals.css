@@ -343,6 +343,25 @@
 }
 
 /*
+  The header sliding out of the way on the way down the page, and back on the
+  way up. The state is a data attribute set by HeaderShell; the movement lives
+  here so every motion definition stays in one file.
+
+  250ms is the interaction budget (§3): this answers a gesture, so it has to
+  feel like a response rather than a performance. The global reduced-motion
+  block collapses the transition, and HeaderShell additionally never sets the
+  attribute for those visitors, so the header simply stays put for them
+  instead of teleporting.
+*/
+@utility header-slide {
+  transition: transform 250ms var(--ease-interaction);
+
+  &[data-hidden="true"] {
+    transform: translateY(-100%);
+  }
+}
+
+/*
   Filmic grain for immersive dark sections. Colourless by construction — the
   turbulence is desaturated, so it adds texture without adding a colour.
 */
