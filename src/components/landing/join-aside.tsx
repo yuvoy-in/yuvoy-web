@@ -8,9 +8,11 @@ import { WaveMotif } from "@/components/brand/wave-motif";
  * element with `id="register-heading"` — the LeadForms section points its
  * aria-labelledby at it.
  *
- * The three answers below are the honest FAQ distilled to the questions a
- * ready-to-join visitor actually still has. Truthfulness rules apply in
- * full — no queue positions, no counts, no promised dates beyond the season.
+ * The answers below are the honest FAQ distilled to the questions a
+ * ready-to-join traveller actually still has. Nothing here addresses
+ * operators: they have their own page, and the header points them at it.
+ * Truthfulness rules apply in full — no queue positions, no counts, no
+ * promised dates beyond the season.
  */
 const ANSWERS = [
   {
@@ -22,8 +24,8 @@ const ANSWERS = [
     a: "Nothing. No fee, no card, no spam. We only ever message you about Yuvoy.",
   },
   {
-    q: "I run experiences. What happens after I apply?",
-    a: "A real person reaches out on WhatsApp for a conversation about what you run. No listing fee, and terms are agreed with you before anything goes live.",
+    q: "How will I hear from you?",
+    a: "On WhatsApp, from a real person, when the first experiences where you are headed are ready. Your details are never sold or shared.",
   },
   {
     q: "A word on the water",

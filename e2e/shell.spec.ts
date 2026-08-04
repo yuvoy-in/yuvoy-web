@@ -187,6 +187,59 @@ test.describe("site shell", () => {
   }
 });
 
+/*
+  The header carries three things and no more: the mark, the one link to the
+  other audience, and the call to action. Everything else lives in the menu,
+  on a desktop exactly as on a phone — which is what lets the homepage drop
+  the operator pitch without stranding an operator who lands there.
+*/
+test.describe("header", () => {
+  test.use({ viewport: { width: 1440, height: 900 } });
+
+  test("carries only the mark, the operator link and the call to action", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const header = page.getByRole("banner");
+
+    await expect(
+      header.getByRole("link", { name: "Yuvoy home" }),
+    ).toBeVisible();
+    await expect(
+      header.getByRole("link", { name: "For operators" }),
+    ).toBeVisible();
+    await expect(
+      header.getByRole("link", { name: /join waitlist/i }),
+    ).toBeVisible();
+    await expect(header.getByRole("link")).toHaveCount(3);
+  });
+
+  test("keeps the menu on desktop, holding every other route", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const trigger = page.getByRole("button", { name: "Open menu" });
+    await expect(trigger).toBeVisible();
+
+    await trigger.click();
+    const dialog = page.getByRole("dialog", { name: "Site menu" });
+    await expect(dialog).toBeVisible();
+
+    for (const label of [
+      "Experiences",
+      "Destinations",
+      "Journal",
+      "How it works",
+      "For travellers",
+      "About",
+    ]) {
+      await expect(
+        dialog.getByRole("link", { name: label, exact: true }),
+      ).toBeVisible();
+    }
+  });
+});
+
 test.describe("mobile menu", () => {
   test.use({ viewport: MOBILE });
 

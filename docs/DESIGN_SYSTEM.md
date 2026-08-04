@@ -144,7 +144,7 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 - **`Input`** — `rounded-edge` field on `cream-deep`, terra-deep focus ring.
 - **`WaveMotif`** — the three-line wave glyph, the island signature. Decorative accent only, at most once per section; tone follows the surface.
 - **`Wordmark`** / **`WaveMark`** — the official ensō mark on its forest tile, wordmark, "Experience more." kicker. `tone="onDark"` adds a hairline ring so the tile stays legible on forest surfaces.
-- **`SiteHeader`** / **`SiteFooter`** / **`MobileMenu`** — the shell, rendered by the root layout on every route. All navigation comes from the registry (§7).
+- **`SiteHeader`** / **`SiteFooter`** / **`SiteMenu`** — the shell, rendered by the root layout on every route. All navigation comes from the registry (§7).
 - Growing set: ExperienceCard, FeedPlayer, AvailabilityPicker, PriceBreakdown (as screens land).
 
 ## 6. Accessibility (release gate)
@@ -160,9 +160,11 @@ WCAG 2.2 AA, enforced not assumed:
 
 ## 7. Navigation registry
 
-`src/lib/site/nav.ts` is the single source of truth for every navigable route. The header, the mobile menu and the footer are all derived from it.
+`src/lib/site/nav.ts` is the single source of truth for every navigable route. The header, the site menu and the footer are all derived from it.
 
 - **A route is added to the registry in the same PR that ships its page** — never before. This makes a link to a non-existent page structurally impossible.
+- **The header names three things and no more** (owner direction, 2026-08-04): the mark, `OPERATOR_NAV`, and `PRIMARY_CTA`. Every other route is in `MENU_ITEMS`, reached through the menu — on desktop as well as on a phone. Adding a fourth item to the header is a design change, not a routing one, so it goes through review rather than through the registry.
+- **The site is addressed to travellers by default.** The homepage, and any future page that does not say otherwise, speaks to them; operator-facing content belongs on `/operators`, which the header link exists to reach. A page that pitches both audiences at once ends up asking the visitor to self-identify before it has earned the right to (see `LeadForms`' `audiences` prop, which is how a page commits to one).
 - Footer columns with no entries are dropped rather than rendered empty.
 - `CONTACT_CHANNELS` is empty by design: an unmonitored address is worse than none, so the footer omits the whole row until a real channel is confirmed.
 

@@ -1,13 +1,17 @@
 import { SectionHeading } from "@/components/ui/section";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
-import { AppStack } from "@/components/landing/app-stack";
+import { AppStack } from "@/components/operators/app-stack";
 
 /**
- * The engine act, staged as a transformation: the improvised six-app stack an
- * operator juggles today on the left, the one system that replaces it on the
- * right, and between them a single connector that reads "becomes". Below it,
- * the Season One roster shows real momentum.
+ * The operator case, staged as a transformation: the improvised six-app stack
+ * an operator juggles today on the left, the one system that replaces it on
+ * the right, and between them a single connector that reads "becomes". Below
+ * it, the Season One roster shows real momentum.
+ *
+ * This lived on the homepage until 2026-08-04. The homepage speaks to
+ * travellers now, and everything an operator needs lives on their own page,
+ * which the header links to by name.
  *
  * **3 signed founding operators is a true count, confirmed by the owner
  * (2026-08-03).** The three roster cards describe those real signings; the
@@ -26,19 +30,18 @@ const ROSTER = [
   { what: "Boats & island days", where: "Port Blair" },
 ];
 
-export function Engine() {
+export function OperatorSystem() {
   return (
     <section
-      id="operators"
-      aria-labelledby="engine-heading"
-      className="bg-cream border-cream-line scroll-mt-16 border-y"
+      aria-labelledby="operator-system-heading"
+      className="bg-cream border-cream-line border-y"
     >
       <div className="container-page py-20 sm:py-28">
         <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <SectionHeading
-              id="engine-heading"
-              eyebrow="For operators"
+              id="operator-system-heading"
+              eyebrow="What it takes today"
               title="You run a business across"
               accent="six apps."
             />
@@ -104,9 +107,11 @@ export function Engine() {
                   </li>
                 ))}
               </ul>
-              {/* Native anchor: #providers must fire hashchange (see Hero). */}
+              {/* Native anchor, not next/link: a hash-only href pushed
+                  through the router uses history.pushState, which does not
+                  move the page the way setting location.hash does. */}
               <a
-                href="#providers"
+                href="#apply"
                 className={cn(
                   buttonVariants({ size: "lg" }),
                   "focus-visible:ring-offset-forest mt-8 w-full sm:w-auto",

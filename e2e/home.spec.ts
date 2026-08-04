@@ -18,7 +18,10 @@ async function textOutsidePreview(page: Page): Promise<string> {
   });
 }
 
-test("landing tells the six-act story in headlines", async ({ page }) => {
+/** The homepage's registration section, which no longer has tabs. */
+const registerForm = (page: Page) => page.locator("#register");
+
+test("landing tells its story in headlines", async ({ page }) => {
   await page.goto("/");
 
   // The billboard test: the acts, readable as headings alone.
@@ -34,10 +37,32 @@ test("landing tells the six-act story in headlines", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: /one destination, done completely/i }),
   ).toBeVisible();
-  await expect(page.getByRole("heading", { name: /six apps/i })).toBeVisible();
   await expect(
     page.getByRole("heading", { name: /be there when it opens/i }),
   ).toBeVisible();
+});
+
+/*
+  The homepage is for travellers. The operator case has its own page, and the
+  header is what points at it — so the homepage must not pitch operators, and
+  must not ask an arriving visitor which of the two they are.
+*/
+test("the homepage speaks only to travellers", async ({ page }) => {
+  await page.goto("/");
+
+  // No audience picker: there is nothing to choose between here.
+  await expect(page.getByRole("tab")).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: /six apps/i })).toHaveCount(0);
+
+  const body = (await page.textContent("body")) ?? "";
+  expect(body).not.toMatch(/founding operator/i);
+  expect(body).not.toMatch(/Season One roster/i);
+
+  // The traveller form is the one that renders, with its own fields.
+  await expect(
+    registerForm(page).getByLabel("What draws you?", { exact: false }),
+  ).toBeVisible();
+  await expect(registerForm(page).getByLabel("Business name")).toHaveCount(0);
 });
 
 test("the preview is labelled and invented numbers stay inside it", async ({
@@ -80,29 +105,30 @@ test("the cover CTA lands on the registration form without leaving the page", as
   const cover = page.locator("main > section").first();
   await cover.getByRole("link", { name: "Join the waitlist" }).click();
   await expect(page).toHaveURL(/#register$/);
-  await expect(
-    page.getByRole("tabpanel", { name: /travelling/i }),
-  ).toBeInViewport();
+  await expect(registerForm(page)).toBeInViewport();
 });
 
-test("the operator CTA opens the provider form via #providers", async ({
-  page,
-}) => {
+/*
+  The operator route out of the homepage is the header, at every breakpoint —
+  that is the whole reason the homepage can drop the operator pitch.
+*/
+test("the header sends operators to their own page", async ({ page }) => {
   await page.goto("/");
 
   await page
-    .getByRole("link", { name: "Apply as a founding operator" })
+    .getByRole("banner")
+    .getByRole("link", { name: "For operators" })
     .click();
-  await expect(page).toHaveURL(/#providers$/);
-  await expect(
-    page.getByRole("tab", { name: /run experiences/i }),
-  ).toHaveAttribute("aria-selected", "true");
+  await expect(page).toHaveURL(/\/operators$/);
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    /show it properly/i,
+  );
 });
 
 /*
   /waitlist used to be a permanent redirect onto these anchors. Browsers cache
-  308s indefinitely, so both must keep working even now that the real page
-  exists — and campaign traffic converts on the page it lands on.
+  308s indefinitely, so both must keep resolving somewhere coherent — and
+  campaign traffic converts on the page it lands on.
 
   Each anchor gets its own test, and therefore its own fresh page. Visiting
   them one after another in a single test is a same-document navigation, which
@@ -110,16 +136,20 @@ test("the operator CTA opens the provider form via #providers", async ({
 */
 test("the homepage still registers in place at #register", async ({ page }) => {
   await page.goto("/#register");
-  await expect(
-    page.getByRole("tabpanel", { name: /travelling/i }),
-  ).toBeVisible();
+  await expect(registerForm(page).getByLabel("Name")).toBeVisible();
 });
 
-test("#providers still opens the operator form", async ({ page }) => {
+test("#providers now carries operators to the application itself", async ({
+  page,
+}) => {
   await page.goto("/#providers");
+
+  // The homepage has no operator form to open any more, so the long-lived
+  // anchor must land on the one that does rather than on nothing.
+  await expect(page).toHaveURL(/\/operators#apply$/);
   await expect(
-    page.getByRole("tab", { name: /run experiences/i }),
-  ).toHaveAttribute("aria-selected", "true");
+    page.locator("#apply").getByLabel("Business name"),
+  ).toBeVisible();
 });
 
 test("traveller form surfaces validation errors without a network call", async ({
@@ -128,14 +158,12 @@ test("traveller form surfaces validation errors without a network call", async (
   await page.goto("/#register");
   // Submitting empty must fail client-side: block any accidental API call.
   await page.route("**/v1/leads", (route) => route.abort());
-  await page
-    .getByRole("tabpanel", { name: /travelling/i })
-    .getByRole("button", { name: "Join the waitlist" })
-    .click();
-  const panel = page.getByRole("tabpanel", { name: /travelling/i });
-  await expect(panel.getByText("Enter your name.")).toBeVisible();
-  await expect(panel.getByText("Enter your WhatsApp number.")).toBeVisible();
-  await expect(panel.getByText(/accept the privacy policy/i)).toBeVisible();
+  const form = registerForm(page);
+  await form.getByRole("button", { name: "Join the waitlist" }).click();
+
+  await expect(form.getByText("Enter your name.")).toBeVisible();
+  await expect(form.getByText("Enter your WhatsApp number.")).toBeVisible();
+  await expect(form.getByText(/accept the privacy policy/i)).toBeVisible();
 });
 
 test("traveller form success state (API stubbed)", async ({ page }) => {
@@ -153,18 +181,18 @@ test("traveller form success state (API stubbed)", async ({ page }) => {
     }),
   );
 
-  const panel = page.getByRole("tabpanel", { name: /travelling/i });
-  await panel.getByLabel("Name").fill("Test Person");
-  await panel.getByLabel("WhatsApp number").fill("+919000000000");
-  await panel.getByText("Diving & water").click();
-  await panel.getByText(/I agree to the/).click();
-  await panel.getByRole("button", { name: "Join the waitlist" }).click();
+  const form = registerForm(page);
+  await form.getByLabel("Name").fill("Test Person");
+  await form.getByLabel("WhatsApp number").fill("+919000000000");
+  await form.getByText("Diving & water").click();
+  await form.getByText(/I agree to the/).click();
+  await form.getByRole("button", { name: "Join the waitlist" }).click();
 
-  await expect(panel.getByRole("status")).toContainText(
+  await expect(form.getByRole("status")).toContainText(
     /You[’']re on the Yuvoy waitlist/,
   );
   // A future promise, never "check your inbox" — there is no autoresponder.
-  await expect(panel.getByRole("status")).toContainText(
+  await expect(form.getByRole("status")).toContainText(
     /We[’']ll message you when the first Andaman experiences are ready\./,
   );
 });
@@ -177,15 +205,15 @@ test("unavailable API produces a truthful failure, never fake success", async ({
     route.fulfill({ status: 503, contentType: "application/json", body: "{}" }),
   );
 
-  const panel = page.getByRole("tabpanel", { name: /travelling/i });
-  await panel.getByLabel("Name").fill("Test Person");
-  await panel.getByLabel("WhatsApp number").fill("+919000000000");
-  await panel.getByText("Diving & water").click();
-  await panel.getByText(/I agree to the/).click();
-  await panel.getByRole("button", { name: "Join the waitlist" }).click();
+  const form = registerForm(page);
+  await form.getByLabel("Name").fill("Test Person");
+  await form.getByLabel("WhatsApp number").fill("+919000000000");
+  await form.getByText("Diving & water").click();
+  await form.getByText(/I agree to the/).click();
+  await form.getByRole("button", { name: "Join the waitlist" }).click();
 
-  await expect(panel.getByRole("alert")).toContainText(/couldn't save/i);
-  await expect(panel.getByText(/on the yuvoy waitlist/i)).toHaveCount(0);
+  await expect(form.getByRole("alert")).toContainText(/couldn't save/i);
+  await expect(form.getByText(/on the yuvoy waitlist/i)).toHaveCount(0);
 });
 
 test("campaign route renders with noindex and canonical to home", async ({

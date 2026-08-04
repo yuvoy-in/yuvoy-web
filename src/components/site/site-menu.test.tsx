@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
-import { MobileMenu } from "./mobile-menu";
+import { SiteMenu } from "./site-menu";
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 
@@ -9,9 +9,9 @@ vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 // Escape, the focus trap and focus restoration need a real browser and are
 // asserted in e2e/shell.spec.ts instead.
 
-describe("MobileMenu", () => {
+describe("SiteMenu", () => {
   it("starts closed and announces that to assistive tech", () => {
-    render(<MobileMenu />);
+    render(<SiteMenu />);
     expect(screen.getByRole("button", { name: "Open menu" })).toHaveAttribute(
       "aria-expanded",
       "false",
@@ -20,7 +20,7 @@ describe("MobileMenu", () => {
 
   it("opens on the trigger and flips aria-expanded", async () => {
     const user = userEvent.setup();
-    render(<MobileMenu />);
+    render(<SiteMenu />);
     const trigger = screen.getByRole("button", { name: "Open menu" });
 
     await user.click(trigger);
@@ -31,7 +31,7 @@ describe("MobileMenu", () => {
 
   it("closes again from the close button", async () => {
     const user = userEvent.setup();
-    render(<MobileMenu />);
+    render(<SiteMenu />);
     const trigger = screen.getByRole("button", { name: "Open menu" });
 
     await user.click(trigger);
@@ -42,7 +42,7 @@ describe("MobileMenu", () => {
 
   it("offers the primary call to action while open", async () => {
     const user = userEvent.setup();
-    render(<MobileMenu />);
+    render(<SiteMenu />);
 
     await user.click(screen.getByRole("button", { name: "Open menu" }));
 

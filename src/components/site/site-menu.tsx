@@ -6,10 +6,16 @@ import { usePathname } from "next/navigation";
 import { Wordmark } from "@/components/brand/wordmark";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
-import { NAV_ITEMS, PRIMARY_CTA, SITE_ROUTES } from "@/lib/site/nav";
+import { MENU_ITEMS, PRIMARY_CTA, SITE_ROUTES } from "@/lib/site/nav";
 
 /**
- * The mobile navigation panel.
+ * The site navigation panel, at every breakpoint.
+ *
+ * The header carries only three things — the mark, the operator link and the
+ * call to action — so every other route lives in here, on a phone and on a
+ * desktop alike. That is why this is no longer conditioned on a breakpoint,
+ * and why there is no longer a resize handler closing it: the trigger can
+ * never disappear out from under an open panel.
  *
  * Built on a native `<dialog>` opened with `showModal()`, which puts it in the
  * browser's top layer. That buys three things we would otherwise hand-roll and
@@ -21,7 +27,7 @@ import { NAV_ITEMS, PRIMARY_CTA, SITE_ROUTES } from "@/lib/site/nav";
  * state (so `aria-expanded` never goes stale), locking background scroll, and
  * deciding when returning focus to the trigger is the right thing to do.
  */
-export function MobileMenu() {
+export function SiteMenu() {
   const [open, setOpen] = React.useState(false);
   const dialogRef = React.useRef<HTMLDialogElement>(null);
   const triggerRef = React.useRef<HTMLButtonElement>(null);
@@ -78,17 +84,6 @@ export function MobileMenu() {
     }
   }, [pathname, close]);
 
-  // Growing past the breakpoint hides the trigger — don't strand an open panel
-  // with no visible way back to it.
-  React.useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    function onChange() {
-      if (mq.matches) close(false);
-    }
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, [close]);
-
   const legalLinks = SITE_ROUTES.filter((r) => r.footer === "trust");
 
   return (
@@ -100,7 +95,7 @@ export function MobileMenu() {
         aria-expanded={open}
         aria-controls="mobile-menu"
         aria-haspopup="dialog"
-        className="text-forest hover:bg-forest/5 focus-visible:ring-terra-deep rounded-edge -mr-2 inline-flex size-11 items-center justify-center transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none lg:hidden"
+        className="text-forest hover:bg-forest/5 focus-visible:ring-terra-deep rounded-edge -mr-2 inline-flex size-11 items-center justify-center transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
       >
         <span className="sr-only">Open menu</span>
         <svg aria-hidden viewBox="0 0 24 24" fill="none" className="size-6">
@@ -166,9 +161,9 @@ export function MobileMenu() {
             aria-label="Site"
             className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-6"
           >
-            {NAV_ITEMS.length > 0 && (
+            {MENU_ITEMS.length > 0 && (
               <ul className="flex flex-col">
-                {NAV_ITEMS.map((item) => {
+                {MENU_ITEMS.map((item) => {
                   const current = pathname === item.href;
                   return (
                     <li key={item.href} className="border-cream-line border-b">
