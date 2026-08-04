@@ -1,8 +1,10 @@
+"use client";
+
 import Link from "next/link";
 import { Wordmark } from "@/components/brand/wordmark";
 import { buttonVariants } from "@/components/ui/button";
-import { HeaderShell } from "@/components/site/header-shell";
 import { SiteMenu } from "@/components/site/site-menu";
+import { useHeaderChrome } from "@/components/site/use-header-chrome";
 import { cn } from "@/lib/cn";
 import { OPERATOR_NAV, PRIMARY_CTA } from "@/lib/site/nav";
 
@@ -10,29 +12,37 @@ import { OPERATOR_NAV, PRIMARY_CTA } from "@/lib/site/nav";
  * The site header: sticky, compact, present on every route, and out of the
  * way while you read.
  *
- * It slides up as you scroll down the page and returns the moment you scroll
- * back — the behaviour and its edge cases live in HeaderShell, which is the
- * only client component here. Everything below stays server-rendered.
- *
  * It carries exactly three things — the mark, the operator link, and the call
  * to action — and every other route lives in the menu, on desktop as well as
  * on a phone. A header that lists everything makes each item worth less; this
  * one states who the site is for (travellers, by default) and where the other
  * audience should go, and lets the page do the rest.
  *
+ * Two scroll behaviours, both owned by `useHeaderChrome`: it slides up as you
+ * scroll down and returns as you scroll back, and at the very top of a page
+ * whose first section is a dark cover it goes transparent and turns its
+ * contents cream, so the top of the homepage reads as one uninterrupted field
+ * rather than a cream bar stuck on a green wall.
+ *
  * The layout is a three-column grid rather than a flex row with
  * `justify-between`, because the operator link has to sit at the true centre
  * of the page and not at the midpoint of whatever space the mark and the
  * button leave over.
- *
- * It looks identical on every route. An adaptive variant that turned forest
- * over the homepage cover and carried a reading progress bar was tried and
- * reverted (owner direction, 2026-08-03): the plain bar is the one that reads
- * as considered.
  */
 export function SiteHeader() {
+  const { ref, overCover } = useHeaderChrome();
+
   return (
-    <HeaderShell className="border-cream-line bg-cream/85 header-slide sticky top-0 z-40 border-b backdrop-blur-md">
+    <header
+      ref={ref}
+      data-hidden="false"
+      className={cn(
+        "header-slide sticky top-0 z-40 border-b backdrop-blur-md",
+        overCover
+          ? "border-transparent bg-transparent"
+          : "border-cream-line bg-cream/85",
+      )}
+    >
       <div className="container-page grid h-14 grid-cols-[1fr_auto_1fr] items-center gap-4">
         {/* `flex`, not the default: an inline-level child sits on the line
             box's baseline, and the strut reserves descender space under it.
@@ -43,13 +53,18 @@ export function SiteHeader() {
           aria-label="Yuvoy home"
           className="rounded-edge flex items-center justify-self-start"
         >
-          <Wordmark />
+          <Wordmark tone={overCover ? "onDark" : "onLight"} />
         </Link>
 
         {/* The other audience, named once, in the middle of the page. */}
         <Link
           href={OPERATOR_NAV.href}
-          className="label tap-target text-forest/75 hover:text-forest justify-self-center transition-colors duration-200"
+          className={cn(
+            "label tap-target justify-self-center transition-colors duration-300",
+            overCover
+              ? "text-cream/75 hover:text-cream"
+              : "text-forest/75 hover:text-forest",
+          )}
         >
           {OPERATOR_NAV.label}
         </Link>
@@ -60,13 +75,16 @@ export function SiteHeader() {
             className={cn(
               buttonVariants({ size: "sm" }),
               "hidden sm:inline-flex",
+              // The terracotta fill reads on both surfaces; only the ring's
+              // offset has to follow what is behind it.
+              overCover && "focus-visible:ring-offset-forest",
             )}
           >
             {PRIMARY_CTA.label}
           </Link>
-          <SiteMenu />
+          <SiteMenu tone={overCover ? "onDark" : "onLight"} />
         </div>
       </div>
-    </HeaderShell>
+    </header>
   );
 }

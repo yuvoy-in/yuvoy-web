@@ -351,7 +351,13 @@
   around one of them, which reads better as plain CSS than as nesting.
 */
 .header-slide {
-  transition: transform 250ms var(--ease-interaction);
+  /* The colours are in the same declaration as the transform on purpose: a
+     Tailwind `transition-*` utility would set the `transition` shorthand and
+     silently drop whichever of the two was declared first. */
+  transition:
+    transform 250ms var(--ease-interaction),
+    background-color 300ms var(--ease-interaction),
+    border-color 300ms var(--ease-interaction);
 }
 
 @media (prefers-reduced-motion: no-preference) {

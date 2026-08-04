@@ -44,10 +44,16 @@ import { MENU_ITEMS, PRIMARY_CTA, SITE_ROUTES } from "@/lib/site/nav";
 /** Must match the closing shutter in globals.css. */
 const SHUTTER_CLOSE_MS = 320;
 
-export function SiteMenu() {
+export function SiteMenu({
+  tone = "onLight",
+}: {
+  /** Follows the header surface the trigger sits on. */
+  tone?: "onLight" | "onDark";
+}) {
   const [open, setOpen] = React.useState(false);
   const [closing, setClosing] = React.useState(false);
   const dialogRef = React.useRef<HTMLDialogElement>(null);
+  const panelRef = React.useRef<HTMLDivElement>(null);
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const closeTimer = React.useRef<ReturnType<typeof setTimeout>>(undefined);
   /**
@@ -87,8 +93,14 @@ export function SiteMenu() {
   React.useEffect(() => {
     const el = dialogRef.current;
     if (!el) return;
-    if (open && !el.open) el.showModal();
-    else if (!open && el.open) el.close();
+    if (open && !el.open) {
+      el.showModal();
+      // Take focus off whatever showModal() picked (the close button) and
+      // park it on the panel, so opening does not paint a focus ring.
+      panelRef.current?.focus();
+    } else if (!open && el.open) {
+      el.close();
+    }
   }, [open]);
 
   // Escape and backdrop dismissal happen in the browser, not in React.
@@ -135,7 +147,12 @@ export function SiteMenu() {
         aria-expanded={open}
         aria-controls="site-menu"
         aria-haspopup="dialog"
-        className="text-forest hover:bg-forest/5 focus-visible:ring-terra-deep rounded-edge -mr-2 inline-flex size-11 items-center justify-center transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
+        className={cn(
+          "rounded-edge -mr-2 inline-flex size-11 items-center justify-center transition-colors duration-300 focus-visible:ring-2 focus-visible:outline-none",
+          tone === "onDark"
+            ? "text-cream hover:bg-cream/10 focus-visible:ring-terra-soft"
+            : "text-forest hover:bg-forest/5 focus-visible:ring-terra-deep",
+        )}
       >
         <span className="sr-only">Open menu</span>
         <svg aria-hidden viewBox="0 0 24 24" fill="none" className="size-6">
@@ -166,8 +183,10 @@ export function SiteMenu() {
         className="m-0 h-dvh max-h-dvh w-screen max-w-none bg-transparent p-0 backdrop:cursor-pointer"
       >
         <div
+          ref={panelRef}
+          tabIndex={-1}
           data-state={closing ? "closing" : "open"}
-          className="menu-shutter bg-cream flex h-full flex-col"
+          className="menu-shutter bg-cream flex h-full flex-col outline-none"
         >
           {/* Mirrors the header exactly, so the close button sits on the
               same pixel the trigger did. */}
@@ -202,8 +221,8 @@ export function SiteMenu() {
             which is both a usability problem and what made an automated
             contrast check resolve them against the wrong background.
           */}
-          <div className="container-page min-h-0 flex-1 overflow-y-auto overscroll-contain py-8 sm:py-10">
-            <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+          <div className="container-page min-h-0 flex-1 overflow-y-auto overscroll-contain py-6 sm:py-8">
+            <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
               <nav aria-label="Site" className="lg:col-span-7">
                 {MENU_ITEMS.length > 0 && (
                   <ul className="border-cream-line flex flex-col border-t">
@@ -212,14 +231,14 @@ export function SiteMenu() {
                       return (
                         <li
                           key={item.href}
-                          className="border-cream-line border-b"
+                          className="border-cream-line border-b last:border-b-0"
                         >
                           <Link
                             href={item.href}
                             aria-current={current ? "page" : undefined}
                             onClick={() => close(false)}
                             className={cn(
-                              "font-display group flex items-baseline justify-between gap-6 py-4 text-[clamp(1.5rem,3.4vw,2.5rem)] leading-tight font-normal tracking-tight transition-colors duration-200 sm:py-5",
+                              "font-display group flex items-baseline justify-between gap-6 py-3.5 text-[clamp(1.375rem,2.8vw,2.25rem)] leading-tight font-normal tracking-tight transition-colors duration-200 sm:py-4",
                               current
                                 ? "text-terra-deep"
                                 : "text-forest hover:text-terra-deep",

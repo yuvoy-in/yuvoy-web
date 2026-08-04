@@ -209,10 +209,40 @@ test.describe("header on scroll", () => {
 
   const header = (page: Page) => page.getByRole("banner");
 
-  test("stays put near the top of the page", async ({ page }) => {
+  const TRANSPARENT = "rgba(0, 0, 0, 0)";
+
+  test("stays put at the very top of the page", async ({ page }) => {
     await page.goto("/");
-    await page.mouse.wheel(0, 60);
+    await page.mouse.wheel(0, 4);
     await expect(header(page)).toBeInViewport();
+  });
+
+  /*
+    At the top of a page whose first section is a dark cover the bar is
+    transparent, so the cover reads as one field; anywhere else it is solid.
+    The change happens while the header is hidden, so the only cross-fade a
+    visitor sees is the deliberate one at the top edge.
+  */
+  test("wears the cover at the top and the bar once you leave it", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
+
+    // Down past the cover, then back up far enough to reveal the bar.
+    await page.mouse.wheel(0, 1200);
+    await page.mouse.wheel(0, -400);
+    await expect(header(page)).toBeInViewport();
+    await expect(header(page)).not.toHaveCSS("background-color", TRANSPARENT);
+
+    // All the way home: it returns to the cover's colours.
+    await page.mouse.wheel(0, -2000);
+    await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
+  });
+
+  test("is solid at the top of a page with no cover", async ({ page }) => {
+    await page.goto("/about");
+    await expect(header(page)).not.toHaveCSS("background-color", TRANSPARENT);
   });
 
   test("hides going down and returns going up", async ({ page }) => {
