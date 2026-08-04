@@ -8,7 +8,14 @@ import { cn } from "@/lib/cn";
  *
  * `tone="onDark"` flips it for forest surfaces. `kicker={false}` and
  * `mark={false}` strip it back for tight contexts (inline in body copy, the
- * mobile menu bar, a favicon-sized slot).
+ * menu bar, a favicon-sized slot).
+ *
+ * **Give it a flex or grid parent.** It is `inline-flex`, so in a plain block
+ * or inline container it sits on a line box's baseline and the strut reserves
+ * descender space beneath it — dead space inside the parent that makes the
+ * mark look high and its container bottom-heavy. That is exactly what was
+ * reported of the header on 2026-08-04; the fix was `flex` on the link, not a
+ * nudge on the mark. Pass `className="flex"` where the parent cannot change.
  */
 export function Wordmark({
   className,

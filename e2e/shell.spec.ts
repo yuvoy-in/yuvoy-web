@@ -272,6 +272,25 @@ test.describe("header", () => {
     await expect(header.getByRole("link")).toHaveCount(3);
   });
 
+  test("centres the mark in the bar", async ({ page }) => {
+    await page.goto("/");
+    const bar = page.getByRole("banner");
+    const mark = bar.getByRole("link", { name: "Yuvoy home" });
+
+    const barBox = (await bar.boundingBox())!;
+    const markBox = (await mark.boundingBox())!;
+    const above = markBox.y - barBox.y;
+    const below = barBox.y + barBox.height - (markBox.y + markBox.height);
+
+    // Within a pixel, allowing for the bar's own bottom border. This once sat
+    // several pixels low because the link was not a flex container, so the
+    // mark inherited a line box and the strut's descender space under it.
+    expect(
+      Math.abs(above - below),
+      `mark is off centre: ${above}px above, ${below}px below`,
+    ).toBeLessThanOrEqual(1.5);
+  });
+
   test("keeps the menu on desktop, holding every other route", async ({
     page,
   }) => {
