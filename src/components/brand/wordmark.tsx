@@ -2,9 +2,8 @@ import Image from "next/image";
 import { cn } from "@/lib/cn";
 
 /**
- * The Yuvoy mark — the official ensō (white brush ring + terracotta dot) on
- * its forest tile, beside the wide-tracked wordmark and the "Experience
- * more." kicker.
+ * The Yuvoy mark — the official ensō (brush ring + terracotta dot), beside
+ * the wide-tracked wordmark and the "Experience more." kicker.
  *
  * `tone="onDark"` flips it for forest surfaces. `kicker={false}` and
  * `mark={false}` strip it back for tight contexts (inline in body copy, the
@@ -31,7 +30,7 @@ export function Wordmark({
   const onDark = tone === "onDark";
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
-      {mark && <WaveMark />}
+      {mark && <WaveMark tone={tone} />}
       <span className="inline-flex flex-col leading-none">
         {/*
           The wordmark stays on the sans (v2.2): the serif is the site's
@@ -69,38 +68,60 @@ export function Wordmark({
 }
 
 /**
- * The mark on its own — the official ensō on its forest tile, for the header,
- * footer and tight slots.
+ * The mark on its own — the official ensō, cut out of its background, for the
+ * header, footer and tight slots.
  *
- * The asset is `public/brand/yuvoy-mark.png`, derived from the delivered logo
- * by `scripts/generate-brand-assets.py` (the source PNG has an opaque black
- * field; the script screen-blends it onto forest, which is why no CSS blend
- * tricks are needed here). The favicon and app icon are the same object.
+ * **No tile.** The delivered logo is a white ensō on an opaque black field, so
+ * the first version of this baked that field into forest and shipped a square.
+ * On a forest section that square was a green box drawn around a logo that
+ * should have had none. `scripts/generate-brand-assets.py` now cuts the mark
+ * out instead, producing one file per surface — the strokes cannot be a single
+ * colour, because a cream ensō is invisible on cream and a forest one is
+ * invisible on forest. The tiled version survives only where an icon genuinely
+ * needs a body: the favicon, the app icon and the OG card.
  *
- * **There is no tone.** The tile is forest on every surface, and the asset's
- * own background is the same forest, so on a dark surface the tile simply
- * disappears and the ensō is left drawn on the section itself. It used to
- * carry a hairline ring there to "keep the square legible", which had it
- * exactly backwards: the square is packaging, not part of the mark, and
- * outlining it on green drew a box around a logo that should have had none
- * (owner report, 2026-08-05).
+ * **Both files render, and opacity does the switching.** Swapping the `src`
+ * would send the browser to fetch the other file at the moment the header
+ * changes colour, which is the one moment it must not blink. They cross-fade
+ * with the bar instead.
  */
-export function WaveMark({ className }: { className?: string }) {
+const MARK_SIZE = 128; // 4× the 32px it draws at, so it stays crisp at 3× DPR.
+
+export function WaveMark({
+  tone = "onLight",
+  className,
+}: {
+  tone?: "onLight" | "onDark";
+  className?: string;
+}) {
+  const onDark = tone === "onDark";
   return (
     <span
       aria-hidden
-      className={cn(
-        "rounded-edge bg-forest inline-flex size-8 shrink-0 overflow-hidden",
-        className,
-      )}
+      className={cn("relative block size-8 shrink-0", className)}
     >
-      <Image
-        src="/brand/yuvoy-mark.png"
-        alt=""
-        width={64}
-        height={64}
-        className="size-full"
-      />
+      {(
+        [
+          ["/brand/yuvoy-mark-on-light.png", !onDark],
+          ["/brand/yuvoy-mark-on-dark.png", onDark],
+        ] as const
+      ).map(([src, shown]) => (
+        <Image
+          key={src}
+          src={src}
+          alt=""
+          width={MARK_SIZE}
+          height={MARK_SIZE}
+          // A logo is not a photograph: re-encoding it lossily is exactly the
+          // "downgraded" look the optimiser's default quality produces.
+          quality={100}
+          priority
+          className={cn(
+            "absolute inset-0 size-full transition-opacity duration-300",
+            shown ? "opacity-100" : "opacity-0",
+          )}
+        />
+      ))}
     </span>
   );
 }
