@@ -84,14 +84,22 @@
   }
 
   /*
-    The mobile menu is a native <dialog> opened with showModal(), so it lives
-    in the top layer — it can never be clipped by an ancestor's overflow or
+    The site menu is a native <dialog> opened with showModal(), so it lives in
+    the top layer — it can never be clipped by an ancestor's overflow or
     stacking context, which is the failure mode a portal was previously needed
     to work around.
+
+    Its backdrop is deliberately empty: no tint, no blur. A backdrop is not
+    animatable alongside the dialog's own dismissal, so whatever it paints
+    vanishes in one frame when the dialog closes — the page appeared to snap
+    from blurred to sharp, which read as a glitch rather than as an effect
+    (owner report, 2026-08-04). With nothing painted there is no state to
+    snap: the shutter simply rolls back and reveals the page it was covering.
+    Declared rather than deleted, because the UA stylesheet paints its own
+    translucent backdrop if we say nothing.
   */
   dialog[data-menu]::backdrop {
-    background-color: color-mix(in srgb, var(--color-forest) 78%, transparent);
-    backdrop-filter: blur(3px);
+    background: transparent;
   }
 
   /*
