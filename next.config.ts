@@ -17,6 +17,16 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  images: {
+    /*
+      Next only serves the qualities listed here, so that a URL parameter
+      cannot make the optimiser render an arbitrary number of variants.
+      75 is its default and what photography uses; 100 exists for the brand
+      mark alone, where lossy re-encoding is visible as fringing on the thin
+      brush strokes (see WaveMark).
+    */
+    qualities: [75, 100],
+  },
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
