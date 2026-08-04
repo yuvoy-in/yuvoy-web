@@ -12,10 +12,12 @@ info:
     ISO-8601 UTC; lists use cursor pagination; money-mutating requests require an
     `Idempotency-Key`; errors use a single envelope `{ error: { code, message, details, requestId } }`.
 servers:
-  - url: https://api.yuvoy.com/v1
+  - url: https://api.yuvoy.in/v1
     description: Production
-  - url: https://api-staging.yuvoy.com/v1
-    description: Staging
+    # No separate staging API exists — one App Runner service backs both the
+    # production and staging web deployments (differentiated by CORS origin,
+    # not by host). Do not add a staging entry unless a second service exists
+    # to resolve it.
 tags:
   - name: auth
   - name: experiences
