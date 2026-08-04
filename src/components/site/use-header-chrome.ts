@@ -26,9 +26,13 @@ import { usePathname } from "next/navigation";
  * it looks stuck on; at the top the header is transparent instead and its
  * contents turn cream. Any scroll away from the top returns the solid bar
  * (owner's choice, 2026-08-04, over the alternative of tracking the whole
- * cover). That is what makes the change invisible in practice: it happens
- * while the header is hidden, so the only cross-fade a visitor ever sees is
- * the one at the top edge, which is deliberate.
+ * cover).
+ *
+ * The swap is **latched to the header being off-screen**, not to the scroll
+ * position that triggers the hide. Those are the same instant, and doing the
+ * obvious thing repainted the bar cream in the frame the hide began, so it
+ * was seen sliding away in the wrong colour. Held until it has actually left,
+ * the change happens where nobody can see it.
  *
  * `hidden` is written straight to the DOM so scrolling never re-renders React.
  * `overCover` is state because the tone genuinely changes the tree — but it
@@ -37,6 +41,19 @@ import { usePathname } from "next/navigation";
 
 /** Never hide within this many pixels of the top, and wear the cover here. */
 const REVEAL_ABOVE = 8;
+
+/**
+ * How far down the page the cover's colours survive if the header never
+ * actually leaves the screen.
+ *
+ * The swap normally waits until the header is off-screen, which is what keeps
+ * it invisible. Under reduced motion the header does not hide at all, so that
+ * moment never comes — and a transparent bar over page content is an
+ * unreadable one. This is the backstop for that case only: far enough down
+ * that a visitor whose header does hide has always swapped long before, and
+ * still inside the cover, which is a viewport tall.
+ */
+const COVER_RELEASE = 240;
 
 /** Total movement in one direction before the header changes its mind. */
 const DIRECTION_DELTA = 8;
@@ -90,7 +107,25 @@ export function useHeaderChrome() {
       // and a negative delta there would read as "scrolling up".
       const y = Math.max(0, window.scrollY);
 
-      const nextCover = hasCover && y <= REVEAL_ABOVE;
+      /*
+        The chrome is latched, not recomputed each frame, and that is the whole
+        trick. Falling straight from "at the top" to "not at the top" repainted
+        the bar cream in the same frame that started the hide, so a small
+        scroll showed a cream bar sliding away — read as a glitch, and rightly
+        (owner report, 2026-08-04).
+
+        So the cover's colours are held until the header is genuinely off the
+        screen, measured rather than assumed: getBoundingClientRect() reports
+        the animated position, so this is only true once the slide has really
+        finished. The swap then happens where nobody can see it, and the only
+        cross-fade on screen is the deliberate one at the top edge.
+      */
+      const offScreen = header.getBoundingClientRect().bottom <= 0;
+      let nextCover = cover;
+      if (!hasCover) nextCover = false;
+      else if (y <= REVEAL_ABOVE) nextCover = true;
+      else if (offScreen || y > COVER_RELEASE) nextCover = false;
+
       if (nextCover !== cover) {
         cover = nextCover;
         setOverCover(nextCover);
