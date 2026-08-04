@@ -257,7 +257,7 @@ export function LeadForms({
   return (
     <section
       id={sectionId}
-      className="bg-forest text-cream scroll-mt-16"
+      className="bg-forest text-cream scroll-mt-14"
       aria-labelledby={headingId}
     >
       {/* The legacy operator anchor, wherever a provider form actually lives.
@@ -265,7 +265,7 @@ export function LeadForms({
           has nothing to scroll to. The homepage no longer offers that form and
           redirects the anchor instead (see LegacyProviderAnchor). */}
       {offersProvider && (
-        <span id="providers" className="block scroll-mt-24" aria-hidden />
+        <span id="providers" className="block scroll-mt-20" aria-hidden />
       )}
       <div className="container-page py-20 sm:py-28">
         {aside ? (

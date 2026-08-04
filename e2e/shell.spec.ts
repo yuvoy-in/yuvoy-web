@@ -47,25 +47,12 @@ test.describe("site shell", () => {
         header.getByRole("link", { name: "Yuvoy home" }),
       ).toBeVisible();
 
-      // It gets out of the way going down, and comes back on the way up.
-      // Short pages never scroll far enough to hide it, so the hiding half of
-      // the assertion only applies where there is room for it.
-      await page.evaluate(() =>
-        window.scrollTo({
-          top: document.body.scrollHeight,
-          behavior: "instant",
-        }),
-      );
-      const scrollable = await page.evaluate(
-        () => document.documentElement.scrollHeight > window.innerHeight + 400,
-      );
-      if (scrollable) {
-        await expect(header).not.toBeInViewport();
-        await page.mouse.wheel(0, -400);
-        await expect(header).toBeInViewport();
-      } else {
-        await expect(header).toBeInViewport();
-      }
+      // Sticky: after moving down the page and back up, it is on screen
+      // again. The directional hide has its own describe below, where the
+      // motion preference is emulated explicitly rather than inherited.
+      await page.mouse.wheel(0, 800);
+      await page.mouse.wheel(0, -800);
+      await expect(header).toBeInViewport();
 
       await expect(page.getByRole("contentinfo")).toBeVisible();
     });
@@ -214,6 +201,12 @@ test.describe("site shell", () => {
 test.describe("header on scroll", () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
+  // Emulated explicitly: the hide lives behind a `no-preference` media query,
+  // and headless runtimes do not agree on what the default should be.
+  test.beforeEach(async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+  });
+
   const header = (page: Page) => page.getByRole("banner");
 
   test("stays put near the top of the page", async ({ page }) => {
@@ -243,6 +236,7 @@ test.describe("header on scroll", () => {
 
   test("stays put entirely under prefers-reduced-motion", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
+    // Belt and braces: emulateMedia overrides the describe-level preference.
     await page.goto("/");
 
     await page.mouse.wheel(0, 900);

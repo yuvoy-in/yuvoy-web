@@ -33,7 +33,7 @@ import { OPERATOR_NAV, PRIMARY_CTA } from "@/lib/site/nav";
 export function SiteHeader() {
   return (
     <HeaderShell className="border-cream-line bg-cream/85 header-slide sticky top-0 z-40 border-b backdrop-blur-md">
-      <div className="container-page grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4">
+      <div className="container-page grid h-14 grid-cols-[1fr_auto_1fr] items-center gap-4">
         <Link
           href="/"
           aria-label="Yuvoy home"

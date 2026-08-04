@@ -33,7 +33,7 @@ export function Hero() {
         <div className="grain" />
       </div>
 
-      <div className="container-page relative flex min-h-[calc(100dvh-4rem)] flex-col justify-center py-16 sm:py-20">
+      <div className="container-page relative flex min-h-[calc(100dvh-3.5rem)] flex-col justify-center py-16 sm:py-20">
         <div className="flex flex-col items-center text-center">
           <p
             className="eyebrow text-terra-soft emerge"

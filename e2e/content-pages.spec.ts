@@ -126,21 +126,26 @@ test("audience pages send each audience to the right form", async ({
     "true",
   );
 
+  // Operators no longer leave the page to apply: the form is on it.
   await page.goto("/operators");
   await page
     .getByRole("link", { name: "Apply as a founding operator" })
     .first()
     .click();
-  await expect(page).toHaveURL(/audience=provider$/);
+  await expect(page).toHaveURL(/\/operators#apply$/);
   await expect(
-    page.getByRole("tab", { name: /run experiences/i }),
-  ).toHaveAttribute("aria-selected", "true");
+    page.locator("#apply").getByLabel("Business name"),
+  ).toBeVisible();
 });
 
 test("the new routes appear in the site navigation", async ({ page }) => {
   await page.goto("/");
-  const nav = page.getByRole("navigation", { name: "Primary" });
+  // Navigation is the menu now: the header names only the operator page.
+  await page.getByRole("button", { name: "Open menu" }).click();
+  const nav = page.getByRole("dialog", { name: "Site menu" });
   for (const label of ["How it works", "For travellers", "For operators"]) {
-    await expect(nav.getByRole("link", { name: label })).toBeVisible();
+    await expect(
+      nav.getByRole("link", { name: label, exact: true }),
+    ).toBeVisible();
   }
 });

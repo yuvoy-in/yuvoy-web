@@ -54,13 +54,19 @@ test("the homepage speaks only to travellers", async ({ page }) => {
   await expect(page.getByRole("tab")).toHaveCount(0);
   await expect(page.getByRole("heading", { name: /six apps/i })).toHaveCount(0);
 
+  // No operator pitch and no operator call to action. The cover's "3 founding
+  // operators signed" is deliberately still here: it is proof the marketplace
+  // is real, which is a traveller's question too.
   const body = (await page.textContent("body")) ?? "";
-  expect(body).not.toMatch(/founding operator/i);
   expect(body).not.toMatch(/Season One roster/i);
+  expect(body).not.toMatch(/Experience OS/i);
+  await expect(
+    page.getByRole("link", { name: /apply as a founding operator/i }),
+  ).toHaveCount(0);
 
   // The traveller form is the one that renders, with its own fields.
   await expect(
-    registerForm(page).getByLabel("What draws you?", { exact: false }),
+    registerForm(page).getByLabel("Where are you headed first?"),
   ).toBeVisible();
   await expect(registerForm(page).getByLabel("Business name")).toHaveCount(0);
 });

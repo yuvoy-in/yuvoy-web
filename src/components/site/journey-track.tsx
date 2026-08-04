@@ -19,7 +19,7 @@ export function JourneyTrack({ journey }: { journey: Journey }) {
     <section
       aria-labelledby={headingId}
       className={cn(
-        "scroll-mt-16",
+        "scroll-mt-14",
         journey.key === "operator"
           ? "bg-forest text-cream"
           : "bg-cream text-forest",

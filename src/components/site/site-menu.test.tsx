@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import { SiteMenu } from "./site-menu";
@@ -29,7 +29,7 @@ describe("SiteMenu", () => {
     expect(screen.getByRole("button", { name: "Close menu" })).toBeVisible();
   });
 
-  it("closes again from the close button", async () => {
+  it("closes again from the close button, once the shutter has run", async () => {
     const user = userEvent.setup();
     render(<SiteMenu />);
     const trigger = screen.getByRole("button", { name: "Open menu" });
@@ -37,7 +37,11 @@ describe("SiteMenu", () => {
     await user.click(trigger);
     await user.click(screen.getByRole("button", { name: "Close menu" }));
 
-    expect(trigger).toHaveAttribute("aria-expanded", "false");
+    // The panel dismisses after the closing shutter, not on the click, so
+    // this is deliberately awaited rather than asserted synchronously.
+    await waitFor(() =>
+      expect(trigger).toHaveAttribute("aria-expanded", "false"),
+    );
   });
 
   it("offers the primary call to action while open", async () => {

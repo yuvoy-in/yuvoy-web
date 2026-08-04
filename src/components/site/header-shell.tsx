@@ -22,9 +22,13 @@ import * as React from "react";
  * - **Focus always wins.** Tabbing into a hidden header would put the focus
  *   ring off-screen (WCAG 2.4.11), and closing the menu returns focus to the
  *   trigger that lives here. A `focusin` listener reveals it in both cases.
- * - **Reduced motion opts out entirely.** Not "the same jump without the
- *   transition": a header that teleports in and out is worse than one that
- *   stays put, so for those visitors it simply stays put.
+ * - **Reduced motion opts out entirely** — in CSS, not here. The stylesheet
+ *   only applies the hidden transform under `prefers-reduced-motion:
+ *   no-preference`, so for those visitors the header stays put rather than
+ *   teleporting. This component sets the attribute either way, because the
+ *   design system's rule is that a component never branches on motion
+ *   preference itself. An earlier version did branch here, and it silently
+ *   disabled the whole behaviour wherever the runtime reported a preference.
  *
  * Scrolling never re-renders React. The listener is passive, coalesced into
  * one rAF, and writes a data attribute the stylesheet reacts to.
@@ -55,10 +59,6 @@ export function HeaderShell({
       header.dataset.hidden = "false";
     };
     header.addEventListener("focusin", reveal);
-
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      return () => header.removeEventListener("focusin", reveal);
-    }
 
     let anchorY = window.scrollY;
     let hidden = false;

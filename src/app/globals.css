@@ -204,22 +204,6 @@
   animation: yuvoy-emerge 1100ms var(--ease-cinematic) both;
 }
 
-/* Mobile menu panel — interaction feedback, so it stays inside the 250ms budget. */
-@keyframes yuvoy-menu-in {
-  from {
-    opacity: 0;
-    transform: translateY(-0.75rem);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@utility menu-in {
-  animation: yuvoy-menu-in 220ms var(--ease-interaction) both;
-}
-
 /* ------------------------------------------------- the product preview */
 
 /*
@@ -344,20 +328,63 @@
 
 /*
   The header sliding out of the way on the way down the page, and back on the
-  way up. The state is a data attribute set by HeaderShell; the movement lives
-  here so every motion definition stays in one file.
+  way up. HeaderShell sets the data attribute; the movement lives here so every
+  motion definition stays in one file.
 
   250ms is the interaction budget (§3): this answers a gesture, so it has to
-  feel like a response rather than a performance. The global reduced-motion
-  block collapses the transition, and HeaderShell additionally never sets the
-  attribute for those visitors, so the header simply stays put for them
-  instead of teleporting.
-*/
-@utility header-slide {
-  transition: transform 250ms var(--ease-interaction);
+  feel like a response rather than a performance.
 
-  &[data-hidden="true"] {
+  The hide is inside a `no-preference` query rather than being switched off in
+  JavaScript. A header that teleports in and out is worse than one that stays
+  put, so under reduced motion it simply never moves — and the decision lives
+  in CSS with every other motion decision, which is the rule.
+
+  Not an `@utility`: this needs a companion attribute rule and a media query
+  around one of them, which reads better as plain CSS than as nesting.
+*/
+.header-slide {
+  transition: transform 250ms var(--ease-interaction);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .header-slide[data-hidden="true"] {
     transform: translateY(-100%);
+  }
+}
+
+/*
+  The site menu opening like a shutter: the panel unrolls from its top edge to
+  the bottom, and rolls back up to close. clip-path rather than a transform, so
+  the contents are revealed where they already are instead of sliding in behind
+  the frame.
+
+  This is an entrance, not interaction feedback — it is a whole surface
+  arriving — so it sits above the 250ms budget. Closing is quicker than
+  opening: waiting on a dismissal you already asked for feels like lag.
+*/
+@keyframes yuvoy-shutter-open {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes yuvoy-shutter-close {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+@utility menu-shutter {
+  animation: yuvoy-shutter-open 420ms var(--ease-cinematic) both;
+
+  &[data-state="closing"] {
+    animation: yuvoy-shutter-close 320ms var(--ease-interaction) both;
   }
 }
 
