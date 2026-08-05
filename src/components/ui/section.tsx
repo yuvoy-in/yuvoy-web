@@ -52,7 +52,7 @@ export function Section({
   return (
     <section
       id={id}
-      className={cn(SURFACE[tone], "scroll-mt-14", className)}
+      className={cn(SURFACE[tone], "scroll-mt-16", className)}
       {...rest}
     >
       <div className="container-page py-20 sm:py-28">{children}</div>

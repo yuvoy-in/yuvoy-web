@@ -213,7 +213,7 @@ export function SiteMenu({
         >
           {/* Mirrors the header exactly, so the close button sits on the
               same pixel the trigger did. */}
-          <div className="border-cream-line container-page flex h-14 shrink-0 items-center justify-between border-b">
+          <div className="border-cream-line container-page flex h-16 shrink-0 items-center justify-between border-b">
             <Wordmark />
             <button
               type="button"
