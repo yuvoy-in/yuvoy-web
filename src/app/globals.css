@@ -267,6 +267,39 @@
 }
 
 /*
+  Word-level entrance for the cover headline: each word rises out of its own
+  clipped mask, so the sentence assembles itself in reading order. The mask
+  carries a little bottom padding (pulled back with a negative margin) so
+  descenders are not sheared while the word is still travelling. Reduced
+  motion collapses every rise to its landed state.
+*/
+@utility word-mask {
+  display: inline-block;
+  overflow: clip;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+@utility word-rise {
+  display: inline-block;
+  animation: yuvoy-word-rise 850ms var(--ease-cinematic) both;
+}
+
+@keyframes yuvoy-word-rise {
+  from {
+    opacity: 0;
+    transform: translateY(115%);
+  }
+  35% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*
   A hairline that draws itself in from the left. Ends fully drawn, which is
   also what reduced-motion visitors see.
 */
