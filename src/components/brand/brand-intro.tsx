@@ -86,9 +86,29 @@ export function BrandIntro() {
       html.style.overflow = "";
     };
 
+    /*
+      Safari tints its tab and toolbar from the page, and it decides that
+      tint at load — when the veil is covering every pixel with forest. It
+      does not re-decide when the veil leaves, so the chrome stayed green
+      over a cream page (owner report, 2026-08-06). The declared
+      `theme-color` (cream, in the root layout's viewport) is what it
+      should be reading; re-inserting that meta element is a mutation
+      Safari does act on, so the chrome re-reads it at the moment the page
+      appears. Harmless everywhere else: browsers that never sampled
+      pixels simply read the same value again.
+    */
+    const retintChrome = () => {
+      const meta = document.querySelector('meta[name="theme-color"]');
+      const head = meta?.parentNode;
+      if (!meta || !head) return;
+      head.removeChild(meta);
+      requestAnimationFrame(() => head.appendChild(meta));
+    };
+
     let timer = 0;
     const settle = () => {
       unlock();
+      retintChrome();
       setGone(true);
     };
 
@@ -108,6 +128,7 @@ export function BrandIntro() {
     const onAnimationStart = (event: AnimationEvent) => {
       if (event.target === veil && event.animationName === "yuvoy-intro-exit") {
         unlock();
+        retintChrome();
         veil.removeAttribute("data-intro-wait");
       }
     };
