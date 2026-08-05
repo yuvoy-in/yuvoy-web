@@ -48,12 +48,13 @@ describe("IntroVeil", () => {
 
     const mark = container.querySelector("img");
     expect(mark).not.toBeNull();
-    // The dark-surface cut-out, not the tiled icon: a tile on forest draws a
-    // box around the mark (§2 of the design system).
-    expect(mark?.getAttribute("src")).toContain("yuvoy-mark-on-dark");
+    // The generated cream vector variant: cream strokes for the dark
+    // surface, tagline stripped (scripts/generate-vector-brand.mjs).
+    expect(mark?.getAttribute("src")).toContain("yuvoy-mark-vector-cream");
 
-    const letters = Array.from(container.querySelectorAll(".intro-letter"));
-    expect(letters.map((letter) => letter.textContent).join("")).toBe("YUVOY");
+    // Five drawn letterforms, each its own token-coloured rising path.
+    const letters = container.querySelectorAll("path.intro-letter");
+    expect(letters).toHaveLength(5);
 
     expect(screen.getByText("Experience more.")).toHaveClass("intro-kicker");
 

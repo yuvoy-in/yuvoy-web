@@ -612,10 +612,13 @@
   animation-direction: reverse;
 }
 
-/* Letters rise through a baseline mask (each sits in an overflow-clipped
-   cell): set type arriving, not a fade. The statement keeps the softer
-   blur-rise — a display line can arrive like the cover's own type does. */
+/* Letters rise through a baseline mask (each letterform's own clipped
+   <svg> cell): set type arriving, not a fade. The statement keeps the
+   softer blur-rise — a display line can arrive like the cover's own type
+   does. `transform-box: fill-box` makes the 115% travel resolve against the
+   glyph's own outline now that the letters are vector paths. */
 .intro-letter {
+  transform-box: fill-box;
   animation: yuvoy-intro-mask-rise var(--intro-rise) var(--ease-cinematic)
     calc(var(--intro-letters-at) + var(--intro-stagger) * var(--i, 0)) both;
 }
