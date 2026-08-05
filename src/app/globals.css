@@ -519,15 +519,6 @@
   transition: opacity 200ms var(--ease-interaction);
 }
 
-/* TEMPORARY (review aid, owner direction): with the hold on, the veil's exit
-   and the lockup's close never run — the entrance plays, then the frame
-   freezes for inspection. Remove together with HOLD_FOR_REVIEW in
-   BrandIntro before merge. */
-.intro-veil[data-hold],
-.intro-veil[data-hold] .intro-stage {
-  animation: none;
-}
-
 .intro-stage {
   animation: yuvoy-intro-close var(--intro-close) var(--ease-cinematic)
     var(--intro-close-at) both;

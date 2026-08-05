@@ -50,25 +50,13 @@ const INTRO_TOTAL_MS = 3400;
 const SKIP_FADE_MS = 240;
 
 /**
- * TEMPORARY (review aid, owner direction): freeze the veil after its
- * entrance so the composition can be inspected. While true: the close and
- * exit never run (CSS `[data-hold]` rule), no keypress or timer dismisses
- * it, and the session flag is neither read nor written, so every reload
- * replays it. Flip to false and remove the `[data-hold]` CSS rule before
- * merge — the veil must never ship holding a page hostage.
- */
-const HOLD_FOR_REVIEW = true;
-
-/**
  * Runs during HTML parsing, before first paint, from the <script> rendered
  * beneath the veil — which is why it may use getElementById. Kept inline,
  * dependency-free and defensive: if storage is unavailable the veil simply
  * never shows, which is the safe failure. Exported for the unit test, which
  * asserts the contract because jsdom never executes injected scripts.
- * Under `data-hold` (review aid) the session flag is bypassed so reloads
- * replay.
  */
-export const INTRO_DECIDE = `(()=>{try{if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;var v=document.getElementById("yuvoy-intro");if(!v)return;if(!v.hasAttribute("data-hold")){if(sessionStorage.getItem("${STORAGE_KEY}"))return;sessionStorage.setItem("${STORAGE_KEY}","1")}v.setAttribute("data-play","")}catch(e){}})()`;
+export const INTRO_DECIDE = `(()=>{try{if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;if(sessionStorage.getItem("${STORAGE_KEY}"))return;sessionStorage.setItem("${STORAGE_KEY}","1");var v=document.getElementById("yuvoy-intro");if(v)v.setAttribute("data-play","")}catch(e){}})()`;
 
 export function BrandIntro() {
   const veilRef = useRef<HTMLDivElement>(null);
@@ -96,9 +84,6 @@ export function BrandIntro() {
     const unlock = () => {
       html.style.overflow = "";
     };
-
-    // TEMPORARY (review aid): held for inspection — no dismissal of any kind.
-    if (veil.hasAttribute("data-hold")) return unlock;
 
     let timer = 0;
     const settle = () => {
@@ -139,7 +124,7 @@ export function BrandIntro() {
 
   return (
     <>
-      <IntroVeil ref={veilRef} hold={HOLD_FOR_REVIEW} />
+      <IntroVeil ref={veilRef} />
       <script dangerouslySetInnerHTML={{ __html: INTRO_DECIDE }} />
     </>
   );
@@ -154,20 +139,13 @@ export function BrandIntro() {
  * render and hydration. `aria-hidden`: the veil is theatre; the page behind
  * it is the accessible truth, and the skip link stays the first tab stop.
  */
-export function IntroVeil({
-  ref,
-  hold = false,
-}: {
-  ref?: Ref<HTMLDivElement>;
-  hold?: boolean;
-}) {
+export function IntroVeil({ ref }: { ref?: Ref<HTMLDivElement> }) {
   return (
     <div
       ref={ref}
       id="yuvoy-intro"
       aria-hidden
       suppressHydrationWarning
-      data-hold={hold ? "" : undefined}
       className="intro-veil"
     >
       {/* The scene, bottom to top: the owner's island horizon (silhouettes
