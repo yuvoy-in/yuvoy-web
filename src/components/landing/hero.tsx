@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import Image from "next/image";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
@@ -27,36 +26,6 @@ const FACTS = [
   "No payment required",
   "3 founding operators signed",
 ];
-
-/**
- * One word of the headline, rising out of its own mask. Word-level spans
- * keep wrapping natural on every width — a phrase-level block would overflow
- * a phone — and assistive tech still reads the heading as one string.
- */
-function RisingWord({
-  children,
-  delay,
-  className,
-}: {
-  children: ReactNode;
-  delay: number;
-  className?: string;
-}) {
-  return (
-    <span className="word-mask">
-      <span
-        className={cn("word-rise", className)}
-        style={{ animationDelay: `${delay}s` }}
-      >
-        {children}
-      </span>
-    </span>
-  );
-}
-
-/** Stagger for the headline words: reading order, one beat apart. */
-const WORD_BEAT = 0.055;
-const wordDelay = (i: number) => 0.14 + i * WORD_BEAT;
 
 export function Hero() {
   return (
@@ -108,60 +77,28 @@ export function Hero() {
           </p>
 
           {/*
-            The headline assembles itself word by word in reading order, and
-            the word "video" wears a hairline frame with a terra play-mark —
-            the product's whole concept, drawn inside the sentence that
-            states it (owner direction, 2026-08-05: "make the title look
-            awesome"). The turn keeps the site's one italic: a synthesized
-            oblique of Cabinet 700, since no italic file ships.
+            Simple and composed (owner verdict, 2026-08-05, after a word-
+            cascade-and-chip round went too far): one statement in two
+            thoughts. The upright line states the fact; the turn takes its
+            own line in italic terracotta — a deliberate lockup, not a
+            decorated break. One entrance for the whole thought; the field's
+            atmosphere and the ghost ensō carry the drama around it. The
+            italic is the site's one permitted slant (synthesized oblique of
+            Cabinet 700 — no italic file ships).
           */}
-          <h1 className="font-display mt-9 max-w-3xl text-[clamp(2.375rem,5.5vw,4.25rem)] leading-[1.12] font-medium tracking-tight text-balance">
-            <RisingWord delay={wordDelay(0)}>Every</RisingWord>{" "}
-            <RisingWord delay={wordDelay(1)}>
-              <span className="border-cream/30 bg-cream/5 rounded-edge inline-flex items-baseline gap-[0.16em] border px-[0.18em]">
-                <svg
-                  aria-hidden
-                  viewBox="0 0 8 8"
-                  className="fill-terra inline-block size-[0.3em] shrink-0 self-center"
-                >
-                  <path d="M0 0 L8 4 L0 8 Z" />
-                </svg>
-                video
-              </span>
-            </RisingWord>{" "}
-            <RisingWord delay={wordDelay(2)}>here</RisingWord>{" "}
-            <RisingWord delay={wordDelay(3)}>is</RisingWord>{" "}
-            <RisingWord delay={wordDelay(4)}>an</RisingWord>{" "}
-            <RisingWord delay={wordDelay(5)}>experience</RisingWord>{" "}
-            <RisingWord
-              delay={wordDelay(7)}
-              className="text-terra-soft font-bold italic"
-            >
-              you
-            </RisingWord>{" "}
-            <RisingWord
-              delay={wordDelay(8)}
-              className="text-terra-soft font-bold italic"
-            >
-              can
-            </RisingWord>{" "}
-            <RisingWord
-              delay={wordDelay(9)}
-              className="text-terra-soft font-bold italic"
-            >
-              actually
-            </RisingWord>{" "}
-            <RisingWord
-              delay={wordDelay(10)}
-              className="text-terra-soft font-bold italic"
-            >
-              book.
-            </RisingWord>
+          <h1
+            className="font-display emerge mt-10 max-w-4xl text-[clamp(2.5rem,6.2vw,4.5rem)] leading-[1.06] font-medium tracking-tight text-balance"
+            style={{ animationDelay: "0.14s" }}
+          >
+            Every video here is an experience
+            <span className="text-terra-soft mt-2 block font-bold italic">
+              you can actually book.
+            </span>
           </h1>
 
           <p
             className="text-cream/70 emerge mt-9 max-w-2xl text-lg leading-relaxed"
-            style={{ animationDelay: "0.55s" }}
+            style={{ animationDelay: "0.28s" }}
           >
             Every video is filmed by the people behind the experience, so what
             you watch is exactly what you&rsquo;ll get. Discover the Andaman
@@ -170,7 +107,7 @@ export function Hero() {
 
           <div
             className="emerge mt-11 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row"
-            style={{ animationDelay: "0.7s" }}
+            style={{ animationDelay: "0.4s" }}
           >
             {/*
               Native anchors, not next/link: hash-only hrefs pushed through
@@ -204,12 +141,12 @@ export function Hero() {
             rule draws itself in as the row arrives. */}
         <div
           className="emerge relative mt-16 flex flex-col items-center gap-4 pt-6 text-center sm:mt-20 sm:flex-row sm:justify-between sm:gap-x-10 sm:text-left"
-          style={{ animationDelay: "0.85s" }}
+          style={{ animationDelay: "0.52s" }}
         >
           <span
             aria-hidden
             className="draw-line bg-cream/12 absolute inset-x-0 top-0 h-px"
-            style={{ animationDelay: "1.05s" }}
+            style={{ animationDelay: "0.72s" }}
           />
           <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 sm:justify-start">
             {FACTS.map((fact) => (
