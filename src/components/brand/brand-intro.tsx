@@ -246,10 +246,10 @@ export function IntroVeil({
         </span>
         {/*
           The sign-off swash, tucked close under the words: a calligraphic
-          sliver — tapered tips, weight in the middle — that bows through a
-          visible curve while climbing from bottom-left to top-right (owner
-          direction), revealed left to right after the word is written.
-          Decoration, so it is exempt from text floors.
+          sliver — tapered tips, weight in the middle — arching upward
+          (owner direction: the bow flipped and deepened) while climbing
+          from bottom-left to top-right, revealed left to right after the
+          word is written. Decoration, so it is exempt from text floors.
         */}
         <svg
           viewBox="0 0 288 18"
@@ -258,7 +258,7 @@ export function IntroVeil({
         >
           <path
             className="intro-stroke fill-current"
-            d="M2 16Q160 15 286 3Q160 19 2 16Z"
+            d="M2 16Q150 -2 286 3Q150 3 2 16Z"
           />
         </svg>
       </div>
