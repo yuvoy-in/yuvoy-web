@@ -44,7 +44,7 @@ const STORAGE_KEY = "yuvoy.intro-played";
  * system's rule is that the two are changed together. Used only for the
  * belt-and-braces removal timeout, so it needs margin, not precision.
  */
-const INTRO_TOTAL_MS = 3950;
+const INTRO_TOTAL_MS = 3750;
 
 /** The `data-skip` fade is 200ms in CSS; settle just after it. */
 const SKIP_FADE_MS = 240;

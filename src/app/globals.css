@@ -468,14 +468,17 @@
   --intro-stagger: 90ms;
   --intro-kicker-at: 700ms;
   --intro-write: 1300ms;
-  --intro-stroke-at: 2050ms;
+  /* The write's cinematic ease decelerates hard, so the word READS as
+     finished around two-thirds of its duration; the swash follows that
+     perceived end, not the nominal one (owner direction: no dead air). */
+  --intro-stroke-at: 1700ms;
   --intro-stroke: 800ms;
   /* The place line lands with the swash: the frame is signed and located
      in the same gesture (owner direction). */
   --intro-place-at: var(--intro-stroke-at);
-  --intro-close-at: 3050ms;
+  --intro-close-at: 2850ms;
   --intro-close: 450ms;
-  --intro-exit-at: 3250ms;
+  --intro-exit-at: 3050ms;
   --intro-exit: 700ms;
 
   position: fixed;
