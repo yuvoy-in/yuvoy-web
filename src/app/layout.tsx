@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { instrumentSerif, inter, plexMono } from "@/lib/fonts";
+import { BrandIntro } from "@/components/brand/brand-intro";
 import { Providers } from "@/components/providers";
 import { SITE_URL, IS_PRODUCTION } from "@/lib/site";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -50,6 +51,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       className={`${instrumentSerif.variable} ${inter.variable} ${plexMono.variable} h-full`}
     >
       <body className="min-h-full">
+        {/*
+          First in the body so the veil and its pre-paint decision script are
+          parsed before anything else can paint on a slow connection. Its
+          z-order, not this source position, is what puts it above the fixed
+          banners. It renders nothing for repeat visits, reduced motion, or
+          JavaScript off.
+        */}
+        <BrandIntro />
         <a
           href="#content"
           className="focus:bg-forest focus:text-cream label rounded-edge sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-3"

@@ -415,3 +415,180 @@
   opacity: 0.05;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+
+/*
+  The brand veil — the site's entrance (see BrandIntro). A forest surface over
+  everything, on which the mark surfaces from depth, the wordmark cascades in
+  letter by letter, a hairline fills like a meter, and the whole surface rolls
+  up — the shutter language — to unveil a page that has already settled
+  underneath. On the homepage the veil and the cover are the same field, so
+  the moving edge itself is invisible and the composition is simply unveiled.
+
+  Decisions, so they are not re-litigated ad hoc:
+
+  - The veil exists only when BrandIntro's inline script stamps `data-play`
+    before first paint. No stamp — a repeat pageload in the same tab, reduced
+    motion, JavaScript off — and the default `display: none` below means it
+    was never there. Every no-show path is flash-proof because showing, not
+    hiding, is the act that needs arguing for.
+  - CSS runs the whole timeline and ends it (the exit's last frame holds
+    `visibility: hidden`), so a slow or failed hydration can never strand an
+    opaque cover over a working page. React only tidies the node afterwards.
+  - This is entrance-class motion (§3): cinematic curve, and the one moment
+    that may exceed the `emerge` budget, because it is the moment the site
+    arrives. The meter is `linear` on purpose — a fill that eases reads as a
+    progress bar stalling, and this brand's meters are engineered, not coy.
+  - Any keypress dismisses it (`data-skip`): that answers a gesture, so it
+    runs on the interaction budget, and it keeps the cover from ever standing
+    between a keyboard user and the focus they just asked for.
+  - The timeline lives in the custom properties below; BrandIntro's fallback
+    timeout mirrors their total. Change them together.
+
+  Fixed-layer order: header 40 · staging badge and consent banner 50 · this
+  veil 60 (it must cover them; they return when it lifts). The site menu is a
+  top-layer <dialog> above everything and unreachable while the veil plays.
+*/
+.intro-veil {
+  --intro-mark-in: 900ms;
+  --intro-rise: 700ms;
+  --intro-letters-at: 160ms;
+  --intro-stagger: 70ms;
+  --intro-kicker-at: 560ms;
+  --intro-line-at: 560ms;
+  --intro-line: 1000ms;
+  --intro-close-at: 1720ms;
+  --intro-close: 380ms;
+  --intro-exit-at: 1880ms;
+  --intro-exit: 620ms;
+
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: none;
+  place-items: center;
+  /* Slightly more space below centre than above: the optical centre of the
+     lockup sits a touch high, which is where a still frame wants it. */
+  padding-bottom: 3rem;
+  /* A 4% cream lift at the upper centre — the film utilities' move — so the
+     field has depth without a second dark ever existing. */
+  background:
+    radial-gradient(
+      120% 90% at 50% 28%,
+      color-mix(in oklab, var(--color-forest) 96%, var(--color-cream)),
+      var(--color-forest) 62%
+    ),
+    var(--color-forest);
+}
+
+.intro-veil[data-play] {
+  display: grid;
+  animation: yuvoy-intro-exit var(--intro-exit) var(--ease-cinematic)
+    var(--intro-exit-at) both;
+}
+
+.intro-veil[data-skip] {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms var(--ease-interaction);
+}
+
+.intro-stage {
+  animation: yuvoy-intro-close var(--intro-close) var(--ease-cinematic)
+    var(--intro-close-at) both;
+}
+
+.intro-mark {
+  animation: yuvoy-intro-surface var(--intro-mark-in) var(--ease-cinematic) both;
+}
+
+.intro-letter {
+  animation: yuvoy-intro-rise var(--intro-rise) var(--ease-cinematic)
+    calc(var(--intro-letters-at) + var(--intro-stagger) * var(--i, 0)) both;
+}
+
+.intro-kicker {
+  animation: yuvoy-intro-rise var(--intro-rise) var(--ease-cinematic)
+    var(--intro-kicker-at) both;
+}
+
+.intro-line {
+  transform-origin: left;
+  animation: yuvoy-intro-line var(--intro-line) linear var(--intro-line-at) both;
+}
+
+/* The mark's arrival — the emerge grammar (scale, settle, focus) retuned for
+   a single object: no travel, just surfacing. The blur clears early so the
+   brush strokes are sharp while the mark is still growing into place. */
+@keyframes yuvoy-intro-surface {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+    filter: blur(10px);
+  }
+
+  60% {
+    filter: blur(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes yuvoy-intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.45em);
+    filter: blur(5px);
+  }
+
+  65% {
+    filter: blur(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes yuvoy-intro-line {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* The lockup steps back before the surface lifts, so the rising clip edge
+   never cuts through it. */
+@keyframes yuvoy-intro-close {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-0.375rem);
+  }
+}
+
+/* `visibility` rides along so the finished veil cannot intercept a pointer
+   even if React never gets to remove the node. */
+@keyframes yuvoy-intro-exit {
+  from {
+    clip-path: inset(0 0 0 0);
+    visibility: visible;
+  }
+
+  to {
+    clip-path: inset(0 0 100% 0);
+    visibility: hidden;
+  }
+}

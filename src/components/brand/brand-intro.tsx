@@ -1,0 +1,167 @@
+"use client";
+
+import Image from "next/image";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type Ref,
+} from "react";
+
+/**
+ * The brand veil — a full-page entrance that plays once per tab session
+ * before the site is seen: the ensō surfaces, YUVOY cascades in, the meter
+ * fills, and the surface rolls up to unveil a page that has already settled
+ * underneath it. The whole choreography is CSS in globals.css; this file
+ * only decides whether it exists and tidies up after it.
+ *
+ * Who never sees it, decided before first paint by the inline script below:
+ * anyone who already saw it this session (the storage flag), anyone who
+ * prefers reduced motion, and anyone without JavaScript — for all of them
+ * the veil stays `display: none` and React removes it at hydration. Showing
+ * is the act that needs arguing for, which is what makes every no-show path
+ * flash-proof.
+ *
+ * It is theatre over a live page, never a gate: the page renders and hydrates
+ * behind it, the exit ends in `visibility: hidden` without JavaScript's help,
+ * and any keypress dismisses it early — a keyboard user's focus must not sit
+ * behind a curtain. The storage flag is stamped when it starts, not when it
+ * ends, so a mid-play refresh does not replay it.
+ */
+
+const STORAGE_KEY = "yuvoy.intro-played";
+
+/**
+ * Mirrors the CSS timeline (`--intro-exit-at` + `--intro-exit`); the design
+ * system's rule is that the two are changed together. Used only for the
+ * belt-and-braces removal timeout, so it needs margin, not precision.
+ */
+const INTRO_TOTAL_MS = 2500;
+
+/** The `data-skip` fade is 200ms in CSS; settle just after it. */
+const SKIP_FADE_MS = 240;
+
+const LETTERS = [..."YUVOY"];
+
+/**
+ * Runs during HTML parsing, before first paint, from the <script> rendered
+ * beneath the veil — which is why it may use getElementById. Kept inline,
+ * dependency-free and defensive: if storage is unavailable the veil simply
+ * never shows, which is the safe failure. Exported for the unit test, which
+ * asserts the contract because jsdom never executes injected scripts.
+ */
+export const INTRO_DECIDE = `(()=>{try{if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;if(sessionStorage.getItem("${STORAGE_KEY}"))return;sessionStorage.setItem("${STORAGE_KEY}","1");document.getElementById("yuvoy-intro").setAttribute("data-play","")}catch(e){}})()`;
+
+export function BrandIntro() {
+  const veilRef = useRef<HTMLDivElement>(null);
+  const [gone, setGone] = useState(false);
+
+  useEffect(() => {
+    const veil = veilRef.current;
+    if (!veil) return;
+
+    // The pre-paint script did not stamp it (repeat visit, reduced motion,
+    // or a client-only render where the script never ran): it is already
+    // invisible, so just take it out of the tree.
+    if (!veil.hasAttribute("data-play")) {
+      setGone(true);
+      return;
+    }
+
+    let timer = 0;
+    const settle = () => setGone(true);
+
+    // The veil's own exit is the one that matters; the letters and the meter
+    // bubble their own `animationend` events past here.
+    const onAnimationEnd = (event: AnimationEvent) => {
+      if (event.target === veil && event.animationName === "yuvoy-intro-exit") {
+        settle();
+      }
+    };
+
+    const onKeyDown = () => {
+      veil.setAttribute("data-skip", "");
+      window.clearTimeout(timer);
+      timer = window.setTimeout(settle, SKIP_FADE_MS);
+    };
+
+    veil.addEventListener("animationend", onAnimationEnd);
+    window.addEventListener("keydown", onKeyDown);
+    // If `animationend` never arrives (an extension pausing animations, an
+    // interrupted paint), the veil still leaves the tree shortly after its
+    // scheduled end.
+    timer = window.setTimeout(settle, INTRO_TOTAL_MS + 600);
+
+    return () => {
+      veil.removeEventListener("animationend", onAnimationEnd);
+      window.removeEventListener("keydown", onKeyDown);
+      window.clearTimeout(timer);
+    };
+  }, []);
+
+  if (gone) return null;
+
+  return (
+    <>
+      <IntroVeil ref={veilRef} />
+      <script dangerouslySetInnerHTML={{ __html: INTRO_DECIDE }} />
+    </>
+  );
+}
+
+/**
+ * The veil's markup, presentation only — split out so the unit test can
+ * assert the lockup without the lifecycle effect removing it first.
+ *
+ * `suppressHydrationWarning` is scoped to this element because the pre-paint
+ * script legitimately mutates its attributes (`data-play`) between server
+ * render and hydration. `aria-hidden`: the veil is theatre; the page behind
+ * it is the accessible truth, and the skip link stays the first tab stop.
+ */
+export function IntroVeil({ ref }: { ref?: Ref<HTMLDivElement> }) {
+  return (
+    <div
+      ref={ref}
+      id="yuvoy-intro"
+      aria-hidden
+      suppressHydrationWarning
+      className="intro-veil"
+    >
+      <div className="grain" />
+      <div className="intro-stage flex flex-col items-center">
+        <Image
+          src="/brand/yuvoy-mark-on-dark.png"
+          alt=""
+          width={256}
+          height={256}
+          quality={100}
+          priority
+          className="intro-mark size-16"
+        />
+        {/*
+          The wordmark rules (§2): sans caps on `tracking-wordmark`. The
+          negative margin gives back the tracking the last letter carries,
+          so the word is optically centred, not centred-plus-a-gap.
+        */}
+        <span className="tracking-wordmark text-cream mt-8 mr-[calc(var(--tracking-wordmark)*-1)] flex font-sans text-2xl font-bold">
+          {LETTERS.map((letter, index) => (
+            <span
+              key={index}
+              className="intro-letter"
+              style={{ "--i": index } as CSSProperties}
+            >
+              {letter}
+            </span>
+          ))}
+        </span>
+        <span className="intro-kicker label text-terra-soft mt-3">
+          Experience more.
+        </span>
+        {/* The same hairline meter the route loader draws, on the dark
+            surface's accent. Decoration, so it is exempt from text floors. */}
+        <span className="intro-line bg-terra-soft mt-12 h-px w-16" />
+      </div>
+    </div>
+  );
+}
