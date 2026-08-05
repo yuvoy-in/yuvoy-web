@@ -56,6 +56,11 @@ describe("IntroVeil", () => {
     expect(letters.map((letter) => letter.textContent).join("")).toBe("YUVOY");
 
     expect(screen.getByText("Experience more.")).toHaveClass("intro-kicker");
-    expect(container.querySelector(".intro-line")).not.toBeNull();
+
+    // The sign-off swash: a pathLength-normalised path, so the CSS dash pair
+    // can draw it from nothing.
+    const stroke = container.querySelector("path.intro-stroke");
+    expect(stroke).not.toBeNull();
+    expect(stroke?.getAttribute("pathLength")).toBe("1");
   });
 });

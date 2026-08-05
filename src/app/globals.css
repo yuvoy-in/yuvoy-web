@@ -419,10 +419,11 @@
 /*
   The brand veil — the site's entrance (see BrandIntro). A forest surface over
   everything, on which the mark surfaces from depth, the wordmark cascades in
-  letter by letter, a hairline fills like a meter, and the whole surface rolls
-  up — the shutter language — to unveil a page that has already settled
-  underneath. On the homepage the veil and the cover are the same field, so
-  the moving edge itself is invisible and the composition is simply unveiled.
+  letter by letter, a handwritten stroke signs off beneath the kicker, and the
+  whole surface rolls up — the shutter language — to unveil a page that has
+  already settled underneath. On the homepage the veil and the cover are the
+  same field, so the moving edge itself is invisible and the composition is
+  simply unveiled.
 
   Decisions, so they are not re-litigated ad hoc:
 
@@ -436,8 +437,9 @@
     opaque cover over a working page. React only tidies the node afterwards.
   - This is entrance-class motion (§3): cinematic curve, and the one moment
     that may exceed the `emerge` budget, because it is the moment the site
-    arrives. The meter is `linear` on purpose — a fill that eases reads as a
-    progress bar stalling, and this brand's meters are engineered, not coy.
+    arrives. The sign-off stroke draws on the cinematic curve too — a pen
+    moves fast and settles at the end of the word, and the stroke is the
+    ensō's brush answering in miniature, not a progress bar.
   - Any keypress dismisses it (`data-skip`): that answers a gesture, so it
     runs on the interaction budget, and it keeps the cover from ever standing
     between a keyboard user and the focus they just asked for.
@@ -449,17 +451,17 @@
   top-layer <dialog> above everything and unreachable while the veil plays.
 */
 .intro-veil {
-  --intro-mark-in: 900ms;
-  --intro-rise: 700ms;
-  --intro-letters-at: 160ms;
-  --intro-stagger: 70ms;
-  --intro-kicker-at: 560ms;
-  --intro-line-at: 560ms;
-  --intro-line: 1000ms;
-  --intro-close-at: 1720ms;
-  --intro-close: 380ms;
-  --intro-exit-at: 1880ms;
-  --intro-exit: 620ms;
+  --intro-mark-in: 1100ms;
+  --intro-rise: 850ms;
+  --intro-letters-at: 200ms;
+  --intro-stagger: 90ms;
+  --intro-kicker-at: 700ms;
+  --intro-stroke-at: 950ms;
+  --intro-stroke: 1250ms;
+  --intro-close-at: 2350ms;
+  --intro-close: 450ms;
+  --intro-exit-at: 2550ms;
+  --intro-exit: 700ms;
 
   position: fixed;
   inset: 0;
@@ -511,9 +513,13 @@
     var(--intro-kicker-at) both;
 }
 
-.intro-line {
-  transform-origin: left;
-  animation: yuvoy-intro-line var(--intro-line) linear var(--intro-line-at) both;
+/* The sign-off stroke is an SVG path with pathLength="1", so the dash pair
+   below draws it from nothing regardless of its real length. */
+.intro-stroke {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: yuvoy-intro-stroke var(--intro-stroke) var(--ease-cinematic)
+    var(--intro-stroke-at) both;
 }
 
 /* The mark's arrival — the emerge grammar (scale, settle, focus) retuned for
@@ -555,13 +561,13 @@
   }
 }
 
-@keyframes yuvoy-intro-line {
+@keyframes yuvoy-intro-stroke {
   from {
-    transform: scaleX(0);
+    stroke-dashoffset: 1;
   }
 
   to {
-    transform: scaleX(1);
+    stroke-dashoffset: 0;
   }
 }
 

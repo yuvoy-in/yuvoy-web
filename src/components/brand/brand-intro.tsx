@@ -11,9 +11,9 @@ import {
 
 /**
  * The brand veil — a full-page entrance that plays once per tab session
- * before the site is seen: the ensō surfaces, YUVOY cascades in, the meter
- * fills, and the surface rolls up to unveil a page that has already settled
- * underneath it. The whole choreography is CSS in globals.css; this file
+ * before the site is seen: the ensō surfaces, YUVOY cascades in, a
+ * handwritten stroke signs off under the kicker, and the surface rolls up to
+ * unveil a page that has already settled underneath it. The whole choreography is CSS in globals.css; this file
  * only decides whether it exists and tidies up after it.
  *
  * Who never sees it, decided before first paint by the inline script below:
@@ -37,7 +37,7 @@ const STORAGE_KEY = "yuvoy.intro-played";
  * system's rule is that the two are changed together. Used only for the
  * belt-and-braces removal timeout, so it needs margin, not precision.
  */
-const INTRO_TOTAL_MS = 2500;
+const INTRO_TOTAL_MS = 3250;
 
 /** The `data-skip` fade is 200ms in CSS; settle just after it. */
 const SKIP_FADE_MS = 240;
@@ -72,8 +72,8 @@ export function BrandIntro() {
     let timer = 0;
     const settle = () => setGone(true);
 
-    // The veil's own exit is the one that matters; the letters and the meter
-    // bubble their own `animationend` events past here.
+    // The veil's own exit is the one that matters; the letters and the
+    // sign-off stroke bubble their own `animationend` events past here.
     const onAnimationEnd = (event: AnimationEvent) => {
       if (event.target === veil && event.animationName === "yuvoy-intro-exit") {
         settle();
@@ -137,14 +137,14 @@ export function IntroVeil({ ref }: { ref?: Ref<HTMLDivElement> }) {
           height={256}
           quality={100}
           priority
-          className="intro-mark size-16"
+          className="intro-mark size-20 sm:size-24"
         />
         {/*
           The wordmark rules (§2): sans caps on `tracking-wordmark`. The
           negative margin gives back the tracking the last letter carries,
           so the word is optically centred, not centred-plus-a-gap.
         */}
-        <span className="tracking-wordmark text-cream mt-8 mr-[calc(var(--tracking-wordmark)*-1)] flex font-sans text-2xl font-bold">
+        <span className="tracking-wordmark text-cream mt-9 -mr-(--tracking-wordmark) flex font-sans text-3xl font-bold sm:text-4xl">
           {LETTERS.map((letter, index) => (
             <span
               key={index}
@@ -155,12 +155,30 @@ export function IntroVeil({ ref }: { ref?: Ref<HTMLDivElement> }) {
             </span>
           ))}
         </span>
-        <span className="intro-kicker label text-terra-soft mt-3">
+        <span className="intro-kicker label text-terra-soft mt-4">
           Experience more.
         </span>
-        {/* The same hairline meter the route loader draws, on the dark
-            surface's accent. Decoration, so it is exempt from text floors. */}
-        <span className="intro-line bg-terra-soft mt-12 h-px w-16" />
+        {/*
+          The sign-off: a hand-drawn underline swash beneath the kicker — the
+          ensō's brush answering in miniature (hand-drawn by owner direction,
+          so the one sanctioned hand-rolled path). pathLength="1" lets the CSS
+          dash pair draw it without knowing its real length. Decoration, so it
+          is exempt from text floors.
+        */}
+        <svg
+          viewBox="0 0 144 12"
+          fill="none"
+          className="text-terra-soft mt-3 h-3 w-36"
+        >
+          <path
+            className="intro-stroke"
+            d="M3 8.75C30 3.5 60 11.75 92 7.5S128 4.25 141 7"
+            pathLength={1}
+            stroke="currentColor"
+            strokeWidth={1.75}
+            strokeLinecap="round"
+          />
+        </svg>
       </div>
     </div>
   );
