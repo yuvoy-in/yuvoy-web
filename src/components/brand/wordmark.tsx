@@ -17,13 +17,18 @@ import { cn } from "@/lib/cn";
  * `unoptimized`: SVG needs no optimiser pass, and this keeps
  * `dangerouslyAllowSVG` out of the image config (same call as the veil).
  *
- * Size it from outside with a height class — the default `h-14` nearly
- * fills the 64px header bar (4px of air each side; owner stepped it up
- * three times, 2026-08-06 — this is as far as the bar allows). The menu
- * bar shares it and the footer passes `h-20`. tailwind-merge keeps the
- * later height. The drawing's 3.2:1 ratio provides the width.
+ * Size it from outside with a height class, and the size now means the
+ * DRAWING's size: the generated variants crop the delivered canvas's empty
+ * margins away, which is what made three owner size-steps look identical.
+ * Default is `h-11 sm:h-14` — a true 56px of art nearly filling the 64px
+ * bar from `sm` up, one step down on phones where the ~200px width would
+ * crowd the centre link. The menu bar shares it; the footer passes `h-20`.
+ * tailwind-merge keeps the later height; the art's ~3.6:1 ratio sets width.
  */
-const LOCKUP = { width: 1600, height: 500 } as const;
+/* The cropped art box the generator emits (1247x347, ~3.6:1) — not the
+   delivered 1600x500 canvas, which carries a third of its height in empty
+   margin. See scripts/generate-header-lockup.mjs. */
+const LOCKUP = { width: 1247, height: 347 } as const;
 
 const VARIANTS = [
   { src: "/brand/yuvoy-lockup-on-light.svg", dark: false },
@@ -42,7 +47,7 @@ export function Wordmark({
     <span
       role="img"
       aria-label="Yuvoy — Experience more."
-      className={cn("relative inline-flex h-14", className)}
+      className={cn("relative inline-flex h-11 sm:h-14", className)}
     >
       {VARIANTS.map(({ src, dark }) => (
         <Image
