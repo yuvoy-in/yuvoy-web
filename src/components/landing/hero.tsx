@@ -58,7 +58,10 @@ export function Hero() {
           alt=""
           fill
           priority
-          quality={82}
+          // 75 is the photography quality the optimiser allows (next.config
+          // keeps the allowlist short on purpose; 100 is the brand mark's).
+          // The scrim and grain sit over this, so nothing finer would show.
+          quality={75}
           sizes="100vw"
           className="hero-photo object-cover object-[center_75%]"
         />
