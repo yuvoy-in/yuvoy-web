@@ -238,7 +238,7 @@
   &::before {
     background: radial-gradient(
       55% 45% at 50% 8%,
-      color-mix(in oklab, var(--color-cream) 14%, transparent),
+      color-mix(in oklab, var(--color-terra-soft) 13%, transparent),
       transparent 70%
     );
     animation: yuvoy-breathe 16s var(--ease-cinematic) infinite alternate;

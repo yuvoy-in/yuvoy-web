@@ -38,9 +38,14 @@ const button = cva(
         primary: "bg-forest text-cream hover:bg-forest/90",
         outline:
           "border-forest/25 text-forest hover:border-forest/45 hover:bg-forest/5 border",
-        // The primary on a forest section: paper on the dark ground.
+        /*
+          The primary on a forest section. `cream-deep`, not `cream`: against
+          a saturated dark green, pure cream reads as white (it is two points
+          off it, and simultaneous contrast does the rest). The deeper tone
+          is unmistakably warm and still 10.49:1 — owner report, 2026-08-05.
+        */
         paper:
-          "bg-cream text-forest hover:bg-cream/90 focus-visible:ring-terra-soft focus-visible:ring-offset-forest",
+          "bg-cream-deep text-forest hover:bg-cream-deep/90 focus-visible:ring-terra-soft focus-visible:ring-offset-forest",
         ghost: "text-forest hover:bg-forest/5",
         // Secondary action on a forest section.
         outlineOnDark:
