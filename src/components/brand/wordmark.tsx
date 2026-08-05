@@ -17,11 +17,11 @@ import { cn } from "@/lib/cn";
  * `unoptimized`: SVG needs no optimiser pass, and this keeps
  * `dangerouslyAllowSVG` out of the image config (same call as the veil).
  *
- * Size it from outside with a height class — the default `h-12` fills the
- * 64px header bar with 8px of air each side, the proportion the owner
- * settled on after two smaller cuts; the menu bar shares it and the footer
- * passes `h-20`. tailwind-merge keeps the later height. The drawing's
- * 3.2:1 ratio provides the width.
+ * Size it from outside with a height class — the default `h-14` nearly
+ * fills the 64px header bar (4px of air each side; owner stepped it up
+ * three times, 2026-08-06 — this is as far as the bar allows). The menu
+ * bar shares it and the footer passes `h-20`. tailwind-merge keeps the
+ * later height. The drawing's 3.2:1 ratio provides the width.
  */
 const LOCKUP = { width: 1600, height: 500 } as const;
 
@@ -42,7 +42,7 @@ export function Wordmark({
     <span
       role="img"
       aria-label="Yuvoy — Experience more."
-      className={cn("relative inline-flex h-12", className)}
+      className={cn("relative inline-flex h-14", className)}
     >
       {VARIANTS.map(({ src, dark }) => (
         <Image
