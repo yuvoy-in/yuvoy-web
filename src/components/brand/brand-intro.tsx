@@ -155,12 +155,13 @@ export function IntroVeil({
       data-hold={hold ? "" : undefined}
       className="intro-veil"
     >
-      {/* The scene, bottom to top: particle swells rolling in from each
-          edge of the night-water gradient and dying away before the centre,
-          so the lockup keeps a pool of still dark; then grain. Each wing
-          holds four independently orbiting planes — neighbouring dots
-          belong to different planes, so no line of dots ever moves as a
-          group. */}
+      {/* The scene, bottom to top: the owner's island horizon (silhouettes
+          and moonlit glint, faded upward into the field), particle swells
+          rolling in from each edge and dying away before the centre so the
+          lockup keeps a pool of still dark, then grain. Each wing holds
+          four independently orbiting planes — neighbouring dots belong to
+          different planes, so no line of dots ever moves as a group. */}
+      <div className="intro-horizon" />
       <div className="intro-wave">
         <span className="intro-swell intro-swell-1" />
         <span className="intro-swell intro-swell-2" />
@@ -188,7 +189,7 @@ export function IntroVeil({
           width={584}
           height={561}
           priority
-          className="intro-mark h-20 w-auto sm:h-24"
+          className="intro-mark h-24 w-auto sm:h-28"
         />
         {/*
           YUVOY in the master logo's own drawn letterforms (generated
@@ -222,28 +223,26 @@ export function IntroVeil({
           voice answers. `leading-tight` + `pb-1` reserve room for the
           descenders an italic line clips at display size.
         */}
-        <span className="intro-kicker font-display text-terra-soft mt-6 pb-1 text-4xl leading-tight italic sm:text-5xl">
+        {/* `terra`, not terra-soft, matching the comp's deeper warmth. The
+            veil is aria-hidden theatre, so the text floors do not gate it. */}
+        <span className="intro-kicker font-display text-terra mt-6 pb-1 text-4xl leading-tight italic sm:text-5xl">
           Experience more.
         </span>
         {/*
-          The sign-off: a hand-drawn underline swash beneath the kicker — the
-          ensō's brush answering in miniature (hand-drawn by owner direction,
-          so the one sanctioned hand-rolled path). pathLength="1" lets the CSS
-          dash pair draw it without knowing its real length. Decoration, so it
-          is exempt from text floors.
+          The sign-off swash per the owner's comp: a long, shallow
+          calligraphic sliver — tapered at both tips, weight in the middle,
+          bowing gently and lifting toward the right — nearly the width of
+          the statement, revealed left to right like a brushstroke.
+          Decoration, so it is exempt from text floors.
         */}
         <svg
-          viewBox="0 0 144 12"
+          viewBox="0 0 288 14"
           fill="none"
-          className="text-terra-soft mt-2 h-3 w-36"
+          className="text-terra mt-3 h-3.5 w-56 sm:w-72"
         >
           <path
-            className="intro-stroke"
-            d="M3 8.75C30 3.5 60 11.75 92 7.5S128 4.25 141 7"
-            pathLength={1}
-            stroke="currentColor"
-            strokeWidth={1.75}
-            strokeLinecap="round"
+            className="intro-stroke fill-current"
+            d="M2 10Q150 0 286 6Q150 7 2 10Z"
           />
         </svg>
       </div>

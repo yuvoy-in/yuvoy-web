@@ -58,11 +58,11 @@ describe("IntroVeil", () => {
 
     expect(screen.getByText("Experience more.")).toHaveClass("intro-kicker");
 
-    // The sign-off swash: a pathLength-normalised path, so the CSS dash pair
-    // can draw it from nothing.
-    const stroke = container.querySelector("path.intro-stroke");
-    expect(stroke).not.toBeNull();
-    expect(stroke?.getAttribute("pathLength")).toBe("1");
+    // The sign-off swash: a filled calligraphic sliver, wiped in by CSS.
+    expect(container.querySelector("path.intro-stroke")).not.toBeNull();
+
+    // The island horizon band from the owner's comp.
+    expect(container.querySelector(".intro-horizon")).not.toBeNull();
 
     // The place line is the cover's own opening words, kept in sync by hand.
     expect(screen.getByText("Andaman Islands")).toHaveClass("intro-place");

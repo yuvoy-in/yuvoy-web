@@ -419,10 +419,12 @@
 /*
   The brand veil — the site's entrance (see BrandIntro). Not a flat card but a
   scene from the brand's world: night water (the film-c gradient language,
-  an ember of terracotta warmth at the bottom edge) crossed by sparse
-  particle swells — tiny cream dots that roll in from either edge on slow,
-  decorrelated periods and die away before the centre, so the water moves
-  while the lockup keeps a pool of still dark — under filmic grain. On it
+  an ember of terracotta warmth at the bottom edge), the owner's island
+  horizon along the foot (silhouettes and a moonlit glint, per the comp in
+  public/assets/intro.png), crossed by sparse particle swells — tiny cream
+  dots that roll in from either edge on slow, decorrelated periods and die
+  away before the centre, so the water moves while the lockup keeps a pool
+  of still dark — under filmic grain. On it
   the mark surfaces from depth, YUVOY rises letter by letter
   through a baseline mask like set type, "Experience more." lands as the
   display statement — the italic terracotta turn, the brand's signature
@@ -484,9 +486,9 @@
      ever exists. */
   background:
     radial-gradient(
-      120% 90% at 50% 24%,
-      color-mix(in oklab, var(--color-forest) 93%, var(--color-cream)),
-      transparent 58%
+      100% 80% at 50% 36%,
+      color-mix(in oklab, var(--color-forest) 94%, var(--color-cream)),
+      transparent 62%
     ),
     linear-gradient(
       175deg,
@@ -628,13 +630,30 @@
     var(--intro-kicker-at) both;
 }
 
-/* The sign-off stroke is an SVG path with pathLength="1", so the dash pair
-   below draws it from nothing regardless of its real length. */
+/* The sign-off swash is a filled calligraphic sliver (tapered tips, weight
+   in the middle), so it cannot be dash-drawn like a stroke: it is revealed
+   left to right by a clip wipe instead, which reads the same — a pen
+   crossing the page. The vertical insets are negative so the wipe can
+   never shave the swash's own curve. */
 .intro-stroke {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: yuvoy-intro-stroke var(--intro-stroke) var(--ease-cinematic)
+  animation: yuvoy-intro-underline var(--intro-stroke) var(--ease-cinematic)
     var(--intro-stroke-at) both;
+}
+
+/* The owner's island scene (cropped from the comp by
+   scripts/generate-intro-scene.mjs): silhouettes and the moonlit glint,
+   pinned to the foot of the veil and faded out upward into the field so
+   there is no seam. The band scales with the viewport but is clamped so it
+   neither swallows a phone screen nor thins to a strip on a tall one. */
+.intro-horizon {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: clamp(9rem, 24vh, 16rem);
+  background-image: url("/assets/intro-horizon.webp");
+  background-size: cover;
+  background-position: center bottom;
+  mask-image: linear-gradient(to top, black 55%, transparent 100%);
+  animation: yuvoy-intro-fade 1600ms var(--ease-cinematic) 200ms both;
 }
 
 /* The island's name, grounding the bottom of the frame. Real brand copy
@@ -686,13 +705,13 @@
   }
 }
 
-@keyframes yuvoy-intro-stroke {
+@keyframes yuvoy-intro-underline {
   from {
-    stroke-dashoffset: 1;
+    clip-path: inset(-30% 100% -30% 0);
   }
 
   to {
-    stroke-dashoffset: 0;
+    clip-path: inset(-30% 0 -30% 0);
   }
 }
 
