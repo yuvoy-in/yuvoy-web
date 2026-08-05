@@ -3,30 +3,49 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/cn";
 
 /**
- * The button system. Two variants are first-class — `primary` (the terracotta
- * call to action) and `outline` (its secondary) — and every screen should
- * reach for those. `ink`, `ghost` and `outlineOnDark` are situational; see
+ * The button system. On light surfaces the first-class pair is `primary`
+ * (solid forest) and `outline`; on forest surfaces it is `paper` (solid
+ * cream) and `outlineOnDark`. `ghost` is situational; see
  * docs/DESIGN_SYSTEM.md §5 for when each is allowed.
  *
- * Labels are wide-tracked uppercase mono: an action reads as an action.
- * Transitions sit inside the 250ms interaction budget (design system §3).
+ * Labels are wide-tracked uppercase bold (v2.3 — the mono went with the
+ * serif): an action reads as an action, set in the text face.
+ *
+ * The premium is in the touch, not the shape (2026-08-05): a press compresses
+ * the button (`active:scale`), a hover lifts it a pixel, and the trailing
+ * arrow eases forward — all on the interaction curve, all inside the 250ms
+ * budget (design system §3). The group is named (`group/btn`) so the arrow
+ * answers only its own button, never an ancestor card's hover.
  */
 const button = cva(
   [
-    "inline-flex items-center justify-center gap-2.5 rounded-edge font-mono text-xs font-semibold uppercase whitespace-nowrap",
-    "transition-colors duration-200 ease-[var(--ease-interaction)]",
+    "group/btn inline-flex items-center justify-center gap-2.5 rounded-edge font-sans text-xs font-bold tracking-label uppercase whitespace-nowrap",
+    "transition-[background-color,border-color,color,transform] duration-200 ease-[var(--ease-interaction)]",
+    "hover:-translate-y-px active:translate-y-0 active:scale-[0.985]",
     "focus-visible:ring-terra-deep focus-visible:ring-offset-cream focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
     "disabled:pointer-events-none disabled:opacity-50",
   ],
   {
     variants: {
       variant: {
-        // cream on terra-deep is 5.21:1 — the lighter `terra` would be 3.4:1
-        // and fail AA at label size, which is why the CTA fill is terra-deep.
-        primary: "bg-terra-deep text-cream hover:bg-terra-deep/90",
+        /*
+          CTAs are monochrome (owner direction, 2026-08-05): the site's two
+          grounds simply swap — forest fill on cream surfaces, cream fill on
+          forest ones — both 11.44:1. Terracotta is an accent for type and
+          marks, never a button fill; the old terra-deep CTA read as the
+          template it came from.
+        */
+        primary: "bg-forest text-cream hover:bg-forest/90",
         outline:
           "border-forest/25 text-forest hover:border-forest/45 hover:bg-forest/5 border",
-        ink: "bg-forest text-cream hover:bg-forest/90",
+        /*
+          The primary on a forest section. `cream-deep`, not `cream`: against
+          a saturated dark green, pure cream reads as white (it is two points
+          off it, and simultaneous contrast does the rest). The deeper tone
+          is unmistakably warm and still 10.49:1 — owner report, 2026-08-05.
+        */
+        paper:
+          "bg-cream-deep text-forest hover:bg-cream-deep/90 focus-visible:ring-terra-soft focus-visible:ring-offset-forest",
         ghost: "text-forest hover:bg-forest/5",
         // Secondary action on a forest section.
         outlineOnDark:
@@ -35,7 +54,7 @@ const button = cva(
       size: {
         sm: "h-9 px-4",
         md: "h-11 px-6",
-        lg: "h-13 px-8 text-sm",
+        lg: "h-12 px-7",
       },
     },
     defaultVariants: { variant: "primary", size: "md" },
@@ -62,7 +81,8 @@ export { button as buttonVariants };
 
 /**
  * The trailing arrow on a forward action. Decorative — the label carries the
- * meaning, so it is hidden from assistive tech.
+ * meaning, so it is hidden from assistive tech. It eases forward when its own
+ * button (`group/btn`) is hovered: the action points where it is about to go.
  */
 export function ButtonArrow() {
   return (
@@ -70,7 +90,7 @@ export function ButtonArrow() {
       aria-hidden
       viewBox="0 0 16 16"
       fill="none"
-      className="size-3.5 shrink-0"
+      className="size-3.5 shrink-0 transition-transform duration-200 ease-[var(--ease-interaction)] group-hover/btn:translate-x-0.5"
     >
       <path
         d="M2 8h11M9 4l4 4-4 4"

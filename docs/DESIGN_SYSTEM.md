@@ -2,13 +2,19 @@
 
 Single source of truth for visual design. **Every color, font, radius and tracking value used in the app must map to a token here.** Never invent a value that falls between tokens — add a token (with review) instead.
 
-Direction: **editorial, rectangular, confident.** Heavy geometric display type against wide-tracked mono labels; cream editorial surfaces alternating with forest immersive ones; hairline rules doing the work that boxes and shadows do elsewhere. Generous space, fast interactions, slow entrances.
+Direction: **editorial, rectangular, confident.** Geometric display type against wide-tracked caps labels; cream editorial surfaces alternating with forest immersive ones; hairline rules doing the work that boxes and shadows do elsewhere. Generous space, fast interactions, slow entrances.
 
 > **Brand Kit v2** (ratified 2026-08-01) supersedes v1. v1 was Fraunces + pill geometry on a warmer cream; v2 moves to Poppins + IBM Plex Mono and a rectangular geometry, retuning the palette to match. Rationale and the full contrast table are in §1.
 >
 > **v2.1 (2026-08-03)** replaces the two darks, `teal` `#0D3B3E` and `ink` `#22302E`, with a single `forest` `#16362E`. Nothing else changed.
 >
 > **v2.2 (2026-08-03, owner-directed)** replaces the display face: Poppins → **Instrument Serif**, the editorial serif the narrative-landing rebuild is set in. Owner brief: anything but the palette may change in service of a more premium register. The serif ships one weight (400 + italic), so display type is `font-normal` always — mass comes from size and leading, and there is no faux-bold to reach for. The wordmark deliberately stays on the sans (Inter semibold) so the mark reads engineered against the serif's warmth. Palette untouched. Adds `--radius-device` (§4) and the preview-surface rule (§8).
+>
+> **v2.3 (2026-08-05, owner-directed, skill-audited)** retires the serif stack entirely: Instrument Serif / Inter / IBM Plex Mono → **Cabinet Grotesk (display) + Satoshi (everything else)**, self-hosted from `src/fonts` via `next/font/local`. Driver: repeated external feedback that the site read as AI-generated, confirmed by the installed design skills — Instrument Serif is a named LLM-favourite face, the serif-over-Inter-with-mono-eyebrows structure is the documented generated-page house style, and headline emphasis by italic style-switch is a listed tell. Display is **medium (500)** with **700 reserved for the turn**; the turn is now **bold + colour in the same family, never italic** (no italic file exists); labels leave the mono for tracked Satoshi caps; buttons pick up `tracking-label`. Five font files total, no Google Fonts dependency. Palette untouched — the skills sanction deep green + bone + warm accent as a premium family.
+>
+> **v2.4 (2026-08-05, owner-directed)** swaps the display face only: Cabinet Grotesk → **Poppins** (600 + 700), taken from the original landing prototype kept in `claude-artifacts/`. This is the Brand Kit v2 display face returning — v2 shipped Poppins, v2.2 replaced it for a more premium register, v2.3 replaced that with Cabinet Grotesk. The owner asked to try it again on headlines **only**, so the prototype's Inter and IBM Plex Mono do **not** come back: Satoshi still carries body, UI, labels and the wordmark. Display weight moves from `font-medium` (500) to `font-semibold` (600), since those are the two files that ship. Poppins is also Indian Type Foundry, so both families share a foundry. Four font files total.
+>
+> **v2.5 (2026-08-06, owner-confirmed)** ends the search: display becomes **Fraunces**, the open-license member of the soft-serif family (Canela / Recoleta / GT Super) that premium travel and island-hospitality brands set their identities in — chosen over roughly 350 candidates across seven review rounds. It ships as a **variable font tuned into the site's own cut**: `opsz` 144, `SOFT` 75, `WONK` 0, pinned on the `font-display` utility itself via `--font-display--font-variation-settings`. Display weight is **400** (`font-normal`, owner pick from a six-weight strip); the turn is a **true drawn italic** at `--font-weight-turn` (480) via `italic font-turn` — the signature stops being a synthesized oblique. Display tracking moves to `--tracking-display` (-0.01em). Satoshi unchanged as the text voice. Five files total (two Fraunces variable + three Satoshi); `font-semibold` is banned everywhere again.
 
 ## 0. Architecture rule
 
@@ -27,7 +33,7 @@ Brand Kit v2. Every ratio below is measured (sRGB relative luminance, WCAG 2.2) 
 | `cream-line` | `#E5DCC9` | Hairline borders on cream                                 |
 | `forest`     | `#16362E` | Primary ink **and** every dark surface (11.44:1 on cream) |
 | `terra`      | `#BE7149` | Accent — decoration and LARGE display text only (3.24:1)  |
-| `terra-deep` | `#985028` | Text-capable accent + primary CTA fill (5.21:1 on cream)  |
+| `terra-deep` | `#985028` | Text-capable accent (5.21:1 on cream); never a CTA fill   |
 | `terra-soft` | `#D89772` | Accent text on forest (5.36:1)                            |
 
 ### Measured contrast
@@ -39,7 +45,7 @@ Brand Kit v2. Every ratio below is measured (sRGB relative luminance, WCAG 2.2) 
 | `terra-deep` on `cream-deep` | 4.77:1  | AA body                     |
 | `terra` on `cream`           | 3.24:1  | **large text only** (≥24px) |
 | `terra` on `cream-deep`      | 2.96:1  | **fails everything**        |
-| `cream` on `terra-deep`      | 5.21:1  | AA body — the primary CTA   |
+| `cream` on `terra-deep`      | 5.21:1  | AA body                     |
 | `cream` on `forest`          | 11.44:1 | AA + AAA body               |
 | `terra-soft` on `forest`     | 5.36:1  | AA body                     |
 
@@ -79,8 +85,10 @@ for body copy, labels, nav, or button text.
   gets a failing accent with no warning, which is exactly what happened to the
   operators section — put the section on `cream` and raise its inner panels to
   `cream-deep` instead, which is how that section is now built.
-- Accent **fills** (the primary CTA) → `bg-terra-deep text-cream`. A `terra`
-  fill with any text on it fails AA; this is why the CTA is the deeper tone.
+- Accent **fills** are not a thing any more. CTAs are monochrome (§5): forest
+  on cream surfaces, cream on forest ones. A `terra` fill with text on it fails
+  AA, and the `terra-deep` fill that used to carry the CTA was retired on
+  2026-08-05 as a template tell.
 
 ### The opacity ladder (measured, not guessed)
 
@@ -99,11 +107,11 @@ Borders and fills are exempt from these floors — `border-forest/20`, `bg-fores
 
 ## 2. Typography
 
-- **Display — Instrument Serif** (`font-display`), single weight 400 + italic. Headlines are set large, light and tight (`font-normal tracking-tight`, leading ≈1.0) — the serif carries mass through **size**, never weight. `font-bold`/`font-extrabold` must never appear with `font-display`: the face has no bold, and the browser would synthesise an ugly one. **Italic is reserved for the terracotta "turn"** — the second thought of a headline — which stays the brand's most recognisable typographic move. Do not use italic display type for anything else.
-- **UI / body — Inter** (`font-sans`, the default). Bold weights live here.
-- **Label — IBM Plex Mono** (`font-mono`) via the `label` utility: uppercase, `text-xs`, `font-medium`, `tracking-label` (0.18em). Eyebrows, nav, stats, metadata, button labels. The engineered counterweight to the serif's warmth.
+- **Display — Fraunces, the Yuvoy cut** (`font-display`; variable, axes pinned by the utility). Headlines are set large and light (`font-normal tracking-display`, leading ≈1.02–1.05) — character comes from the letterforms, never from shouting. `font-medium`/`font-semibold`/`font-bold` must never appear with `font-display`: the display system is exactly two voices — `font-normal` (400) upright, and the turn at `italic font-turn` (480). `font-semibold` is banned everywhere (Satoshi ships no 600). **The italic terracotta turn** — the second thought of a headline, `italic font-turn` + accent colour — is the brand's most recognisable typographic move, and since v2.5 it is a **true drawn italic** (Fraunces ships the file). Italic remains reserved for turns inside display type; body text never slants — Satoshi has no italic file and emphasis there is `font-bold` upright.
+- **UI / body — Satoshi** (`font-sans`, the default), weights 400 / 500 / 700. There is no 600, so `font-semibold` must never appear on body text (the browser would synthesise it). Emphasis in running text is `font-bold`.
+- **Label — Satoshi** via the `label` utility: uppercase, `text-xs`, `font-medium`, `tracking-label` (0.18em). Eyebrows, nav, stats, metadata, button labels. The mono was retired in v2.3 — it read as terminal, not magazine.
 - **`eyebrow` utility** — the `label` preceded by a terracotta dot, the same square `size-1` marker the fact rows use (a hairline rule until 2026-08-05, replaced by owner direction). This is the section-opening gesture; **use it once per section**, at the top. Eyebrows are plain phrases: no act numbering (owner direction 2026-08-03). The one exception is the cover: the hero's opening line is a plain `label` with no marker (owner direction 2026-08-05).
-- **Wordmark** — `tracking-wordmark` (0.34em) on **sans** semibold caps (v2.2): the serif is the site's voice, the sans mark is the object that signs it. See `<Wordmark />`, which also carries the official mark and the "Experience more." kicker.
+- **Wordmark** — `tracking-wordmark` (0.34em) on **sans bold caps** (v2.3: bold, not semibold — 600 does not exist): one text voice speaks and signs. See `<Wordmark />`, which also carries the official mark and the "Experience more." kicker.
 - **Punctuation** — rendered copy never uses an em dash. Prefer a period, a colon, a comma or a parenthetical; ranges and pairings use a middot (owner direction 2026-08-03). Code comments are exempt.
 - **Launch timing** — never name a month. The hero states it plainly ("Opening soon", owner direction 2026-08-05); deeper copy may describe the season evocatively ("when the water clears", "when the sea turns to glass").
 - **The mark** — the official ensō (brush ring + terracotta dot), **cut out, never tiled**. The delivered source (`public/yuvoy-logo.png`) is white strokes on an opaque black field, so every display asset is derived by `scripts/generate-brand-assets.py`; never hand-edit them, and re-run it if the source is replaced.
@@ -112,7 +120,7 @@ Borders and fills are exempt from these floors — `border-forest/20`, `bg-fores
   - The script resamples by **area averaging, not bilinear**. Bilinear is a magnifying filter; shrinking with it discards most of the source pixels and is what made the mark look coarse and its brush strokes break up. Masks are measured off the source, not guessed.
   - **Vector assets** are derived from the delivered master `public/yuvoy-logo-vector.svg` by `scripts/generate-vector-brand.mjs`: `public/brand/yuvoy-mark-vector-{cream,forest}.svg`, `public/brand/yuvoy-lockup-vector-{cream,forest}.svg`, and the intro's per-letter module `src/components/brand/yuvoy-letter-paths.ts`. The tagline is stripped from all of them, and the delivered colours are re-expressed as tokens (cream or forest strokes, `terra` dot). Never hand-edit the outputs; re-run the script.
 
-Scale: Tailwind's type scale. Headlines `font-display`; everything else inherits Inter unless it is a label.
+Scale: Tailwind's type scale. Headlines `font-display`; everything else inherits Satoshi unless it is a label.
 
 ## 3. Motion
 
@@ -146,9 +154,9 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 
 ## 5. Components (current)
 
-- **`Button`** — variants `primary | outline | ink | ghost | outlineOnDark`, sizes `sm | md | lg`. Labels are uppercase mono.
-  - **`primary` and `outline` are the first-class pair.** Every screen should use those two; a page with three competing button styles is a bug.
-  - `ink` (solid forest), `ghost` (text-only) and `outlineOnDark` (secondary on forest sections) are **situational** — allowed, but justify them in review.
+- **`Button`** — variants `primary | outline | paper | ghost | outlineOnDark`, sizes `sm | md | lg`. Labels are uppercase bold at `tracking-label`; hover lifts a pixel, press compresses (`active:scale`), and the trailing arrow eases forward — all on `--ease-interaction`.
+  - **CTAs are monochrome** (owner direction 2026-08-05): on cream surfaces the pair is `primary` (solid forest) + `outline`; on forest surfaces it is `paper` (solid cream) + `outlineOnDark`. Both fills are 11.44:1. **Terracotta is never a button fill** — it is the accent for type, dots and marks; the old terra-deep CTA was retired as a template tell.
+  - `ghost` (text-only) is **situational** — allowed, but justify it in review. The former `ink` variant is gone: `primary` now is the forest fill.
   - Use `buttonVariants()` to style a `<Link>` as a button; `<ButtonArrow />` for the trailing arrow on a forward action.
 - **`Input`** — `rounded-edge` field on `cream-deep`, terra-deep focus ring.
 - **`WaveMotif`** — the three-line wave glyph, the island signature. Decorative accent only, at most once per section; tone follows the surface.

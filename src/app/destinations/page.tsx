@@ -38,7 +38,7 @@ export default function DestinationsPage() {
               className="border-cream-line border-t pt-10 lg:pr-10"
             >
               <span className="label text-forest/75">0{i + 1}</span>
-              <h3 className="font-display text-forest mt-5 text-2xl font-normal tracking-tight">
+              <h3 className="font-display text-forest tracking-display mt-5 text-2xl font-normal">
                 <Link
                   href={destinationHref(destination)}
                   className="hover:text-terra-deep transition-colors duration-200"
@@ -73,8 +73,8 @@ export default function DestinationsPage() {
         <Link
           href="/waitlist"
           className={cn(
-            buttonVariants({ size: "lg" }),
-            "focus-visible:ring-offset-forest mt-12 flex w-full sm:inline-flex sm:w-auto",
+            buttonVariants({ variant: "paper", size: "lg" }),
+            "mt-12 flex w-full sm:inline-flex sm:w-auto",
           )}
         >
           Join the waitlist

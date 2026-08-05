@@ -5,9 +5,9 @@
   No hex, font, or tracking value may exist outside this @theme block.
 
   Palette: Brand Kit v2.1 (dark green unified 2026-08-03) — Forest,
-  Terracotta, Cream. Type: Brand Kit v2.2 (2026-08-03) — editorial serif
-  display, sans body, mono labels. Every pairing below is measured against
-  WCAG 2.2 AA; the
+  Terracotta, Cream. Type: Brand Kit v2.3 (2026-08-05) — grotesque display at
+  medium weight, one sans text voice, no mono, no italics. Every pairing
+  below is measured against WCAG 2.2 AA; the
   ratios and the terra / terra-deep / terra-soft usage rule live in
   docs/DESIGN_SYSTEM.md §1. Read that rule before using an accent on text —
   `terra` is NOT body-safe.
@@ -24,21 +24,25 @@
   --color-cream-line: #e5dcc9; /* hairline borders on cream */
   --color-forest: #16362e; /* primary ink AND every dark surface (11.44:1) */
   --color-terra: #be7149; /* accent — decoration + LARGE display text (3.24:1) */
-  --color-terra-deep: #985028; /* text-capable accent + CTA fill (5.21:1) */
+  --color-terra-deep: #985028; /* text-capable accent (5.21:1); never a CTA fill */
   --color-terra-soft: #d89772; /* accent text on forest (5.36:1) */
 
   /* ----------------------------------------------------------------- type */
-  /* v2.2: the display face is an editorial serif set large and light — mass
-     comes from size and leading, never weight (the face has no bold). The
-     wordmark deliberately stays on the sans so the mark reads engineered. */
-  --font-display: var(
-    --font-instrument-serif
-  ); /* headlines — editorial serif */
-  --font-sans: var(--font-inter); /* body + UI + wordmark */
-  --font-mono: var(--font-plex-mono); /* eyebrows, nav, stats, metadata */
+  /* v2.5: Fraunces, tuned into the site's own cut — optical size at 144
+     for display-grade contrast, SOFT 75 for sea-glass terminals, WONK 0.
+     The variation settings ride the `font-display` utility itself, so every
+     headline gets the cut for free. Display weight is 400; the turn is a
+     TRUE italic at `font-turn` (480). Satoshi remains the one text voice. */
+  --font-display: var(--font-fraunces); /* headlines — the Yuvoy serif cut */
+  --font-display--font-variation-settings: "opsz" 144, "SOFT" 75, "WONK" 0;
+  --font-sans: var(--font-satoshi); /* body + UI + labels + wordmark */
   /* The handwriting face exists for exactly one element: the brand veil's
      statement, written on by owner direction. Never page typography. */
   --font-script: var(--font-dancing-script);
+
+  /* The turn's weight: 80 above the display's 400. A token, not a magic
+     number, so the upright/turn relationship is stated once. */
+  --font-weight-turn: 480;
 
   /* --------------------------------------------------------------- layout */
   --container-page: 70rem; /* the page measure — `max-w-page` */
@@ -61,6 +65,7 @@
   /* ------------------------------------------------------------- tracking */
   --tracking-wordmark: 0.34em;
   --tracking-label: 0.18em;
+  --tracking-display: -0.01em; /* Fraunces sets looser than a grotesque */
 }
 
 @layer base {
@@ -125,13 +130,14 @@
 /* ------------------------------------------------------------- typography */
 
 /**
- * Wide-tracked uppercase mono label — the brand's editorial voice.
- * On cream use `text-terra-deep` or `text-forest/75`; on forest use
- * `text-terra-soft` or `text-cream/70`. Never `text-terra` (fails AA at this
- * size), and never below `text-forest/70` on cream.
+ * Wide-tracked uppercase label — the brand's editorial voice, set in the
+ * text face (the mono was retired with Brand Kit v2.3: it read as terminal,
+ * not magazine). On cream use `text-terra-deep` or `text-forest/75`; on
+ * forest use `text-terra-soft` or `text-cream/70`. Never `text-terra` (fails
+ * AA at this size), and never below `text-forest/70` on cream.
  */
 @utility label {
-  @apply font-mono text-xs font-medium uppercase;
+  @apply font-sans text-xs font-medium uppercase;
   letter-spacing: var(--tracking-label);
 }
 
@@ -142,7 +148,7 @@
  * gesture; use it once per section.
  */
 @utility eyebrow {
-  @apply inline-flex items-center gap-2.5 font-mono text-xs font-medium uppercase;
+  @apply inline-flex items-center gap-2.5 font-sans text-xs font-medium uppercase;
   letter-spacing: var(--tracking-label);
 
   &::before {
@@ -215,6 +221,115 @@
 
 @utility emerge {
   animation: yuvoy-emerge 1100ms var(--ease-cinematic) both;
+}
+
+/*
+  The cover's atmosphere (owner direction, 2026-08-05: "more dramatic"):
+  lagoon light, built from tokens the same way the preview's film is. Two
+  layers breathe on slow, offset cycles — a cream glow high in the water and
+  terra warmth low at the horizon — so the field reads as a place with light
+  moving through it rather than a flat panel. Fills are exempt from the
+  contrast floors, and the global reduced-motion rule collapses the breathing
+  to its resting (fully lit) state.
+
+  This is not the corner glow that was removed on 2026-08-04: that was an
+  ornament pinned to one edge; this is the field itself carrying light.
+*/
+@utility hero-atmosphere {
+  position: absolute;
+  inset: 0;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -20%;
+  }
+
+  &::before {
+    background: radial-gradient(
+      55% 45% at 50% 8%,
+      color-mix(in oklab, var(--color-terra-soft) 13%, transparent),
+      transparent 70%
+    );
+    animation: yuvoy-breathe 16s var(--ease-cinematic) infinite alternate;
+  }
+
+  &::after {
+    background: radial-gradient(
+      70% 55% at 72% 108%,
+      color-mix(in oklab, var(--color-terra) 22%, transparent),
+      transparent 65%
+    );
+    animation: yuvoy-breathe 21s var(--ease-cinematic) infinite
+      alternate-reverse;
+  }
+}
+
+@keyframes yuvoy-breathe {
+  from {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+/*
+  The cover artwork's drift: a very slow push-in, so the seascape reads as
+  filmed rather than pasted. It starts already scaled so no edge is ever
+  revealed, and reduced motion freezes it mid-drift.
+*/
+@utility hero-photo {
+  animation: yuvoy-photo-drift 38s var(--ease-cinematic) infinite alternate;
+}
+
+@keyframes yuvoy-photo-drift {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+/*
+  The scrim that merges the cover artwork into the forest field. Near-solid
+  at the very top (the transparent header needs forest behind it, and the
+  headline needs a quiet ground), thinnest across the horizon band where the
+  artwork's light lives, then rising again at the foot so the facts row and
+  its hairline sit on brand ink rather than on water. Token-built like every
+  other fill.
+*/
+@utility hero-scrim {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-forest) 94%, transparent) 0%,
+    color-mix(in oklab, var(--color-forest) 72%, transparent) 30%,
+    color-mix(in oklab, var(--color-forest) 34%, transparent) 58%,
+    color-mix(in oklab, var(--color-forest) 28%, transparent) 74%,
+    color-mix(in oklab, var(--color-forest) 66%, transparent) 100%
+  );
+}
+
+/*
+  A hairline that draws itself in from the left. Ends fully drawn, which is
+  also what reduced-motion visitors see.
+*/
+@keyframes yuvoy-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@utility draw-line {
+  transform-origin: left center;
+  animation: yuvoy-draw 900ms var(--ease-cinematic) both;
 }
 
 /* ------------------------------------------------- the product preview */

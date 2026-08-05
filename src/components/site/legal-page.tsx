@@ -22,7 +22,7 @@ export function LegalPage({
   return (
     <main className="mx-auto max-w-2xl px-6 py-16 sm:px-10 sm:py-24">
       <p className="eyebrow text-terra-deep">Legal</p>
-      <h1 className="font-display text-forest mt-6 text-[clamp(2rem,5vw,3rem)] leading-[1.05] font-normal tracking-tight">
+      <h1 className="font-display text-forest tracking-display mt-6 text-[clamp(2rem,5vw,3rem)] leading-[1.05] font-normal">
         {title}
       </h1>
       <p className="label text-forest/75 mt-6">Last updated {updated}</p>
@@ -48,7 +48,7 @@ export function LegalSection({
 }) {
   return (
     <section>
-      <h2 className="font-display text-forest text-xl font-normal tracking-tight">
+      <h2 className="font-display text-forest tracking-display text-xl font-normal">
         {heading}
       </h2>
       <div className="text-forest/75 mt-4 flex flex-col gap-4 leading-relaxed">

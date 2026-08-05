@@ -37,12 +37,12 @@ export function JourneyTrack({ journey }: { journey: Journey }) {
         </p>
         <h2
           id={headingId}
-          className="font-display mt-6 max-w-3xl text-[clamp(1.875rem,4.5vw,3rem)] leading-[1.05] font-normal tracking-tight text-balance"
+          className="font-display tracking-display mt-6 max-w-3xl text-[clamp(1.875rem,4.5vw,3rem)] leading-[1.05] font-normal text-balance"
         >
           {journey.title}{" "}
           <em
             className={cn(
-              "italic",
+              "font-turn italic",
               journey.key === "operator" ? "text-terra-soft" : "text-terra",
             )}
           >
@@ -90,7 +90,7 @@ export function JourneyTrack({ journey }: { journey: Journey }) {
                 <StatusChip status={step.status} tone={journey.key} />
               </div>
               <div className="sm:col-span-9">
-                <h3 className="font-display text-lg font-normal tracking-tight">
+                <h3 className="font-display tracking-display text-lg font-normal">
                   {step.title}
                 </h3>
                 <p
@@ -111,9 +111,11 @@ export function JourneyTrack({ journey }: { journey: Journey }) {
         <Link
           href={journey.cta.href}
           className={cn(
-            buttonVariants({ size: "lg" }),
+            buttonVariants({
+              variant: journey.key === "operator" ? "paper" : "primary",
+              size: "lg",
+            }),
             "mt-12 flex w-full sm:inline-flex sm:w-auto",
-            journey.key === "operator" && "focus-visible:ring-offset-forest",
           )}
         >
           {journey.cta.label}

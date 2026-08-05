@@ -95,7 +95,7 @@ export default async function DestinationPage({
           {destination.focus.map((item, i) => (
             <li key={item} className="pt-8 sm:pr-8">
               <span className="label text-forest/75">0{i + 1}</span>
-              <p className="font-display text-forest mt-4 text-lg font-normal tracking-tight">
+              <p className="font-display text-forest tracking-display mt-4 text-lg font-normal">
                 {item}
               </p>
             </li>
@@ -116,8 +116,8 @@ export default async function DestinationPage({
           <Link
             href="/waitlist"
             className={cn(
-              buttonVariants({ size: "lg" }),
-              "focus-visible:ring-offset-forest w-full sm:w-auto",
+              buttonVariants({ variant: "paper", size: "lg" }),
+              "w-full sm:w-auto",
             )}
           >
             Join the traveller waitlist

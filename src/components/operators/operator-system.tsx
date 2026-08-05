@@ -81,7 +81,7 @@ export function OperatorSystem() {
               <p className="label text-terra-soft">
                 With Yuvoy: one Experience OS
               </p>
-              <h3 className="font-display mt-5 text-3xl tracking-tight">
+              <h3 className="font-display tracking-display mt-5 text-3xl">
                 One place to run it all.
               </h3>
               <ul className="mt-6 flex flex-col gap-3.5">
@@ -113,8 +113,8 @@ export function OperatorSystem() {
               <a
                 href="#apply"
                 className={cn(
-                  buttonVariants({ size: "lg" }),
-                  "focus-visible:ring-offset-forest mt-8 w-full sm:w-auto",
+                  buttonVariants({ variant: "paper", size: "lg" }),
+                  "mt-8 w-full sm:w-auto",
                 )}
               >
                 Apply as a founding operator
@@ -139,17 +139,13 @@ export function OperatorSystem() {
                 <span aria-hidden className="bg-terra size-1" />
                 Signed
               </p>
-              <p className="text-forest mt-3 text-sm font-semibold">
-                {slot.what}
-              </p>
+              <p className="text-forest mt-3 text-sm font-bold">{slot.what}</p>
               <p className="text-forest/75 mt-0.5 text-xs">{slot.where}</p>
             </li>
           ))}
           <li className="border-terra-deep/50 rounded-edge border border-dashed p-5">
             <p className="label text-terra-deep text-[9px]">Open</p>
-            <p className="text-terra-deep mt-3 text-sm font-semibold">
-              Your spot
-            </p>
+            <p className="text-terra-deep mt-3 text-sm font-bold">Your spot</p>
             <p className="text-forest/75 mt-0.5 text-xs">Applications open</p>
           </li>
         </ul>

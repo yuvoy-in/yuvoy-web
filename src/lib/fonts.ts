@@ -1,27 +1,47 @@
-import {
-  Dancing_Script,
-  Instrument_Serif,
-  Inter,
-  IBM_Plex_Mono,
-} from "next/font/google";
+import { Dancing_Script } from "next/font/google";
+import localFont from "next/font/local";
 
 /**
- * Display face — an editorial serif, set large and light. Brand Kit v2.2:
- * headlines carry their mass through size and tight leading, never through
- * weight (the face ships a single 400). Italic is reserved for the terracotta
- * "turn" — the second thought of a headline — which stays the brand's most
- * recognisable typographic move.
+ * Brand Kit v2.5 (2026-08-06, owner-confirmed): Fraunces + Satoshi.
  *
- * Instrument Serif ships exactly one weight, which is a feature: two font
- * files total, and no faux-bold anywhere because there is no bold to reach
- * for.
+ * The display face is **Fraunces**, the open-license member of the soft-serif
+ * family (Canela, Recoleta, GT Super) that premium travel and island
+ * hospitality brands set their identities in. It ships as a variable font
+ * and is tuned into the site's own cut in globals.css: optical size pinned
+ * at 144, SOFT 75 (terminals rounded, sea-glass), WONK 0. Display weight is
+ * **400** (owner pick from a six-weight strip); the turn rides at **480**
+ * via the `font-turn` token.
+ *
+ * Fraunces has **true italics** — the terracotta turn is a real drawn italic
+ * for the first time, not a synthesized oblique. Italic is still reserved
+ * for the turn alone.
+ *
+ * Satoshi (400 / 500 / 700) carries body, UI, labels and the wordmark.
+ * It has no italic file and no 600: body emphasis stays `font-bold` upright,
+ * and `font-semibold` must not appear anywhere in the tree.
+ *
+ * Both families are self-hosted; five files total, no runtime requests to
+ * Google. A third face, Dancing Script, exists for the brand veil alone.
+ * Journey here: v2.2 Instrument Serif (read as AI-generated) → v2.3 Cabinet
+ * Grotesk → v2.4 Poppins → v2.5 Fraunces, picked over ~350 candidates.
  */
-export const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  variable: "--font-instrument-serif",
+
+/** Display face — headlines only. Axes are pinned in globals.css. */
+export const fraunces = localFont({
+  src: [
+    {
+      path: "../fonts/Fraunces-Variable.woff2",
+      weight: "100 900",
+      style: "normal",
+    },
+    {
+      path: "../fonts/FrauncesItalic-Variable.woff2",
+      weight: "100 900",
+      style: "italic",
+    },
+  ],
+  variable: "--font-fraunces",
   display: "swap",
-  weight: "400",
-  style: ["normal", "italic"],
 });
 
 /**
@@ -31,6 +51,9 @@ export const instrumentSerif = Instrument_Serif({
  * feedback: simpler, cleaner loops, better legibility at display size.
  * One place; it must not leak into page typography, which stays the
  * display/body pair.
+ *
+ * next/font/google downloads and self-hosts at build, so this is still no
+ * runtime request to Google.
  */
 export const dancingScript = Dancing_Script({
   subsets: ["latin"],
@@ -38,20 +61,13 @@ export const dancingScript = Dancing_Script({
   display: "swap",
 });
 
-/** UI + body face — quiet, legible, modern. */
-export const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
+/** Body, UI, labels and the wordmark — the site's single text voice. */
+export const satoshi = localFont({
+  src: [
+    { path: "../fonts/Satoshi-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../fonts/Satoshi-Medium.woff2", weight: "500", style: "normal" },
+    { path: "../fonts/Satoshi-Bold.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-satoshi",
   display: "swap",
-});
-
-/**
- * Label face — wide-tracked uppercase mono for eyebrows, nav, stats and
- * metadata. The engineered counterweight to the serif's warmth.
- */
-export const plexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  variable: "--font-plex-mono",
-  display: "swap",
-  weight: ["400", "500", "600"],
 });

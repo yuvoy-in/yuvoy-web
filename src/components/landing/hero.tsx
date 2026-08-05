@@ -1,16 +1,24 @@
+import Image from "next/image";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 
 /**
- * The cover: a full-viewport statement on a flat forest field, textured only
- * by filmic grain. The scene is still; the only motion is the composition
- * surfacing from depth once, on first paint (the `emerge` utility). An
- * animated wave horizon and a terracotta corner glow were both tried and
- * removed (owner direction, 2026-08-03 and 2026-08-04); the type carries the
- * register on its own.
+ * The cover: a full-viewport statement on a forest field that carries light
+ * — and, since 2026-08-06, a place. The owner-supplied island seascape
+ * (public/assets/hero-section-bg.webp, 32KB — the 1.5MB PNG
+ * source was converted because the optimiser decoding it on every cold
+ * variant kept the page from ever reaching network idle in e2e) is merged into the field through a
+ * multiply wash and a scrim, so the brand green stays the ground and the
+ * artwork reads as depth within it, warmest along the horizon where its low
+ * sun echoes the terracotta. The `hero-atmosphere` lagoon light breathes
+ * over it and filmic grain seats every layer in the same film. Entrance is
+ * first-paint choreography only — the composition surfaces from depth and
+ * the facts rule draws itself in — and there is still no scroll-triggered
+ * motion (owner direction, 2026-08-04 stands); the artwork's 38s drift is
+ * ambient, like the light, not an event.
  *
  * The product preview lives in the next act, so the cover's only job is the
- * question.
+ * promise: every video is a bookable experience (owner copy, 2026-08-05).
  *
  * The facts row along the bottom is the page's momentum line and every entry
  * on it must be literally true today. "3 founding operators signed" is a real
@@ -36,10 +44,32 @@ export function Hero() {
       data-dark-hero
       className="bg-forest text-cream relative -mt-14 overflow-hidden"
     >
-      {/* Nothing but grain: a flat forest field, so the type is the whole
-          composition. The terracotta corner glow that used to sit here went
-          with the waves (owner direction, 2026-08-04). */}
+      {/*
+        The field, in five layers (owner artwork + direction, 2026-08-06):
+        the island seascape the owner supplied, drifting almost imperceptibly;
+        a forest multiply wash that pulls its hues onto the brand green; the
+        scrim that dissolves it into solid forest at the top and foot; the
+        breathing lagoon light; and grain over everything so all of it sits
+        in the same film. The artwork is merged into the field, never pasted
+        onto it — at the top edge the cover still reads as the flat forest
+        the transparent header expects. All decorative, all inert.
+      */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
+        <Image
+          src="/assets/hero-section-bg.webp"
+          alt=""
+          fill
+          priority
+          // 75 is the photography quality the optimiser allows (next.config
+          // keeps the allowlist short on purpose; 100 is the brand mark's).
+          // The scrim and grain sit over this, so nothing finer would show.
+          quality={75}
+          sizes="100vw"
+          className="hero-photo object-cover object-[center_75%]"
+        />
+        <div className="bg-forest/30 absolute inset-0 mix-blend-multiply" />
+        <div className="hero-scrim absolute inset-0" />
+        <div className="hero-atmosphere" />
         <div className="grain" />
       </div>
 
@@ -57,27 +87,41 @@ export function Hero() {
             Andaman Islands · Opening soon
           </p>
 
+          {/*
+            The staircase lockup (owner brief, 2026-08-06: "more premium,
+            wonderful"): three composed lines, each carrying exactly one
+            turned word — video, experience, book — so the italics descend
+            through the sentence in reading order. The breaks are deliberate
+            composition, not decoration: they exist to give every line one
+            turn. From `sm` up the staircase is fixed; below it the breaks
+            release and text-balance takes over, because a phone's measure
+            cannot hold the long third line. Each turn is a TRUE drawn
+            italic (v2.5) at the `font-turn` weight.
+          */}
           <h1
-            className="font-display emerge mt-9 max-w-4xl text-[clamp(3rem,8.5vw,6rem)] leading-[0.98] font-normal tracking-tight text-balance"
+            className="font-display emerge tracking-display mt-10 max-w-4xl text-[clamp(2.625rem,7.4vw,5.75rem)] leading-[1.06] font-normal text-balance"
             style={{ animationDelay: "0.14s" }}
           >
-            Every trip starts with one question.
-            <span className="text-terra-soft mt-3 block italic">
-              &ldquo;What should I do?&rdquo;
-            </span>
+            Every <em className="text-terra-soft font-turn italic">video</em>{" "}
+            here
+            <br className="hidden sm:inline" /> is an{" "}
+            <em className="text-terra-soft font-turn italic">experience</em>
+            <br className="hidden sm:inline" /> you can actually{" "}
+            <em className="text-terra-soft font-turn italic">book.</em>
           </h1>
 
           <p
             className="text-cream/70 emerge mt-9 max-w-2xl text-lg leading-relaxed"
-            style={{ animationDelay: "0.26s" }}
+            style={{ animationDelay: "0.28s" }}
           >
-            Yuvoy answers it. Everything a place actually offers, on honest
-            video from the people who run it, booked in the same scroll.
+            Every video is filmed by the people behind the experience, so what
+            you watch is exactly what you&rsquo;ll get. Discover the Andaman
+            Islands through real moments, not advertisements.
           </p>
 
           <div
             className="emerge mt-11 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row"
-            style={{ animationDelay: "0.38s" }}
+            style={{ animationDelay: "0.4s" }}
           >
             {/*
               Native anchors, not next/link: hash-only hrefs pushed through
@@ -88,8 +132,8 @@ export function Hero() {
             <a
               href="#register"
               className={cn(
-                buttonVariants({ size: "lg" }),
-                "focus-visible:ring-offset-forest w-full sm:w-auto",
+                buttonVariants({ variant: "paper", size: "lg" }),
+                "w-full sm:w-auto",
               )}
             >
               Join the waitlist
@@ -107,11 +151,17 @@ export function Hero() {
           </div>
         </div>
 
-        {/* The momentum line: three true facts, and the three islands. */}
+        {/* The momentum line: three true facts, and the three islands. Its
+            rule draws itself in as the row arrives. */}
         <div
-          className="emerge border-cream/12 mt-16 flex flex-col items-center gap-4 border-t pt-6 text-center sm:mt-20 sm:flex-row sm:justify-between sm:gap-x-10 sm:text-left"
-          style={{ animationDelay: "0.5s" }}
+          className="emerge relative mt-16 flex flex-col items-center gap-4 pt-6 text-center sm:mt-20 sm:flex-row sm:justify-between sm:gap-x-10 sm:text-left"
+          style={{ animationDelay: "0.52s" }}
         >
+          <span
+            aria-hidden
+            className="draw-line bg-cream/12 absolute inset-x-0 top-0 h-px"
+            style={{ animationDelay: "0.72s" }}
+          />
           <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 sm:justify-start">
             {FACTS.map((fact) => (
               <li

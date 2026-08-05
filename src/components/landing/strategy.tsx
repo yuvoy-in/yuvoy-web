@@ -43,7 +43,7 @@ export function Strategy() {
         {FACTS.map((fact) => (
           <li key={fact.caption}>
             <p className="flex items-baseline gap-3">
-              <span className="font-display text-terra text-[clamp(3rem,5vw,4.25rem)] leading-none tracking-tight">
+              <span className="font-display text-terra tracking-display text-[clamp(3rem,5vw,4.25rem)] leading-none">
                 {fact.figure}
               </span>
               <span className="label text-forest/75">{fact.caption}</span>
@@ -63,9 +63,9 @@ export function Strategy() {
       */}
       <div className="mt-16 flex flex-col items-center text-center">
         <WaveMotif className="h-4 w-11" />
-        <p className="font-display text-forest mt-5 text-[clamp(1.875rem,4.5vw,3rem)] leading-tight tracking-tight text-balance">
+        <p className="font-display text-forest tracking-display mt-5 text-[clamp(1.875rem,4.5vw,3rem)] leading-tight text-balance">
           Don&rsquo;t be a tourist.{" "}
-          <em className="text-terra italic">Experience more.</em>
+          <em className="text-terra font-turn italic">Experience more.</em>
         </p>
       </div>
     </Section>

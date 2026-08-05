@@ -8,13 +8,22 @@ describe("Button", () => {
     expect(screen.getByRole("button", { name: "Book" })).toBeInTheDocument();
   });
 
-  it("defaults to the primary variant, filled with terra-deep", () => {
-    // terra-deep, not terra: cream on terra would be 3.4:1 and fail AA at
-    // label size. If this ever flips to `bg-terra`, contrast regresses.
+  it("defaults to the primary variant, filled with forest", () => {
+    // Monochrome CTAs (owner direction 2026-08-05): forest fill on cream
+    // surfaces, 11.44:1. If this ever flips to a terra fill, the CTA is
+    // back on the retired template accent — and `bg-terra` would fail AA.
     render(<Button>Go</Button>);
     expect(screen.getByRole("button", { name: "Go" }).className).toContain(
-      "bg-terra-deep",
+      "bg-forest",
     );
+  });
+
+  it("offers paper as the primary on forest surfaces", () => {
+    render(<Button variant="paper">Go</Button>);
+    const cls = screen.getByRole("button", { name: "Go" }).className;
+    expect(cls).toContain("bg-cream");
+    // The ring offset must follow the dark surface behind the button.
+    expect(cls).toContain("focus-visible:ring-offset-forest");
   });
 
   it("applies the outline variant as the secondary action", () => {
