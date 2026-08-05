@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { dancingScript, instrumentSerif, inter, plexMono } from "@/lib/fonts";
 import { BrandIntro } from "@/components/brand/brand-intro";
@@ -35,6 +35,18 @@ export const metadata: Metadata = {
     description:
       "Local experiences in the Andaman Islands, shown in honest video by the people who run them. Join the waitlist.",
   },
+};
+
+/*
+  Without an explicit theme-color, Safari tints its tab and URL chrome by
+  sampling the page's top pixels — which, while the brand veil plays, are
+  forest, so the chrome went green and then disagreed with the cream page
+  underneath (owner report, 2026-08-06). Pinned to the canvas token
+  `cream` (#F4EFE4 in globals.css @theme; a literal here because metadata
+  cannot read CSS variables — the OG frame does the same).
+*/
+export const viewport: Viewport = {
+  themeColor: "#f4efe4",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
