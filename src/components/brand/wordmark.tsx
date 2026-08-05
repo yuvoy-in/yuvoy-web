@@ -16,6 +16,10 @@ import { cn } from "@/lib/cn";
  *
  * `unoptimized`: SVG needs no optimiser pass, and this keeps
  * `dangerouslyAllowSVG` out of the image config (same call as the veil).
+ * Deliberately NOT `priority`: both variants render for the cross-fade, so
+ * preloading would queue two images on every page when one is invisible.
+ * They are ~19KB of markup served straight from the origin, and the header
+ * is above the fold anyway, so the browser requests them immediately.
  *
  * Size it from outside with a height class, and the size now means the
  * DRAWING's size: the generated variants crop the delivered canvas's empty
@@ -59,7 +63,6 @@ export function Wordmark({
           aria-hidden
           width={LOCKUP.width}
           height={LOCKUP.height}
-          priority
           className={cn(
             "h-full w-auto transition-opacity duration-300",
             dark && "absolute inset-y-0 left-0",
