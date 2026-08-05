@@ -261,7 +261,7 @@ export function SiteMenu({
                             aria-current={current ? "page" : undefined}
                             onClick={() => close(false)}
                             className={cn(
-                              "font-display group flex items-baseline justify-between gap-6 py-3.5 text-[clamp(1.375rem,2.8vw,2.25rem)] leading-tight font-semibold tracking-tight transition-colors duration-200 sm:py-4",
+                              "font-display group tracking-display flex items-baseline justify-between gap-6 py-3.5 text-[clamp(1.375rem,2.8vw,2.25rem)] leading-tight font-normal transition-colors duration-200 sm:py-4",
                               current
                                 ? "text-terra-deep"
                                 : "text-forest hover:text-terra-deep",
@@ -286,9 +286,9 @@ export function SiteMenu({
                   only, so there is nothing here to miss on a small screen. */}
               <div className="hidden lg:col-span-5 lg:block lg:pt-2">
                 <WaveMotif />
-                <p className="font-display text-forest mt-6 text-2xl leading-snug tracking-tight text-balance">
+                <p className="font-display text-forest tracking-display mt-6 text-2xl leading-snug text-balance">
                   Season One opens in the Andaman Islands{" "}
-                  <em className="text-terra font-bold not-italic">
+                  <em className="text-terra font-turn italic">
                     when the water clears.
                   </em>
                 </p>

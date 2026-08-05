@@ -81,7 +81,7 @@ export function OperatorSystem() {
               <p className="label text-terra-soft">
                 With Yuvoy: one Experience OS
               </p>
-              <h3 className="font-display mt-5 text-3xl tracking-tight">
+              <h3 className="font-display tracking-display mt-5 text-3xl">
                 One place to run it all.
               </h3>
               <ul className="mt-6 flex flex-col gap-3.5">

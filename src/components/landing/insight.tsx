@@ -54,9 +54,7 @@ export function Insight() {
 
           <p className="font-display border-cream-line text-forest mt-10 border-t pt-8 text-[clamp(1.375rem,2.4vw,1.75rem)] leading-snug">
             Hours later you have a shortlist, and{" "}
-            <em className="text-terra-deep font-bold not-italic">
-              still no idea
-            </em>{" "}
+            <em className="text-terra-deep font-turn italic">still no idea</em>{" "}
             what you missed.
           </p>
         </div>

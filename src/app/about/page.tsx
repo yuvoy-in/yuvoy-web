@@ -141,7 +141,7 @@ export default function AboutPage() {
           {PRINCIPLES.map((principle, i) => (
             <li key={principle.title} className="pt-10 sm:pr-10">
               <span className="label text-forest/75">0{i + 1}</span>
-              <h3 className="font-display text-forest mt-5 text-xl font-semibold tracking-tight">
+              <h3 className="font-display text-forest tracking-display mt-5 text-xl font-normal">
                 {principle.title}
               </h3>
               <p className="text-forest/75 mt-3 leading-relaxed">

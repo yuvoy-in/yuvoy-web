@@ -7,7 +7,7 @@ The **frontend** of Yuvoy (Experience Commerce platform, "Experience More."). Ow
 ## Stack
 
 Next.js 16 (App Router, RSC, TS strict) · Tailwind v4 (tokens via `@theme`) · Motion · TanStack Query · react-hook-form + Zod · pnpm. Node 22.
-Type: Poppins (display, 600/700) + Satoshi (body/UI/labels, 400/500/700) — Brand Kit v2.4, self-hosted in `src/fonts`, no italic files, no mono. `font-semibold` is display-only.
+Type: Fraunces variable (display, the tuned "Yuvoy cut": opsz 144 / SOFT 75, weight 400, turns `italic font-turn` 480 true italic) + Satoshi (body/UI/labels, 400/500/700) — Brand Kit v2.5, self-hosted in `src/fonts`, no mono, no `font-semibold` anywhere.
 
 > **Next.js 16 has breaking changes vs. older training data** (see `AGENTS.md`). When unsure about an App Router / config / caching API, check `node_modules/next/dist/docs/` or context7 before writing — do not guess from memory.
 

@@ -48,7 +48,7 @@ export default function HowItWorksPage() {
       <Section aria-labelledby="status-heading">
         <h2
           id="status-heading"
-          className="font-display max-w-3xl text-2xl font-semibold tracking-tight text-balance"
+          className="font-display tracking-display max-w-3xl text-2xl font-normal text-balance"
         >
           What you can actually do today
         </h2>

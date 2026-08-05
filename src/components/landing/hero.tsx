@@ -67,16 +67,15 @@ export function Hero() {
             thoughts. The upright line states the fact; the turn takes its
             own line in italic terracotta — a deliberate lockup, not a
             decorated break. One entrance for the whole thought; the field's
-            atmosphere carries the drama around it. The italic is the site's
-            one permitted slant, rendered as a synthesized oblique of the
-            display bold — no italic file ships.
+            atmosphere carries the drama around it. The turn is a TRUE drawn
+            italic (v2.5: Fraunces ships one) at the `font-turn` weight.
           */}
           <h1
-            className="font-display emerge mt-10 max-w-4xl text-[clamp(2.5rem,6.2vw,4.5rem)] leading-[1.06] font-semibold tracking-tight text-balance"
+            className="font-display emerge tracking-display mt-10 max-w-4xl text-[clamp(2.75rem,7vw,5.25rem)] leading-[1.03] font-normal text-balance"
             style={{ animationDelay: "0.14s" }}
           >
             Every video here is an experience
-            <span className="text-terra-soft mt-2 block font-bold italic">
+            <span className="text-terra-soft font-turn mt-2 block italic">
               you can actually book.
             </span>
           </h1>

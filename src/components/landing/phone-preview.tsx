@@ -292,7 +292,7 @@ export function PhonePreview() {
                   {/* Not a heading: the card is illustration content inside
                       the hero, and an h3 here would skip the document's
                       h1 → h2 order. */}
-                  <p className="font-display text-cream mt-1.5 text-[22px] leading-[1.1] tracking-tight">
+                  <p className="font-display text-cream tracking-display mt-1.5 text-[22px] leading-[1.1]">
                     {scene.title}
                   </p>
                   <p className="text-cream/70 mt-1 text-[10px]">{scene.meta}</p>

@@ -62,11 +62,11 @@ export function Section({
 
 /**
  * The section opener: an eyebrow, then a headline whose second thought turns
- * bold terracotta. That turn is the brand's signature typographic move — one
- * per section, never more. It is weight and colour in the same family (v2.3),
- * never an italic: the system ships no italic files.
+ * italic terracotta. That turn is the brand's signature typographic move —
+ * one per section, never more. Since v2.5 it is a TRUE italic (Fraunces
+ * ships a drawn italic file) at `font-turn`, 80 above the upright.
  *
- * `title` is the plain first line; `accent` is the bold turn. Both render
+ * `title` is the plain first line; `accent` is the italic turn. Both render
  * inside a single `<h2>` so the heading reads as one string to assistive
  * tech and to search engines.
  */
@@ -94,14 +94,15 @@ export function SectionHeading({
     <div className={cn("max-w-3xl", className)}>
       {eyebrow && <p className={cn("eyebrow", EYEBROW[tone])}>{eyebrow}</p>}
       {/*
-        v2.4: display type is the geometric at semibold (600) — the face's
-        display weight — with 700 reserved for the turn. Only those two
-        display files ship, so `font-semibold` states what actually renders.
+        v2.5: display type is Fraunces at 400, the owner-picked light weight;
+        the axes (opsz/SOFT/WONK) ride the `font-display` utility. The turn
+        is a true italic at `font-turn` (480) — the variable file renders
+        the exact weight.
       */}
       <Heading
         id={id}
         className={cn(
-          "font-display mt-6 font-semibold tracking-tight text-balance",
+          "font-display tracking-display mt-6 font-normal text-balance",
           level === 1
             ? "text-[clamp(2.5rem,7vw,4.5rem)] leading-none"
             : "text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04]",
@@ -111,9 +112,7 @@ export function SectionHeading({
         {accent && (
           <>
             {" "}
-            <em className={cn("font-bold not-italic", ACCENT[tone])}>
-              {accent}
-            </em>
+            <em className={cn("font-turn italic", ACCENT[tone])}>{accent}</em>
           </>
         )}
       </Heading>

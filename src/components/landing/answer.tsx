@@ -55,7 +55,7 @@ export function Answer() {
                   {step.n}
                 </span>
                 <div>
-                  <h3 className="font-display text-xl tracking-tight">
+                  <h3 className="font-display tracking-display text-xl">
                     {step.title}
                   </h3>
                   <p className="text-cream/70 mt-1.5 text-[15px] leading-relaxed">
