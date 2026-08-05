@@ -23,7 +23,7 @@ import { LAUNCH_MARKET } from "@/lib/leads/registry";
  * The acts are written to pass the billboard test: reading only the headlines
  * tells the whole story.
  *
- *   Cover     "Every trip starts with one question."   the hook, island horizon
+ *   Cover     "Every video here is an experience..."   the hook, island horizon
  *   Insight   "The hard part was never booking."       the observation
  *   Answer    "Scroll. Watch. Book."                   the product, running live
  *   Strategy  "One destination, done completely."      the wedge

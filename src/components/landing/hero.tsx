@@ -5,7 +5,9 @@ import { cn } from "@/lib/cn";
 /**
  * The cover: a full-viewport statement on a forest field that carries light
  * — and, since 2026-08-06, a place. The owner-supplied island seascape
- * (public/assets/hero-section-bg.png) is merged into the field through a
+ * (public/assets/hero-section-bg.webp, 32KB — the 1.5MB PNG
+ * source was converted because the optimiser decoding it on every cold
+ * variant kept the page from ever reaching network idle in e2e) is merged into the field through a
  * multiply wash and a scrim, so the brand green stays the ground and the
  * artwork reads as depth within it, warmest along the horizon where its low
  * sun echoes the terracotta. The `hero-atmosphere` lagoon light breathes
@@ -54,7 +56,7 @@ export function Hero() {
       */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <Image
-          src="/assets/hero-section-bg.png"
+          src="/assets/hero-section-bg.webp"
           alt=""
           fill
           priority
