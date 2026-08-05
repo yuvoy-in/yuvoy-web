@@ -36,6 +36,9 @@
   ); /* headlines — editorial serif */
   --font-sans: var(--font-inter); /* body + UI + wordmark */
   --font-mono: var(--font-plex-mono); /* eyebrows, nav, stats, metadata */
+  /* The handwriting face exists for exactly one element: the brand veil's
+     statement, written on by owner direction. Never page typography. */
+  --font-script: var(--font-dancing-script);
 
   /* --------------------------------------------------------------- layout */
   --container-page: 70rem; /* the page measure — `max-w-page` */
@@ -414,4 +417,429 @@
   pointer-events: none;
   opacity: 0.05;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/*
+  The brand veil — the site's entrance (see BrandIntro). Not a flat card but a
+  scene from the brand's world: night water (the film-c gradient language,
+  an ember of terracotta warmth at the bottom edge), the owner's island
+  horizon along the foot (silhouettes and a moonlit glint, per the comp in
+  public/assets/intro.png), crossed by sparse particle swells — tiny cream
+  dots that roll in from either edge on slow, decorrelated periods and die
+  away before the centre, so the water moves while the lockup keeps a pool
+  of still dark — under filmic grain. On it the mark surfaces from depth,
+  the wordmark's letterforms arrive one by one in the cover's own emerge
+  grammar, "Experience more." is written on in the handwriting face with
+  the calligraphic swash as its underline, and the island's name grounds
+  the bottom of the frame. Then the camera pushes through: the veil grows
+  past the frame and dissolves while the cover runs its own emerge
+  entrance underneath (the handoff rule by the exit keyframes), so the
+  site arrives in the same breath the veil leaves.
+
+  Decisions, so they are not re-litigated ad hoc:
+
+  - The veil exists only when BrandIntro's inline script stamps `data-play`
+    before first paint. No stamp — a repeat pageload in the same tab, reduced
+    motion, JavaScript off — and the default `display: none` below means it
+    was never there. Every no-show path is flash-proof because showing, not
+    hiding, is the act that needs arguing for.
+  - CSS runs the whole timeline and ends it (the exit's last frame holds
+    `visibility: hidden`), so a slow or failed hydration can never strand an
+    opaque cover over a working page. React only tidies the node afterwards.
+  - This is entrance-class motion (§3): cinematic curve, and the one moment
+    that may exceed the `emerge` budget, because it is the moment the site
+    arrives. The sign-off stroke draws on the cinematic curve too — a pen
+    moves fast and settles at the end of the word, and the stroke is the
+    ensō's brush answering in miniature, not a progress bar.
+  - Any keypress dismisses it (`data-skip`): that answers a gesture, so it
+    runs on the interaction budget, and it keeps the cover from ever standing
+    between a keyboard user and the focus they just asked for.
+  - The timeline lives in the custom properties below; BrandIntro's fallback
+    timeout mirrors their total. Change them together.
+
+  Fixed-layer order: header 40 · staging badge and consent banner 50 · this
+  veil 60 (it must cover them; they return when it lifts). The site menu is a
+  top-layer <dialog> above everything and unreachable while the veil plays.
+*/
+.intro-veil {
+  --intro-mark-in: 1100ms;
+  --intro-rise: 850ms;
+  --intro-word-at: 200ms;
+  --intro-word-in: 1100ms;
+  --intro-kicker-at: 700ms;
+  --intro-write: 1300ms;
+  /* The swash (and the place line with it) leads the write's end by half
+     a second — still derived from it, so retuning the write moves them
+     together (owner direction, 2026-08-06: overlap the last letters). */
+  --intro-stroke-at: calc(var(--intro-kicker-at) + var(--intro-write) - 500ms);
+  --intro-stroke: 800ms;
+  /* The place line lands with the swash: the frame is signed and located
+     in the same gesture (owner direction). */
+  --intro-place-at: var(--intro-stroke-at);
+  --intro-close-at: 2500ms;
+  --intro-close: 450ms;
+  --intro-exit-at: 2700ms;
+  --intro-exit: 700ms;
+
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: none;
+  place-items: center;
+  /* The veil is a sealed scene: containment keeps its constant animation
+     work from invalidating the page underneath (and vice versa), and the
+     will-change pre-promotes its layer so the exit dissolve does not begin
+     with a promotion hitch 2.7s in. */
+  contain: layout paint;
+  will-change: transform, opacity;
+  /* Slightly more space below centre than above: the optical centre of the
+     lockup sits a touch high, which is where a still frame wants it. */
+  padding-bottom: 3rem;
+  /* Night water: a faint cream lift where the surface would be, forest
+     depths, and an ember of terracotta warmth at the bottom edge — all
+     color-mix on brand tokens, the film utilities' rule, so no second dark
+     ever exists. */
+  background:
+    radial-gradient(
+      100% 80% at 50% 36%,
+      color-mix(in oklab, var(--color-forest) 94%, var(--color-cream)),
+      transparent 62%
+    ),
+    linear-gradient(
+      175deg,
+      color-mix(in oklab, var(--color-forest) 90%, var(--color-cream)) 0%,
+      var(--color-forest) 52%,
+      color-mix(in oklab, var(--color-forest) 84%, var(--color-terra)) 100%
+    );
+}
+
+.intro-veil[data-play] {
+  display: grid;
+  animation: yuvoy-intro-exit var(--intro-exit) var(--ease-cinematic)
+    var(--intro-exit-at) both;
+}
+
+.intro-veil[data-skip] {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms var(--ease-interaction);
+}
+
+/* will-change on the stage, the swash and the place line: their animations
+   start mid-choreography (2.5s, 1.5s, 1.5s in), and promoting a layer at
+   the moment its delay expires is exactly the kind of one-frame hitch this
+   entrance cannot afford. Elements that animate from first paint promote
+   naturally and need no hint. */
+.intro-stage {
+  will-change: transform, opacity;
+  animation: yuvoy-intro-close var(--intro-close) var(--ease-cinematic)
+    var(--intro-close-at) both;
+}
+
+.intro-mark {
+  animation: yuvoy-intro-surface var(--intro-mark-in) var(--ease-cinematic) both;
+}
+
+/*
+  A particle swell: two sparse dot grids (different densities, offset so
+  they never align) drifting on different periods inside an elliptical mask
+  anchored to one edge — dots that roll in and die away before the centre.
+  The right wing is the same element mirrored with scaleX(-1), so one mask
+  and one set of keyframes serve both sides, and "toward the centre" stays
+  a single direction in the maths.
+*/
+.intro-wave {
+  position: absolute;
+  inset: 0;
+  right: auto;
+  width: 46%;
+  pointer-events: none;
+  mask-image: radial-gradient(115% 75% at 0% 50%, black 25%, transparent 78%);
+  animation: yuvoy-intro-fade 1600ms var(--ease-cinematic) 300ms both;
+}
+
+.intro-wave-right {
+  right: 0;
+  left: auto;
+  transform: scaleX(-1);
+}
+
+/*
+  The particles are hand-scattered SVG tiles, not gradient grids: a grid
+  reads as straight rows however it moves, so each tile lays its dots along
+  gentle sine arcs. The SVGs are alpha stencils (mask-image), so the dots'
+  colour stays a brand token painted by background-color, and no colour
+  value lives inside the data URI.
+
+  Each wing holds FOUR planes with only a handful of dots each. Any two
+  neighbouring dots on screen almost always belong to different planes, and
+  every plane orbits its own ellipse (the --ox/--oy amplitudes) on its own
+  period, phase and direction — so the eye finds no group that moves
+  together, which is what "each dot moving differently" needs without a
+  canvas. Plane 4 alone carries the few larger dots.
+*/
+.intro-swell {
+  position: absolute;
+  inset: -12%;
+  animation: yuvoy-intro-orbit linear infinite;
+}
+
+.intro-swell-1 {
+  --ox: 2.2%;
+  --oy: 1.4%;
+  background-color: color-mix(in srgb, var(--color-cream) 30%, transparent);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cg fill='white'%3E%3Ccircle cx='18' cy='52' r='1.5'/%3E%3Ccircle cx='66' cy='34' r='1.3'/%3E%3Ccircle cx='114' cy='30' r='1.6'/%3E%3Ccircle cx='162' cy='44' r='1.4'/%3E%3Ccircle cx='40' cy='138' r='1.4'/%3E%3Ccircle cx='120' cy='158' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
+  mask-size: 200px 200px;
+  animation-duration: 9s;
+  animation-delay: -2s;
+}
+
+.intro-swell-2 {
+  --ox: 1.6%;
+  --oy: 2.2%;
+  background-color: color-mix(in srgb, var(--color-cream) 22%, transparent);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cg fill='white'%3E%3Ccircle cx='30' cy='80' r='1.4'/%3E%3Ccircle cx='92' cy='60' r='1.2'/%3E%3Ccircle cx='150' cy='52' r='1.5'/%3E%3Ccircle cx='210' cy='66' r='1.3'/%3E%3Ccircle cx='60' cy='190' r='1.5'/%3E%3Ccircle cx='170' cy='206' r='1.2'/%3E%3C/g%3E%3C/svg%3E");
+  mask-size: 240px 240px;
+  animation-duration: 13s;
+  animation-delay: -7s;
+  animation-direction: reverse;
+}
+
+.intro-swell-3 {
+  --ox: 2.8%;
+  --oy: 1.8%;
+  background-color: color-mix(in srgb, var(--color-cream) 26%, transparent);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cg fill='white'%3E%3Ccircle cx='36' cy='96' r='1.7'/%3E%3Ccircle cx='120' cy='70' r='1.5'/%3E%3Ccircle cx='200' cy='62' r='1.8'/%3E%3Ccircle cx='262' cy='84' r='1.5'/%3E%3Ccircle cx='80' cy='220' r='1.8'/%3E%3Ccircle cx='190' cy='240' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
+  mask-size: 280px 280px;
+  animation-duration: 16s;
+  animation-delay: -11s;
+}
+
+.intro-swell-4 {
+  --ox: 2%;
+  --oy: 2.6%;
+  background-color: color-mix(in srgb, var(--color-cream) 20%, transparent);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='340'%3E%3Cg fill='white'%3E%3Ccircle cx='60' cy='110' r='2.4'/%3E%3Ccircle cx='200' cy='80' r='2.2'/%3E%3Ccircle cx='290' cy='180' r='2.6'/%3E%3C/g%3E%3C/svg%3E");
+  mask-size: 340px 340px;
+  animation-duration: 21s;
+  animation-delay: -5s;
+  animation-direction: reverse;
+}
+
+/* The word arrives exactly as the cover's headline does: ONE block
+   surfacing from depth in the yuvoy-emerge grammar at the cover's own
+   1100ms — not a letter cascade (owner direction, 2026-08-06, twice: the
+   per-letter stagger read as a different move). Deliberate reuse of the
+   cover's keyframes, not the `emerge` utility: the veil speaks the motion
+   language of the page it is about to unveil. */
+.intro-word {
+  animation: yuvoy-emerge var(--intro-word-in) var(--ease-cinematic)
+    var(--intro-word-at) both;
+}
+
+/* The statement is written, not shown: a soft-edged mask sweeps left to
+   right across the cursive line like a pen crossing the page. The swash
+   below starts only after the word is finished — you underline after you
+   write. */
+.intro-kicker {
+  mask-image: linear-gradient(to right, black 45%, transparent 55%);
+  mask-size: 250% 100%;
+  mask-repeat: no-repeat;
+  animation: yuvoy-intro-write var(--intro-write) var(--ease-cinematic)
+    var(--intro-kicker-at) both;
+}
+
+/* The sign-off swash is a filled calligraphic sliver (tapered tips, weight
+   in the middle), so it cannot be dash-drawn like a stroke: it is revealed
+   left to right by a clip wipe instead, which reads the same — a pen
+   crossing the page. The vertical insets are negative so the wipe can
+   never shave the swash's own curve. */
+.intro-stroke {
+  will-change: clip-path;
+  animation: yuvoy-intro-underline var(--intro-stroke) var(--ease-cinematic)
+    var(--intro-stroke-at) both;
+}
+
+/* The owner's island scene (cropped from the comp by
+   scripts/generate-intro-scene.mjs): silhouettes and the moonlit glint,
+   pinned to the foot of the veil and faded out upward into the field so
+   there is no seam. The band scales with the viewport but is clamped so it
+   neither swallows a phone screen nor thins to a strip on a tall one. */
+.intro-horizon {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: clamp(10rem, 30vh, 19rem);
+  background-image: url("/assets/intro-horizon.webp");
+  background-size: cover;
+  background-position: center bottom;
+  mask-image: linear-gradient(to top, black 65%, transparent 100%);
+  animation: yuvoy-intro-fade 1600ms var(--ease-cinematic) 200ms both;
+}
+
+/* The island's name, grounding the bottom of the frame. Real brand copy
+   (the cover's own opening line), not an atmospheric flourish. Wordmark
+   tracking rather than label tracking: at the foot of this frame it is a
+   signature, and the extra air is what keeps it from reading as a caption. */
+.intro-place {
+  letter-spacing: var(--tracking-wordmark);
+  will-change: transform, opacity, filter;
+  animation: yuvoy-intro-rise var(--intro-rise) var(--ease-cinematic)
+    var(--intro-place-at) both;
+}
+
+/* The mark's arrival — the emerge grammar (scale, settle, focus) retuned for
+   a single object: no travel, just surfacing. The blur clears early so the
+   brush strokes are sharp while the mark is still growing into place. */
+@keyframes yuvoy-intro-surface {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+    filter: blur(10px);
+  }
+
+  60% {
+    filter: blur(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes yuvoy-intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.45em);
+    filter: blur(5px);
+  }
+
+  65% {
+    filter: blur(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* With the mask 2.5x the box and no-repeat: at 100% the box shows the
+   mask's transparent tail (nothing), at 0% its solid head (everything).
+   The travel is clamped to 92% -> 8% because outside that range the mask
+   moves over pixels whose fate is already decided: the text is fully
+   hidden above 92% and fully shown below 8%. Sweeping the whole 100 -> 0
+   made the easing spend its long decelerating tail on invisible travel,
+   so the word LOOKED finished ~half a second before the animation ended
+   and the swash (which starts at the animation's end) seemed to lag
+   (owner report, twice). The end of this animation now IS the visual end. */
+@keyframes yuvoy-intro-write {
+  from {
+    mask-position: 92% 0;
+  }
+
+  to {
+    mask-position: 8% 0;
+  }
+}
+
+@keyframes yuvoy-intro-underline {
+  from {
+    clip-path: inset(-30% 100% -30% 0);
+  }
+
+  to {
+    clip-path: inset(-30% 0 -30% 0);
+  }
+}
+
+@keyframes yuvoy-intro-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Water moves its particles in circles, so the swell planes orbit rather
+   than slide: one closed elliptical loop, parameterised per plane by the
+   --ox/--oy amplitudes and run at each plane's own period, phase and
+   direction. Linear timing keeps the angular speed constant — easing an
+   orbit makes it pulse. */
+@keyframes yuvoy-intro-orbit {
+  0% {
+    transform: translate(calc(-1 * var(--ox, 2%)), 0);
+  }
+
+  25% {
+    transform: translate(0, var(--oy, 2%));
+  }
+
+  50% {
+    transform: translate(var(--ox, 2%), 0);
+  }
+
+  75% {
+    transform: translate(0, calc(-1 * var(--oy, 2%)));
+  }
+
+  100% {
+    transform: translate(calc(-1 * var(--ox, 2%)), 0);
+  }
+}
+
+/* The lockup steps back a beat before the veil itself dissolves, so the
+   scene empties before the camera moves through it. */
+@keyframes yuvoy-intro-close {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-0.375rem);
+  }
+}
+
+/* The exit is the emerge grammar reversed: the camera pushes through the
+   veil, which grows past the frame and dissolves while the cover performs
+   its own entrance underneath (the .emerge release below). `visibility`
+   rides along so the finished veil cannot intercept a pointer even if
+   React never gets to remove the node. */
+@keyframes yuvoy-intro-exit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+    visibility: visible;
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.045);
+    visibility: hidden;
+  }
+}
+
+/*
+  The handoff. The cover's `emerge` entrance used to play at first paint,
+  invisibly, behind the veil — by the time the veil left, the hero had
+  been still for two seconds and its arrival was simply never seen (owner
+  report, 2026-08-06). While the veil holds `data-intro-wait` (stamped by
+  its pre-paint script), the cover's entrance is suspended; the attribute
+  is removed the instant the exit starts, which re-applies the animations
+  from zero, so the hero surfaces through the dissolving veil.
+
+  Suspension is `animation: none` — the elements stand plainly VISIBLE
+  behind the opaque veil, not held at their from-frame — and the trigger
+  is :has() on the veil node itself. Both choices are the fail-open: if
+  JavaScript dies after the stamp, or the browser predates :has(), the
+  page shows a settled cover rather than an invisible one.
+*/
+body:has(#yuvoy-intro[data-intro-wait]) .emerge {
+  animation: none;
 }

@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./support/session";
 
 /** Nothing on the site may claim a price, a rating or a review count. */
 const FABRICATED = /₹|\breviews?\b|\bratings?\b/i;
