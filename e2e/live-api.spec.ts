@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./support/session";
 
 /**
  * Live smoke test against the deployed API — no stubbing, no mocks.

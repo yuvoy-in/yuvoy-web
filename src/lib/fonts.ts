@@ -1,3 +1,4 @@
+import { Dancing_Script } from "next/font/google";
 import localFont from "next/font/local";
 
 /**
@@ -19,7 +20,8 @@ import localFont from "next/font/local";
  * It has no italic file and no 600: body emphasis stays `font-bold` upright,
  * and `font-semibold` must not appear anywhere in the tree.
  *
- * Both families are self-hosted; five files total, no external requests.
+ * Both families are self-hosted; five files total, no runtime requests to
+ * Google. A third face, Dancing Script, exists for the brand veil alone.
  * Journey here: v2.2 Instrument Serif (read as AI-generated) → v2.3 Cabinet
  * Grotesk → v2.4 Poppins → v2.5 Fraunces, picked over ~350 candidates.
  */
@@ -39,6 +41,23 @@ export const fraunces = localFont({
     },
   ],
   variable: "--font-fraunces",
+  display: "swap",
+});
+
+/**
+ * Script face — cursive handwriting, used ONLY by the brand veil's
+ * "Experience more." statement (owner direction: the line should read as
+ * being written by hand). Dancing Script replaced Great Vibes on owner
+ * feedback: simpler, cleaner loops, better legibility at display size.
+ * One place; it must not leak into page typography, which stays the
+ * display/body pair.
+ *
+ * next/font/google downloads and self-hosts at build, so this is still no
+ * runtime request to Google.
+ */
+export const dancingScript = Dancing_Script({
+  subsets: ["latin"],
+  variable: "--font-dancing-script",
   display: "swap",
 });
 

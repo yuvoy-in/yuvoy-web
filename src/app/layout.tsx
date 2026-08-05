@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import { fraunces, satoshi } from "@/lib/fonts";
+import { dancingScript, fraunces, satoshi } from "@/lib/fonts";
+import { BrandIntro } from "@/components/brand/brand-intro";
 import { Providers } from "@/components/providers";
 import { SITE_URL, IS_PRODUCTION } from "@/lib/site";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -36,6 +37,18 @@ export const metadata: Metadata = {
   },
 };
 
+/*
+  Without an explicit theme-color, Safari tints its tab and URL chrome by
+  sampling the page's top pixels — which, while the brand veil plays, are
+  forest, so the chrome went green and then disagreed with the cream page
+  underneath (owner report, 2026-08-06). Pinned to the canvas token
+  `cream` (#F4EFE4 in globals.css @theme; a literal here because metadata
+  cannot read CSS variables — the OG frame does the same).
+*/
+export const viewport: Viewport = {
+  themeColor: "#f4efe4",
+};
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
@@ -47,9 +60,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         page instead of arriving at it.
       */
       data-scroll-behavior="smooth"
-      className={`${fraunces.variable} ${satoshi.variable} h-full`}
+      className={`${fraunces.variable} ${satoshi.variable} ${dancingScript.variable} h-full`}
     >
       <body className="min-h-full">
+        {/*
+          First in the body so the veil and its pre-paint decision script are
+          parsed before anything else can paint on a slow connection. Its
+          z-order, not this source position, is what puts it above the fixed
+          banners. It renders nothing for repeat visits, reduced motion, or
+          JavaScript off.
+        */}
+        <BrandIntro />
         <a
           href="#content"
           className="focus:bg-forest focus:text-cream label rounded-edge sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-3"

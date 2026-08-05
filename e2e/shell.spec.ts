@@ -1,4 +1,4 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect, type Page } from "./support/session";
 import AxeBuilder from "@axe-core/playwright";
 
 /** Routes that exist today and must all render inside the shell. */
@@ -211,6 +211,24 @@ test.describe("header on scroll", () => {
 
   const TRANSPARENT = "rgba(0, 0, 0, 0)";
 
+  /**
+   * Scroll down until the bar actually hides.
+   *
+   * `page.goto` resolves on load, not on hydration, so a lone wheel can
+   * land before the scroll listener exists: the page moves, the header
+   * never learns the gesture was downward, and it sits there in view. That
+   * raced twice in CI on 2026-08-06 (both runs recovered on retry, which is
+   * exactly how a latent race announces itself). Repeating the gesture
+   * until it takes keeps these tests about the header rather than about
+   * hydration timing.
+   */
+  const scrollUntilHidden = async (page: Page) => {
+    await expect(async () => {
+      await page.mouse.wheel(0, 900);
+      await expect(header(page)).not.toBeInViewport({ timeout: 1_000 });
+    }).toPass({ timeout: 15_000 });
+  };
+
   test("stays put at the very top of the page", async ({ page }) => {
     await page.goto("/");
     await page.mouse.wheel(0, 4);
@@ -248,8 +266,7 @@ test.describe("header on scroll", () => {
   test("hides going down and returns going up", async ({ page }) => {
     await page.goto("/");
 
-    await page.mouse.wheel(0, 900);
-    await expect(header(page)).not.toBeInViewport();
+    await scrollUntilHidden(page);
 
     await page.mouse.wheel(0, -120);
     await expect(header(page)).toBeInViewport();
@@ -257,8 +274,7 @@ test.describe("header on scroll", () => {
 
   test("comes back when focus enters it", async ({ page }) => {
     await page.goto("/");
-    await page.mouse.wheel(0, 900);
-    await expect(header(page)).not.toBeInViewport();
+    await scrollUntilHidden(page);
 
     // Any focusable in the bar; at this width that is the inline nav.
     await header(page).getByRole("link", { name: "Experiences" }).focus();
