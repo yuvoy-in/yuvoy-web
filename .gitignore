@@ -50,3 +50,6 @@ next-env.d.ts
 
 # backend reference clone (read-only; never track or push)
 /yuvoy-api
+
+# Agent worktrees are whole checkouts; never part of this repo.
+.claude/worktrees/
