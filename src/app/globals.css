@@ -417,13 +417,16 @@
 }
 
 /*
-  The brand veil — the site's entrance (see BrandIntro). A forest surface over
-  everything, on which the mark surfaces from depth, the wordmark cascades in
-  letter by letter, a handwritten stroke signs off beneath the kicker, and the
+  The brand veil — the site's entrance (see BrandIntro). Not a flat card but a
+  scene from the brand's world: night water (the film-c gradient language,
+  an ember of terracotta warmth at the bottom edge) under drifting dive-light
+  (the caustics utility) and grain. On it, a giant ensō ring draws itself
+  around the arriving lockup — left slightly open, as a real ensō is — while
+  the mark surfaces from depth, YUVOY rises letter by letter through a
+  baseline mask like set type, a handwritten stroke signs off beneath the
+  kicker, and the island's name grounds the bottom of the frame. Then the
   whole surface rolls up — the shutter language — to unveil a page that has
-  already settled underneath. On the homepage the veil and the cover are the
-  same field, so the moving edge itself is invisible and the composition is
-  simply unveiled.
+  already settled underneath; the reveal begins at the warm edge.
 
   Decisions, so they are not re-litigated ad hoc:
 
@@ -451,6 +454,8 @@
   top-layer <dialog> above everything and unreachable while the veil plays.
 */
 .intro-veil {
+  --intro-ring-at: 150ms;
+  --intro-ring: 2300ms;
   --intro-mark-in: 1100ms;
   --intro-rise: 850ms;
   --intro-letters-at: 200ms;
@@ -458,6 +463,7 @@
   --intro-kicker-at: 700ms;
   --intro-stroke-at: 950ms;
   --intro-stroke: 1250ms;
+  --intro-place-at: 1500ms;
   --intro-close-at: 2350ms;
   --intro-close: 450ms;
   --intro-exit-at: 2550ms;
@@ -471,15 +477,22 @@
   /* Slightly more space below centre than above: the optical centre of the
      lockup sits a touch high, which is where a still frame wants it. */
   padding-bottom: 3rem;
-  /* A 4% cream lift at the upper centre — the film utilities' move — so the
-     field has depth without a second dark ever existing. */
+  /* Night water: a faint cream lift where the surface would be, forest
+     depths, and an ember of terracotta warmth at the bottom edge — all
+     color-mix on brand tokens, the film utilities' rule, so no second dark
+     ever exists. */
   background:
     radial-gradient(
-      120% 90% at 50% 28%,
-      color-mix(in oklab, var(--color-forest) 96%, var(--color-cream)),
-      var(--color-forest) 62%
+      120% 90% at 50% 24%,
+      color-mix(in oklab, var(--color-forest) 93%, var(--color-cream)),
+      transparent 58%
     ),
-    var(--color-forest);
+    linear-gradient(
+      175deg,
+      color-mix(in oklab, var(--color-forest) 90%, var(--color-cream)) 0%,
+      var(--color-forest) 52%,
+      color-mix(in oklab, var(--color-forest) 84%, var(--color-terra)) 100%
+    );
 }
 
 .intro-veil[data-play] {
@@ -512,8 +525,23 @@
   animation: yuvoy-intro-surface var(--intro-mark-in) var(--ease-cinematic) both;
 }
 
+/* The great ring: the ensō drawn at the scale of the frame, encircling the
+   lockup as it arrives. pathLength="1" and a dash pair, like the sign-off
+   stroke — and it never quite closes (the offset settles at 0.035), because
+   an ensō's opening is the point of an ensō. */
+.intro-ring {
+  rotate: -100deg;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: yuvoy-intro-ring var(--intro-ring) var(--ease-cinematic)
+    var(--intro-ring-at) both;
+}
+
+/* Letters rise through a baseline mask (each sits in an overflow-clipped
+   cell): set type arriving, not a fade. The kicker keeps the softer
+   blur-rise — small text can afford softness that display caps cannot. */
 .intro-letter {
-  animation: yuvoy-intro-rise var(--intro-rise) var(--ease-cinematic)
+  animation: yuvoy-intro-mask-rise var(--intro-rise) var(--ease-cinematic)
     calc(var(--intro-letters-at) + var(--intro-stagger) * var(--i, 0)) both;
 }
 
@@ -529,6 +557,13 @@
   stroke-dashoffset: 1;
   animation: yuvoy-intro-stroke var(--intro-stroke) var(--ease-cinematic)
     var(--intro-stroke-at) both;
+}
+
+/* The island's name, grounding the bottom of the frame. Real brand copy
+   (the cover's own opening line), not an atmospheric flourish. */
+.intro-place {
+  animation: yuvoy-intro-rise var(--intro-rise) var(--ease-cinematic)
+    var(--intro-place-at) both;
 }
 
 /* The mark's arrival — the emerge grammar (scale, settle, focus) retuned for
@@ -577,6 +612,26 @@
 
   to {
     stroke-dashoffset: 0;
+  }
+}
+
+@keyframes yuvoy-intro-ring {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0.035;
+  }
+}
+
+@keyframes yuvoy-intro-mask-rise {
+  from {
+    transform: translateY(115%);
+  }
+
+  to {
+    transform: translateY(0);
   }
 }
 

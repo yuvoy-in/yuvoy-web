@@ -11,10 +11,12 @@ import {
 
 /**
  * The brand veil — a full-page entrance that plays once per tab session
- * before the site is seen: the ensō surfaces, YUVOY cascades in, a
- * handwritten stroke signs off under the kicker, and the surface rolls up to
- * unveil a page that has already settled underneath it. The whole choreography is CSS in globals.css; this file
- * only decides whether it exists and tidies up after it.
+ * before the site is seen: on a night-water scene, a frame-scale ensō ring
+ * draws itself around the surfacing mark, YUVOY rises through a baseline
+ * mask, a handwritten stroke signs off under the kicker, and the surface
+ * rolls up to unveil a page that has already settled underneath it. The
+ * whole choreography is CSS in globals.css; this file only decides whether
+ * it exists and tidies up after it.
  *
  * Who never sees it, decided before first paint by the inline script below:
  * anyone who already saw it this session (the storage flag), anyone who
@@ -150,7 +152,31 @@ export function IntroVeil({
       data-hold={hold ? "" : undefined}
       className="intro-veil"
     >
+      {/* The scene, bottom to top: drifting dive-light over the night-water
+          gradient, then grain. Both are decoration layers the preview
+          surface already owns; the veil borrows them at reduced strength. */}
+      <div className="caustics opacity-60" />
       <div className="grain" />
+      {/*
+        The great ring — the ensō at the scale of the frame, drawing itself
+        around the lockup. Its box shares the veil's bottom padding so its
+        centre sits exactly on the lockup's optical centre.
+      */}
+      <svg
+        viewBox="0 0 100 100"
+        fill="none"
+        className="intro-ring text-cream/12 absolute inset-0 bottom-12 m-auto size-72 sm:size-96"
+      >
+        <circle
+          cx="50"
+          cy="50"
+          r="48.5"
+          pathLength={1}
+          stroke="currentColor"
+          strokeWidth={0.9}
+          strokeLinecap="round"
+        />
+      </svg>
       <div className="intro-stage flex flex-col items-center">
         <Image
           src="/brand/yuvoy-mark-on-dark.png"
@@ -164,16 +190,19 @@ export function IntroVeil({
         {/*
           The wordmark rules (§2): sans caps on `tracking-wordmark`. The
           negative margin gives back the tracking the last letter carries,
-          so the word is optically centred, not centred-plus-a-gap.
+          so the word is optically centred, not centred-plus-a-gap. Each
+          letter sits in an overflow-clipped cell and rises through its
+          baseline — set type arriving, not a fade.
         */}
-        <span className="tracking-wordmark text-cream mt-9 -mr-(--tracking-wordmark) flex font-sans text-3xl font-bold sm:text-4xl">
+        <span className="tracking-wordmark text-cream mt-9 -mr-(--tracking-wordmark) flex font-sans text-4xl font-bold sm:text-5xl">
           {LETTERS.map((letter, index) => (
-            <span
-              key={index}
-              className="intro-letter"
-              style={{ "--i": index } as CSSProperties}
-            >
-              {letter}
+            <span key={index} className="overflow-hidden">
+              <span
+                className="intro-letter block"
+                style={{ "--i": index } as CSSProperties}
+              >
+                {letter}
+              </span>
             </span>
           ))}
         </span>
@@ -202,6 +231,11 @@ export function IntroVeil({
           />
         </svg>
       </div>
+      {/* The island's name grounds the frame — the cover's own opening
+          words, so the veil and the page tell one story. */}
+      <span className="intro-place label text-cream/60 absolute inset-x-0 bottom-10 text-center">
+        Andaman Islands
+      </span>
     </div>
   );
 }
