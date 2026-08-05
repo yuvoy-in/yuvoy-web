@@ -73,8 +73,8 @@ export default function DestinationsPage() {
         <Link
           href="/waitlist"
           className={cn(
-            buttonVariants({ size: "lg" }),
-            "focus-visible:ring-offset-forest mt-12 flex w-full sm:inline-flex sm:w-auto",
+            buttonVariants({ variant: "paper", size: "lg" }),
+            "mt-12 flex w-full sm:inline-flex sm:w-auto",
           )}
         >
           Join the waitlist

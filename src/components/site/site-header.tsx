@@ -78,11 +78,13 @@ export function SiteHeader() {
           <Link
             href={PRIMARY_CTA.href}
             className={cn(
-              buttonVariants({ size: "sm" }),
+              // Monochrome CTAs swap grounds with the bar: paper over the
+              // dark cover, forest on the cream bar.
+              buttonVariants({
+                variant: overCover ? "paper" : "primary",
+                size: "sm",
+              }),
               "hidden sm:inline-flex",
-              // The terracotta fill reads on both surfaces; only the ring's
-              // offset has to follow what is behind it.
-              overCover && "focus-visible:ring-offset-forest",
             )}
           >
             {PRIMARY_CTA.label}

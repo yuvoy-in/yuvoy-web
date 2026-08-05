@@ -29,7 +29,7 @@ Brand Kit v2. Every ratio below is measured (sRGB relative luminance, WCAG 2.2) 
 | `cream-line` | `#E5DCC9` | Hairline borders on cream                                 |
 | `forest`     | `#16362E` | Primary ink **and** every dark surface (11.44:1 on cream) |
 | `terra`      | `#BE7149` | Accent — decoration and LARGE display text only (3.24:1)  |
-| `terra-deep` | `#985028` | Text-capable accent + primary CTA fill (5.21:1 on cream)  |
+| `terra-deep` | `#985028` | Text-capable accent (5.21:1 on cream); never a CTA fill   |
 | `terra-soft` | `#D89772` | Accent text on forest (5.36:1)                            |
 
 ### Measured contrast
@@ -146,9 +146,9 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 
 ## 5. Components (current)
 
-- **`Button`** — variants `primary | outline | ink | ghost | outlineOnDark`, sizes `sm | md | lg`. Labels are uppercase bold at `tracking-label`.
-  - **`primary` and `outline` are the first-class pair.** Every screen should use those two; a page with three competing button styles is a bug.
-  - `ink` (solid forest), `ghost` (text-only) and `outlineOnDark` (secondary on forest sections) are **situational** — allowed, but justify them in review.
+- **`Button`** — variants `primary | outline | paper | ghost | outlineOnDark`, sizes `sm | md | lg`. Labels are uppercase bold at `tracking-label`; hover lifts a pixel, press compresses (`active:scale`), and the trailing arrow eases forward — all on `--ease-interaction`.
+  - **CTAs are monochrome** (owner direction 2026-08-05): on cream surfaces the pair is `primary` (solid forest) + `outline`; on forest surfaces it is `paper` (solid cream) + `outlineOnDark`. Both fills are 11.44:1. **Terracotta is never a button fill** — it is the accent for type, dots and marks; the old terra-deep CTA was retired as a template tell.
+  - `ghost` (text-only) is **situational** — allowed, but justify it in review. The former `ink` variant is gone: `primary` now is the forest fill.
   - Use `buttonVariants()` to style a `<Link>` as a button; `<ButtonArrow />` for the trailing arrow on a forward action.
 - **`Input`** — `rounded-edge` field on `cream-deep`, terra-deep focus ring.
 - **`WaveMotif`** — the three-line wave glyph, the island signature. Decorative accent only, at most once per section; tone follows the surface.

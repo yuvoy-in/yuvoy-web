@@ -646,7 +646,7 @@ function TravellerForm({ context }: { context: LeadContext }) {
         registerMarketing={register("marketingOptIn")}
       />
 
-      <Button type="submit" size="lg" disabled={isSubmitting}>
+      <Button type="submit" variant="paper" size="lg" disabled={isSubmitting}>
         {isSubmitting ? "Sending…" : "Join the waitlist"}
       </Button>
     </form>
@@ -842,7 +842,7 @@ function ProviderForm({ context }: { context: LeadContext }) {
         registerMarketing={register("marketingOptIn")}
       />
 
-      <Button type="submit" size="lg" disabled={isSubmitting}>
+      <Button type="submit" variant="paper" size="lg" disabled={isSubmitting}>
         {isSubmitting ? "Sending…" : "Join the waitlist"}
       </Button>
 

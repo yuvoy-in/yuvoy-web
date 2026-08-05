@@ -57,12 +57,15 @@ export function Hero() {
             Andaman Islands · Opening soon
           </p>
 
+          {/* The turn flows inline: a forced line break before it is the
+              split-headline tell the skills ban, and the sentence reads
+              better as one breath (owner sizing note, 2026-08-05). */}
           <h1
-            className="font-display emerge mt-9 max-w-4xl text-[clamp(3rem,8.5vw,6rem)] leading-[1.02] font-medium tracking-tight text-balance"
+            className="font-display emerge mt-9 max-w-3xl text-[clamp(2.375rem,5.5vw,4.25rem)] leading-[1.06] font-medium tracking-tight text-balance"
             style={{ animationDelay: "0.14s" }}
           >
-            Every video here is an experience
-            <span className="text-terra-soft mt-3 block font-bold not-italic">
+            Every video here is an experience{" "}
+            <span className="text-terra-soft font-bold">
               you can actually book.
             </span>
           </h1>
@@ -89,8 +92,8 @@ export function Hero() {
             <a
               href="#register"
               className={cn(
-                buttonVariants({ size: "lg" }),
-                "focus-visible:ring-offset-forest w-full sm:w-auto",
+                buttonVariants({ variant: "paper", size: "lg" }),
+                "w-full sm:w-auto",
               )}
             >
               Join the waitlist

@@ -113,8 +113,8 @@ export function OperatorSystem() {
               <a
                 href="#apply"
                 className={cn(
-                  buttonVariants({ size: "lg" }),
-                  "focus-visible:ring-offset-forest mt-8 w-full sm:w-auto",
+                  buttonVariants({ variant: "paper", size: "lg" }),
+                  "mt-8 w-full sm:w-auto",
                 )}
               >
                 Apply as a founding operator

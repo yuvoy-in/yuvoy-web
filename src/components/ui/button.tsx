@@ -3,9 +3,9 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/cn";
 
 /**
- * The button system. Two variants are first-class — `primary` (the terracotta
- * call to action) and `outline` (its secondary) — and every screen should
- * reach for those. `ink`, `ghost` and `outlineOnDark` are situational; see
+ * The button system. On light surfaces the first-class pair is `primary`
+ * (solid forest) and `outline`; on forest surfaces it is `paper` (solid
+ * cream) and `outlineOnDark`. `ghost` is situational; see
  * docs/DESIGN_SYSTEM.md §5 for when each is allowed.
  *
  * Labels are wide-tracked uppercase bold (v2.3 — the mono went with the
@@ -28,12 +28,19 @@ const button = cva(
   {
     variants: {
       variant: {
-        // cream on terra-deep is 5.21:1 — the lighter `terra` would be 3.4:1
-        // and fail AA at label size, which is why the CTA fill is terra-deep.
-        primary: "bg-terra-deep text-cream hover:bg-terra-deep/90",
+        /*
+          CTAs are monochrome (owner direction, 2026-08-05): the site's two
+          grounds simply swap — forest fill on cream surfaces, cream fill on
+          forest ones — both 11.44:1. Terracotta is an accent for type and
+          marks, never a button fill; the old terra-deep CTA read as the
+          template it came from.
+        */
+        primary: "bg-forest text-cream hover:bg-forest/90",
         outline:
           "border-forest/25 text-forest hover:border-forest/45 hover:bg-forest/5 border",
-        ink: "bg-forest text-cream hover:bg-forest/90",
+        // The primary on a forest section: paper on the dark ground.
+        paper:
+          "bg-cream text-forest hover:bg-cream/90 focus-visible:ring-terra-soft focus-visible:ring-offset-forest",
         ghost: "text-forest hover:bg-forest/5",
         // Secondary action on a forest section.
         outlineOnDark:
@@ -42,7 +49,7 @@ const button = cva(
       size: {
         sm: "h-9 px-4",
         md: "h-11 px-6",
-        lg: "h-14 px-9 text-sm",
+        lg: "h-12 px-7",
       },
     },
     defaultVariants: { variant: "primary", size: "md" },

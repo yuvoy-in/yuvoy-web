@@ -178,8 +178,8 @@ export default function AboutPage() {
           <Link
             href="/waitlist"
             className={cn(
-              buttonVariants({ size: "lg" }),
-              "focus-visible:ring-offset-forest w-full sm:w-auto",
+              buttonVariants({ variant: "paper", size: "lg" }),
+              "w-full sm:w-auto",
             )}
           >
             Join the waitlist

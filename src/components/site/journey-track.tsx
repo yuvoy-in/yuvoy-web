@@ -111,9 +111,11 @@ export function JourneyTrack({ journey }: { journey: Journey }) {
         <Link
           href={journey.cta.href}
           className={cn(
-            buttonVariants({ size: "lg" }),
+            buttonVariants({
+              variant: journey.key === "operator" ? "paper" : "primary",
+              size: "lg",
+            }),
             "mt-12 flex w-full sm:inline-flex sm:w-auto",
-            journey.key === "operator" && "focus-visible:ring-offset-forest",
           )}
         >
           {journey.cta.label}

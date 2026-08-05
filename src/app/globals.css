@@ -24,7 +24,7 @@
   --color-cream-line: #e5dcc9; /* hairline borders on cream */
   --color-forest: #16362e; /* primary ink AND every dark surface (11.44:1) */
   --color-terra: #be7149; /* accent — decoration + LARGE display text (3.24:1) */
-  --color-terra-deep: #985028; /* text-capable accent + CTA fill (5.21:1) */
+  --color-terra-deep: #985028; /* text-capable accent (5.21:1); never a CTA fill */
   --color-terra-soft: #d89772; /* accent text on forest (5.36:1) */
 
   /* ----------------------------------------------------------------- type */
