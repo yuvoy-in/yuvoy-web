@@ -722,14 +722,21 @@
 }
 
 /* With the mask 2.5x the box and no-repeat: at 100% the box shows the
-   mask's transparent tail (nothing), at 0% its solid head (everything). */
+   mask's transparent tail (nothing), at 0% its solid head (everything).
+   The travel is clamped to 92% -> 8% because outside that range the mask
+   moves over pixels whose fate is already decided: the text is fully
+   hidden above 92% and fully shown below 8%. Sweeping the whole 100 -> 0
+   made the easing spend its long decelerating tail on invisible travel,
+   so the word LOOKED finished ~half a second before the animation ended
+   and the swash (which starts at the animation's end) seemed to lag
+   (owner report, twice). The end of this animation now IS the visual end. */
 @keyframes yuvoy-intro-write {
   from {
-    mask-position: 100% 0;
+    mask-position: 92% 0;
   }
 
   to {
-    mask-position: 0% 0;
+    mask-position: 8% 0;
   }
 }
 
