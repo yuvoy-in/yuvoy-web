@@ -62,22 +62,25 @@ export function Hero() {
           </p>
 
           {/*
-            One flowing sentence with the three journey words turned — video,
-            experience, book — instead of a block second line (owner
-            direction, 2026-08-06). The highlights trace exactly what the
-            product does: watch the video, it is the experience, book it.
-            Each is a TRUE drawn italic (v2.5: Fraunces ships one) at the
-            `font-turn` weight; the cover is the one place the brand turns
-            more than once, because these three words ARE the concept.
+            The staircase lockup (owner brief, 2026-08-06: "more premium,
+            wonderful"): three composed lines, each carrying exactly one
+            turned word — video, experience, book — so the italics descend
+            through the sentence in reading order. The breaks are deliberate
+            composition, not decoration: they exist to give every line one
+            turn. From `sm` up the staircase is fixed; below it the breaks
+            release and text-balance takes over, because a phone's measure
+            cannot hold the long third line. Each turn is a TRUE drawn
+            italic (v2.5) at the `font-turn` weight.
           */}
           <h1
-            className="font-display emerge tracking-display mt-10 max-w-4xl text-[clamp(2.75rem,7vw,5.25rem)] leading-[1.08] font-normal text-balance"
+            className="font-display emerge tracking-display mt-10 max-w-4xl text-[clamp(2.625rem,7.4vw,5.75rem)] leading-[1.06] font-normal text-balance"
             style={{ animationDelay: "0.14s" }}
           >
             Every <em className="text-terra-soft font-turn italic">video</em>{" "}
-            here is an{" "}
-            <em className="text-terra-soft font-turn italic">experience</em> you
-            can actually{" "}
+            here
+            <br className="hidden sm:inline" /> is an{" "}
+            <em className="text-terra-soft font-turn italic">experience</em>
+            <br className="hidden sm:inline" /> you can actually{" "}
             <em className="text-terra-soft font-turn italic">book.</em>
           </h1>
 
