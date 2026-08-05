@@ -486,6 +486,12 @@
   z-index: 60;
   display: none;
   place-items: center;
+  /* The veil is a sealed scene: containment keeps its constant animation
+     work from invalidating the page underneath (and vice versa), and the
+     will-change pre-promotes its layer so the exit clip does not begin
+     with a promotion hitch 2.7s in. */
+  contain: layout paint;
+  will-change: clip-path;
   /* Slightly more space below centre than above: the optical centre of the
      lockup sits a touch high, which is where a still frame wants it. */
   padding-bottom: 3rem;
@@ -519,7 +525,13 @@
   transition: opacity 200ms var(--ease-interaction);
 }
 
+/* will-change on the stage, the swash and the place line: their animations
+   start mid-choreography (2.5s, 1.5s, 1.5s in), and promoting a layer at
+   the moment its delay expires is exactly the kind of one-frame hitch this
+   entrance cannot afford. Elements that animate from first paint promote
+   naturally and need no hint. */
 .intro-stage {
+  will-change: transform, opacity;
   animation: yuvoy-intro-close var(--intro-close) var(--ease-cinematic)
     var(--intro-close-at) both;
 }
@@ -643,6 +655,7 @@
    crossing the page. The vertical insets are negative so the wipe can
    never shave the swash's own curve. */
 .intro-stroke {
+  will-change: clip-path;
   animation: yuvoy-intro-underline var(--intro-stroke) var(--ease-cinematic)
     var(--intro-stroke-at) both;
 }
@@ -669,6 +682,7 @@
    signature, and the extra air is what keeps it from reading as a caption. */
 .intro-place {
   letter-spacing: var(--tracking-wordmark);
+  will-change: transform, opacity, filter;
   animation: yuvoy-intro-rise var(--intro-rise) var(--ease-cinematic)
     var(--intro-place-at) both;
 }

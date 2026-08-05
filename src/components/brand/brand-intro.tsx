@@ -8,6 +8,7 @@ import {
   type CSSProperties,
   type Ref,
 } from "react";
+import { preload } from "react-dom";
 import {
   LETTER_HEIGHT,
   LETTER_TOP,
@@ -62,6 +63,12 @@ export function BrandIntro() {
   const veilRef = useRef<HTMLDivElement>(null);
   const [gone, setGone] = useState(false);
 
+  // The horizon is a CSS background, which the browser only discovers once
+  // styles apply — on a cold cache it could pop in mid-fade. Preloading
+  // from render puts it on the wire with the document itself. (The mark is
+  // already preloaded by next/image `priority`; the fonts by next/font.)
+  preload("/assets/intro-horizon.webp", { as: "image" });
+
   useEffect(() => {
     const veil = veilRef.current;
     if (!veil) return;
@@ -99,12 +106,23 @@ export function BrandIntro() {
       }
     };
 
+    // Unlock on the exit's FIRST frame, not its last: restoring the
+    // scrollbar reflows the page, and at that instant the veil still
+    // covers every pixel — so the one visible glitch the lock could cause
+    // happens where it cannot be seen.
+    const onAnimationStart = (event: AnimationEvent) => {
+      if (event.target === veil && event.animationName === "yuvoy-intro-exit") {
+        unlock();
+      }
+    };
+
     const onKeyDown = () => {
       veil.setAttribute("data-skip", "");
       window.clearTimeout(timer);
       timer = window.setTimeout(settle, SKIP_FADE_MS);
     };
 
+    veil.addEventListener("animationstart", onAnimationStart);
     veil.addEventListener("animationend", onAnimationEnd);
     window.addEventListener("keydown", onKeyDown);
     // If `animationend` never arrives (an extension pausing animations, an
@@ -113,6 +131,7 @@ export function BrandIntro() {
     timer = window.setTimeout(settle, INTRO_TOTAL_MS + 600);
 
     return () => {
+      veil.removeEventListener("animationstart", onAnimationStart);
       veil.removeEventListener("animationend", onAnimationEnd);
       window.removeEventListener("keydown", onKeyDown);
       window.clearTimeout(timer);
