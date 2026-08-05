@@ -661,7 +661,7 @@
 .intro-horizon {
   position: absolute;
   inset: auto 0 0 0;
-  height: clamp(11rem, 30vh, 20rem);
+  height: clamp(10rem, 30vh, 19rem);
   background-image: url("/assets/intro-horizon.webp");
   background-size: cover;
   background-position: center bottom;
