@@ -212,6 +212,78 @@
   animation: yuvoy-emerge 1100ms var(--ease-cinematic) both;
 }
 
+/*
+  The cover's atmosphere (owner direction, 2026-08-05: "more dramatic"):
+  lagoon light, built from tokens the same way the preview's film is. Two
+  layers breathe on slow, offset cycles — a cream glow high in the water and
+  terra warmth low at the horizon — so the field reads as a place with light
+  moving through it rather than a flat panel. Fills are exempt from the
+  contrast floors, and the global reduced-motion rule collapses the breathing
+  to its resting (fully lit) state.
+
+  This is not the corner glow that was removed on 2026-08-04: that was an
+  ornament pinned to one edge; this is the field itself carrying light.
+*/
+@utility hero-atmosphere {
+  position: absolute;
+  inset: 0;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -20%;
+  }
+
+  &::before {
+    background: radial-gradient(
+      55% 45% at 50% 8%,
+      color-mix(in oklab, var(--color-cream) 14%, transparent),
+      transparent 70%
+    );
+    animation: yuvoy-breathe 16s var(--ease-cinematic) infinite alternate;
+  }
+
+  &::after {
+    background: radial-gradient(
+      70% 55% at 72% 108%,
+      color-mix(in oklab, var(--color-terra) 22%, transparent),
+      transparent 65%
+    );
+    animation: yuvoy-breathe 21s var(--ease-cinematic) infinite
+      alternate-reverse;
+  }
+}
+
+@keyframes yuvoy-breathe {
+  from {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+/*
+  A hairline that draws itself in from the left. Ends fully drawn, which is
+  also what reduced-motion visitors see.
+*/
+@keyframes yuvoy-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@utility draw-line {
+  transform-origin: left center;
+  animation: yuvoy-draw 900ms var(--ease-cinematic) both;
+}
+
 /* ------------------------------------------------- the product preview */
 
 /*

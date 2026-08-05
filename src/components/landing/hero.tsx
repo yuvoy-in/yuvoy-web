@@ -1,13 +1,17 @@
+import Image from "next/image";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 
 /**
- * The cover: a full-viewport statement on a flat forest field, textured only
- * by filmic grain. The scene is still; the only motion is the composition
- * surfacing from depth once, on first paint (the `emerge` utility). An
- * animated wave horizon and a terracotta corner glow were both tried and
- * removed (owner direction, 2026-08-03 and 2026-08-04); the type carries the
- * register on its own.
+ * The cover: a full-viewport statement on a forest field that carries light.
+ * Three quiet layers build the drama (owner direction, 2026-08-05): the
+ * `hero-atmosphere` lagoon light breathing through the field, the official
+ * ensō vast and almost invisible behind the type, and filmic grain over it
+ * all. Entrance is first-paint choreography only — the composition surfaces
+ * from depth and the facts rule draws itself in — there is still no
+ * scroll-triggered motion (owner direction, 2026-08-04 stands). An animated
+ * wave horizon and a corner glow were tried and removed in earlier rounds;
+ * the atmosphere differs in kind — it is the field, not an ornament on it.
  *
  * The product preview lives in the next act, so the cover's only job is the
  * promise: every video is a bookable experience (owner copy, 2026-08-05).
@@ -36,10 +40,25 @@ export function Hero() {
       data-dark-hero
       className="bg-forest text-cream relative -mt-14 overflow-hidden"
     >
-      {/* Nothing but grain: a flat forest field, so the type is the whole
-          composition. The terracotta corner glow that used to sit here went
-          with the waves (owner direction, 2026-08-04). */}
+      {/* The field: breathing lagoon light, the ghosted ensō, then grain on
+          top so everything sits in the same film. All decorative, all inert. */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="hero-atmosphere" />
+        {/*
+          The mark itself, vast and at the edge of visibility — the ring
+          halos the headline the way a watermark signs a print. Cream
+          strokes at 5% shift the forest behind the type by less than a
+          tone, so every contrast floor holds untouched.
+        */}
+        <Image
+          src="/brand/yuvoy-mark-on-dark.png"
+          alt=""
+          width={1024}
+          height={1024}
+          priority
+          quality={100}
+          className="absolute top-[44%] left-1/2 w-[min(78vmin,44rem)] -translate-x-1/2 -translate-y-1/2 opacity-[0.05]"
+        />
         <div className="grain" />
       </div>
 
@@ -65,7 +84,13 @@ export function Hero() {
             style={{ animationDelay: "0.14s" }}
           >
             Every video here is an experience{" "}
-            <span className="text-terra-soft font-bold">
+            {/*
+              The one italic on the site (owner direction, 2026-08-05): no
+              italic file ships, so this slant is the browser's synthesized
+              oblique of Cabinet 700 — same family, same weight, skewed.
+              Acceptable at display size only; italics stay banned elsewhere.
+            */}
+            <span className="text-terra-soft font-bold italic">
               you can actually book.
             </span>
           </h1>
@@ -111,11 +136,17 @@ export function Hero() {
           </div>
         </div>
 
-        {/* The momentum line: three true facts, and the three islands. */}
+        {/* The momentum line: three true facts, and the three islands. Its
+            rule draws itself in as the row arrives. */}
         <div
-          className="emerge border-cream/12 mt-16 flex flex-col items-center gap-4 border-t pt-6 text-center sm:mt-20 sm:flex-row sm:justify-between sm:gap-x-10 sm:text-left"
+          className="emerge relative mt-16 flex flex-col items-center gap-4 pt-6 text-center sm:mt-20 sm:flex-row sm:justify-between sm:gap-x-10 sm:text-left"
           style={{ animationDelay: "0.5s" }}
         >
+          <span
+            aria-hidden
+            className="draw-line bg-cream/12 absolute inset-x-0 top-0 h-px"
+            style={{ animationDelay: "0.7s" }}
+          />
           <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 sm:justify-start">
             {FACTS.map((fact) => (
               <li
