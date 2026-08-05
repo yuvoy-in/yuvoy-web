@@ -11,12 +11,12 @@ import {
 
 /**
  * The brand veil — a full-page entrance that plays once per tab session
- * before the site is seen: on a night-water scene, a frame-scale ensō ring
- * draws itself around the surfacing mark, YUVOY rises through a baseline
- * mask, a handwritten stroke signs off under the kicker, and the surface
- * rolls up to unveil a page that has already settled underneath it. The
- * whole choreography is CSS in globals.css; this file only decides whether
- * it exists and tidies up after it.
+ * before the site is seen: on a night-water scene, the mark surfaces from
+ * depth, YUVOY rises through a baseline mask, "Experience more." lands as
+ * the display statement with a handwritten stroke as its underline, and the
+ * surface rolls up to unveil a page that has already settled underneath it.
+ * The whole choreography is CSS in globals.css; this file only decides
+ * whether it exists and tidies up after it.
  *
  * Who never sees it, decided before first paint by the inline script below:
  * anyone who already saw it this session (the storage flag), anyone who
@@ -157,26 +157,6 @@ export function IntroVeil({
           surface already owns; the veil borrows them at reduced strength. */}
       <div className="caustics opacity-60" />
       <div className="grain" />
-      {/*
-        The great ring — the ensō at the scale of the frame, drawing itself
-        around the lockup. Its box shares the veil's bottom padding so its
-        centre sits exactly on the lockup's optical centre.
-      */}
-      <svg
-        viewBox="0 0 100 100"
-        fill="none"
-        className="intro-ring text-cream/12 absolute inset-0 bottom-12 m-auto size-72 sm:size-96"
-      >
-        <circle
-          cx="50"
-          cy="50"
-          r="48.5"
-          pathLength={1}
-          stroke="currentColor"
-          strokeWidth={0.9}
-          strokeLinecap="round"
-        />
-      </svg>
       <div className="intro-stage flex flex-col items-center">
         <Image
           src="/brand/yuvoy-mark-on-dark.png"
@@ -194,7 +174,7 @@ export function IntroVeil({
           letter sits in an overflow-clipped cell and rises through its
           baseline — set type arriving, not a fade.
         */}
-        <span className="tracking-wordmark text-cream mt-9 -mr-(--tracking-wordmark) flex font-sans text-4xl font-bold sm:text-5xl">
+        <span className="tracking-wordmark text-cream mt-9 -mr-(--tracking-wordmark) flex font-sans text-3xl font-bold sm:text-4xl">
           {LETTERS.map((letter, index) => (
             <span key={index} className="overflow-hidden">
               <span
@@ -206,7 +186,14 @@ export function IntroVeil({
             </span>
           ))}
         </span>
-        <span className="intro-kicker label text-terra-soft mt-4">
+        {/*
+          The statement — the brand kicker promoted to the display voice, in
+          the italic terracotta turn (§2), the site's most recognisable
+          typographic move: the engineered wordmark speaks, the editorial
+          voice answers. `leading-tight` + `pb-1` reserve room for the
+          descenders an italic line clips at display size.
+        */}
+        <span className="intro-kicker font-display text-terra-soft mt-6 pb-1 text-4xl leading-tight italic sm:text-5xl">
           Experience more.
         </span>
         {/*
@@ -219,7 +206,7 @@ export function IntroVeil({
         <svg
           viewBox="0 0 144 12"
           fill="none"
-          className="text-terra-soft mt-3 h-3 w-36"
+          className="text-terra-soft mt-2 h-3 w-36"
         >
           <path
             className="intro-stroke"
@@ -233,7 +220,7 @@ export function IntroVeil({
       </div>
       {/* The island's name grounds the frame — the cover's own opening
           words, so the veil and the page tell one story. */}
-      <span className="intro-place label text-cream/60 absolute inset-x-0 bottom-10 text-center">
+      <span className="intro-place label text-cream/70 absolute inset-x-0 bottom-10 text-center">
         Andaman Islands
       </span>
     </div>

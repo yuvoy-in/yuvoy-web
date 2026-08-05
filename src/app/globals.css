@@ -420,13 +420,14 @@
   The brand veil — the site's entrance (see BrandIntro). Not a flat card but a
   scene from the brand's world: night water (the film-c gradient language,
   an ember of terracotta warmth at the bottom edge) under drifting dive-light
-  (the caustics utility) and grain. On it, a giant ensō ring draws itself
-  around the arriving lockup — left slightly open, as a real ensō is — while
-  the mark surfaces from depth, YUVOY rises letter by letter through a
-  baseline mask like set type, a handwritten stroke signs off beneath the
-  kicker, and the island's name grounds the bottom of the frame. Then the
-  whole surface rolls up — the shutter language — to unveil a page that has
-  already settled underneath; the reveal begins at the warm edge.
+  (the caustics utility, its diagonal sweep damped for this surface) and
+  grain. On it the mark surfaces from depth, YUVOY rises letter by letter
+  through a baseline mask like set type, "Experience more." lands as the
+  display statement — the italic terracotta turn, the brand's signature
+  move — with the handwritten stroke as its underline, and the island's name
+  grounds the bottom of the frame. Then the whole surface rolls up — the
+  shutter language — to unveil a page that has already settled underneath;
+  the reveal begins at the warm edge.
 
   Decisions, so they are not re-litigated ad hoc:
 
@@ -454,8 +455,6 @@
   top-layer <dialog> above everything and unreachable while the veil plays.
 */
 .intro-veil {
-  --intro-ring-at: 150ms;
-  --intro-ring: 2300ms;
   --intro-mark-in: 1100ms;
   --intro-rise: 850ms;
   --intro-letters-at: 200ms;
@@ -525,21 +524,16 @@
   animation: yuvoy-intro-surface var(--intro-mark-in) var(--ease-cinematic) both;
 }
 
-/* The great ring: the ensō drawn at the scale of the frame, encircling the
-   lockup as it arrives. pathLength="1" and a dash pair, like the sign-off
-   stroke — and it never quite closes (the offset settles at 0.035), because
-   an ensō's opening is the point of an ensō. */
-.intro-ring {
-  rotate: -100deg;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: yuvoy-intro-ring var(--intro-ring) var(--ease-cinematic)
-    var(--intro-ring-at) both;
+/* The veil borrows the preview's caustics but damps their diagonal sweep:
+   at full strength the streaks read as a pattern, and the veil's light
+   should be felt, not seen (owner direction). */
+.intro-veil .caustics::after {
+  opacity: 0.3;
 }
 
 /* Letters rise through a baseline mask (each sits in an overflow-clipped
-   cell): set type arriving, not a fade. The kicker keeps the softer
-   blur-rise — small text can afford softness that display caps cannot. */
+   cell): set type arriving, not a fade. The statement keeps the softer
+   blur-rise — a display line can arrive like the cover's own type does. */
 .intro-letter {
   animation: yuvoy-intro-mask-rise var(--intro-rise) var(--ease-cinematic)
     calc(var(--intro-letters-at) + var(--intro-stagger) * var(--i, 0)) both;
@@ -560,8 +554,11 @@
 }
 
 /* The island's name, grounding the bottom of the frame. Real brand copy
-   (the cover's own opening line), not an atmospheric flourish. */
+   (the cover's own opening line), not an atmospheric flourish. Wordmark
+   tracking rather than label tracking: at the foot of this frame it is a
+   signature, and the extra air is what keeps it from reading as a caption. */
 .intro-place {
+  letter-spacing: var(--tracking-wordmark);
   animation: yuvoy-intro-rise var(--intro-rise) var(--ease-cinematic)
     var(--intro-place-at) both;
 }
@@ -612,16 +609,6 @@
 
   to {
     stroke-dashoffset: 0;
-  }
-}
-
-@keyframes yuvoy-intro-ring {
-  from {
-    stroke-dashoffset: 1;
-  }
-
-  to {
-    stroke-dashoffset: 0.035;
   }
 }
 
