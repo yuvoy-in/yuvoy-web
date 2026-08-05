@@ -20,9 +20,10 @@ import { cn } from "@/lib/cn";
  * Size it from outside with a height class, and the size now means the
  * DRAWING's size: the generated variants crop the delivered canvas's empty
  * margins away, which is what made three owner size-steps look identical.
- * Default is `h-11 sm:h-14` — a true 56px of art nearly filling the 64px
- * bar from `sm` up, one step down on phones where the ~200px width would
- * crowd the centre link. The menu bar shares it; the footer passes `h-20`.
+ * Default is `h-10 sm:h-12` — a true 48px of art in the 64px bar from `sm`
+ * up (8px of air each side; owner settled here after seeing 56px), one step
+ * down on phones where the width would crowd the centre link. The menu bar
+ * shares it; the footer passes `h-20`.
  * tailwind-merge keeps the later height; the art's ~3.6:1 ratio sets width.
  */
 /* The cropped art box the generator emits (1247x347, ~3.6:1) — not the
@@ -47,7 +48,7 @@ export function Wordmark({
     <span
       role="img"
       aria-label="Yuvoy — Experience more."
-      className={cn("relative inline-flex h-11 sm:h-14", className)}
+      className={cn("relative inline-flex h-10 sm:h-12", className)}
     >
       {VARIANTS.map(({ src, dark }) => (
         <Image
