@@ -275,6 +275,43 @@
 }
 
 /*
+  The cover artwork's drift: a very slow push-in, so the seascape reads as
+  filmed rather than pasted. It starts already scaled so no edge is ever
+  revealed, and reduced motion freezes it mid-drift.
+*/
+@utility hero-photo {
+  animation: yuvoy-photo-drift 38s var(--ease-cinematic) infinite alternate;
+}
+
+@keyframes yuvoy-photo-drift {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+/*
+  The scrim that merges the cover artwork into the forest field. Near-solid
+  at the very top (the transparent header needs forest behind it, and the
+  headline needs a quiet ground), thinnest across the horizon band where the
+  artwork's light lives, then rising again at the foot so the facts row and
+  its hairline sit on brand ink rather than on water. Token-built like every
+  other fill.
+*/
+@utility hero-scrim {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-forest) 94%, transparent) 0%,
+    color-mix(in oklab, var(--color-forest) 72%, transparent) 30%,
+    color-mix(in oklab, var(--color-forest) 34%, transparent) 58%,
+    color-mix(in oklab, var(--color-forest) 28%, transparent) 74%,
+    color-mix(in oklab, var(--color-forest) 66%, transparent) 100%
+  );
+}
+
+/*
   A hairline that draws itself in from the left. Ends fully drawn, which is
   also what reduced-motion visitors see.
 */

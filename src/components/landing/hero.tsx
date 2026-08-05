@@ -1,15 +1,19 @@
+import Image from "next/image";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 
 /**
- * The cover: a full-viewport statement on a forest field that carries light.
- * Two quiet layers build the drama (owner direction, 2026-08-05): the
- * `hero-atmosphere` lagoon light breathing through the field, and filmic
- * grain over it. Entrance is first-paint choreography only — the composition surfaces
- * from depth and the facts rule draws itself in — there is still no
- * scroll-triggered motion (owner direction, 2026-08-04 stands). An animated
- * wave horizon and a corner glow were tried and removed in earlier rounds;
- * the atmosphere differs in kind — it is the field, not an ornament on it.
+ * The cover: a full-viewport statement on a forest field that carries light
+ * — and, since 2026-08-06, a place. The owner-supplied island seascape
+ * (public/assets/hero-section-bg.png) is merged into the field through a
+ * multiply wash and a scrim, so the brand green stays the ground and the
+ * artwork reads as depth within it, warmest along the horizon where its low
+ * sun echoes the terracotta. The `hero-atmosphere` lagoon light breathes
+ * over it and filmic grain seats every layer in the same film. Entrance is
+ * first-paint choreography only — the composition surfaces from depth and
+ * the facts rule draws itself in — and there is still no scroll-triggered
+ * motion (owner direction, 2026-08-04 stands); the artwork's 38s drift is
+ * ambient, like the light, not an event.
  *
  * The product preview lives in the next act, so the cover's only job is the
  * promise: every video is a bookable experience (owner copy, 2026-08-05).
@@ -38,11 +42,28 @@ export function Hero() {
       data-dark-hero
       className="bg-forest text-cream relative -mt-14 overflow-hidden"
     >
-      {/* The field: breathing lagoon light, then grain on top so both sit in
-          the same film. A vast ghosted ensō was tried here and removed
-          (owner direction, 2026-08-05) — the mark belongs in the header, not
-          behind the type. All decorative, all inert. */}
+      {/*
+        The field, in five layers (owner artwork + direction, 2026-08-06):
+        the island seascape the owner supplied, drifting almost imperceptibly;
+        a forest multiply wash that pulls its hues onto the brand green; the
+        scrim that dissolves it into solid forest at the top and foot; the
+        breathing lagoon light; and grain over everything so all of it sits
+        in the same film. The artwork is merged into the field, never pasted
+        onto it — at the top edge the cover still reads as the flat forest
+        the transparent header expects. All decorative, all inert.
+      */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
+        <Image
+          src="/assets/hero-section-bg.png"
+          alt=""
+          fill
+          priority
+          quality={82}
+          sizes="100vw"
+          className="hero-photo object-cover object-[center_75%]"
+        />
+        <div className="bg-forest/30 absolute inset-0 mix-blend-multiply" />
+        <div className="hero-scrim absolute inset-0" />
         <div className="hero-atmosphere" />
         <div className="grain" />
       </div>
