@@ -9,13 +9,19 @@ import { cn } from "@/lib/cn";
  * docs/DESIGN_SYSTEM.md §5 for when each is allowed.
  *
  * Labels are wide-tracked uppercase bold (v2.3 — the mono went with the
- * serif): an action reads as an action. Transitions sit inside the 250ms
- * interaction budget (design system §3).
+ * serif): an action reads as an action.
+ *
+ * The premium is in the touch, not the shape (2026-08-05): a press compresses
+ * the button (`active:scale`), a hover lifts it a pixel, and the trailing
+ * arrow eases forward — all on the interaction curve, all inside the 250ms
+ * budget (design system §3). The group is named (`group/btn`) so the arrow
+ * answers only its own button, never an ancestor card's hover.
  */
 const button = cva(
   [
-    "inline-flex items-center justify-center gap-2.5 rounded-edge font-sans text-xs font-bold tracking-label uppercase whitespace-nowrap",
-    "transition-colors duration-200 ease-[var(--ease-interaction)]",
+    "group/btn inline-flex items-center justify-center gap-2.5 rounded-edge font-sans text-xs font-bold tracking-label uppercase whitespace-nowrap",
+    "transition-[background-color,border-color,color,transform] duration-200 ease-[var(--ease-interaction)]",
+    "hover:-translate-y-px active:translate-y-0 active:scale-[0.985]",
     "focus-visible:ring-terra-deep focus-visible:ring-offset-cream focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
     "disabled:pointer-events-none disabled:opacity-50",
   ],
@@ -36,7 +42,7 @@ const button = cva(
       size: {
         sm: "h-9 px-4",
         md: "h-11 px-6",
-        lg: "h-13 px-8 text-sm",
+        lg: "h-14 px-9 text-sm",
       },
     },
     defaultVariants: { variant: "primary", size: "md" },
@@ -63,7 +69,8 @@ export { button as buttonVariants };
 
 /**
  * The trailing arrow on a forward action. Decorative — the label carries the
- * meaning, so it is hidden from assistive tech.
+ * meaning, so it is hidden from assistive tech. It eases forward when its own
+ * button (`group/btn`) is hovered: the action points where it is about to go.
  */
 export function ButtonArrow() {
   return (
@@ -71,7 +78,7 @@ export function ButtonArrow() {
       aria-hidden
       viewBox="0 0 16 16"
       fill="none"
-      className="size-3.5 shrink-0"
+      className="size-3.5 shrink-0 transition-transform duration-200 ease-[var(--ease-interaction)] group-hover/btn:translate-x-0.5"
     >
       <path
         d="M2 8h11M9 4l4 4-4 4"

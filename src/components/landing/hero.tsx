@@ -10,7 +10,7 @@ import { cn } from "@/lib/cn";
  * register on its own.
  *
  * The product preview lives in the next act, so the cover's only job is the
- * question.
+ * promise: every video is a bookable experience (owner copy, 2026-08-05).
  *
  * The facts row along the bottom is the page's momentum line and every entry
  * on it must be literally true today. "3 founding operators signed" is a real
@@ -61,9 +61,9 @@ export function Hero() {
             className="font-display emerge mt-9 max-w-4xl text-[clamp(3rem,8.5vw,6rem)] leading-[1.02] font-medium tracking-tight text-balance"
             style={{ animationDelay: "0.14s" }}
           >
-            Every trip starts with one question.
+            Every video here is an experience
             <span className="text-terra-soft mt-3 block font-bold not-italic">
-              &ldquo;What should I do?&rdquo;
+              you can actually book.
             </span>
           </h1>
 
@@ -71,8 +71,9 @@ export function Hero() {
             className="text-cream/70 emerge mt-9 max-w-2xl text-lg leading-relaxed"
             style={{ animationDelay: "0.26s" }}
           >
-            Yuvoy answers it. Everything a place actually offers, on honest
-            video from the people who run it, booked in the same scroll.
+            Every video is filmed by the people behind the experience, so what
+            you watch is exactly what you&rsquo;ll get. Discover the Andaman
+            Islands through real moments, not advertisements.
           </p>
 
           <div
