@@ -239,26 +239,26 @@ export function IntroVeil({
           descenders an italic line clips at display size.
         */}
         {/* Cursive handwriting (the veil-only script face), written on by
-            the mask sweep in globals.css. `terra`, matching the comp's
-            warmth: the veil is aria-hidden theatre, so the text floors do
-            not gate it. */}
-        <span className="intro-kicker font-script text-terra mt-5 pb-1 text-5xl leading-tight sm:text-6xl">
+            the mask sweep in globals.css. `terra-soft` per the palette:
+            the measured accent for text on forest (§1). */}
+        <span className="intro-kicker font-script text-terra-soft mt-5 text-5xl leading-tight font-medium sm:text-6xl">
           Experience more.
         </span>
         {/*
-          The sign-off swash: a long calligraphic sliver — tapered at both
-          tips, weight in the middle — climbing from bottom-left to
-          top-right (owner direction), revealed left to right after the
-          word is written. Decoration, so it is exempt from text floors.
+          The sign-off swash, tucked close under the words: a calligraphic
+          sliver — tapered tips, weight in the middle — that bows through a
+          visible curve while climbing from bottom-left to top-right (owner
+          direction), revealed left to right after the word is written.
+          Decoration, so it is exempt from text floors.
         */}
         <svg
-          viewBox="0 0 288 16"
+          viewBox="0 0 288 18"
           fill="none"
-          className="text-terra mt-2 h-4 w-56 sm:w-72"
+          className="text-terra-soft mt-1 h-4 w-56 sm:w-72"
         >
           <path
             className="intro-stroke fill-current"
-            d="M2 15Q150 6 286 2Q150 11 2 15Z"
+            d="M2 16Q160 15 286 3Q160 19 2 16Z"
           />
         </svg>
       </div>

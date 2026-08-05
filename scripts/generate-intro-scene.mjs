@@ -29,11 +29,15 @@ const sharp = require(join(pnpmDir, sharpEntry, "node_modules/sharp"));
 const SRC = join(root, "public/assets/intro.png");
 const OUT = join(root, "public/assets/intro-horizon.webp");
 
-// Measured off the 1672x941 comp: the swash bottoms out near y 640 and the
-// baked place line starts near y 848. The band between holds the islands
-// (tops ~y 720) and the brightest water glint (~y 780-840).
-const BAND_TOP = 655;
-const BAND_BOTTOM = 840;
+// Measured off the 1672x941 comp: the swash bottoms out near y 640; the
+// band below it runs to the comp's bottom edge (owner direction: the
+// complete bottom of the comp, not a sliver). The comp's baked
+// "ANDAMAN ISLANDS" (x ~728-952, y ~865-880, on the glint) is erased with
+// a vertically mirrored strip of the water directly above it — a mirror
+// stays seamless on a reflection — because the veil renders its own live
+// place line in the same spot.
+const BAND_TOP = 645;
+const LABEL = { left: 700, top: 855, width: 280, height: 36 };
 
 const { width, height } = await sharp(SRC).metadata();
 if (width !== 1672 || height !== 941) {
@@ -42,8 +46,22 @@ if (width !== 1672 || height !== 941) {
   );
 }
 
-await sharp(SRC)
-  .extract({ left: 0, top: BAND_TOP, width, height: BAND_BOTTOM - BAND_TOP })
+const band = await sharp(SRC)
+  .extract({ left: 0, top: BAND_TOP, width, height: height - BAND_TOP })
+  .toBuffer();
+const waterPatch = await sharp(band)
+  .extract({
+    left: LABEL.left,
+    top: LABEL.top - BAND_TOP - LABEL.height,
+    width: LABEL.width,
+    height: LABEL.height,
+  })
+  .flip()
+  .toBuffer();
+await sharp(band)
+  .composite([
+    { input: waterPatch, left: LABEL.left, top: LABEL.top - BAND_TOP },
+  ])
   .webp({ quality: 82 })
   .toFile(OUT);
 console.log(`wrote ${OUT}`);

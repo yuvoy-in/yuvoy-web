@@ -1,5 +1,5 @@
 import {
-  Great_Vibes,
+  Dancing_Script,
   Instrument_Serif,
   Inter,
   IBM_Plex_Mono,
@@ -27,14 +27,15 @@ export const instrumentSerif = Instrument_Serif({
 /**
  * Script face — cursive handwriting, used ONLY by the brand veil's
  * "Experience more." statement (owner direction: the line should read as
- * being written by hand). One weight, one place; it must not leak into
- * page typography, which stays the display/body pair.
+ * being written by hand). Dancing Script replaced Great Vibes on owner
+ * feedback: simpler, cleaner loops, better legibility at display size.
+ * One place; it must not leak into page typography, which stays the
+ * display/body pair.
  */
-export const greatVibes = Great_Vibes({
+export const dancingScript = Dancing_Script({
   subsets: ["latin"],
-  variable: "--font-great-vibes",
+  variable: "--font-dancing-script",
   display: "swap",
-  weight: "400",
 });
 
 /** UI + body face — quiet, legible, modern. */

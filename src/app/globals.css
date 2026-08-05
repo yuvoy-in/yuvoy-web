@@ -38,7 +38,7 @@
   --font-mono: var(--font-plex-mono); /* eyebrows, nav, stats, metadata */
   /* The handwriting face exists for exactly one element: the brand veil's
      statement, written on by owner direction. Never page typography. */
-  --font-script: var(--font-great-vibes);
+  --font-script: var(--font-dancing-script);
 
   /* --------------------------------------------------------------- layout */
   --container-page: 70rem; /* the page measure — `max-w-page` */
@@ -470,7 +470,9 @@
   --intro-write: 1300ms;
   --intro-stroke-at: 2050ms;
   --intro-stroke: 800ms;
-  --intro-place-at: 1500ms;
+  /* The place line lands with the swash: the frame is signed and located
+     in the same gesture (owner direction). */
+  --intro-place-at: var(--intro-stroke-at);
   --intro-close-at: 3050ms;
   --intro-close: 450ms;
   --intro-exit-at: 3250ms;
@@ -659,7 +661,7 @@
 .intro-horizon {
   position: absolute;
   inset: auto 0 0 0;
-  height: clamp(10rem, 30vh, 19rem);
+  height: clamp(11rem, 30vh, 20rem);
   background-image: url("/assets/intro-horizon.webp");
   background-size: cover;
   background-position: center bottom;
