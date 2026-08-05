@@ -41,7 +41,7 @@ export function JoinAside() {
       <p className="eyebrow text-terra-soft">Join Season One</p>
       <h2
         id="register-heading"
-        className="font-display mt-6 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-medium tracking-tight text-balance"
+        className="font-display mt-6 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-semibold tracking-tight text-balance"
       >
         Be there when it{" "}
         <em className="text-terra-soft font-bold not-italic">opens.</em>

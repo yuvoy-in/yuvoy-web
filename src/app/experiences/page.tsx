@@ -128,7 +128,7 @@ export default function ExperiencesPage() {
                     className="text-terra-deep size-6"
                   />
                 </div>
-                <h3 className="font-display text-forest mt-6 text-2xl font-medium tracking-tight">
+                <h3 className="font-display text-forest mt-6 text-2xl font-semibold tracking-tight">
                   {interest.label}
                 </h3>
                 <p className="text-forest/75 mt-3 leading-relaxed">{body}</p>
@@ -163,7 +163,7 @@ export default function ExperiencesPage() {
         <ul className="border-cream/12 mt-14 grid grid-cols-1 gap-px border-t md:grid-cols-3">
           {DESTINATIONS.map((destination) => (
             <li key={destination.key} className="pt-10 md:pr-8">
-              <h3 className="font-display text-2xl font-medium tracking-tight">
+              <h3 className="font-display text-2xl font-semibold tracking-tight">
                 <Link
                   href={destinationHref(destination)}
                   className="hover:text-terra-soft transition-colors duration-200"

@@ -28,10 +28,10 @@
   --color-terra-soft: #d89772; /* accent text on forest (5.36:1) */
 
   /* ----------------------------------------------------------------- type */
-  /* v2.3: a grotesque display at medium weight (500; 700 is the turn) over a
-     single sans text voice. No mono family and no italics exist in the
+  /* v2.4: a geometric display at semibold (600; 700 is the turn) over a
+     single sans text voice. No mono family and no italic files exist in the
      system — emphasis is the same family, heavier, in an accent colour. */
-  --font-display: var(--font-cabinet-grotesk); /* headlines — warm grotesque */
+  --font-display: var(--font-poppins); /* headlines — geometric sans */
   --font-sans: var(--font-satoshi); /* body + UI + labels + wordmark */
 
   /* --------------------------------------------------------------- layout */

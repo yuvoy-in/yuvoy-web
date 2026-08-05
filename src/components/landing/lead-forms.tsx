@@ -281,7 +281,7 @@ export function LeadForms({
               <p className="eyebrow text-terra-soft">{eyebrow}</p>
               <Heading
                 id={headingId}
-                className="font-display mt-6 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-medium tracking-tight text-balance"
+                className="font-display mt-6 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-semibold tracking-tight text-balance"
               >
                 {heading}
               </Heading>
@@ -333,7 +333,7 @@ function OutcomeNotice({
 
   return (
     <div role="alert" className="border-terra-soft/40 rounded-edge border p-6">
-      <p className="font-display text-xl font-medium tracking-tight">
+      <p className="font-display text-xl font-semibold tracking-tight">
         {copy.title}
       </p>
       <p className="text-cream/70 mt-2 text-sm">{copy.body}</p>
@@ -368,7 +368,7 @@ function SuccessNotice({
         later, never an email now: there is no visitor-facing autoresponder,
         so "check your inbox" would be a lie.
       */}
-      <p className="font-display mt-6 text-2xl font-medium tracking-tight text-balance">
+      <p className="font-display mt-6 text-2xl font-semibold tracking-tight text-balance">
         {updated
           ? "We already had you; your preferences are updated."
           : "You’re on the Yuvoy waitlist"}

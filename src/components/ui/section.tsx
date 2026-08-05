@@ -94,14 +94,14 @@ export function SectionHeading({
     <div className={cn("max-w-3xl", className)}>
       {eyebrow && <p className={cn("eyebrow", EYEBROW[tone])}>{eyebrow}</p>}
       {/*
-        v2.3: display type is the grotesque at medium (500) — the face's
-        comfortable reading weight — with 700 reserved for the turn. There is
-        no 400 display file, so `font-medium` states what actually renders.
+        v2.4: display type is the geometric at semibold (600) — the face's
+        display weight — with 700 reserved for the turn. Only those two
+        display files ship, so `font-semibold` states what actually renders.
       */}
       <Heading
         id={id}
         className={cn(
-          "font-display mt-6 font-medium tracking-tight text-balance",
+          "font-display mt-6 font-semibold tracking-tight text-balance",
           level === 1
             ? "text-[clamp(2.5rem,7vw,4.5rem)] leading-none"
             : "text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04]",

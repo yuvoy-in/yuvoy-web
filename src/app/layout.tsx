@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { cabinetGrotesk, satoshi } from "@/lib/fonts";
+import { poppins, satoshi } from "@/lib/fonts";
 import { Providers } from "@/components/providers";
 import { SITE_URL, IS_PRODUCTION } from "@/lib/site";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -47,7 +47,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         page instead of arriving at it.
       */
       data-scroll-behavior="smooth"
-      className={`${cabinetGrotesk.variable} ${satoshi.variable} h-full`}
+      className={`${poppins.variable} ${satoshi.variable} h-full`}
     >
       <body className="min-h-full">
         <a

@@ -9,7 +9,7 @@ import { cn } from "@/lib/cn";
  * docs/DESIGN_SYSTEM.md §5 for when each is allowed.
  *
  * Labels are wide-tracked uppercase bold (v2.3 — the mono went with the
- * serif): an action reads as an action.
+ * serif): an action reads as an action, set in the text face.
  *
  * The premium is in the touch, not the shape (2026-08-05): a press compresses
  * the button (`active:scale`), a hover lifts it a pixel, and the trailing

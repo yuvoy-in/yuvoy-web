@@ -83,7 +83,7 @@ export default function TravellersPage() {
           {GETS.map((item, i) => (
             <li key={item.title} className="pt-10 md:pr-8">
               <span className="label text-forest/75">0{i + 1}</span>
-              <h3 className="font-display text-forest mt-5 text-xl font-medium tracking-tight">
+              <h3 className="font-display text-forest mt-5 text-xl font-semibold tracking-tight">
                 {item.title}
               </h3>
               <p className="text-forest/75 mt-3 leading-relaxed">{item.body}</p>
@@ -103,7 +103,7 @@ export default function TravellersPage() {
         <dl className="border-cream/12 mt-14 border-t">
           {HESITATIONS.map((item) => (
             <div key={item.q} className="border-cream/12 border-b py-8">
-              <dt className="font-display text-xl font-medium tracking-tight">
+              <dt className="font-display text-xl font-semibold tracking-tight">
                 {item.q}
               </dt>
               <dd className="text-cream/70 mt-3 max-w-3xl leading-relaxed">
@@ -125,7 +125,7 @@ export default function TravellersPage() {
         <ul className="border-cream-line mt-14 grid grid-cols-1 gap-px border-t md:grid-cols-3">
           {DESTINATIONS.map((destination) => (
             <li key={destination.key} className="pt-10 md:pr-8">
-              <h3 className="font-display text-forest text-xl font-medium tracking-tight">
+              <h3 className="font-display text-forest text-xl font-semibold tracking-tight">
                 {destination.shortLabel}
               </h3>
               <p className="label text-forest/75 mt-2">{destination.label}</p>

@@ -261,7 +261,7 @@ export function SiteMenu({
                             aria-current={current ? "page" : undefined}
                             onClick={() => close(false)}
                             className={cn(
-                              "font-display group flex items-baseline justify-between gap-6 py-3.5 text-[clamp(1.375rem,2.8vw,2.25rem)] leading-tight font-medium tracking-tight transition-colors duration-200 sm:py-4",
+                              "font-display group flex items-baseline justify-between gap-6 py-3.5 text-[clamp(1.375rem,2.8vw,2.25rem)] leading-tight font-semibold tracking-tight transition-colors duration-200 sm:py-4",
                               current
                                 ? "text-terra-deep"
                                 : "text-forest hover:text-terra-deep",
