@@ -56,7 +56,7 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1.95fr)] lg:gap-20">
           {/* Identity. */}
           <div>
-            <Wordmark tone="onDark" className="h-14" />
+            <Wordmark tone="onDark" className="h-20" />
             <p className="text-cream/70 mt-6 max-w-xs text-sm leading-relaxed">
               The experience commerce platform. First stop: the Andaman Islands.
             </p>

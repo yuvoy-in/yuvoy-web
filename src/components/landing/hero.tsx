@@ -34,7 +34,7 @@ const FACTS = [
 export function Hero() {
   return (
     /*
-      `-mt-14` pulls the cover up behind the header's own 56px of flow, and the
+      `-mt-16` pulls the cover up behind the header's own 64px of flow, and the
       inner `pt-14` puts the content back exactly where it was. Without this a
       transparent header would show the page background above the cover, not
       the cover itself. `data-dark-hero` is how the header knows this page has
@@ -42,7 +42,7 @@ export function Hero() {
     */
     <section
       data-dark-hero
-      className="bg-forest text-cream relative -mt-14 overflow-hidden"
+      className="bg-forest text-cream relative -mt-16 overflow-hidden"
     >
       {/*
         The field, in five layers (owner artwork + direction, 2026-08-06):
@@ -73,10 +73,10 @@ export function Hero() {
         <div className="grain" />
       </div>
 
-      {/* Top padding is the header (3.5rem) plus the section's own, so the
+      {/* Top padding is the header (4rem) plus the section's own, so the
           composition lands exactly where it did before the cover was pulled
           up behind the bar. */}
-      <div className="container-page relative flex min-h-dvh flex-col justify-center pt-30 pb-16 sm:pt-34 sm:pb-20">
+      <div className="container-page relative flex min-h-dvh flex-col justify-center pt-32 pb-16 sm:pt-36 sm:pb-20">
         <div className="flex flex-col items-center text-center">
           {/* Plain `label`, not `eyebrow`: the cover line carries no marker
               (owner direction, 2026-08-05). */}

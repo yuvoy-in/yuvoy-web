@@ -19,7 +19,7 @@ import { cn } from "@/lib/cn";
  *
  * Size it from outside with a height class — the default `h-11` is what
  * the header and menu bar use (owner sizing, 2026-08-06: the first cut
- * read too small); the footer passes `h-14`. tailwind-merge keeps the
+ * read too small); the footer passes `h-20`. tailwind-merge keeps the
  * later height. The drawing's 3.2:1 ratio provides the width.
  */
 const LOCKUP = { width: 1600, height: 500 } as const;

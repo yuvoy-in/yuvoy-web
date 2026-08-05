@@ -44,7 +44,7 @@ export function SiteHeader() {
           : "border-cream-line bg-cream/85",
       )}
     >
-      <div className="container-page grid h-14 grid-cols-[1fr_auto_1fr] items-center gap-4">
+      <div className="container-page grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4">
         {/* `flex`, not the default: an inline-level child sits on the line
             box's baseline, and the strut reserves descender space under it.
             That dead space is inside the link, so centring the link centres

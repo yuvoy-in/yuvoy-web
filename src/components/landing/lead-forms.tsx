@@ -257,7 +257,7 @@ export function LeadForms({
   return (
     <section
       id={sectionId}
-      className="bg-forest text-cream scroll-mt-14"
+      className="bg-forest text-cream scroll-mt-16"
       aria-labelledby={headingId}
     >
       {/* The legacy operator anchor, wherever a provider form actually lives.
