@@ -62,22 +62,23 @@ export function Hero() {
           </p>
 
           {/*
-            Simple and composed (owner verdict, 2026-08-05, after a word-
-            cascade-and-chip round went too far): one statement in two
-            thoughts. The upright line states the fact; the turn takes its
-            own line in italic terracotta — a deliberate lockup, not a
-            decorated break. One entrance for the whole thought; the field's
-            atmosphere carries the drama around it. The turn is a TRUE drawn
-            italic (v2.5: Fraunces ships one) at the `font-turn` weight.
+            One flowing sentence with the three journey words turned — video,
+            experience, book — instead of a block second line (owner
+            direction, 2026-08-06). The highlights trace exactly what the
+            product does: watch the video, it is the experience, book it.
+            Each is a TRUE drawn italic (v2.5: Fraunces ships one) at the
+            `font-turn` weight; the cover is the one place the brand turns
+            more than once, because these three words ARE the concept.
           */}
           <h1
-            className="font-display emerge tracking-display mt-10 max-w-4xl text-[clamp(2.75rem,7vw,5.25rem)] leading-[1.03] font-normal text-balance"
+            className="font-display emerge tracking-display mt-10 max-w-4xl text-[clamp(2.75rem,7vw,5.25rem)] leading-[1.08] font-normal text-balance"
             style={{ animationDelay: "0.14s" }}
           >
-            Every video here is an experience
-            <span className="text-terra-soft font-turn mt-2 block italic">
-              you can actually book.
-            </span>
+            Every <em className="text-terra-soft font-turn italic">video</em>{" "}
+            here is an{" "}
+            <em className="text-terra-soft font-turn italic">experience</em> you
+            can actually{" "}
+            <em className="text-terra-soft font-turn italic">book.</em>
           </h1>
 
           <p
