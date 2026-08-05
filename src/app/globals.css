@@ -419,9 +419,11 @@
 /*
   The brand veil — the site's entrance (see BrandIntro). Not a flat card but a
   scene from the brand's world: night water (the film-c gradient language,
-  an ember of terracotta warmth at the bottom edge) under drifting dive-light
-  (the caustics utility, its diagonal sweep damped for this surface) and
-  grain. On it the mark surfaces from depth, YUVOY rises letter by letter
+  an ember of terracotta warmth at the bottom edge) crossed by sparse
+  particle swells — tiny cream dots that roll in from either edge on slow,
+  decorrelated periods and die away before the centre, so the water moves
+  while the lockup keeps a pool of still dark — under filmic grain. On it
+  the mark surfaces from depth, YUVOY rises letter by letter
   through a baseline mask like set type, "Experience more." lands as the
   display statement — the italic terracotta turn, the brand's signature
   move — with the handwritten stroke as its underline, and the island's name
@@ -524,11 +526,56 @@
   animation: yuvoy-intro-surface var(--intro-mark-in) var(--ease-cinematic) both;
 }
 
-/* The veil borrows the preview's caustics but damps their diagonal sweep:
-   at full strength the streaks read as a pattern, and the veil's light
-   should be felt, not seen (owner direction). */
-.intro-veil .caustics::after {
-  opacity: 0.3;
+/*
+  A particle swell: two sparse dot grids (different densities, offset so
+  they never align) drifting on different periods inside an elliptical mask
+  anchored to one edge — dots that roll in and die away before the centre.
+  The right wing is the same element mirrored with scaleX(-1), so one mask
+  and one set of keyframes serve both sides, and "toward the centre" stays
+  a single direction in the maths.
+*/
+.intro-wave {
+  position: absolute;
+  inset: 0;
+  right: auto;
+  width: 46%;
+  pointer-events: none;
+  mask-image: radial-gradient(115% 75% at 0% 50%, black 25%, transparent 78%);
+  animation: yuvoy-intro-fade 1600ms var(--ease-cinematic) 300ms both;
+}
+
+.intro-wave-right {
+  right: 0;
+  left: auto;
+  transform: scaleX(-1);
+}
+
+.intro-wave::before,
+.intro-wave::after {
+  content: "";
+  position: absolute;
+  inset: -12%;
+}
+
+.intro-wave::before {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-cream) 26%, transparent) 1px,
+    transparent 1.5px
+  );
+  background-size: 56px 56px;
+  animation: yuvoy-intro-swell-a 11s ease-in-out infinite alternate;
+}
+
+.intro-wave::after {
+  background-image: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-cream) 16%, transparent) 1px,
+    transparent 1.5px
+  );
+  background-size: 104px 104px;
+  background-position: 31px 47px;
+  animation: yuvoy-intro-swell-b 17s ease-in-out infinite alternate;
 }
 
 /* Letters rise through a baseline mask (each sits in an overflow-clipped
@@ -619,6 +666,38 @@
 
   to {
     transform: translateY(0);
+  }
+}
+
+@keyframes yuvoy-intro-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* The two swell layers drift toward the centre on different diagonals and
+   different periods, which is what makes a grid read as water. */
+@keyframes yuvoy-intro-swell-a {
+  from {
+    transform: translate(-3%, 2%);
+  }
+
+  to {
+    transform: translate(5%, -2%);
+  }
+}
+
+@keyframes yuvoy-intro-swell-b {
+  from {
+    transform: translate(-2%, -3%);
+  }
+
+  to {
+    transform: translate(4%, 2%);
   }
 }
 

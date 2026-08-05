@@ -65,5 +65,8 @@ describe("IntroVeil", () => {
 
     // The place line is the cover's own opening words, kept in sync by hand.
     expect(screen.getByText("Andaman Islands")).toHaveClass("intro-place");
+
+    // One swell per edge: the pair is what leaves the centre still.
+    expect(container.querySelectorAll(".intro-wave")).toHaveLength(2);
   });
 });

@@ -152,10 +152,11 @@ export function IntroVeil({
       data-hold={hold ? "" : undefined}
       className="intro-veil"
     >
-      {/* The scene, bottom to top: drifting dive-light over the night-water
-          gradient, then grain. Both are decoration layers the preview
-          surface already owns; the veil borrows them at reduced strength. */}
-      <div className="caustics opacity-60" />
+      {/* The scene, bottom to top: particle swells rolling in from each
+          edge of the night-water gradient and dying away before the centre,
+          so the lockup keeps a pool of still dark; then grain. */}
+      <div className="intro-wave" />
+      <div className="intro-wave intro-wave-right" />
       <div className="grain" />
       <div className="intro-stage flex flex-col items-center">
         <Image
