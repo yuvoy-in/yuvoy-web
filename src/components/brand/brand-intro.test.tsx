@@ -55,8 +55,9 @@ describe("IntroVeil", () => {
     // surface, tagline stripped (scripts/generate-vector-brand.mjs).
     expect(mark?.getAttribute("src")).toContain("yuvoy-mark-vector-cream");
 
-    // Five drawn letterforms, each its own token-coloured emerging cell.
-    const letters = container.querySelectorAll("svg.intro-letter");
+    // Five drawn letterforms inside the word block, which emerges as one
+    // unit in the cover headline's motion.
+    const letters = container.querySelectorAll(".intro-word svg");
     expect(letters).toHaveLength(5);
 
     expect(screen.getByText("Experience more.")).toHaveClass("intro-kicker");

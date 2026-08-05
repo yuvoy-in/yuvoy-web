@@ -1,13 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import {
-  useEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type Ref,
-} from "react";
+import { useEffect, useRef, useState, type Ref } from "react";
 import { preload } from "react-dom";
 import {
   LETTER_HEIGHT,
@@ -207,14 +201,13 @@ export function IntroVeil({ ref }: { ref?: Ref<HTMLDivElement> }) {
         />
         {/*
           YUVOY in the master logo's own drawn letterforms (generated
-          per-letter module), coloured by token via fill-current. Each
-          letter surfaces from depth exactly as the cover's headline does —
-          the emerge grammar, staggered — so the animation lives on the
-          <svg> cell, where blur and travel are free of the viewBox clip.
-          All five share the module's vertical window, so they sit on one
+          per-letter module), coloured by token via fill-current, arriving
+          as ONE block in the cover headline's exact emerge — the animation
+          sits on the word wrapper, like the hero's sits on its h1. All
+          five cells share the module's vertical window, so they sit on one
           baseline.
         */}
-        <span className="text-cream mt-9 flex h-8 items-end gap-5 sm:h-10 sm:gap-6">
+        <span className="intro-word text-cream mt-9 flex h-8 items-end gap-5 sm:h-10 sm:gap-6">
           {YUVOY_LETTERS.map((letter, index) => (
             <svg
               key={index}
@@ -222,8 +215,7 @@ export function IntroVeil({ ref }: { ref?: Ref<HTMLDivElement> }) {
               width={letter.width}
               height={LETTER_HEIGHT}
               fill="none"
-              className="intro-letter h-full w-auto"
-              style={{ "--i": index } as CSSProperties}
+              className="h-full w-auto"
             >
               <path d={letter.d} className="fill-current" />
             </svg>

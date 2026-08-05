@@ -464,8 +464,8 @@
 .intro-veil {
   --intro-mark-in: 1100ms;
   --intro-rise: 850ms;
-  --intro-letters-at: 200ms;
-  --intro-stagger: 90ms;
+  --intro-word-at: 200ms;
+  --intro-word-in: 1100ms;
   --intro-kicker-at: 700ms;
   --intro-write: 1300ms;
   /* The swash (and the place line with it) leads the write's end by half
@@ -626,14 +626,15 @@
   animation-direction: reverse;
 }
 
-/* The letters arrive exactly as the cover's own headline does — the
-   yuvoy-emerge grammar (surface from depth: settle, scale, blur pulling
-   into focus), staggered per letter. Deliberate reuse of the cover's
-   keyframes, not the `emerge` utility: the veil speaks the motion language
-   of the page it is about to unveil (owner direction, 2026-08-06). */
-.intro-letter {
-  animation: yuvoy-emerge var(--intro-rise) var(--ease-cinematic)
-    calc(var(--intro-letters-at) + var(--intro-stagger) * var(--i, 0)) both;
+/* The word arrives exactly as the cover's headline does: ONE block
+   surfacing from depth in the yuvoy-emerge grammar at the cover's own
+   1100ms — not a letter cascade (owner direction, 2026-08-06, twice: the
+   per-letter stagger read as a different move). Deliberate reuse of the
+   cover's keyframes, not the `emerge` utility: the veil speaks the motion
+   language of the page it is about to unveil. */
+.intro-word {
+  animation: yuvoy-emerge var(--intro-word-in) var(--ease-cinematic)
+    var(--intro-word-at) both;
 }
 
 /* The statement is written, not shown: a soft-edged mask sweeps left to
