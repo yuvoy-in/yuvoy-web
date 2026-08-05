@@ -17,9 +17,10 @@ import { cn } from "@/lib/cn";
  * `unoptimized`: SVG needs no optimiser pass, and this keeps
  * `dangerouslyAllowSVG` out of the image config (same call as the veil).
  *
- * Size it from outside with a height class — the default is the header's
- * `h-9`; pass e.g. `h-10` in `className` to override (tailwind-merge keeps
- * the later height). The drawing's 3.2:1 ratio provides the width.
+ * Size it from outside with a height class — the default `h-11` is what
+ * the header and menu bar use (owner sizing, 2026-08-06: the first cut
+ * read too small); the footer passes `h-14`. tailwind-merge keeps the
+ * later height. The drawing's 3.2:1 ratio provides the width.
  */
 const LOCKUP = { width: 1600, height: 500 } as const;
 
@@ -40,7 +41,7 @@ export function Wordmark({
     <span
       role="img"
       aria-label="Yuvoy — Experience more."
-      className={cn("relative inline-flex h-9", className)}
+      className={cn("relative inline-flex h-11", className)}
     >
       {VARIANTS.map(({ src, dark }) => (
         <Image
