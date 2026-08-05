@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/brand/wordmark";
 import { buttonVariants } from "@/components/ui/button";
+import { NavLinks } from "@/components/site/nav-links";
 import { SiteMenu } from "@/components/site/site-menu";
 import { useHeaderChrome } from "@/components/site/use-header-chrome";
 import { cn } from "@/lib/cn";
@@ -12,11 +13,11 @@ import { OPERATOR_NAV, PRIMARY_CTA } from "@/lib/site/nav";
  * The site header: sticky, compact, present on every route, and out of the
  * way while you read.
  *
- * It carries exactly three things — the mark, the operator link, and the call
- * to action — and every other route lives in the menu, on desktop as well as
- * on a phone. A header that lists everything makes each item worth less; this
- * one states who the site is for (travellers, by default) and where the other
- * audience should go, and lets the page do the rest.
+ * From `lg` up it lists the primary routes inline — a desktop has the room,
+ * and a nav you can see beats one behind a click (owner direction 2026-08-05,
+ * reverting the desktop-menu concept). Below `lg` it carries exactly three
+ * things — the mark, the operator link, and the call to action — and every
+ * other route lives in the shutter menu, whose trigger only exists there.
  *
  * Two scroll behaviours, both owned by `useHeaderChrome`: it slides up as you
  * scroll down and returns as you scroll back, and at the very top of a page
@@ -25,9 +26,9 @@ import { OPERATOR_NAV, PRIMARY_CTA } from "@/lib/site/nav";
  * rather than a cream bar stuck on a green wall.
  *
  * The layout is a three-column grid rather than a flex row with
- * `justify-between`, because the operator link has to sit at the true centre
- * of the page and not at the midpoint of whatever space the mark and the
- * button leave over.
+ * `justify-between`, because the centre cell — the nav on desktop, the
+ * operator link below it — has to sit at the true centre of the page and not
+ * at the midpoint of whatever space the mark and the button leave over.
  */
 export function SiteHeader() {
   const { ref, overCover } = useHeaderChrome();
@@ -56,18 +57,22 @@ export function SiteHeader() {
           <Wordmark tone={overCover ? "onDark" : "onLight"} />
         </Link>
 
-        {/* The other audience, named once, in the middle of the page. */}
-        <Link
-          href={OPERATOR_NAV.href}
-          className={cn(
-            "label tap-target justify-self-center transition-colors duration-300",
-            overCover
-              ? "text-cream/75 hover:text-cream"
-              : "text-forest/75 hover:text-forest",
-          )}
-        >
-          {OPERATOR_NAV.label}
-        </Link>
+        <div className="justify-self-center">
+          <NavLinks tone={overCover ? "onDark" : "onLight"} />
+
+          {/* Below `lg` the centre names the other audience, once. */}
+          <Link
+            href={OPERATOR_NAV.href}
+            className={cn(
+              "label tap-target transition-colors duration-300 lg:hidden",
+              overCover
+                ? "text-cream/75 hover:text-cream"
+                : "text-forest/75 hover:text-forest",
+            )}
+          >
+            {OPERATOR_NAV.label}
+          </Link>
+        </div>
 
         <div className="flex items-center gap-2 justify-self-end">
           <Link
@@ -82,7 +87,10 @@ export function SiteHeader() {
           >
             {PRIMARY_CTA.label}
           </Link>
-          <SiteMenu tone={overCover ? "onDark" : "onLight"} />
+          <SiteMenu
+            tone={overCover ? "onDark" : "onLight"}
+            className="lg:hidden"
+          />
         </div>
       </div>
     </header>

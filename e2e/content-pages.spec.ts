@@ -140,9 +140,10 @@ test("audience pages send each audience to the right form", async ({
 
 test("the new routes appear in the site navigation", async ({ page }) => {
   await page.goto("/");
-  // Navigation is the menu now: the header names only the operator page.
-  await page.getByRole("button", { name: "Open menu" }).click();
-  const nav = page.getByRole("dialog", { name: "Site menu" });
+  // Desktop lists the primary routes inline in the header.
+  const nav = page.getByRole("banner").getByRole("navigation", {
+    name: "Primary",
+  });
   for (const label of ["How it works", "For travellers", "For operators"]) {
     await expect(
       nav.getByRole("link", { name: label, exact: true }),

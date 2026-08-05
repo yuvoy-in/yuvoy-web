@@ -113,9 +113,10 @@ test.describe("/destinations", () => {
 
 test("the discover routes appear in the site navigation", async ({ page }) => {
   await page.goto("/");
-  // Navigation is the menu now: the header names only the operator page.
-  await page.getByRole("button", { name: "Open menu" }).click();
-  const nav = page.getByRole("dialog", { name: "Site menu" });
+  // Desktop lists the primary routes inline in the header.
+  const nav = page.getByRole("banner").getByRole("navigation", {
+    name: "Primary",
+  });
   for (const label of ["Experiences", "Destinations"]) {
     await expect(
       nav.getByRole("link", { name: label, exact: true }),
