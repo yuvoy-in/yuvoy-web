@@ -26,6 +26,9 @@ describe("BrandIntro", () => {
     expect(INTRO_DECIDE).toContain("sessionStorage.getItem");
     expect(INTRO_DECIDE).toContain("sessionStorage.setItem");
     expect(INTRO_DECIDE).toContain('setAttribute("data-play"');
+    // The stamp that suspends the cover's emerge entrance until the veil
+    // begins its exit (the handoff rule in globals.css).
+    expect(INTRO_DECIDE).toContain('setAttribute("data-intro-wait"');
     // Defensive by contract: storage being unavailable must mean "no veil",
     // never an uncaught error before first paint.
     expect(INTRO_DECIDE).toContain("try{");
@@ -52,8 +55,8 @@ describe("IntroVeil", () => {
     // surface, tagline stripped (scripts/generate-vector-brand.mjs).
     expect(mark?.getAttribute("src")).toContain("yuvoy-mark-vector-cream");
 
-    // Five drawn letterforms, each its own token-coloured rising path.
-    const letters = container.querySelectorAll("path.intro-letter");
+    // Five drawn letterforms, each its own token-coloured emerging cell.
+    const letters = container.querySelectorAll("svg.intro-letter");
     expect(letters).toHaveLength(5);
 
     expect(screen.getByText("Experience more.")).toHaveClass("intro-kicker");

@@ -57,7 +57,7 @@ const SKIP_FADE_MS = 240;
  * never shows, which is the safe failure. Exported for the unit test, which
  * asserts the contract because jsdom never executes injected scripts.
  */
-export const INTRO_DECIDE = `(()=>{try{if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;if(sessionStorage.getItem("${STORAGE_KEY}"))return;sessionStorage.setItem("${STORAGE_KEY}","1");var v=document.getElementById("yuvoy-intro");if(v)v.setAttribute("data-play","")}catch(e){}})()`;
+export const INTRO_DECIDE = `(()=>{try{if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;if(sessionStorage.getItem("${STORAGE_KEY}"))return;sessionStorage.setItem("${STORAGE_KEY}","1");var v=document.getElementById("yuvoy-intro");if(v){v.setAttribute("data-play","");v.setAttribute("data-intro-wait","")}}catch(e){}})()`;
 
 export function BrandIntro() {
   const veilRef = useRef<HTMLDivElement>(null);
@@ -106,13 +106,15 @@ export function BrandIntro() {
       }
     };
 
-    // Unlock on the exit's FIRST frame, not its last: restoring the
-    // scrollbar reflows the page, and at that instant the veil still
-    // covers every pixel — so the one visible glitch the lock could cause
-    // happens where it cannot be seen.
+    // On the exit's FIRST frame, not its last: the scroll lock releases
+    // (restoring the scrollbar reflows the page while the veil still
+    // covers every pixel), and `data-intro-wait` comes off — which lets
+    // the cover's suspended `emerge` entrance re-apply from zero, so the
+    // hero surfaces through the dissolving veil.
     const onAnimationStart = (event: AnimationEvent) => {
       if (event.target === veil && event.animationName === "yuvoy-intro-exit") {
         unlock();
+        veil.removeAttribute("data-intro-wait");
       }
     };
 
@@ -206,9 +208,11 @@ export function IntroVeil({ ref }: { ref?: Ref<HTMLDivElement> }) {
         {/*
           YUVOY in the master logo's own drawn letterforms (generated
           per-letter module), coloured by token via fill-current. Each
-          letter's <svg> is its overflow-clipped cell, and the path rises
-          through the baseline — set type arriving, not a fade. All five
-          share the module's vertical window, so they sit on one baseline.
+          letter surfaces from depth exactly as the cover's headline does —
+          the emerge grammar, staggered — so the animation lives on the
+          <svg> cell, where blur and travel are free of the viewBox clip.
+          All five share the module's vertical window, so they sit on one
+          baseline.
         */}
         <span className="text-cream mt-9 flex h-8 items-end gap-5 sm:h-10 sm:gap-6">
           {YUVOY_LETTERS.map((letter, index) => (
@@ -218,13 +222,10 @@ export function IntroVeil({ ref }: { ref?: Ref<HTMLDivElement> }) {
               width={letter.width}
               height={LETTER_HEIGHT}
               fill="none"
-              className="h-full w-auto"
+              className="intro-letter h-full w-auto"
+              style={{ "--i": index } as CSSProperties}
             >
-              <path
-                d={letter.d}
-                className="intro-letter fill-current"
-                style={{ "--i": index } as CSSProperties}
-              />
+              <path d={letter.d} className="fill-current" />
             </svg>
           ))}
         </span>
