@@ -297,7 +297,7 @@ export function PhonePreview() {
                   </p>
                   <p className="text-cream/70 mt-1 text-[10px]">{scene.meta}</p>
                   <div className="mt-3 flex items-center justify-between gap-3">
-                    <p className="text-cream text-lg font-semibold">
+                    <p className="text-cream text-lg font-bold">
                       {scene.price}
                       <span className="text-cream/60 ml-1 text-[10px] font-normal">
                         / person
@@ -307,7 +307,7 @@ export function PhonePreview() {
                       type="button"
                       onClick={() => book(scene)}
                       aria-label={`Book ${scene.title} (preview only)`}
-                      className="bg-terra-deep text-cream rounded-edge hover:bg-terra-deep/90 focus-visible:ring-terra-soft px-4 py-2 font-mono text-[10px] font-semibold tracking-widest uppercase transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
+                      className="bg-terra-deep text-cream rounded-edge hover:bg-terra-deep/90 focus-visible:ring-terra-soft px-4 py-2 font-sans text-[10px] font-bold tracking-widest uppercase transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                     >
                       Book
                     </button>

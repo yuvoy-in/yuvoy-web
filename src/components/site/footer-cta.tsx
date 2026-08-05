@@ -20,9 +20,11 @@ export function FooterCta() {
   return (
     <div className="container-page border-cream/12 border-b py-20 sm:py-24">
       <p className="eyebrow text-terra-soft">Experience more.</p>
-      <h2 className="font-display mt-6 max-w-3xl text-4xl leading-[1.05] font-normal tracking-tight text-balance sm:text-5xl">
+      <h2 className="font-display mt-6 max-w-3xl text-4xl leading-[1.05] font-medium tracking-tight text-balance sm:text-5xl">
         The islands first.{" "}
-        <em className="text-terra-soft italic">Then everywhere worth going.</em>
+        <em className="text-terra-soft font-bold not-italic">
+          Then everywhere worth going.
+        </em>
       </h2>
       <p className="text-cream/70 mt-6 max-w-xl text-lg">
         Join the waitlist and we&rsquo;ll message you when the first Andaman

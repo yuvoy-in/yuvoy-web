@@ -139,17 +139,13 @@ export function OperatorSystem() {
                 <span aria-hidden className="bg-terra size-1" />
                 Signed
               </p>
-              <p className="text-forest mt-3 text-sm font-semibold">
-                {slot.what}
-              </p>
+              <p className="text-forest mt-3 text-sm font-bold">{slot.what}</p>
               <p className="text-forest/75 mt-0.5 text-xs">{slot.where}</p>
             </li>
           ))}
           <li className="border-terra-deep/50 rounded-edge border border-dashed p-5">
             <p className="label text-terra-deep text-[9px]">Open</p>
-            <p className="text-terra-deep mt-3 text-sm font-semibold">
-              Your spot
-            </p>
+            <p className="text-terra-deep mt-3 text-sm font-bold">Your spot</p>
             <p className="text-forest/75 mt-0.5 text-xs">Applications open</p>
           </li>
         </ul>

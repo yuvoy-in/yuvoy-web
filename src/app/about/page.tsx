@@ -57,10 +57,10 @@ export default function AboutPage() {
           <>
             <p>
               Yuvoy, <em className="not-italic">yoo-voy</em>, is built from two
-              words: <strong className="text-forest font-semibold">you</strong>{" "}
-              and <strong className="text-forest font-semibold">voyage</strong>.
-              It is a platform for finding and booking real-world experiences,
-              opening first in the Andaman Islands.
+              words: <strong className="text-forest font-bold">you</strong> and{" "}
+              <strong className="text-forest font-bold">voyage</strong>. It is a
+              platform for finding and booking real-world experiences, opening
+              first in the Andaman Islands.
             </p>
             <p className="mt-4">
               The idea underneath it is one most people have felt without
@@ -141,7 +141,7 @@ export default function AboutPage() {
           {PRINCIPLES.map((principle, i) => (
             <li key={principle.title} className="pt-10 sm:pr-10">
               <span className="label text-forest/75">0{i + 1}</span>
-              <h3 className="font-display text-forest mt-5 text-xl font-normal tracking-tight">
+              <h3 className="font-display text-forest mt-5 text-xl font-medium tracking-tight">
                 {principle.title}
               </h3>
               <p className="text-forest/75 mt-3 leading-relaxed">

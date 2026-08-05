@@ -5,9 +5,9 @@
   No hex, font, or tracking value may exist outside this @theme block.
 
   Palette: Brand Kit v2.1 (dark green unified 2026-08-03) — Forest,
-  Terracotta, Cream. Type: Brand Kit v2.2 (2026-08-03) — editorial serif
-  display, sans body, mono labels. Every pairing below is measured against
-  WCAG 2.2 AA; the
+  Terracotta, Cream. Type: Brand Kit v2.3 (2026-08-05) — grotesque display at
+  medium weight, one sans text voice, no mono, no italics. Every pairing
+  below is measured against WCAG 2.2 AA; the
   ratios and the terra / terra-deep / terra-soft usage rule live in
   docs/DESIGN_SYSTEM.md §1. Read that rule before using an accent on text —
   `terra` is NOT body-safe.
@@ -28,14 +28,11 @@
   --color-terra-soft: #d89772; /* accent text on forest (5.36:1) */
 
   /* ----------------------------------------------------------------- type */
-  /* v2.2: the display face is an editorial serif set large and light — mass
-     comes from size and leading, never weight (the face has no bold). The
-     wordmark deliberately stays on the sans so the mark reads engineered. */
-  --font-display: var(
-    --font-instrument-serif
-  ); /* headlines — editorial serif */
-  --font-sans: var(--font-inter); /* body + UI + wordmark */
-  --font-mono: var(--font-plex-mono); /* eyebrows, nav, stats, metadata */
+  /* v2.3: a grotesque display at medium weight (500; 700 is the turn) over a
+     single sans text voice. No mono family and no italics exist in the
+     system — emphasis is the same family, heavier, in an accent colour. */
+  --font-display: var(--font-cabinet-grotesk); /* headlines — warm grotesque */
+  --font-sans: var(--font-satoshi); /* body + UI + labels + wordmark */
 
   /* --------------------------------------------------------------- layout */
   --container-page: 70rem; /* the page measure — `max-w-page` */
@@ -122,13 +119,14 @@
 /* ------------------------------------------------------------- typography */
 
 /**
- * Wide-tracked uppercase mono label — the brand's editorial voice.
- * On cream use `text-terra-deep` or `text-forest/75`; on forest use
- * `text-terra-soft` or `text-cream/70`. Never `text-terra` (fails AA at this
- * size), and never below `text-forest/70` on cream.
+ * Wide-tracked uppercase label — the brand's editorial voice, set in the
+ * text face (the mono was retired with Brand Kit v2.3: it read as terminal,
+ * not magazine). On cream use `text-terra-deep` or `text-forest/75`; on
+ * forest use `text-terra-soft` or `text-cream/70`. Never `text-terra` (fails
+ * AA at this size), and never below `text-forest/70` on cream.
  */
 @utility label {
-  @apply font-mono text-xs font-medium uppercase;
+  @apply font-sans text-xs font-medium uppercase;
   letter-spacing: var(--tracking-label);
 }
 
@@ -139,7 +137,7 @@
  * gesture; use it once per section.
  */
 @utility eyebrow {
-  @apply inline-flex items-center gap-2.5 font-mono text-xs font-medium uppercase;
+  @apply inline-flex items-center gap-2.5 font-sans text-xs font-medium uppercase;
   letter-spacing: var(--tracking-label);
 
   &::before {

@@ -65,7 +65,7 @@ export function Strategy() {
         <WaveMotif className="h-4 w-11" />
         <p className="font-display text-forest mt-5 text-[clamp(1.875rem,4.5vw,3rem)] leading-tight tracking-tight text-balance">
           Don&rsquo;t be a tourist.{" "}
-          <em className="text-terra italic">Experience more.</em>
+          <em className="text-terra font-bold not-italic">Experience more.</em>
         </p>
       </div>
     </Section>

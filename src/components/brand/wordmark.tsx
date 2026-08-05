@@ -33,12 +33,12 @@ export function Wordmark({
       {mark && <WaveMark tone={tone} />}
       <span className="inline-flex flex-col leading-none">
         {/*
-          The wordmark stays on the sans (v2.2): the serif is the site's
-          editorial voice, the mark is the engineered object it signs.
+          The wordmark is the text voice in bold caps (v2.3): one family
+          speaks and signs; the mark supplies the craft.
         */}
         <span
           className={cn(
-            "tracking-wordmark font-sans text-sm font-semibold",
+            "tracking-wordmark font-sans text-sm font-bold",
             onDark ? "text-cream" : "text-forest",
           )}
         >

@@ -58,11 +58,11 @@ export function Hero() {
           </p>
 
           <h1
-            className="font-display emerge mt-9 max-w-4xl text-[clamp(3rem,8.5vw,6rem)] leading-[0.98] font-normal tracking-tight text-balance"
+            className="font-display emerge mt-9 max-w-4xl text-[clamp(3rem,8.5vw,6rem)] leading-[1.02] font-medium tracking-tight text-balance"
             style={{ animationDelay: "0.14s" }}
           >
             Every trip starts with one question.
-            <span className="text-terra-soft mt-3 block italic">
+            <span className="text-terra-soft mt-3 block font-bold not-italic">
               &ldquo;What should I do?&rdquo;
             </span>
           </h1>

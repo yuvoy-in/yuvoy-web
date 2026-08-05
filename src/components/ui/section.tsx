@@ -61,13 +61,14 @@ export function Section({
 }
 
 /**
- * The section opener: an eyebrow, then a headline whose second line turns
- * italic terracotta. That turn is the brand's signature typographic move —
- * one per section, never more.
+ * The section opener: an eyebrow, then a headline whose second thought turns
+ * bold terracotta. That turn is the brand's signature typographic move — one
+ * per section, never more. It is weight and colour in the same family (v2.3),
+ * never an italic: the system ships no italic files.
  *
- * `title` is the plain first line; `accent` is the italic second line. Both
- * render inside a single `<h2>` so the heading reads as one string to
- * assistive tech and to search engines.
+ * `title` is the plain first line; `accent` is the bold turn. Both render
+ * inside a single `<h2>` so the heading reads as one string to assistive
+ * tech and to search engines.
  */
 export function SectionHeading({
   eyebrow,
@@ -93,14 +94,14 @@ export function SectionHeading({
     <div className={cn("max-w-3xl", className)}>
       {eyebrow && <p className={cn("eyebrow", EYEBROW[tone])}>{eyebrow}</p>}
       {/*
-        v2.2: the serif carries mass through size, not weight — there is no
-        bold in the face, so headlines are font-normal and a step larger than
-        the sans scale they replaced.
+        v2.3: display type is the grotesque at medium (500) — the face's
+        comfortable reading weight — with 700 reserved for the turn. There is
+        no 400 display file, so `font-medium` states what actually renders.
       */}
       <Heading
         id={id}
         className={cn(
-          "font-display mt-6 font-normal tracking-tight text-balance",
+          "font-display mt-6 font-medium tracking-tight text-balance",
           level === 1
             ? "text-[clamp(2.5rem,7vw,4.5rem)] leading-none"
             : "text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04]",
@@ -110,7 +111,9 @@ export function SectionHeading({
         {accent && (
           <>
             {" "}
-            <em className={cn("italic", ACCENT[tone])}>{accent}</em>
+            <em className={cn("font-bold not-italic", ACCENT[tone])}>
+              {accent}
+            </em>
           </>
         )}
       </Heading>

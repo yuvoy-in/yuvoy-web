@@ -41,9 +41,10 @@ export function JoinAside() {
       <p className="eyebrow text-terra-soft">Join Season One</p>
       <h2
         id="register-heading"
-        className="font-display mt-6 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-normal tracking-tight text-balance"
+        className="font-display mt-6 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-medium tracking-tight text-balance"
       >
-        Be there when it <em className="text-terra-soft italic">opens.</em>
+        Be there when it{" "}
+        <em className="text-terra-soft font-bold not-italic">opens.</em>
       </h2>
       <p className="text-cream/70 mt-6 max-w-md text-lg leading-relaxed">
         The waitlist hears first: travellers get first access as experiences go

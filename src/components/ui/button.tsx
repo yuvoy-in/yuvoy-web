@@ -8,12 +8,13 @@ import { cn } from "@/lib/cn";
  * reach for those. `ink`, `ghost` and `outlineOnDark` are situational; see
  * docs/DESIGN_SYSTEM.md §5 for when each is allowed.
  *
- * Labels are wide-tracked uppercase mono: an action reads as an action.
- * Transitions sit inside the 250ms interaction budget (design system §3).
+ * Labels are wide-tracked uppercase bold (v2.3 — the mono went with the
+ * serif): an action reads as an action. Transitions sit inside the 250ms
+ * interaction budget (design system §3).
  */
 const button = cva(
   [
-    "inline-flex items-center justify-center gap-2.5 rounded-edge font-mono text-xs font-semibold uppercase whitespace-nowrap",
+    "inline-flex items-center justify-center gap-2.5 rounded-edge font-sans text-xs font-bold tracking-label uppercase whitespace-nowrap",
     "transition-colors duration-200 ease-[var(--ease-interaction)]",
     "focus-visible:ring-terra-deep focus-visible:ring-offset-cream focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
     "disabled:pointer-events-none disabled:opacity-50",

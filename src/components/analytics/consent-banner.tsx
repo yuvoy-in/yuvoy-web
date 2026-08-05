@@ -30,7 +30,7 @@ export function ConsentBanner() {
       <div className="border-cream-line bg-cream rounded-edge mx-auto max-w-3xl border p-6 shadow-lg sm:p-8">
         <h2
           id={headingId}
-          className="font-display text-forest text-lg font-normal tracking-tight"
+          className="font-display text-forest text-lg font-medium tracking-tight"
         >
           Help us understand what&rsquo;s working?
         </h2>

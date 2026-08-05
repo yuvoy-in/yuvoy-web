@@ -7,7 +7,7 @@ The **frontend** of Yuvoy (Experience Commerce platform, "Experience More."). Ow
 ## Stack
 
 Next.js 16 (App Router, RSC, TS strict) · Tailwind v4 (tokens via `@theme`) · Motion · TanStack Query · react-hook-form + Zod · pnpm. Node 22.
-Type: Poppins (display) + Inter (body) + IBM Plex Mono (labels) — Brand Kit v2.
+Type: Cabinet Grotesk (display, 500/700) + Satoshi (body/UI/labels, 400/500/700) — Brand Kit v2.3, self-hosted in `src/fonts`, no italics, no 600, no mono.
 
 > **Next.js 16 has breaking changes vs. older training data** (see `AGENTS.md`). When unsure about an App Router / config / caching API, check `node_modules/next/dist/docs/` or context7 before writing — do not guess from memory.
 

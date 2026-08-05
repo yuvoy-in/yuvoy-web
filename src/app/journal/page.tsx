@@ -52,7 +52,7 @@ export default async function JournalPage() {
                   </p>
                 </div>
                 <div className="sm:col-span-9">
-                  <h3 className="font-display text-forest group-hover:text-terra-deep text-2xl font-normal tracking-tight transition-colors duration-200">
+                  <h3 className="font-display text-forest group-hover:text-terra-deep text-2xl font-medium tracking-tight transition-colors duration-200">
                     {post.title}
                   </h3>
                   <p className="text-forest/75 mt-3 max-w-2xl leading-relaxed">

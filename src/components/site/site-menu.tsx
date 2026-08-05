@@ -261,7 +261,7 @@ export function SiteMenu({
                             aria-current={current ? "page" : undefined}
                             onClick={() => close(false)}
                             className={cn(
-                              "font-display group flex items-baseline justify-between gap-6 py-3.5 text-[clamp(1.375rem,2.8vw,2.25rem)] leading-tight font-normal tracking-tight transition-colors duration-200 sm:py-4",
+                              "font-display group flex items-baseline justify-between gap-6 py-3.5 text-[clamp(1.375rem,2.8vw,2.25rem)] leading-tight font-medium tracking-tight transition-colors duration-200 sm:py-4",
                               current
                                 ? "text-terra-deep"
                                 : "text-forest hover:text-terra-deep",
@@ -288,7 +288,9 @@ export function SiteMenu({
                 <WaveMotif />
                 <p className="font-display text-forest mt-6 text-2xl leading-snug tracking-tight text-balance">
                   Season One opens in the Andaman Islands{" "}
-                  <em className="text-terra italic">when the water clears.</em>
+                  <em className="text-terra font-bold not-italic">
+                    when the water clears.
+                  </em>
                 </p>
                 <p className="text-forest/75 mt-5 max-w-xs leading-relaxed">
                   Havelock, Neil and Port Blair, covered properly, before

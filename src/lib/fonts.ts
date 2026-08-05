@@ -1,38 +1,51 @@
-import { Instrument_Serif, Inter, IBM_Plex_Mono } from "next/font/google";
+import localFont from "next/font/local";
 
 /**
- * Display face — an editorial serif, set large and light. Brand Kit v2.2:
- * headlines carry their mass through size and tight leading, never through
- * weight (the face ships a single 400). Italic is reserved for the terracotta
- * "turn" — the second thought of a headline — which stays the brand's most
- * recognisable typographic move.
+ * Brand Kit v2.3 (2026-08-05, owner-directed, skill-audited): two families,
+ * five files, no italics.
  *
- * Instrument Serif ships exactly one weight, which is a feature: two font
- * files total, and no faux-bold anywhere because there is no bold to reach
- * for.
+ * The v2.2 serif stack (Instrument Serif / Inter / IBM Plex Mono) was retired
+ * after repeated feedback that it read as AI-generated — the serif-display +
+ * Inter + mono-eyebrow combination is the documented generated-page house
+ * style, and Instrument Serif is a named LLM-favourite face. The replacement
+ * carries premium through letterform character at medium weight, not through
+ * contrast or italics.
+ *
+ * Self-hosted (Fontshare, ITF Free Font License — free for commercial use,
+ * no attribution) rather than next/font/google: no external dependency at
+ * build, and the families sit outside the generated-page vocabulary.
+ *
+ * There is deliberately no italic file and no 600 weight in either family.
+ * Emphasis is always the same family, heavier (`font-bold`), usually in an
+ * accent colour — never a style switch. `font-semibold` must not appear in
+ * the tree: with no 600 on disk the browser would synthesise it.
  */
-export const instrumentSerif = Instrument_Serif({
-  subsets: ["latin"],
-  variable: "--font-instrument-serif",
+
+/** Display face — headlines only, 500 by default, 700 for the turn. */
+export const cabinetGrotesk = localFont({
+  src: [
+    {
+      path: "../fonts/CabinetGrotesk-Medium.woff2",
+      weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../fonts/CabinetGrotesk-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+  ],
+  variable: "--font-cabinet-grotesk",
   display: "swap",
-  weight: "400",
-  style: ["normal", "italic"],
 });
 
-/** UI + body face — quiet, legible, modern. */
-export const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
+/** Body, UI, labels and the wordmark — the site's single text voice. */
+export const satoshi = localFont({
+  src: [
+    { path: "../fonts/Satoshi-Regular.woff2", weight: "400", style: "normal" },
+    { path: "../fonts/Satoshi-Medium.woff2", weight: "500", style: "normal" },
+    { path: "../fonts/Satoshi-Bold.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-satoshi",
   display: "swap",
-});
-
-/**
- * Label face — wide-tracked uppercase mono for eyebrows, nav, stats and
- * metadata. The engineered counterweight to the serif's warmth.
- */
-export const plexMono = IBM_Plex_Mono({
-  subsets: ["latin"],
-  variable: "--font-plex-mono",
-  display: "swap",
-  weight: ["400", "500", "600"],
 });
