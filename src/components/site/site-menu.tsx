@@ -10,13 +10,13 @@ import { cn } from "@/lib/cn";
 import { MENU_ITEMS, PRIMARY_CTA, SITE_ROUTES } from "@/lib/site/nav";
 
 /**
- * The site navigation panel, at every breakpoint.
+ * The site navigation panel below `lg`.
  *
- * The header carries only three things — the mark, the operator link and the
- * call to action — so every other route lives in here, on a phone and on a
- * desktop alike. That is why this is no longer conditioned on a breakpoint,
- * and why there is no longer a resize handler closing it: the trigger can
- * never disappear out from under an open panel.
+ * From `lg` up the header lists the primary routes inline and this trigger is
+ * hidden (owner direction 2026-08-05, reverting the desktop-menu concept).
+ * Because the trigger disappears at that breakpoint, growing the viewport
+ * past it closes an open panel — otherwise a rotation or a window snap would
+ * leave a modal on screen with no visible owner.
  *
  * Two details that make it feel like a considered object rather than an
  * overlay:
@@ -46,9 +46,12 @@ const SHUTTER_CLOSE_MS = 320;
 
 export function SiteMenu({
   tone = "onLight",
+  className,
 }: {
   /** Follows the header surface the trigger sits on. */
   tone?: "onLight" | "onDark";
+  /** Extra classes for the trigger button (the header hides it from `lg`). */
+  className?: string;
 }) {
   const [open, setOpen] = React.useState(false);
   const [closing, setClosing] = React.useState(false);
@@ -136,6 +139,25 @@ export function SiteMenu({
     }
   }, [pathname, close]);
 
+  /*
+    The trigger is hidden from `lg` up, so an open panel would outlive its
+    owner when the viewport grows past the breakpoint. Close instantly, with
+    no shutter and no focus restore: this is layout bookkeeping, not a
+    dismissal, and the trigger focus would land on a hidden button.
+  */
+  React.useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 64rem)");
+    function onChange(event: MediaQueryListEvent) {
+      if (!event.matches) return;
+      restoreFocus.current = false;
+      clearTimeout(closeTimer.current);
+      setClosing(false);
+      setOpen(false);
+    }
+    desktop.addEventListener("change", onChange);
+    return () => desktop.removeEventListener("change", onChange);
+  }, []);
+
   const legalLinks = SITE_ROUTES.filter((r) => r.footer === "trust");
 
   return (
@@ -152,6 +174,7 @@ export function SiteMenu({
           tone === "onDark"
             ? "text-cream hover:bg-cream/10 focus-visible:ring-terra-soft"
             : "text-forest hover:bg-forest/5 focus-visible:ring-terra-deep",
+          className,
         )}
       >
         <span className="sr-only">Open menu</span>

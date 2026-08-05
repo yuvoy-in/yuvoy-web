@@ -260,7 +260,8 @@ test.describe("header on scroll", () => {
     await page.mouse.wheel(0, 900);
     await expect(header(page)).not.toBeInViewport();
 
-    await header(page).getByRole("button", { name: "Open menu" }).focus();
+    // Any focusable in the bar; at this width that is the inline nav.
+    await header(page).getByRole("link", { name: "Experiences" }).focus();
     await expect(header(page)).toBeInViewport();
   });
 
@@ -276,15 +277,15 @@ test.describe("header on scroll", () => {
 });
 
 /*
-  The header carries three things and no more: the mark, the one link to the
-  other audience, and the call to action. Everything else lives in the menu,
-  on a desktop exactly as on a phone — which is what lets the homepage drop
-  the operator pitch without stranding an operator who lands there.
+  From `lg` up the header lists the primary routes inline (owner direction
+  2026-08-05) and the menu trigger does not exist. Below `lg` the bar carries
+  three things — the mark, the one link to the other audience, and the call
+  to action — and everything else lives in the shutter menu.
 */
 test.describe("header", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
-  test("carries only the mark, the operator link and the call to action", async ({
+  test("lists the primary routes inline on desktop, with no menu trigger", async ({
     page,
   }) => {
     await page.goto("/");
@@ -293,13 +294,25 @@ test.describe("header", () => {
     await expect(
       header.getByRole("link", { name: "Yuvoy home" }),
     ).toBeVisible();
-    await expect(
-      header.getByRole("link", { name: "For operators" }),
-    ).toBeVisible();
+    for (const label of [
+      "Experiences",
+      "Destinations",
+      "How it works",
+      "For travellers",
+      "For operators",
+    ]) {
+      await expect(
+        header.getByRole("link", { name: label, exact: true }),
+      ).toBeVisible();
+    }
     await expect(
       header.getByRole("link", { name: /join waitlist/i }),
     ).toBeVisible();
-    await expect(header.getByRole("link")).toHaveCount(3);
+    // The mark, the five primary routes, the call to action — nothing else.
+    await expect(header.getByRole("link")).toHaveCount(7);
+    await expect(
+      header.getByRole("button", { name: "Open menu" }),
+    ).toBeHidden();
   });
 
   test("centres the mark in the bar", async ({ page }) => {
@@ -321,29 +334,25 @@ test.describe("header", () => {
     ).toBeLessThanOrEqual(1.5);
   });
 
-  test("keeps the menu on desktop, holding every other route", async ({
+  /*
+    The trigger disappears at `lg`, so an open panel must not survive the
+    viewport growing past it — a rotation or a window snap would otherwise
+    leave a modal on screen with no visible owner, and the page behind it
+    locked.
+  */
+  test("closes the menu when the viewport grows to desktop", async ({
     page,
   }) => {
+    await page.setViewportSize(MOBILE);
     await page.goto("/");
-    const trigger = page.getByRole("button", { name: "Open menu" });
-    await expect(trigger).toBeVisible();
-
-    await trigger.click();
+    await page.getByRole("button", { name: "Open menu" }).click();
     const dialog = page.getByRole("dialog", { name: "Site menu" });
     await expect(dialog).toBeVisible();
 
-    for (const label of [
-      "Experiences",
-      "Destinations",
-      "Journal",
-      "How it works",
-      "For travellers",
-      "About",
-    ]) {
-      await expect(
-        dialog.getByRole("link", { name: label, exact: true }),
-      ).toBeVisible();
-    }
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await expect(dialog).toBeHidden();
+    // The scroll lock releases with it.
+    await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
   });
 });
 

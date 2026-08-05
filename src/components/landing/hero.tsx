@@ -48,11 +48,13 @@ export function Hero() {
           up behind the bar. */}
       <div className="container-page relative flex min-h-dvh flex-col justify-center pt-30 pb-16 sm:pt-34 sm:pb-20">
         <div className="flex flex-col items-center text-center">
+          {/* Plain `label`, not `eyebrow`: the cover line carries no marker
+              (owner direction, 2026-08-05). */}
           <p
-            className="eyebrow text-terra-soft emerge"
+            className="label text-terra-soft emerge"
             style={{ animationDelay: "0.05s" }}
           >
-            Season One · Opening when the water clears
+            Andaman Islands · Opening soon
           </p>
 
           <h1
