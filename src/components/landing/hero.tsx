@@ -1,13 +1,11 @@
-import Image from "next/image";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 
 /**
  * The cover: a full-viewport statement on a forest field that carries light.
- * Three quiet layers build the drama (owner direction, 2026-08-05): the
- * `hero-atmosphere` lagoon light breathing through the field, the official
- * ensō vast and almost invisible behind the type, and filmic grain over it
- * all. Entrance is first-paint choreography only — the composition surfaces
+ * Two quiet layers build the drama (owner direction, 2026-08-05): the
+ * `hero-atmosphere` lagoon light breathing through the field, and filmic
+ * grain over it. Entrance is first-paint choreography only — the composition surfaces
  * from depth and the facts rule draws itself in — there is still no
  * scroll-triggered motion (owner direction, 2026-08-04 stands). An animated
  * wave horizon and a corner glow were tried and removed in earlier rounds;
@@ -40,25 +38,12 @@ export function Hero() {
       data-dark-hero
       className="bg-forest text-cream relative -mt-14 overflow-hidden"
     >
-      {/* The field: breathing lagoon light, the ghosted ensō, then grain on
-          top so everything sits in the same film. All decorative, all inert. */}
+      {/* The field: breathing lagoon light, then grain on top so both sit in
+          the same film. A vast ghosted ensō was tried here and removed
+          (owner direction, 2026-08-05) — the mark belongs in the header, not
+          behind the type. All decorative, all inert. */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="hero-atmosphere" />
-        {/*
-          The mark itself, vast and at the edge of visibility — the ring
-          halos the headline the way a watermark signs a print. Cream
-          strokes at 5% shift the forest behind the type by less than a
-          tone, so every contrast floor holds untouched.
-        */}
-        <Image
-          src="/brand/yuvoy-mark-on-dark.png"
-          alt=""
-          width={1024}
-          height={1024}
-          priority
-          quality={100}
-          className="absolute top-[44%] left-1/2 w-[min(78vmin,44rem)] -translate-x-1/2 -translate-y-1/2 opacity-[0.05]"
-        />
         <div className="grain" />
       </div>
 
