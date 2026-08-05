@@ -66,7 +66,9 @@ describe("IntroVeil", () => {
     // The place line is the cover's own opening words, kept in sync by hand.
     expect(screen.getByText("Andaman Islands")).toHaveClass("intro-place");
 
-    // One swell per edge: the pair is what leaves the centre still.
+    // One swell wing per edge, four orbit planes each: the pair leaves the
+    // centre still, the planes keep neighbouring dots from moving together.
     expect(container.querySelectorAll(".intro-wave")).toHaveLength(2);
+    expect(container.querySelectorAll(".intro-swell")).toHaveLength(8);
   });
 });

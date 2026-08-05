@@ -154,9 +154,22 @@ export function IntroVeil({
     >
       {/* The scene, bottom to top: particle swells rolling in from each
           edge of the night-water gradient and dying away before the centre,
-          so the lockup keeps a pool of still dark; then grain. */}
-      <div className="intro-wave" />
-      <div className="intro-wave intro-wave-right" />
+          so the lockup keeps a pool of still dark; then grain. Each wing
+          holds four independently orbiting planes — neighbouring dots
+          belong to different planes, so no line of dots ever moves as a
+          group. */}
+      <div className="intro-wave">
+        <span className="intro-swell intro-swell-1" />
+        <span className="intro-swell intro-swell-2" />
+        <span className="intro-swell intro-swell-3" />
+        <span className="intro-swell intro-swell-4" />
+      </div>
+      <div className="intro-wave intro-wave-right">
+        <span className="intro-swell intro-swell-1" />
+        <span className="intro-swell intro-swell-2" />
+        <span className="intro-swell intro-swell-3" />
+        <span className="intro-swell intro-swell-4" />
+      </div>
       <div className="grain" />
       <div className="intro-stage flex flex-col items-center">
         <Image

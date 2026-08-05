@@ -553,30 +553,63 @@
 /*
   The particles are hand-scattered SVG tiles, not gradient grids: a grid
   reads as straight rows however it moves, so each tile lays its dots along
-  gentle sine arcs and the two layers use different tiles at different
-  scales — curved at rest, decorrelated in motion. The SVGs are alpha
-  stencils (mask-image), so the dots' colour stays a brand token painted by
-  background-color, and no colour value lives inside the data URI.
+  gentle sine arcs. The SVGs are alpha stencils (mask-image), so the dots'
+  colour stays a brand token painted by background-color, and no colour
+  value lives inside the data URI.
+
+  Each wing holds FOUR planes with only a handful of dots each. Any two
+  neighbouring dots on screen almost always belong to different planes, and
+  every plane orbits its own ellipse (the --ox/--oy amplitudes) on its own
+  period, phase and direction — so the eye finds no group that moves
+  together, which is what "each dot moving differently" needs without a
+  canvas. Plane 4 alone carries the few larger dots.
 */
-.intro-wave::before,
-.intro-wave::after {
-  content: "";
+.intro-swell {
   position: absolute;
   inset: -12%;
+  animation: yuvoy-intro-orbit linear infinite;
 }
 
-.intro-wave::before {
+.intro-swell-1 {
+  --ox: 2.2%;
+  --oy: 1.4%;
   background-color: color-mix(in srgb, var(--color-cream) 30%, transparent);
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cg fill='white'%3E%3Ccircle cx='10' cy='44' r='2'/%3E%3Ccircle cx='50' cy='28' r='2.6'/%3E%3Ccircle cx='90' cy='22' r='2'/%3E%3Ccircle cx='130' cy='30' r='2.4'/%3E%3Ccircle cx='170' cy='46' r='1.8'/%3E%3Ccircle cx='210' cy='58' r='2.2'/%3E%3Ccircle cx='30' cy='142' r='2.4'/%3E%3Ccircle cx='70' cy='126' r='1.8'/%3E%3Ccircle cx='110' cy='116' r='2.6'/%3E%3Ccircle cx='150' cy='124' r='2'/%3E%3Ccircle cx='190' cy='140' r='2.2'/%3E%3Ccircle cx='230' cy='152' r='1.8'/%3E%3Ccircle cx='20' cy='210' r='2'/%3E%3Ccircle cx='60' cy='196' r='2.4'/%3E%3Ccircle cx='100' cy='190' r='1.8'/%3E%3Ccircle cx='140' cy='198' r='2.6'/%3E%3Ccircle cx='180' cy='212' r='2'/%3E%3C/g%3E%3C/svg%3E");
-  mask-size: 240px 240px;
-  animation: yuvoy-intro-swell-a 13s linear infinite;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cg fill='white'%3E%3Ccircle cx='18' cy='52' r='1.5'/%3E%3Ccircle cx='66' cy='34' r='1.3'/%3E%3Ccircle cx='114' cy='30' r='1.6'/%3E%3Ccircle cx='162' cy='44' r='1.4'/%3E%3Ccircle cx='40' cy='138' r='1.4'/%3E%3Ccircle cx='120' cy='158' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
+  mask-size: 200px 200px;
+  animation-duration: 9s;
+  animation-delay: -2s;
 }
 
-.intro-wave::after {
-  background-color: color-mix(in srgb, var(--color-cream) 18%, transparent);
-  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cg fill='white'%3E%3Ccircle cx='24' cy='60' r='2.8'/%3E%3Ccircle cx='88' cy='36' r='2.2'/%3E%3Ccircle cx='152' cy='28' r='3'/%3E%3Ccircle cx='216' cy='40' r='2.4'/%3E%3Ccircle cx='280' cy='64' r='2.8'/%3E%3Ccircle cx='40' cy='170' r='2.4'/%3E%3Ccircle cx='110' cy='146' r='3'/%3E%3Ccircle cx='180' cy='138' r='2.4'/%3E%3Ccircle cx='250' cy='152' r='2.8'/%3E%3Ccircle cx='310' cy='176' r='2.2'/%3E%3Ccircle cx='70' cy='268' r='2.8'/%3E%3Ccircle cx='140' cy='246' r='2.2'/%3E%3Ccircle cx='210' cy='238' r='3'/%3E%3Ccircle cx='280' cy='252' r='2.4'/%3E%3C/g%3E%3C/svg%3E");
-  mask-size: 320px 320px;
-  animation: yuvoy-intro-swell-b 19s linear infinite;
+.intro-swell-2 {
+  --ox: 1.6%;
+  --oy: 2.2%;
+  background-color: color-mix(in srgb, var(--color-cream) 22%, transparent);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cg fill='white'%3E%3Ccircle cx='30' cy='80' r='1.4'/%3E%3Ccircle cx='92' cy='60' r='1.2'/%3E%3Ccircle cx='150' cy='52' r='1.5'/%3E%3Ccircle cx='210' cy='66' r='1.3'/%3E%3Ccircle cx='60' cy='190' r='1.5'/%3E%3Ccircle cx='170' cy='206' r='1.2'/%3E%3C/g%3E%3C/svg%3E");
+  mask-size: 240px 240px;
+  animation-duration: 13s;
+  animation-delay: -7s;
+  animation-direction: reverse;
+}
+
+.intro-swell-3 {
+  --ox: 2.8%;
+  --oy: 1.8%;
+  background-color: color-mix(in srgb, var(--color-cream) 26%, transparent);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cg fill='white'%3E%3Ccircle cx='36' cy='96' r='1.7'/%3E%3Ccircle cx='120' cy='70' r='1.5'/%3E%3Ccircle cx='200' cy='62' r='1.8'/%3E%3Ccircle cx='262' cy='84' r='1.5'/%3E%3Ccircle cx='80' cy='220' r='1.8'/%3E%3Ccircle cx='190' cy='240' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
+  mask-size: 280px 280px;
+  animation-duration: 16s;
+  animation-delay: -11s;
+}
+
+.intro-swell-4 {
+  --ox: 2%;
+  --oy: 2.6%;
+  background-color: color-mix(in srgb, var(--color-cream) 20%, transparent);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='340'%3E%3Cg fill='white'%3E%3Ccircle cx='60' cy='110' r='2.4'/%3E%3Ccircle cx='200' cy='80' r='2.2'/%3E%3Ccircle cx='290' cy='180' r='2.6'/%3E%3C/g%3E%3C/svg%3E");
+  mask-size: 340px 340px;
+  animation-duration: 21s;
+  animation-delay: -5s;
+  animation-direction: reverse;
 }
 
 /* Letters rise through a baseline mask (each sits in an overflow-clipped
@@ -680,51 +713,30 @@
   }
 }
 
-/* Water moves its particles in circles, so the swell layers orbit rather
-   than slide: closed elliptical loops, opposite directions, different
-   periods. Linear timing keeps the angular speed constant — easing an
+/* Water moves its particles in circles, so the swell planes orbit rather
+   than slide: one closed elliptical loop, parameterised per plane by the
+   --ox/--oy amplitudes and run at each plane's own period, phase and
+   direction. Linear timing keeps the angular speed constant — easing an
    orbit makes it pulse. */
-@keyframes yuvoy-intro-swell-a {
+@keyframes yuvoy-intro-orbit {
   0% {
-    transform: translate(-2.5%, 0);
+    transform: translate(calc(-1 * var(--ox, 2%)), 0);
   }
 
   25% {
-    transform: translate(0, 2%);
+    transform: translate(0, var(--oy, 2%));
   }
 
   50% {
-    transform: translate(2.5%, 0);
+    transform: translate(var(--ox, 2%), 0);
   }
 
   75% {
-    transform: translate(0, -2%);
+    transform: translate(0, calc(-1 * var(--oy, 2%)));
   }
 
   100% {
-    transform: translate(-2.5%, 0);
-  }
-}
-
-@keyframes yuvoy-intro-swell-b {
-  0% {
-    transform: translate(2%, 0);
-  }
-
-  25% {
-    transform: translate(0, -1.6%);
-  }
-
-  50% {
-    transform: translate(-2%, 0);
-  }
-
-  75% {
-    transform: translate(0, 1.6%);
-  }
-
-  100% {
-    transform: translate(2%, 0);
+    transform: translate(calc(-1 * var(--ox, 2%)), 0);
   }
 }
 
