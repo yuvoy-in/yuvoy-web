@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./support/session";
 
 const FABRICATED = /₹|\breviews?\b|\bratings?\b/i;
 

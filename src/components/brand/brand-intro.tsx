@@ -27,8 +27,8 @@ import {
  *
  * It is theatre over a live page, never a gate: the page renders and hydrates
  * behind it, the exit ends in `visibility: hidden` without JavaScript's help,
- * and any keypress dismisses it early — a keyboard user's focus must not sit
- * behind a curtain. The storage flag is stamped when it starts, not when it
+ * and any attempt to move the page — a keypress, a wheel, a touch drag —
+ * dismisses it early. The storage flag is stamped when it starts, not when it
  * ends, so a mid-play refresh does not replay it.
  */
 
@@ -133,7 +133,17 @@ export function BrandIntro() {
       }
     };
 
-    const onKeyDown = () => {
+    /*
+      Any attempt to move the page dismisses the veil: a keypress, a wheel
+      or trackpad gesture, a touch drag. The scroll lock above is what
+      makes this necessary — without it a visitor who reaches for the
+      scrollbar in the first few seconds gets a page that answers nothing,
+      which is indistinguishable from a hung page (found by the e2e suite,
+      2026-08-06: two header-scroll specs scrolled nothing while the veil
+      held the lock). The veil is theatre, and theatre yields the moment
+      someone asks to get on with it.
+    */
+    const skip = () => {
       veil.setAttribute("data-skip", "");
       window.clearTimeout(timer);
       timer = window.setTimeout(settle, SKIP_FADE_MS);
@@ -141,7 +151,11 @@ export function BrandIntro() {
 
     veil.addEventListener("animationstart", onAnimationStart);
     veil.addEventListener("animationend", onAnimationEnd);
-    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keydown", skip);
+    // Passive: these listeners never call preventDefault — the lock, not
+    // the handler, is what stops the page moving.
+    window.addEventListener("wheel", skip, { passive: true });
+    window.addEventListener("touchmove", skip, { passive: true });
     // If `animationend` never arrives (an extension pausing animations, an
     // interrupted paint), the veil still leaves the tree shortly after its
     // scheduled end.
@@ -150,7 +164,9 @@ export function BrandIntro() {
     return () => {
       veil.removeEventListener("animationstart", onAnimationStart);
       veil.removeEventListener("animationend", onAnimationEnd);
-      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keydown", skip);
+      window.removeEventListener("wheel", skip);
+      window.removeEventListener("touchmove", skip);
       window.clearTimeout(timer);
       unlock();
     };

@@ -1,4 +1,4 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect, type Page } from "./support/session";
 import AxeBuilder from "@axe-core/playwright";
 
 /** Routes that exist today and must all render inside the shell. */

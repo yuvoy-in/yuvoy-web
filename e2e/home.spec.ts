@@ -1,4 +1,4 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect, type Page } from "./support/session";
 
 /**
  * Nothing on the page may claim a price, a rating or a review count — with

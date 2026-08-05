@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./support/session";
 
 /**
  * /safety is the highest-risk page on the site: a claim here that turns out to

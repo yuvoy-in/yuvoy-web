@@ -6,6 +6,10 @@ import { test, expect, type Page } from "@playwright/test";
  * The decision happens in a pre-paint inline script, so "never see it" is
  * assertable immediately after load — a veil that was going to play is
  * visible from the first frame.
+ *
+ * This file deliberately imports `@playwright/test` rather than the suite's
+ * returning-visitor fixture (`e2e/support/session.ts`): it is the one place
+ * that wants a clean session, because the veil is its subject.
  */
 
 const veil = (page: Page) => page.locator("#yuvoy-intro");
@@ -25,6 +29,43 @@ test.describe("brand intro veil", () => {
     // Same tab, stamped session: the veil stays display:none until hydration
     // removes it. It must never become visible again.
     await expect(veil(page)).toBeHidden();
+  });
+
+  /*
+   * The lock is why the veil has to yield to a gesture: a page that answers
+   * nothing is indistinguishable from a hung one. Asserted with programmatic
+   * scrolls, so the gesture-skip below is not what is being measured here.
+   */
+  test("locks the page while it plays and releases it on the way out", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await expect(veil(page)).toBeVisible();
+    await expect(page.locator("html")).toHaveAttribute(
+      "style",
+      /overflow:\s*hidden/,
+    );
+
+    await page.evaluate(() => window.scrollTo(0, 600));
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+
+    await expect(veil(page)).toHaveCount(0, { timeout: 8_000 });
+    await page.evaluate(() => window.scrollTo(0, 600));
+    await expect
+      .poll(() => page.evaluate(() => window.scrollY))
+      .toBeGreaterThan(0);
+  });
+
+  test("a scroll gesture dismisses it", async ({ page }) => {
+    await page.goto("/");
+    await expect(veil(page)).toBeVisible();
+
+    // As with the keypress: the listener arrives with hydration, so keep
+    // asking until the veil leaves.
+    await expect(async () => {
+      await page.mouse.wheel(0, 240);
+      await expect(veil(page)).toHaveCount(0, { timeout: 400 });
+    }).toPass({ timeout: 6_000 });
   });
 
   test("any keypress dismisses it early", async ({ page }) => {
