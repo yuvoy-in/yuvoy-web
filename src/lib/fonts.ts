@@ -1,4 +1,9 @@
-import { Instrument_Serif, Inter, IBM_Plex_Mono } from "next/font/google";
+import {
+  Great_Vibes,
+  Instrument_Serif,
+  Inter,
+  IBM_Plex_Mono,
+} from "next/font/google";
 
 /**
  * Display face — an editorial serif, set large and light. Brand Kit v2.2:
@@ -17,6 +22,19 @@ export const instrumentSerif = Instrument_Serif({
   display: "swap",
   weight: "400",
   style: ["normal", "italic"],
+});
+
+/**
+ * Script face — cursive handwriting, used ONLY by the brand veil's
+ * "Experience more." statement (owner direction: the line should read as
+ * being written by hand). One weight, one place; it must not leak into
+ * page typography, which stays the display/body pair.
+ */
+export const greatVibes = Great_Vibes({
+  subsets: ["latin"],
+  variable: "--font-great-vibes",
+  display: "swap",
+  weight: "400",
 });
 
 /** UI + body face — quiet, legible, modern. */

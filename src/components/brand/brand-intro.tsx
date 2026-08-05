@@ -44,7 +44,7 @@ const STORAGE_KEY = "yuvoy.intro-played";
  * system's rule is that the two are changed together. Used only for the
  * belt-and-braces removal timeout, so it needs margin, not precision.
  */
-const INTRO_TOTAL_MS = 3250;
+const INTRO_TOTAL_MS = 3950;
 
 /** The `data-skip` fade is 200ms in CSS; settle just after it. */
 const SKIP_FADE_MS = 240;
@@ -86,11 +86,25 @@ export function BrandIntro() {
       return;
     }
 
+    // The veil owns the whole viewport while it plays, so scrolling could
+    // only move the page invisibly underneath it — a moving scrollbar over
+    // a still frame reads as breakage (owner report). Locked here rather
+    // than in the pre-paint script so a hydration failure can never strand
+    // a scroll-locked page: no JavaScript, no lock.
+    const html = document.documentElement;
+    html.style.overflow = "hidden";
+    const unlock = () => {
+      html.style.overflow = "";
+    };
+
     // TEMPORARY (review aid): held for inspection — no dismissal of any kind.
-    if (veil.hasAttribute("data-hold")) return;
+    if (veil.hasAttribute("data-hold")) return unlock;
 
     let timer = 0;
-    const settle = () => setGone(true);
+    const settle = () => {
+      unlock();
+      setGone(true);
+    };
 
     // The veil's own exit is the one that matters; the letters and the
     // sign-off stroke bubble their own `animationend` events past here.
@@ -117,6 +131,7 @@ export function BrandIntro() {
       veil.removeEventListener("animationend", onAnimationEnd);
       window.removeEventListener("keydown", onKeyDown);
       window.clearTimeout(timer);
+      unlock();
     };
   }, []);
 
@@ -223,26 +238,27 @@ export function IntroVeil({
           voice answers. `leading-tight` + `pb-1` reserve room for the
           descenders an italic line clips at display size.
         */}
-        {/* `terra`, not terra-soft, matching the comp's deeper warmth. The
-            veil is aria-hidden theatre, so the text floors do not gate it. */}
-        <span className="intro-kicker font-display text-terra mt-6 pb-1 text-4xl leading-tight italic sm:text-5xl">
+        {/* Cursive handwriting (the veil-only script face), written on by
+            the mask sweep in globals.css. `terra`, matching the comp's
+            warmth: the veil is aria-hidden theatre, so the text floors do
+            not gate it. */}
+        <span className="intro-kicker font-script text-terra mt-5 pb-1 text-5xl leading-tight sm:text-6xl">
           Experience more.
         </span>
         {/*
-          The sign-off swash per the owner's comp: a long, shallow
-          calligraphic sliver — tapered at both tips, weight in the middle,
-          bowing gently and lifting toward the right — nearly the width of
-          the statement, revealed left to right like a brushstroke.
-          Decoration, so it is exempt from text floors.
+          The sign-off swash: a long calligraphic sliver — tapered at both
+          tips, weight in the middle — climbing from bottom-left to
+          top-right (owner direction), revealed left to right after the
+          word is written. Decoration, so it is exempt from text floors.
         */}
         <svg
-          viewBox="0 0 288 14"
+          viewBox="0 0 288 16"
           fill="none"
-          className="text-terra mt-3 h-3.5 w-56 sm:w-72"
+          className="text-terra mt-2 h-4 w-56 sm:w-72"
         >
           <path
             className="intro-stroke fill-current"
-            d="M2 10Q150 0 286 6Q150 7 2 10Z"
+            d="M2 15Q150 6 286 2Q150 11 2 15Z"
           />
         </svg>
       </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { instrumentSerif, inter, plexMono } from "@/lib/fonts";
+import { greatVibes, instrumentSerif, inter, plexMono } from "@/lib/fonts";
 import { BrandIntro } from "@/components/brand/brand-intro";
 import { Providers } from "@/components/providers";
 import { SITE_URL, IS_PRODUCTION } from "@/lib/site";
@@ -48,7 +48,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         page instead of arriving at it.
       */
       data-scroll-behavior="smooth"
-      className={`${instrumentSerif.variable} ${inter.variable} ${plexMono.variable} h-full`}
+      className={`${instrumentSerif.variable} ${inter.variable} ${plexMono.variable} ${greatVibes.variable} h-full`}
     >
       <body className="min-h-full">
         {/*

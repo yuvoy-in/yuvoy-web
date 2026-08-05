@@ -36,6 +36,9 @@
   ); /* headlines — editorial serif */
   --font-sans: var(--font-inter); /* body + UI + wordmark */
   --font-mono: var(--font-plex-mono); /* eyebrows, nav, stats, metadata */
+  /* The handwriting face exists for exactly one element: the brand veil's
+     statement, written on by owner direction. Never page typography. */
+  --font-script: var(--font-great-vibes);
 
   /* --------------------------------------------------------------- layout */
   --container-page: 70rem; /* the page measure — `max-w-page` */
@@ -464,12 +467,13 @@
   --intro-letters-at: 200ms;
   --intro-stagger: 90ms;
   --intro-kicker-at: 700ms;
-  --intro-stroke-at: 950ms;
-  --intro-stroke: 1250ms;
+  --intro-write: 1300ms;
+  --intro-stroke-at: 2050ms;
+  --intro-stroke: 800ms;
   --intro-place-at: 1500ms;
-  --intro-close-at: 2350ms;
+  --intro-close-at: 3050ms;
   --intro-close: 450ms;
-  --intro-exit-at: 2550ms;
+  --intro-exit-at: 3250ms;
   --intro-exit: 700ms;
 
   position: fixed;
@@ -625,8 +629,15 @@
     calc(var(--intro-letters-at) + var(--intro-stagger) * var(--i, 0)) both;
 }
 
+/* The statement is written, not shown: a soft-edged mask sweeps left to
+   right across the cursive line like a pen crossing the page. The swash
+   below starts only after the word is finished — you underline after you
+   write. */
 .intro-kicker {
-  animation: yuvoy-intro-rise var(--intro-rise) var(--ease-cinematic)
+  mask-image: linear-gradient(to right, black 45%, transparent 55%);
+  mask-size: 250% 100%;
+  mask-repeat: no-repeat;
+  animation: yuvoy-intro-write var(--intro-write) var(--ease-cinematic)
     var(--intro-kicker-at) both;
 }
 
@@ -648,11 +659,11 @@
 .intro-horizon {
   position: absolute;
   inset: auto 0 0 0;
-  height: clamp(9rem, 24vh, 16rem);
+  height: clamp(10rem, 30vh, 19rem);
   background-image: url("/assets/intro-horizon.webp");
   background-size: cover;
   background-position: center bottom;
-  mask-image: linear-gradient(to top, black 55%, transparent 100%);
+  mask-image: linear-gradient(to top, black 65%, transparent 100%);
   animation: yuvoy-intro-fade 1600ms var(--ease-cinematic) 200ms both;
 }
 
@@ -702,6 +713,18 @@
     opacity: 1;
     transform: translateY(0);
     filter: blur(0);
+  }
+}
+
+/* With the mask 2.5x the box and no-repeat: at 100% the box shows the
+   mask's transparent tail (nothing), at 0% its solid head (everything). */
+@keyframes yuvoy-intro-write {
+  from {
+    mask-position: 100% 0;
+  }
+
+  to {
+    mask-position: 0% 0;
   }
 }
 
