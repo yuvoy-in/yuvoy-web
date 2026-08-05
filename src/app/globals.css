@@ -133,18 +133,20 @@
 }
 
 /**
- * A section eyebrow — the label preceded by a short terracotta rule.
- * This is the brand's section-opening gesture; use it once per section.
+ * A section eyebrow — the label preceded by a terracotta dot, the same
+ * square `size-1` marker the fact rows use (square, not round: `rounded-full`
+ * is reserved for the device preview). This is the brand's section-opening
+ * gesture; use it once per section.
  */
 @utility eyebrow {
-  @apply inline-flex items-center gap-3 font-mono text-xs font-medium uppercase;
+  @apply inline-flex items-center gap-2.5 font-mono text-xs font-medium uppercase;
   letter-spacing: var(--tracking-label);
 
   &::before {
     content: "";
     flex: none;
-    width: 1.75rem;
-    height: 1px;
+    width: 0.25rem;
+    height: 0.25rem;
     background-color: var(--color-terra);
   }
 }
