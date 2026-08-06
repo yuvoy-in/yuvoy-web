@@ -353,8 +353,8 @@
 */
 @utility device-shadow {
   box-shadow:
-    0 2px 6px color-mix(in oklab, var(--color-forest) 7%, transparent),
-    0 18px 40px -12px color-mix(in oklab, var(--color-forest) 18%, transparent);
+    0 3px 10px color-mix(in oklab, var(--color-forest) 10%, transparent),
+    0 30px 64px -18px color-mix(in oklab, var(--color-forest) 32%, transparent);
 }
 
 /* ------------------------------------------------- the product preview */
