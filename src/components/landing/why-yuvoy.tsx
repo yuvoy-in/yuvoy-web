@@ -27,8 +27,20 @@ import { ProductDemo } from "@/components/landing/product-demo";
  * here, and this is now the section that shows it.
  */
 
-/** The improvised stack, as the tab bar it actually is. */
-const TABS = ["Instagram", "Google", "YouTube", "Tripadvisor"];
+/**
+ * The improvised stack every traveller actually uses, one card each, with
+ * what that source leaves you holding. Real product names and no logos: this
+ * is reportage, not endorsement, and a card carries the name at a readable
+ * size instead of a clipped tab strip. Six of them fill the grid exactly.
+ */
+const SOURCES = [
+  { name: "Instagram", note: "Clips, no prices" },
+  { name: "Google", note: "Ten blue links" },
+  { name: "YouTube", note: "Vlogs from 2019" },
+  { name: "Tripadvisor", note: "Verdicts, no video" },
+  { name: "WhatsApp", note: "A number, if you ask" },
+  { name: "The hotel desk", note: "Whoever they know" },
+];
 
 /** The comparison every traveller tries to build, and cannot finish. */
 const COMPARE = {
@@ -71,35 +83,25 @@ export function WhyYuvoy() {
 
         {/* ----------------------------------------- without Yuvoy · panel */}
         <div className="border-cream-line divide-cream-line bg-cream-deep rounded-edge flex flex-col divide-y border lg:col-start-1 lg:row-start-2">
-          {/* The tab bar: the headline's "too many tabs", drawn. */}
+          {/* The open tabs, one card each: the headline's "too many tabs",
+              drawn. Six cards, six cells, so the grid reads as finished
+              rather than clipped (owner report, 2026-08-06). */}
           <div aria-hidden className="p-5 select-none">
-            <div className="flex items-stretch gap-1.5">
-              {TABS.map((tab, index) => (
-                <span
-                  key={tab}
-                  className={
-                    index === 0
-                      ? "border-cream-line bg-cream text-forest rounded-edge flex min-w-0 flex-1 items-center gap-2 border px-2.5 py-2 text-xs"
-                      : // /75, not /70: the ladder's floors are measured on
-                        // cream, and this tint spends that headroom (pinned
-                        // in palette.test.ts).
-                        "bg-forest/5 text-forest/75 rounded-edge flex min-w-0 flex-1 items-center gap-2 border border-transparent px-2.5 py-2 text-xs"
-                  }
+            <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+              {SOURCES.map((source) => (
+                <li
+                  key={source.name}
+                  className="border-cream-line bg-cream rounded-edge border px-3 py-2.5"
                 >
-                  <span
-                    className={
-                      index === 0
-                        ? "bg-terra size-1.5 flex-none"
-                        : "bg-forest/25 size-1.5 flex-none"
-                    }
-                  />
-                  <span className="truncate">{tab}</span>
-                </span>
+                  <span className="text-forest block truncate text-sm">
+                    {source.name}
+                  </span>
+                  <span className="text-forest/70 mt-1 block text-xs">
+                    {source.note}
+                  </span>
+                </li>
               ))}
-              <span className="text-forest/75 rounded-edge bg-forest/5 flex flex-none items-center px-2.5 py-2 text-xs">
-                +9
-              </span>
-            </div>
+            </ul>
           </div>
 
           {/* The comparison that never resolves. Every cell is a question
@@ -195,8 +197,11 @@ export function WhyYuvoy() {
         {/* ------------------------------------------- with Yuvoy · header */}
         <div className="lg:col-start-3 lg:row-start-1">
           <p className="label text-terra-deep">With Yuvoy</p>
+          {/* text-2xl is 24px, which is where `terra` clears AA as large
+              text, and this header sits on `cream`, never on a panel. */}
           <p className="font-display tracking-display mt-3 text-2xl leading-snug text-balance">
-            Everything you need. In one flow.
+            Everything you need.{" "}
+            <em className="text-terra font-turn italic">In one flow.</em>
           </p>
         </div>
 

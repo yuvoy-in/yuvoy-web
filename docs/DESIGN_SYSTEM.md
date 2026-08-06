@@ -196,7 +196,10 @@ No Figma. The reference is the [pre-launch landing artifact](https://claude.ai/p
 
 The homepage's **Season One phone preview** is the one place illustrative product content may appear — prices, seat counts, operator lines — under three conditions, all enforced:
 
-1. The frame is **visibly labelled** ("Season One preview") and its wrapper carries `data-preview`; the homepage e2e guard bans invented numbers everywhere _outside_ that wrapper.
+1. Its wrapper carries `data-preview`, and the frame's accessible name states that nothing is bookable yet; the homepage e2e guard bans invented numbers everywhere _outside_ that wrapper.
+
+   > **The visible label was removed on 2026-08-06** (owner direction, twice: first the badge pinned to the frame, then the caption under it). The page's plain-language statement now lives in the registration section's first answer — "Can I book something today? No, and we won't pretend otherwise." — which `home.spec.ts` asserts alongside the frame's accessible name. **Accept the residual risk knowingly:** a sighted visitor skimming the why act sees a price and a seat count with no disclaimer beside them, and the honest sentence is a scroll away. If that ever needs undoing, put the caption back under the frame rather than the badge on it.
+
 2. Its "footage" is **moving colour built from brand tokens** (`film-*` + `caustics` utilities, `color-mix` only) — unmistakably an illustration, never a fake photograph or a real-looking screenshot.
 3. Claims **outside** the preview stay literally true (e.g. the "3 founding operators signed" count is owner-confirmed and must track reality).
 

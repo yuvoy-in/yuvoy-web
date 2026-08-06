@@ -70,13 +70,10 @@ test("the homepage speaks only to travellers", async ({ page }) => {
   await expect(registerForm(page).getByLabel("Business name")).toHaveCount(0);
 });
 
-test("the preview is labelled and invented numbers stay inside it", async ({
-  page,
-}) => {
+test("invented numbers stay inside the preview", async ({ page }) => {
   await page.goto("/");
 
-  // The exception must announce itself…
-  await expect(page.getByText("Season One preview")).toBeVisible();
+  // Exactly one wrapper may carry the exception…
   await expect(page.locator("[data-preview]")).toHaveCount(1);
 
   // …and the rule holds everywhere else.
@@ -108,19 +105,21 @@ test("the demo rail seeks the flow and reports its position", async ({
 
 /*
   The page shows a full booking flow, right down to a payment, so it has to
-  say plainly that none of it is live yet. The long-form caveat that used to
-  close the why act was dropped on 2026-08-06 (owner direction); these two
-  statements are what carry the point now, and neither may quietly go the
-  same way. The preview caption is the design system's §8 condition; the
-  registration answer is the page's flat "no".
+  say plainly that none of it is live yet. Both visible statements around the
+  preview were dropped on owner direction (2026-08-06): the long-form caveat
+  that closed the why act, then the caption under the frame. What is left is
+  the registration section's flat "no" and the preview's own accessible
+  name, and neither may quietly go the same way.
 */
 test("the page states that nothing is bookable yet", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByText("nothing is bookable yet")).toBeVisible();
   await expect(
     page.getByText("No, and we won't pretend otherwise.", { exact: false }),
   ).toBeAttached();
+  await expect(
+    page.getByRole("group", { name: /nothing is bookable yet/i }),
+  ).toBeVisible();
 });
 
 test("the cover's momentum line states only true facts", async ({ page }) => {

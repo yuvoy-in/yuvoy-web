@@ -72,8 +72,8 @@ const SCRIPT: Step[] = (() => {
     step("watch", 2600),
     step("watch", 2600, { feedIndex: 1 }),
     step("understand", 1800, { screen: "detail" }),
-    step("understand", 2000, { detailScroll: 1 }),
-    step("understand", 2100, { detailScroll: 2 }),
+    step("understand", 3000, { detailScroll: 1 }),
+    step("understand", 3200, { detailScroll: 2 }),
     step("book", 650, { bookTap: true }),
     step("book", 1200, { screen: "booking", bookTap: false }),
     step("book", 950, { bookingStage: 1 }),
@@ -105,7 +105,13 @@ SCRIPT.forEach((step, index) => {
 /** Screens stack left to right; the confirmation rises from the foot. */
 const STACK: Screen[] = ["feed", "detail", "booking", "checkout", "confirmed"];
 
-const DETAIL_SCROLL_STOPS = [0, 0.55, 1];
+/**
+ * Where the detail content sits at each stop, as a fraction of its travel.
+ * The two moves are 49% then 51% because their steps are 3000ms and 3200ms:
+ * matching the distances to the durations keeps the speed constant across
+ * the join, so the act reads as one slow crawl rather than two slides.
+ */
+const DETAIL_SCROLL_STOPS = [0, 0.49, 1];
 
 const REELS = [
   {
@@ -149,9 +155,26 @@ const INCLUDED = [
   "Photos & a video clip",
 ];
 
+/** The detail screen reads long on purpose: the act crawls down it. */
+const TIMELINE = [
+  { at: "First 20 minutes", what: "Briefing and gear fitting on the beach." },
+  { at: "Next 30 minutes", what: "Breathing practice in the shallows." },
+  { at: "Then 40 minutes", what: "The reef itself, holding your instructor." },
+  { at: "Last 20 minutes", what: "Warm rinse, and your clips handed over." },
+];
+
+const GOOD_TO_KNOW = [
+  "No swimming experience needed. You never leave your instructor.",
+  "Ages 10 and up. A short health form is signed at check-in.",
+  "Bring swimwear, a towel and reef-safe sunscreen.",
+  "Mornings have the clearest water, before the day boats arrive.",
+];
+
 export function ProductDemo() {
   const rootRef = React.useRef<HTMLDivElement>(null);
   const detailRef = React.useRef<HTMLDivElement>(null);
+  const detailContentRef = React.useRef<HTMLDivElement>(null);
+  const [detailTravel, setDetailTravel] = React.useState(0);
   const [stepIndex, setStepIndex] = React.useState(0);
   const [playing, setPlaying] = React.useState(true);
   const [inView, setInView] = React.useState(false);
@@ -196,18 +219,25 @@ export function ProductDemo() {
     return () => clearTimeout(timer);
   }, [running, stepIndex, step.dur]);
 
-  // The detail scroller is driven, not user-scrollable, so its position is
-  // state like everything else. Smooth only while the screen is showing;
-  // resets between loops happen off screen and must be instant.
+  /**
+   * How far the detail content can travel inside its window. Measured rather
+   * than assumed: the copy is long enough that its height depends on where
+   * every line happens to wrap, which changes with the frame's width.
+   */
   React.useEffect(() => {
-    const el = detailRef.current;
-    if (!el) return;
-    const travel = el.scrollHeight - el.clientHeight;
-    el.scrollTo({
-      top: travel * (DETAIL_SCROLL_STOPS[step.detailScroll] ?? 0),
-      behavior: reduced || step.screen !== "detail" ? "auto" : "smooth",
-    });
-  }, [step.detailScroll, step.screen, reduced]);
+    const viewport = detailRef.current;
+    const content = detailContentRef.current;
+    if (!viewport || !content) return;
+    const measure = () =>
+      setDetailTravel(
+        Math.max(0, content.scrollHeight - viewport.clientHeight),
+      );
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(viewport);
+    ro.observe(content);
+    return () => ro.disconnect();
+  }, []);
 
   function seek(act: ActId) {
     setEpoch((count) => count + 1);
@@ -237,8 +267,22 @@ export function ProductDemo() {
       data-demo
       className="flex flex-col items-center gap-8 lg:flex-row lg:gap-7"
     >
-      <div data-preview ref={rootRef} className="relative w-fit flex-none">
-        <div className="rounded-device ring-cream/15 bg-forest relative p-2 ring-1">
+      {/*
+        Both boxes size to the frame, and the frame sizes to the screen.
+        This used to be one `w-fit` wrapper holding the frame and a caption:
+        `fit-content` took the caption's width (uppercase at `tracking-label`
+        is far wider than a phone on a 390px viewport), the frame is a block
+        so it stretched to that width, and the fixed-width screen sat left
+        inside it — which put all the slack on the right and read as a fat
+        right border (owner report, 2026-08-06). Anything added beside the
+        frame from here can only affect its own row.
+      */}
+      <div
+        data-preview
+        ref={rootRef}
+        className="relative flex w-fit flex-none flex-col items-center"
+      >
+        <div className="rounded-device ring-cream/15 bg-forest relative w-fit p-2 ring-1">
           {/* Camera dot — hardware depiction, the one rounded object on the site. */}
           <span
             aria-hidden
@@ -272,7 +316,18 @@ export function ProductDemo() {
                 active={activeScreen}
                 className="bg-cream text-forest flex flex-col"
               >
-                <DetailScreen bookTap={step.bookTap} scrollerRef={detailRef} />
+                <DetailScreen
+                  bookTap={step.bookTap}
+                  viewportRef={detailRef}
+                  contentRef={detailContentRef}
+                  offset={
+                    detailTravel * (DETAIL_SCROLL_STOPS[step.detailScroll] ?? 0)
+                  }
+                  // The crawl runs for exactly as long as the step it belongs
+                  // to, at constant speed. Off the detail screen there is
+                  // nothing to watch, so the reset is instant.
+                  duration={step.screen === "detail" ? step.dur : 0}
+                />
               </ScreenShell>
 
               <ScreenShell
@@ -366,15 +421,6 @@ export function ProductDemo() {
             )}
           </div>
         </div>
-
-        {/*
-          The label that keeps the preview honest (DESIGN_SYSTEM §8): it moved
-          off the frame as a badge and became this caption, which also carries
-          the not-yet-bookable statement the section used to close on.
-        */}
-        <p className="label text-forest/75 mt-4 text-center text-[10px]">
-          Season One preview <span aria-hidden>·</span> nothing is bookable yet
-        </p>
       </div>
 
       {/* The rail: the same three moves the section promises, highlighted in
@@ -555,12 +601,28 @@ function FeedScreen({ feedIndex }: { feedIndex: number }) {
   );
 }
 
+/**
+ * The detail screen, and the act's slow read down it.
+ *
+ * The content moves by transform rather than by `scrollTo`, which is what
+ * made this look like a glitch: the native smooth scroll runs on its own
+ * short curve, so each step jumped over a few hundred milliseconds and then
+ * sat still for two seconds. A linear transform over the step's whole
+ * duration is one continuous crawl, it stays on the compositor, and the
+ * global reduced-motion rule collapses it to an instant move.
+ */
 function DetailScreen({
   bookTap,
-  scrollerRef,
+  viewportRef,
+  contentRef,
+  offset,
+  duration,
 }: {
   bookTap: boolean;
-  scrollerRef: React.RefObject<HTMLDivElement | null>;
+  viewportRef: React.RefObject<HTMLDivElement | null>;
+  contentRef: React.RefObject<HTMLDivElement | null>;
+  offset: number;
+  duration: number;
 }) {
   const reel = REELS[1];
   return (
@@ -587,8 +649,17 @@ function DetailScreen({
         </div>
       </div>
 
-      <div ref={scrollerRef} className="min-h-0 flex-1 overflow-hidden">
-        <div className="space-y-3.5 px-3 py-3">
+      <div ref={viewportRef} className="min-h-0 flex-1 overflow-hidden">
+        <div
+          ref={contentRef}
+          className="space-y-3.5 px-3 py-3"
+          style={{
+            transform: `translateY(${-offset}px)`,
+            transitionProperty: "transform",
+            transitionDuration: `${duration}ms`,
+            transitionTimingFunction: "linear",
+          }}
+        >
           <div className="flex flex-wrap gap-1.5">
             {["Certified crew", "Insured", "Free cancel · 24h"].map((chip) => (
               <span
@@ -659,8 +730,60 @@ function DetailScreen({
             </div>
           </div>
 
-          <p className="text-forest/70 pb-1 text-[10px]">
-            Free cancellation up to 24 hours before your slot.
+          <div>
+            <p className="text-terra-deep tracking-label text-[9px] font-medium uppercase">
+              How the day runs
+            </p>
+            <ol className="border-cream-line mt-1.5 border-l pl-3">
+              {TIMELINE.map((entry) => (
+                <li key={entry.at} className="pb-2.5 last:pb-0">
+                  <span className="text-forest/70 block text-[9px] font-medium">
+                    {entry.at}
+                  </span>
+                  <span className="block text-[11px] leading-snug">
+                    {entry.what}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </div>
+
+          <div>
+            <p className="text-terra-deep tracking-label text-[9px] font-medium uppercase">
+              Where you meet
+            </p>
+            <div className="border-cream-line bg-cream-deep rounded-edge mt-1.5 border p-2.5">
+              <p className="text-[11px] font-bold">Beach No. 5 kiosk</p>
+              <p className="text-forest/70 mt-0.5 text-[10px] leading-relaxed">
+                Ten minutes from the jetty. Your operator sends a pin the
+                evening before, on WhatsApp.
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-terra-deep tracking-label text-[9px] font-medium uppercase">
+              Good to know
+            </p>
+            <ul className="mt-1.5 space-y-1.5">
+              {GOOD_TO_KNOW.map((item) => (
+                <li
+                  key={item}
+                  className="text-forest/80 flex items-baseline gap-2 text-[11px] leading-snug"
+                >
+                  <span
+                    aria-hidden
+                    className="bg-terra mt-1 size-1 flex-none"
+                  />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <p className="border-cream-line text-forest/70 border-t pt-2.5 pb-1 text-[10px] leading-relaxed">
+            Free cancellation up to 24 hours before your slot. If the operator
+            calls it off for weather, you are refunded in full.
           </p>
         </div>
       </div>
