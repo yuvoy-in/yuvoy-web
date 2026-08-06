@@ -16,10 +16,8 @@ import { Wordmark } from "@/components/brand/wordmark";
  * moving colour (`film-*` + `caustics`), never a fake photograph. Prices,
  * seats, the operator and the booking reference are illustrative; the
  * wrapper carries `data-preview` so the e2e truthfulness guard confines
- * invented numbers to this screen, and the frame's accessible name says
- * outright that nothing is bookable yet. There is no longer a visible
- * label on the page (owner direction, 2026-08-06) — DESIGN_SYSTEM §8
- * records that decision and the risk it accepts.
+ * invented numbers to this screen, the frame is captioned "Sample preview",
+ * and its accessible name says outright that nothing is bookable yet.
  *
  * The tour is watch-only: the surfaces inside the phone are illustrations
  * (divs styled as UI), never focusable controls, and the whole screen region
@@ -76,8 +74,8 @@ const SCRIPT: Step[] = (() => {
     step("watch", 2600),
     step("watch", 2600, { feedIndex: 1 }),
     step("understand", 1800, { screen: "detail" }),
-    step("understand", 3000, { detailScroll: 1 }),
-    step("understand", 3200, { detailScroll: 2 }),
+    step("understand", 2400, { detailScroll: 1 }),
+    step("understand", 2600, { detailScroll: 2 }),
     step("book", 650, { bookTap: true }),
     step("book", 1200, { screen: "booking", bookTap: false }),
     step("book", 950, { bookingStage: 1 }),
@@ -111,11 +109,12 @@ const STACK: Screen[] = ["feed", "detail", "booking", "checkout", "confirmed"];
 
 /**
  * Where the detail content sits at each stop, as a fraction of its travel.
- * The two moves are 49% then 51% because their steps are 3000ms and 3200ms:
+ * The two moves are 48% then 52% because their steps are 2400ms and 2600ms:
  * matching the distances to the durations keeps the speed constant across
  * the join, so the act reads as one slow crawl rather than two slides.
+ * Retune these together — the ratio is the point, not the numbers.
  */
-const DETAIL_SCROLL_STOPS = [0, 0.49, 1];
+const DETAIL_SCROLL_STOPS = [0, 0.48, 1];
 
 const REELS = [
   {
@@ -159,19 +158,20 @@ const INCLUDED = [
   "Photos & a video clip",
 ];
 
-/** The detail screen reads long on purpose: the act crawls down it. */
+/**
+ * The detail screen reads long enough for the act to crawl down it, and no
+ * longer: it was trimmed on 2026-08-06 (owner report, too much to read).
+ * Anything added back here has to earn its line.
+ */
 const TIMELINE = [
   { at: "First 20 minutes", what: "Briefing and gear fitting on the beach." },
   { at: "Next 30 minutes", what: "Breathing practice in the shallows." },
   { at: "Then 40 minutes", what: "The reef itself, holding your instructor." },
-  { at: "Last 20 minutes", what: "Warm rinse, and your clips handed over." },
 ];
 
 const GOOD_TO_KNOW = [
-  "No swimming experience needed. You never leave your instructor.",
-  "Ages 10 and up. A short health form is signed at check-in.",
-  "Bring swimwear, a towel and reef-safe sunscreen.",
-  "Mornings have the clearest water, before the day boats arrive.",
+  "No swimming experience needed.",
+  "Ages 10 and up. Health form at check-in.",
 ];
 
 export function ProductDemo() {
@@ -425,6 +425,18 @@ export function ProductDemo() {
             )}
           </div>
         </div>
+
+        {/*
+          The visible label the preview surface rule asks for (DESIGN_SYSTEM
+          §8), back as two quiet words. It is short by design: the caption it
+          replaces was wider than the phone, and on a `w-fit` wrapper that is
+          what put a fat forest margin down the frame's right edge. The frame
+          carries its own `w-fit` now, so this can no longer offset it, but
+          keep any future caption narrower than the screen regardless.
+        */}
+        <p className="label text-forest/75 mt-3.5 text-center text-[10px]">
+          Sample preview
+        </p>
       </div>
 
       {/* The rail: the same three moves the section promises, highlighted in
@@ -759,8 +771,7 @@ function DetailScreen({
             <div className="border-cream-line bg-cream-deep rounded-edge mt-1.5 border p-2.5">
               <p className="text-[11px] font-bold">Beach No. 5 kiosk</p>
               <p className="text-forest/70 mt-0.5 text-[10px] leading-relaxed">
-                Ten minutes from the jetty. Your operator sends a pin the
-                evening before, on WhatsApp.
+                Ten minutes from the jetty. Pin sent the evening before.
               </p>
             </div>
           </div>
@@ -786,8 +797,7 @@ function DetailScreen({
           </div>
 
           <p className="border-cream-line text-forest/70 border-t pt-2.5 pb-1 text-[10px] leading-relaxed">
-            Free cancellation up to 24 hours before your slot. If the operator
-            calls it off for weather, you are refunded in full.
+            Free cancellation up to 24 hours before your slot.
           </p>
         </div>
       </div>

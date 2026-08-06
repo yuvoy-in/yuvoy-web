@@ -105,21 +105,21 @@ test("the demo rail seeks the flow and reports its position", async ({
 
 /*
   The page shows a full booking flow, right down to a payment, so it has to
-  say plainly that none of it is live yet. Both visible statements around the
-  preview were dropped on owner direction (2026-08-06): the long-form caveat
-  that closed the why act, then the caption under the frame. What is left is
-  the registration section's flat "no" and the preview's own accessible
-  name, and neither may quietly go the same way.
+  say plainly that none of it is live yet. Three things carry that, and none
+  may quietly go: the frame's caption (DESIGN_SYSTEM §8), its accessible
+  name, and the registration section's flat "no". The long-form caveat that
+  used to close the why act was dropped on owner direction, 2026-08-06.
 */
 test("the page states that nothing is bookable yet", async ({ page }) => {
   await page.goto("/");
 
-  await expect(
-    page.getByText("No, and we won't pretend otherwise.", { exact: false }),
-  ).toBeAttached();
+  await expect(page.getByText("Sample preview")).toBeVisible();
   await expect(
     page.getByRole("group", { name: /nothing is bookable yet/i }),
   ).toBeVisible();
+  await expect(
+    page.getByText("No, and we won't pretend otherwise.", { exact: false }),
+  ).toBeAttached();
 });
 
 test("the cover's momentum line states only true facts", async ({ page }) => {
