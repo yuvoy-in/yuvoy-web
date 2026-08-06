@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { cn } from "@/lib/cn";
+import { Wordmark } from "@/components/brand/wordmark";
 
 /**
  * The Season One product tour: the phone walks the whole loop on its own,
@@ -216,6 +217,17 @@ export function ProductDemo() {
 
   const activeScreen = STACK.indexOf(step.screen);
   const activeActIndex = ACTS.findIndex((act) => act.id === step.act);
+  /**
+   * Whether the top of the frame is currently dark, which is what the
+   * lockup's tone and its scrim follow. The feed and the detail hero are
+   * footage, the confirmation is a forest field, and the processing overlay
+   * covers whatever is under it; the booking and checkout screens are cream.
+   */
+  const onDarkSurface =
+    step.paying ||
+    step.screen === "feed" ||
+    step.screen === "detail" ||
+    step.screen === "confirmed";
 
   return (
     // data-demo marks the perpetual-motion surface for the e2e axe helper:
@@ -226,11 +238,6 @@ export function ProductDemo() {
       className="flex flex-col items-center gap-8 lg:flex-row lg:gap-7"
     >
       <div data-preview ref={rootRef} className="relative w-fit flex-none">
-        {/* The label that keeps the preview honest, pinned to the frame. */}
-        <p className="label border-cream/20 text-cream/70 rounded-edge bg-forest absolute -top-3 left-1/2 z-10 -translate-x-1/2 border px-3 py-1 whitespace-nowrap">
-          Season One preview
-        </p>
-
         <div className="rounded-device ring-cream/15 bg-forest relative p-2 ring-1">
           {/* Camera dot — hardware depiction, the one rounded object on the site. */}
           <span
@@ -241,26 +248,16 @@ export function ProductDemo() {
           <div
             role="group"
             aria-label="Auto-playing preview of the Yuvoy flow: watch a real video, read the details, pick a time and pay. Illustrative: nothing is bookable yet."
-            className="bg-forest relative flex aspect-[9/17.4] w-[min(72vw,300px)] flex-col overflow-hidden rounded-[calc(var(--radius-device)-0.5rem)]"
+            // Narrower at lg than at xl: the rail sits beside it from lg up,
+            // and 300px of phone leaves the rail too thin at that width.
+            className="group bg-forest relative aspect-[9/17.4] w-[min(72vw,300px)] overflow-hidden rounded-[calc(var(--radius-device)-0.5rem)] lg:w-65 xl:w-75"
           >
-            {/* Browser chrome: the product is a website a QR code opens, not
-                an app, and the address strip is what says so. */}
-            <div
-              aria-hidden
-              className="border-cream/10 flex h-10 flex-none items-end justify-center border-b pb-1.5"
-            >
-              <span className="bg-cream/10 text-cream/80 rounded-edge flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-medium">
-                <LockGlyph className="size-2.5 opacity-70" />
-                yuvoy.in
-              </span>
-            </div>
-
             {/* The screens. Illustration only: hidden from assistive tech
                 (the group label above tells the story) and inert to the
                 pointer, because this is a film, not a control surface. */}
             <div
               aria-hidden
-              className="pointer-events-none relative flex-1 overflow-hidden select-none"
+              className="pointer-events-none absolute inset-0 overflow-hidden select-none"
             >
               <ScreenShell
                 order={0}
@@ -319,27 +316,65 @@ export function ProductDemo() {
                 </span>
               </div>
             </div>
+
+            {/*
+              The product's own top bar: content runs edge to edge and the
+              lockup sits over it (owner direction, 2026-08-06, replacing the
+              browser address strip). The mark takes the surface's tone, and
+              a scrim rides in only over the dark screens, where cream type
+              needs ground under it; the cream screens reserve the band with
+              their own top padding instead.
+            */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-x-0 top-0 z-20 flex h-11 items-center justify-center"
+            >
+              <span
+                className={cn(
+                  "from-forest/85 ease-interaction absolute inset-0 bg-linear-to-b to-transparent transition-opacity duration-300",
+                  onDarkSurface ? "opacity-100" : "opacity-0",
+                )}
+              />
+              <Wordmark
+                tone={onDarkSurface ? "onDark" : "onLight"}
+                className="relative h-6 sm:h-6"
+              />
+            </div>
+
+            {/*
+              WCAG 2.2.2: the tour moves for far longer than five seconds, so
+              a pause mechanism has to exist. It rides the frame like a video
+              player's control rather than sitting under it as a labelled
+              button (owner direction: the button was visual noise) — revealed
+              on hover, and on keyboard focus, which is the skip-link pattern
+              and keeps it reachable without a pointer. Under reduced motion
+              nothing auto-plays, so there is nothing to pause.
+            */}
+            {!reduced && (
+              <button
+                type="button"
+                onClick={() => setPlaying((now) => !now)}
+                aria-label={playing ? "Pause the preview" : "Play the preview"}
+                className="border-cream/25 bg-forest/70 text-cream rounded-edge focus-visible:ring-terra-soft ease-interaction absolute top-2.5 right-2.5 z-30 flex size-8 items-center justify-center border opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:outline-none"
+              >
+                {playing ? (
+                  <PauseGlyph className="size-3" />
+                ) : (
+                  <PlayGlyph className="size-3" />
+                )}
+              </button>
+            )}
           </div>
         </div>
 
-        {/* WCAG 2.2.2: the tour runs longer than five seconds, so it can be
-            paused. Hidden under reduced motion, where nothing auto-plays. */}
-        {!reduced && (
-          <div className="mt-4 flex justify-center">
-            <button
-              type="button"
-              onClick={() => setPlaying((now) => !now)}
-              className="border-cream-line text-forest/75 hover:text-forest rounded-edge focus-visible:ring-terra-deep tracking-label ease-interaction inline-flex h-9 items-center gap-2 border px-3 font-sans text-xs font-medium uppercase transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
-            >
-              {playing ? (
-                <PauseGlyph className="size-3" />
-              ) : (
-                <PlayGlyph className="size-3" />
-              )}
-              {playing ? "Pause" : "Play"}
-            </button>
-          </div>
-        )}
+        {/*
+          The label that keeps the preview honest (DESIGN_SYSTEM §8): it moved
+          off the frame as a badge and became this caption, which also carries
+          the not-yet-bookable statement the section used to close on.
+        */}
+        <p className="label text-forest/75 mt-4 text-center text-[10px]">
+          Season One preview <span aria-hidden>·</span> nothing is bookable yet
+        </p>
       </div>
 
       {/* The rail: the same three moves the section promises, highlighted in
@@ -442,7 +477,7 @@ function ScreenShell({
   return (
     <div
       className={cn(
-        "ease-cinematic absolute inset-0 overflow-hidden transition-transform duration-[420ms]",
+        "ease-cinematic absolute inset-0 overflow-hidden transition-transform duration-420",
         open
           ? "translate-x-0 translate-y-0"
           : rise
@@ -470,7 +505,8 @@ function FeedScreen({ feedIndex }: { feedIndex: number }) {
             {/* Scrim so every word on the card sits on near-forest. */}
             <div className="to-forest/95 via-forest/40 absolute inset-0 bg-linear-to-b from-transparent from-35%" />
 
-            <p className="bg-forest/55 text-cream rounded-edge tracking-label absolute top-3 left-3 inline-flex items-center gap-1.5 px-2 py-1 text-[9px] font-medium uppercase backdrop-blur-sm">
+            {/* Clears the lockup band that now rides over the footage. */}
+            <p className="bg-forest/55 text-cream rounded-edge tracking-label absolute top-14 left-3 inline-flex items-center gap-1.5 px-2 py-1 text-[9px] font-medium uppercase backdrop-blur-sm">
               <span className="bg-terra-soft inline-block size-1 animate-pulse rounded-full" />
               {reel.live}
             </p>
@@ -533,7 +569,8 @@ function DetailScreen({
         <div className={cn("film", reel.film)} />
         <div className="caustics" />
         <div className="to-forest/90 absolute inset-0 bg-linear-to-b from-transparent from-40%" />
-        <span className="bg-forest/40 text-cream rounded-edge absolute top-2.5 left-2.5 flex size-6 items-center justify-center backdrop-blur-sm">
+        {/* Sits in the lockup band, where a real app puts its back control. */}
+        <span className="bg-forest/40 text-cream rounded-edge absolute top-3.5 left-2.5 flex size-6 items-center justify-center backdrop-blur-sm">
           <ChevronGlyph className="size-3" />
         </span>
         <div className="text-cream absolute inset-x-3 bottom-2.5">
@@ -651,7 +688,9 @@ function DetailScreen({
 function BookingScreen({ stage }: { stage: number }) {
   return (
     <>
-      <div className="border-cream-line flex flex-none items-center gap-2.5 border-b px-3 py-2.5">
+      {/* pt-11 reserves the lockup band: these screens are cream, so the
+          band is empty surface above them rather than a scrim over footage. */}
+      <div className="border-cream-line flex flex-none items-center gap-2.5 border-b px-3 pt-11 pb-2.5">
         <span className="border-cream-line rounded-edge flex size-6 flex-none items-center justify-center border">
           <ChevronGlyph className="size-3" />
         </span>
@@ -766,7 +805,9 @@ function BookingScreen({ stage }: { stage: number }) {
 function CheckoutScreen({ payTap }: { payTap: boolean }) {
   return (
     <>
-      <div className="border-cream-line flex flex-none items-center gap-2.5 border-b px-3 py-2.5">
+      {/* pt-11 reserves the lockup band: these screens are cream, so the
+          band is empty surface above them rather than a scrim over footage. */}
+      <div className="border-cream-line flex flex-none items-center gap-2.5 border-b px-3 pt-11 pb-2.5">
         <span className="border-cream-line rounded-edge flex size-6 flex-none items-center justify-center border">
           <ChevronGlyph className="size-3" />
         </span>

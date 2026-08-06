@@ -44,6 +44,7 @@ const over = (fg: string, bg: string, alpha: number) =>
     .join("");
 
 const CREAM = "#f4efe4";
+const CREAM_DEEP = "#ece5d6";
 const FOREST = "#16362e";
 const TERRA_SOFT = "#d89772";
 
@@ -75,6 +76,21 @@ describe("the dark surface", () => {
     expect(contrast(over(CREAM, FOREST, 0.7), FOREST)).toBeGreaterThanOrEqual(
       4.5,
     );
+  });
+
+  /*
+    The ladder's floors are measured against `cream`, and a recessed surface
+    spends the headroom they leave: the why act's inactive tab is `forest/5`
+    on `cream-deep`, and `forest/60` on it renders 3.41:1 — which is what
+    axe caught the first time that panel was built. Two rungs are pinned
+    here so the next panel that recesses a fill cannot rediscover it.
+  */
+  it("holds the ladder on a tinted raised surface", () => {
+    const recessed = over(FOREST, CREAM_DEEP, 0.05);
+    expect(contrast(over(FOREST, recessed, 0.6), recessed)).toBeLessThan(4.5);
+    expect(
+      contrast(over(FOREST, recessed, 0.75), recessed),
+    ).toBeGreaterThanOrEqual(4.5);
   });
 
   /*

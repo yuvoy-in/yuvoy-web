@@ -106,15 +106,21 @@ test("the demo rail seeks the flow and reports its position", async ({
   await expect(bookStep).not.toHaveAttribute("aria-current", "step");
 });
 
-test("the honest booking caveat is stated verbatim", async ({ page }) => {
+/*
+  The page shows a full booking flow, right down to a payment, so it has to
+  say plainly that none of it is live yet. The long-form caveat that used to
+  close the why act was dropped on 2026-08-06 (owner direction); these two
+  statements are what carry the point now, and neither may quietly go the
+  same way. The preview caption is the design system's §8 condition; the
+  registration answer is the page's flat "no".
+*/
+test("the page states that nothing is bookable yet", async ({ page }) => {
   await page.goto("/");
-  // Owner-approved canon. It is the page's clearest statement that booking
-  // does not exist yet, so it is asserted word for word.
+
+  await expect(page.getByText("nothing is bookable yet")).toBeVisible();
   await expect(
-    page.getByText(
-      "Booking opens after the first curated collection is ready.",
-    ),
-  ).toBeVisible();
+    page.getByText("No, and we won't pretend otherwise.", { exact: false }),
+  ).toBeAttached();
 });
 
 test("the cover's momentum line states only true facts", async ({ page }) => {
