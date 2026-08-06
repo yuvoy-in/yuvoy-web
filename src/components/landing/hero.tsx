@@ -79,8 +79,8 @@ export function Hero() {
       {/* Top padding is the header (4rem) plus the section's own, so the
           composition lands exactly where it did before the cover was pulled
           up behind the bar. */}
-      <div className="container-page relative flex min-h-dvh flex-col justify-center pt-32 pb-16 sm:pt-36 sm:pb-20">
-        <div className="flex flex-col items-center text-center">
+      <div className="container-page relative flex min-h-dvh flex-col pt-32 pb-8 sm:pt-36 sm:pb-10">
+        <div className="flex flex-1 flex-col items-center justify-center text-center">
           {/* Plain `label`, not `eyebrow`: the cover line carries no marker
               (owner direction, 2026-08-05). */}
           <p
@@ -166,10 +166,15 @@ export function Hero() {
           </div>
         </div>
 
-        {/* The momentum line: three true facts, and the three islands. Its
-            rule draws itself in as the row arrives. */}
+        {/* The momentum line: three true facts, and the three islands. It
+            sits at the foot of the cover — the statement above takes the
+            free space (`flex-1`) and centres within it, so this row lands
+            on the container's bottom padding rather than floating with the
+            content (owner report, 2026-08-06: too much space beneath it).
+            The margin is now only a floor for short viewports. Its rule
+            draws itself in as the row arrives. */}
         <div
-          className="emerge relative mt-16 flex flex-col items-center gap-4 pt-6 text-center sm:mt-20 sm:flex-row sm:justify-between sm:gap-x-10 sm:text-left"
+          className="emerge relative mt-12 flex flex-col items-center gap-4 pt-6 text-center sm:mt-16 sm:flex-row sm:justify-between sm:gap-x-10 sm:text-left"
           style={{ animationDelay: "0.52s" }}
         >
           <span
