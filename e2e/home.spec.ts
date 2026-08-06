@@ -26,7 +26,7 @@ test("landing tells its story in headlines", async ({ page }) => {
 
   // The billboard test: the acts, readable as headings alone.
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Every video here is an experience you can actually book.",
+    "Watch real experiences. Make one yours.",
   );
   await expect(
     page.getByRole("heading", { name: /the hard part was never booking/i }),
@@ -227,7 +227,7 @@ test("campaign route renders with noindex and canonical to home", async ({
 }) => {
   await page.goto("/go/ferry");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "Every video here is an experience you can actually book.",
+    "Watch real experiences. Make one yours.",
   );
   await expect(page.locator('meta[name="robots"]').first()).toHaveAttribute(
     "content",

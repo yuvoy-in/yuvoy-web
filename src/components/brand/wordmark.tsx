@@ -18,8 +18,8 @@ import { cn } from "@/lib/cn";
  * `dangerouslyAllowSVG` out of the image config (same call as the veil).
  * Deliberately NOT `priority`: both variants render for the cross-fade, so
  * preloading would queue two images on every page when one is invisible.
- * They are ~19KB of markup served straight from the origin, and the header
- * is above the fold anyway, so the browser requests them immediately.
+ * They load eagerly instead — no preload link, but no lazy-load delay on an
+ * above-the-fold mark either.
  *
  * Size it from outside with a height class, and the size now means the
  * DRAWING's size: the generated variants crop the delivered canvas's empty
@@ -63,6 +63,12 @@ export function Wordmark({
           aria-hidden
           width={LOCKUP.width}
           height={LOCKUP.height}
+          // `loading="eager"` but NOT `priority`: the header is above the
+          // fold so lazy-loading it costs LCP (Next warns), while
+          // `priority` would also inject a preload link for BOTH variants
+          // on every page — which is what pushed the e2e structure specs
+          // past network idle. Eager without the preload is the middle.
+          loading="eager"
           className={cn(
             "h-full w-auto transition-opacity duration-300",
             dark && "absolute inset-y-0 left-0",
