@@ -26,15 +26,16 @@ Direction: **editorial, rectangular, confident.** Geometric display type against
 
 Brand Kit v2. Every ratio below is measured (sRGB relative luminance, WCAG 2.2) — not estimated.
 
-| Token        | Hex       | Role                                                      |
-| ------------ | --------- | --------------------------------------------------------- |
-| `cream`      | `#F4EFE4` | Canvas — default page background                          |
-| `cream-deep` | `#ECE5D6` | Raised surfaces — cards, inputs, panels on cream          |
-| `cream-line` | `#E5DCC9` | Hairline borders on cream                                 |
-| `forest`     | `#16362E` | Primary ink **and** every dark surface (11.44:1 on cream) |
-| `terra`      | `#BE7149` | Accent — decoration and LARGE display text only (3.24:1)  |
-| `terra-deep` | `#985028` | Text-capable accent (5.21:1 on cream); never a CTA fill   |
-| `terra-soft` | `#D89772` | Accent text on forest (5.36:1)                            |
+| Token        | Hex       | Role                                                           |
+| ------------ | --------- | -------------------------------------------------------------- |
+| `cream`      | `#F4EFE4` | Canvas — default page background                               |
+| `cream-deep` | `#ECE5D6` | Raised surfaces — cards, inputs, panels on cream               |
+| `cream-line` | `#E5DCC9` | Hairline borders on cream                                      |
+| `forest`     | `#16362E` | Primary ink **and** every dark surface (11.44:1 on cream)      |
+| `terra`      | `#BE7149` | Accent — decoration and LARGE display text only (3.24:1)       |
+| `terra-deep` | `#985028` | Text-capable accent (5.21:1 on cream); never a CTA fill        |
+| `terra-soft` | `#D89772` | Accent text on forest (5.36:1)                                 |
+| `device`     | `#0A100E` | **The preview bezel only** — an object's colour, not a surface |
 
 ### Measured contrast
 
@@ -146,6 +147,9 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 
 - **Radius: `rounded-edge` (2px) — the editorial near-square.** Buttons, inputs, cards and panels all share it. **Pills are not part of the system** (v1 used them; v2 does not).
 - **`--radius-device` (2.25rem) — the one rounded object in the system**: the Season One phone-preview frame. It depicts hardware, not UI; nothing else may use it. (Tiny `rounded-full` dots inside the preview depict hardware/avatars and share this exemption.)
+- **`bg-device` — the bezel's near-black**, on that same frame and nothing else (owner direction, 2026-08-06). `forest` was tried and reads green at 4px of bezel. This is **not a second dark surface**: it is what a phone's frame is made of, and `Section` still offers one dark tone and no choice to make. `palette.test.ts` pins that exactly one element in `src` carries `bg-device`, and that it is darker than `forest` — the moment a section takes it, the site has two darks again. Not pure `#000`, which sits harder than anything else on the page and rims the frame against cream.
+- **The bezel's padding and the screen's radius are one measurement.** The screen is `calc(var(--radius-device) - <bezel padding>)`; change the padding without the radius and the two curves stop being concentric, which shows as an uneven bezel at the corners.
+- **`device-frame` — the one gradient and the one shadow in the system**, on that same frame and nothing else (owner direction, 2026-08-06). The frame is an object resting on the page rather than a panel drawn on it, which is the whole reason it may be lit or cast at all. It carries a diagonal rail gradient, a 1px specular edge and a top highlight (so it reads as milled metal rather than a border), then two soft drop shadows — a tight contact one and a wide ambient one with negative spread so it cannot bloom into a halo. Every value is a `color-mix` on a token: the highlights are `cream` lifting `device`, and the shadows are `forest`, never black, which would grey the cream under it. `device-key` draws the volume and wake buttons from the same mix. Everywhere else, hairlines still do the work shadows do elsewhere.
 - Spacing: Tailwind v4 dynamic scale (multiples of `0.25rem`). Stay on the scale.
 - Control heights: `sm` 36px (`h-9`), `md` 44px (`h-11`), `lg` 52px (`h-13`). Inputs are 48px (`h-12`).
 - **The header is 56px (`h-14`)**, and the menu panel's top bar matches it exactly — same height, same `container-page` gutters, same negative margin on the button — so the close button lands on the pixel the trigger occupied. Anything that offsets for the header (`scroll-mt-14`, the cover's `100dvh-3.5rem`) follows this number; change them together.
@@ -196,7 +200,12 @@ No Figma. The reference is the [pre-launch landing artifact](https://claude.ai/p
 
 The homepage's **Season One phone preview** is the one place illustrative product content may appear — prices, seat counts, operator lines — under three conditions, all enforced:
 
-1. The frame is **visibly labelled** ("Season One preview") and its wrapper carries `data-preview`; the homepage e2e guard bans invented numbers everywhere _outside_ that wrapper.
+1. The frame is **visibly captioned** ("Sample preview") and its wrapper carries `data-preview`; the frame's accessible name states outright that nothing is bookable yet, and the homepage e2e guard bans invented numbers everywhere _outside_ that wrapper.
+
+   > The wording moved twice on 2026-08-06 (owner direction): the "Season One preview" badge pinned to the frame, then the longer caption under it, then the present two words. **A caption must stay narrower than the screen it labels** — the long one was wider than a phone, and on a shared `w-fit` wrapper that sized the wrapper to the caption, stretched the frame block to match and left the screen's slack down its right edge. The frame carries its own `w-fit` now, but the rule stands.
+   >
+   > The caption says "sample", not "not bookable". The page's plain-language statement lives in the registration section's first answer — "Can I book something today? No, and we won't pretend otherwise." — which `home.spec.ts` asserts alongside the caption.
+
 2. Its "footage" is **moving colour built from brand tokens** (`film-*` + `caustics` utilities, `color-mix` only) — unmistakably an illustration, never a fake photograph or a real-looking screenshot.
 3. Claims **outside** the preview stay literally true (e.g. the "3 founding operators signed" count is owner-confirmed and must track reality).
 

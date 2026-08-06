@@ -188,7 +188,11 @@ export function Hero() {
                 key={fact}
                 className="label text-cream/70 flex items-center gap-2.5"
               >
-                <span aria-hidden className="bg-terra size-1 shrink-0" />
+                {/* terra-soft, not terra: this marker sits on forest, where
+                    `terra` is the cream-surface rung and goes muddy (3.52:1
+                    against terra-soft's 5.36:1). §1's pairing, and the
+                    brighter one beside the eyebrow above. */}
+                <span aria-hidden className="bg-terra-soft size-1 shrink-0" />
                 {fact}
               </li>
             ))}

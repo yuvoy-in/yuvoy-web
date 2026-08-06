@@ -29,10 +29,9 @@ test("landing tells its story in headlines", async ({ page }) => {
     "Watch real experiences. Make one yours.",
   );
   await expect(
-    page.getByRole("heading", { name: /the hard part was never booking/i }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: /scroll\. watch\. book\./i }),
+    page.getByRole("heading", {
+      name: /from too many tabs to one simple place/i,
+    }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: /one destination, done completely/i }),
@@ -71,28 +70,56 @@ test("the homepage speaks only to travellers", async ({ page }) => {
   await expect(registerForm(page).getByLabel("Business name")).toHaveCount(0);
 });
 
-test("the preview is labelled and invented numbers stay inside it", async ({
-  page,
-}) => {
+test("invented numbers stay inside the preview", async ({ page }) => {
   await page.goto("/");
 
-  // The exception must announce itself…
-  await expect(page.getByText("Season One preview")).toBeVisible();
+  // Exactly one wrapper may carry the exception…
   await expect(page.locator("[data-preview]")).toHaveCount(1);
 
   // …and the rule holds everywhere else.
   expect(await textOutsidePreview(page)).not.toMatch(FABRICATED);
 });
 
-test("the honest booking caveat is stated verbatim", async ({ page }) => {
+/*
+  The why-section tour: the rail is the demo's control surface, so clicking a
+  step must mark that step current (the phone itself is aria-hidden
+  illustration, which is exactly why the rail has to carry the state). The
+  assertion is timing-safe: seeking is synchronous, and the sought act holds
+  aria-current for its full multi-second run.
+*/
+test("the demo rail seeks the flow and reports its position", async ({
+  page,
+}) => {
   await page.goto("/");
-  // Owner-approved canon. It is the page's clearest statement that booking
-  // does not exist yet, so it is asserted word for word.
+
+  const bookStep = page.getByRole("button", { name: /^Book/ });
+  await bookStep.scrollIntoViewIfNeeded();
+  await bookStep.click();
+  await expect(bookStep).toHaveAttribute("aria-current", "step");
+
+  const watchStep = page.getByRole("button", { name: /^Watch/ });
+  await watchStep.click();
+  await expect(watchStep).toHaveAttribute("aria-current", "step");
+  await expect(bookStep).not.toHaveAttribute("aria-current", "step");
+});
+
+/*
+  The page shows a full booking flow, right down to a payment, so it has to
+  say plainly that none of it is live yet. Three things carry that, and none
+  may quietly go: the frame's caption (DESIGN_SYSTEM §8), its accessible
+  name, and the registration section's flat "no". The long-form caveat that
+  used to close the why act was dropped on owner direction, 2026-08-06.
+*/
+test("the page states that nothing is bookable yet", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByText("Sample preview")).toBeVisible();
   await expect(
-    page.getByText(
-      "Booking opens after the first curated collection is ready.",
-    ),
+    page.getByRole("group", { name: /nothing is bookable yet/i }),
   ).toBeVisible();
+  await expect(
+    page.getByText("No, and we won't pretend otherwise.", { exact: false }),
+  ).toBeAttached();
 });
 
 test("the cover's momentum line states only true facts", async ({ page }) => {
