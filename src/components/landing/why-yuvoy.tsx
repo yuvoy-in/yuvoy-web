@@ -1,5 +1,6 @@
 import { Section, SectionHeading } from "@/components/ui/section";
 import { ProductDemo } from "@/components/landing/product-demo";
+import { Wordmark } from "@/components/brand/wordmark";
 
 /**
  * The why act: the problem and the product in one frame, because they are
@@ -211,7 +212,52 @@ export function WhyYuvoy() {
         </div>
       </div>
 
-      <div className="border-cream-line mt-20 border-t pt-10 text-center sm:mt-24">
+      {/*
+        The sign-off: the mark, then a line drawn down to the sentence it
+        signs. It used to sit under a full-width rule, which reads as the
+        start of the next section rather than the end of this one (owner
+        report, 2026-08-06) — a hairline across the measure is a divider
+        wherever it lands. Space does the separating now, and the stroke
+        runs down the page instead of across it, so it leads the eye into
+        the line rather than fencing it off. The stroke fades up out of the
+        mark (a gradient on `currentColor`, so the colour is still the
+        token) and lands solid on the arrowhead.
+      */}
+      <div className="mt-24 flex flex-col items-center text-center sm:mt-32">
+        <Wordmark className="h-11 sm:h-13" />
+
+        <svg
+          viewBox="0 0 16 60"
+          fill="none"
+          aria-hidden
+          className="text-terra my-7 h-15 w-4"
+        >
+          <defs>
+            <linearGradient
+              id="yuvoy-signoff-stroke"
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="1"
+            >
+              <stop offset="0" stopColor="currentColor" stopOpacity="0" />
+              <stop offset="0.6" stopColor="currentColor" stopOpacity="1" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M8 0V54"
+            stroke="url(#yuvoy-signoff-stroke)"
+            strokeWidth="1.5"
+          />
+          <path
+            d="M2.75 48.5L8 55.5L13.25 48.5"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+
         <p className="font-display tracking-display text-[clamp(1.75rem,4vw,2.625rem)] leading-tight text-balance">
           Less searching.{" "}
           <em className="text-terra font-turn italic">Better decisions.</em>
