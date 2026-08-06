@@ -8,14 +8,18 @@ import { Wordmark } from "@/components/brand/wordmark";
  * The Season One product tour: the phone walks the whole loop on its own,
  * watch, understand, book, while the rail beside it names the act being
  * performed. Clicking a rail step seeks the tour to that act, like chapters
- * on a video; a pause control satisfies WCAG 2.2.2 for motion that runs
- * longer than five seconds.
+ * on a video; the pause control rides the frame, revealed on hover and on
+ * focus, which is WCAG 2.2.2's mechanism for motion that runs past five
+ * seconds without putting a labelled button under the phone.
  *
  * Everything on the screen is built from brand tokens. The "footage" is
- * moving colour (`film-*` + `caustics`), never a fake photograph, and the
- * frame is labelled a preview. Prices, seats, the operator and the booking
- * reference are illustrative; the wrapper carries `data-preview` so the e2e
- * truthfulness guard confines invented numbers to this labelled screen.
+ * moving colour (`film-*` + `caustics`), never a fake photograph. Prices,
+ * seats, the operator and the booking reference are illustrative; the
+ * wrapper carries `data-preview` so the e2e truthfulness guard confines
+ * invented numbers to this screen, and the frame's accessible name says
+ * outright that nothing is bookable yet. There is no longer a visible
+ * label on the page (owner direction, 2026-08-06) — DESIGN_SYSTEM §8
+ * records that decision and the risk it accepts.
  *
  * The tour is watch-only: the surfaces inside the phone are illustrations
  * (divs styled as UI), never focusable controls, and the whole screen region
