@@ -58,7 +58,21 @@ const COSTS = [
 
 export function WhyYuvoy() {
   return (
-    <Section id="how" aria-labelledby="why-heading">
+    /*
+      The closing rule is the section's own bottom border, not a child of it.
+      As a child it sat inside `Section`'s container, so below it came this
+      act's bottom padding AND the next act's top padding: 224px of empty
+      page between the rule and "The first market" (owner report,
+      2026-08-06). On the boundary it separates what it is meant to
+      separate, and the gap either side is each section's own padding, the
+      same rhythm as every other section join. Two cream sections meet here,
+      which is why the join needs drawing at all.
+    */
+    <Section
+      id="how"
+      aria-labelledby="why-heading"
+      className="border-cream-line border-b"
+    >
       <SectionHeading
         id="why-heading"
         className="mx-auto text-center"
@@ -233,7 +247,14 @@ export function WhyYuvoy() {
         2. The viewBox ran to 60 while the arrowhead ended at 56.25, leaving
            dead space under the tip. The box is now exactly the drawing:
            the line starts at y=0 with a butt cap, and the head's round join
-           carries half a stroke width past y=55.25 to land on 56.
+           carries half a stroke width past y=27.25 to land on 28.
+
+           The box is also 1:1 with the rendered size (16x28 units in an
+           `h-7 w-4`), so the stroke is exactly 1.5px and the head keeps its
+           drawn proportions at 6.75 tall by 10.5 wide. Shortening it again
+           means editing the viewBox and both paths together and leaving the
+           head's numbers alone — dropping the height class on its own would
+           scale the whole drawing down, head and stroke with it.
         3. `leading-tight` puts roughly 8px of empty line box above the
            sentence's cap height, which no margin can see. The bottom margin
            is therefore one step short of the top (24px against 32px) so the
@@ -243,14 +264,14 @@ export function WhyYuvoy() {
         <Wordmark className="h-16 sm:h-20" />
 
         <svg
-          viewBox="0 0 16 56"
+          viewBox="0 0 16 28"
           fill="none"
           aria-hidden
-          className="text-terra mt-8 mb-6 h-14 w-4"
+          className="text-terra mt-8 mb-6 h-7 w-4"
         >
-          <path d="M8 0V54" stroke="currentColor" strokeWidth="1.5" />
+          <path d="M8 0V26" stroke="currentColor" strokeWidth="1.5" />
           <path
-            d="M2.75 48.5L8 55.25L13.25 48.5"
+            d="M2.75 20.5L8 27.25L13.25 20.5"
             stroke="currentColor"
             strokeWidth="1.5"
             strokeLinecap="round"
@@ -263,10 +284,6 @@ export function WhyYuvoy() {
           <em className="text-terra font-turn italic">Better decisions.</em>
         </p>
       </div>
-
-      {/* The act's closing rule: two cream sections meet here, so without it
-          the boundary between this and the next is invisible. */}
-      <div aria-hidden className="border-cream-line mt-20 border-t sm:mt-24" />
     </Section>
   );
 }
