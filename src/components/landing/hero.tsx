@@ -96,13 +96,15 @@ export function Hero() {
             then make one yours — the promise in two beats, with the accent
             closing each. Real block elements rather than the previous
             `<br>` staircase, so the break is structural and each line still
-            wraps naturally on a phone. Shorter copy buys scale: the type
-            runs a step larger than the three-line version did, which is
-            where this face wants to be. Both turns are TRUE drawn italics
-            (v2.5) at the `font-turn` weight.
+            wraps naturally on a phone. Shorter copy buys scale: 88px at
+            the cap on a 5xl measure — between the 80px that felt small and
+            the 100px that read as too much, and near the ceiling anyway,
+            since past ~90px the first line no longer holds on one line.
+            Both turns are TRUE drawn italics (v2.5) at the `font-turn`
+            weight.
           */}
           <h1
-            className="font-display emerge tracking-display mt-9 max-w-4xl text-[clamp(2.5rem,6.8vw,5rem)] leading-[1.08] font-normal"
+            className="font-display emerge tracking-display mt-9 max-w-5xl text-[clamp(2.625rem,7.2vw,5.5rem)] leading-[1.06] font-normal"
             style={{ animationDelay: "0.14s" }}
           >
             <span className="block">
