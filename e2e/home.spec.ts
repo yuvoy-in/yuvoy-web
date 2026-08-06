@@ -29,10 +29,9 @@ test("landing tells its story in headlines", async ({ page }) => {
     "Watch real experiences. Make one yours.",
   );
   await expect(
-    page.getByRole("heading", { name: /the hard part was never booking/i }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: /scroll\. watch\. book\./i }),
+    page.getByRole("heading", {
+      name: /from too many tabs to one simple place/i,
+    }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: /one destination, done completely/i }),
@@ -82,6 +81,29 @@ test("the preview is labelled and invented numbers stay inside it", async ({
 
   // …and the rule holds everywhere else.
   expect(await textOutsidePreview(page)).not.toMatch(FABRICATED);
+});
+
+/*
+  The why-section tour: the rail is the demo's control surface, so clicking a
+  step must mark that step current (the phone itself is aria-hidden
+  illustration, which is exactly why the rail has to carry the state). The
+  assertion is timing-safe: seeking is synchronous, and the sought act holds
+  aria-current for its full multi-second run.
+*/
+test("the demo rail seeks the flow and reports its position", async ({
+  page,
+}) => {
+  await page.goto("/");
+
+  const bookStep = page.getByRole("button", { name: /^Book/ });
+  await bookStep.scrollIntoViewIfNeeded();
+  await bookStep.click();
+  await expect(bookStep).toHaveAttribute("aria-current", "step");
+
+  const watchStep = page.getByRole("button", { name: /^Watch/ });
+  await watchStep.click();
+  await expect(watchStep).toHaveAttribute("aria-current", "step");
+  await expect(bookStep).not.toHaveAttribute("aria-current", "step");
 });
 
 test("the honest booking caveat is stated verbatim", async ({ page }) => {

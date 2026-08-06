@@ -1,6 +1,5 @@
 import { Hero } from "@/components/landing/hero";
-import { Insight } from "@/components/landing/insight";
-import { Answer } from "@/components/landing/answer";
+import { WhyYuvoy } from "@/components/landing/why-yuvoy";
 import { Strategy } from "@/components/landing/strategy";
 import { JoinAside } from "@/components/landing/join-aside";
 import { LeadForms, type LeadContext } from "@/components/landing/lead-forms";
@@ -23,11 +22,14 @@ import { LAUNCH_MARKET } from "@/lib/leads/registry";
  * The acts are written to pass the billboard test: reading only the headlines
  * tells the whole story.
  *
- *   Cover     "Watch real experiences. Make one yours."  the hook, island horizon
- *   Insight   "The hard part was never booking."       the observation
- *   Answer    "Scroll. Watch. Book."                   the product, running live
- *   Strategy  "One destination, done completely."      the wedge
- *   Ask       "Be there when it opens."                the form
+ *   Cover     "Watch real experiences. Make one yours."      the hook, island horizon
+ *   Why       "From too many tabs to one simple place."      problem and product in one frame
+ *   Strategy  "One destination, done completely."            the wedge
+ *   Ask       "Be there when it opens."                      the form
+ *
+ * Why used to be two acts, the observation ("The hard part was never
+ * booking.") and the product demo ("Scroll. Watch. Book."); they merged on
+ * 2026-08-06 (owner direction) because they were one thought told twice.
  *
  * (Acts are deliberately unnumbered on the page itself, per owner direction.)
  * The page still ends in the registration form: a visitor who read this far
@@ -47,8 +49,7 @@ export function Landing({ context }: { context: LeadContext }) {
       />
       <LegacyProviderAnchor />
       <Hero />
-      <Insight />
-      <Answer />
+      <WhyYuvoy />
       <Strategy />
       <LeadForms
         context={context}

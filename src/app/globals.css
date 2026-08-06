@@ -455,6 +455,31 @@
 }
 
 /*
+  The why-section tour's act meter: each step's underline fills over that
+  act's real duration, so the rail reads like a video timeline. Duration and
+  play-state ride inline styles from ProductDemo (they are runtime state);
+  linear timing because a progress meter must move at constant speed. Under
+  reduced motion the global rule collapses it to a full bar, which is the
+  right resting state: the tour does not auto-play there, so the bar marks
+  the current step instead of timing it.
+*/
+@keyframes yuvoy-demo-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@utility demo-fill {
+  transform-origin: left;
+  animation-name: yuvoy-demo-fill;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+/*
   The header sliding out of the way on the way down the page, and back on the
   way up. HeaderShell sets the data attribute; the movement lives here so every
   motion definition stays in one file.

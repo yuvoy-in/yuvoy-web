@@ -492,18 +492,23 @@ const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
  *
  * Contrast is a property of the settled page: sampling mid-entrance measures
  * a half-faded element against whatever is behind it and reports failures that
- * do not exist once the animation lands. Infinite animations (the loading
- * pulse) never finish and are skipped — they run only on decorative elements.
+ * do not exist once the animation lands. Two classes of motion never finish
+ * and are skipped: infinite animations (the loading pulse), and anything
+ * inside `[data-demo]` — the homepage tour re-arms finite animations for as
+ * long as it is on screen, so waiting for it deadlocks. Both run only on
+ * decorative surfaces; the demo's animated content is aria-hidden.
  */
 async function settle(page: Page) {
   await page.waitForFunction(() =>
-    document
-      .getAnimations()
-      .every(
-        (a) =>
-          a.effect?.getTiming().iterations === Infinity ||
-          a.playState === "finished",
-      ),
+    document.getAnimations().every((a) => {
+      if (a.effect?.getTiming().iterations === Infinity) return true;
+      if (a.playState === "finished") return true;
+      const target =
+        a.effect instanceof KeyframeEffect ? a.effect.target : null;
+      return (
+        target instanceof Element && target.closest("[data-demo]") !== null
+      );
+    }),
   );
 }
 
