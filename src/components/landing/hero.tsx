@@ -4,10 +4,9 @@ import { cn } from "@/lib/cn";
 
 /**
  * The cover: a full-viewport statement on a forest field that carries light
- * — and, since 2026-08-06, a place. The owner-supplied island seascape
- * (public/assets/hero-section-bg.webp, 32KB — the 1.5MB PNG
- * source was converted because the optimiser decoding it on every cold
- * variant kept the page from ever reaching network idle in e2e) is merged into the field through a
+ * — and, since 2026-08-06, a place.
+ *
+ * The owner-supplied island seascape is merged into the field through a
  * multiply wash and a scrim, so the brand green stays the ground and the
  * artwork reads as depth within it, warmest along the horizon where its low
  * sun echoes the terracotta. The `hero-atmosphere` lagoon light breathes
@@ -17,8 +16,12 @@ import { cn } from "@/lib/cn";
  * motion (owner direction, 2026-08-04 stands); the artwork's 38s drift is
  * ambient, like the light, not an event.
  *
+ * The artwork ships as a 32KB WebP. The delivered 1.5MB PNG was converted
+ * because the optimiser decoding it for every cold variant kept the page
+ * from reaching network idle, which timed the e2e structure specs out.
+ *
  * The product preview lives in the next act, so the cover's only job is the
- * promise: every video is a bookable experience (owner copy, 2026-08-05).
+ * promise: watch real experiences, make one yours (owner copy, 2026-08-06).
  *
  * The facts row along the bottom is the page's momentum line and every entry
  * on it must be literally true today. "3 founding operators signed" is a real
@@ -76,8 +79,8 @@ export function Hero() {
       {/* Top padding is the header (4rem) plus the section's own, so the
           composition lands exactly where it did before the cover was pulled
           up behind the bar. */}
-      <div className="container-page relative flex min-h-dvh flex-col justify-center pt-32 pb-16 sm:pt-36 sm:pb-20">
-        <div className="flex flex-col items-center text-center">
+      <div className="container-page relative flex min-h-dvh flex-col pt-32 pb-8 sm:pt-36 sm:pb-10">
+        <div className="flex flex-1 flex-col items-center justify-center text-center">
           {/* Plain `label`, not `eyebrow`: the cover line carries no marker
               (owner direction, 2026-08-05). */}
           <p
@@ -88,39 +91,51 @@ export function Hero() {
           </p>
 
           {/*
-            The staircase lockup (owner brief, 2026-08-06: "more premium,
-            wonderful"): three composed lines, each carrying exactly one
-            turned word — video, experience, book — so the italics descend
-            through the sentence in reading order. The breaks are deliberate
-            composition, not decoration: they exist to give every line one
-            turn. From `sm` up the staircase is fixed; below it the breaks
-            release and text-balance takes over, because a phone's measure
-            cannot hold the long third line. Each turn is a TRUE drawn
-            italic (v2.5) at the `font-turn` weight.
+            Two sentences, two lines, each landing on its own italic turn
+            (owner copy, 2026-08-06). The couplet is the composition: watch,
+            then make one yours — the promise in two beats, with the accent
+            closing each. Real block elements rather than the previous
+            `<br>` staircase, so the break is structural and each line still
+            wraps naturally on a phone. Shorter copy buys scale: 88px at
+            the cap on a 5xl measure — between the 80px that felt small and
+            the 100px that read as too much, and near the ceiling anyway,
+            since past ~90px the first line no longer holds on one line.
+            Both turns are TRUE drawn italics (v2.5) at the `font-turn`
+            weight.
           */}
           <h1
-            className="font-display emerge tracking-display mt-10 max-w-4xl text-[clamp(2.625rem,7.4vw,5.75rem)] leading-[1.06] font-normal text-balance"
+            className="font-display emerge tracking-display mt-9 max-w-5xl text-[clamp(2.625rem,7.2vw,5.5rem)] leading-[1.06] font-normal"
             style={{ animationDelay: "0.14s" }}
           >
-            Every <em className="text-terra-soft font-turn italic">video</em>{" "}
-            here
-            <br className="hidden sm:inline" /> is an{" "}
-            <em className="text-terra-soft font-turn italic">experience</em>
-            <br className="hidden sm:inline" /> you can actually{" "}
-            <em className="text-terra-soft font-turn italic">book.</em>
+            <span className="block">
+              Watch{" "}
+              <em className="text-terra-soft font-turn italic">
+                real experiences.
+              </em>
+            </span>
+            {/* A real space between the blocks: it collapses visually, but
+                the heading is read as one string by assistive tech and by
+                search engines, and without it they get "experiences.Make". */}{" "}
+            <span className="mt-1.5 block">
+              Make one{" "}
+              <em className="text-terra-soft font-turn italic">yours.</em>
+            </span>
           </h1>
 
+          {/* A narrower measure than the title's: roughly 68 characters, the
+              readable column, so the lede reads as considered prose under
+              the statement rather than a second banner. */}
           <p
-            className="text-cream/70 emerge mt-9 max-w-2xl text-lg leading-relaxed"
+            className="text-cream/75 emerge mt-10 max-w-xl text-lg leading-relaxed"
             style={{ animationDelay: "0.28s" }}
           >
-            Every video is filmed by the people behind the experience, so what
-            you watch is exactly what you&rsquo;ll get. Discover the Andaman
-            Islands through real moments, not advertisements.
+            Every video is filmed by the people who host the experience. Book
+            it, and bring the experience to life. Discover the Andaman Islands
+            through real moments, not advertisements.
           </p>
 
           <div
-            className="emerge mt-11 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row"
+            className="emerge mt-12 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row"
             style={{ animationDelay: "0.4s" }}
           >
             {/*
@@ -151,10 +166,15 @@ export function Hero() {
           </div>
         </div>
 
-        {/* The momentum line: three true facts, and the three islands. Its
-            rule draws itself in as the row arrives. */}
+        {/* The momentum line: three true facts, and the three islands. It
+            sits at the foot of the cover — the statement above takes the
+            free space (`flex-1`) and centres within it, so this row lands
+            on the container's bottom padding rather than floating with the
+            content (owner report, 2026-08-06: too much space beneath it).
+            The margin is now only a floor for short viewports. Its rule
+            draws itself in as the row arrives. */}
         <div
-          className="emerge relative mt-16 flex flex-col items-center gap-4 pt-6 text-center sm:mt-20 sm:flex-row sm:justify-between sm:gap-x-10 sm:text-left"
+          className="emerge relative mt-12 flex flex-col items-center gap-4 pt-6 text-center sm:mt-16 sm:flex-row sm:justify-between sm:gap-x-10 sm:text-left"
           style={{ animationDelay: "0.52s" }}
         >
           <span
