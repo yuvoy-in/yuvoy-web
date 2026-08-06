@@ -286,19 +286,35 @@ export function ProductDemo() {
         ref={rootRef}
         className="relative flex w-fit flex-none flex-col items-center"
       >
-        <div className="rounded-device ring-cream/15 bg-forest device-shadow relative w-fit p-2 ring-1">
+        {/* The bezel: 4px of near-black rail, lit like milled metal by
+            `device-frame` (owner direction, 2026-08-06 — it should read as
+            a phone's frame, not a border). Its padding and the screen's
+            radius are one measurement: `--radius-device` minus the padding
+            keeps the two curves concentric, so changing one without the
+            other leaves the screen's corners fighting the frame's. The
+            cream ring that used to sit outside is gone — the rail's own
+            specular edge does that job now, and two edges read as two
+            frames. */}
+        <div className="rounded-device bg-device device-frame relative w-fit p-1">
           {/* Camera dot — hardware depiction, the one rounded object on the site. */}
           <span
             aria-hidden
             className="bg-cream/20 absolute top-3.5 left-1/2 z-10 size-1.5 -translate-x-1/2 rounded-full"
           />
 
+          {/* Side keys: the volume pair on the left, the wake button lower
+              on the right, the way a phone actually carries them. They are
+              what stops the frame reading as a rounded rectangle. */}
+          <span aria-hidden className="device-key top-[19%] -left-0.5 h-7" />
+          <span aria-hidden className="device-key top-[28%] -left-0.5 h-7" />
+          <span aria-hidden className="device-key top-[23%] -right-0.5 h-11" />
+
           <div
             role="group"
             aria-label="Auto-playing preview of the Yuvoy flow: watch a real video, read the details, pick a time and pay. Illustrative: nothing is bookable yet."
             // Narrower at lg than at xl: the rail sits beside it from lg up,
             // and 300px of phone leaves the rail too thin at that width.
-            className="group bg-forest relative aspect-[9/17.4] w-[min(72vw,300px)] overflow-hidden rounded-[calc(var(--radius-device)-0.5rem)] lg:w-65 xl:w-75"
+            className="group bg-forest relative aspect-[9/17.4] w-[min(72vw,300px)] overflow-hidden rounded-[calc(var(--radius-device)-0.25rem)] lg:w-65 xl:w-75"
           >
             {/* The screens. Illustration only: hidden from assistive tech
                 (the group label above tells the story) and inert to the
