@@ -217,40 +217,40 @@ export function WhyYuvoy() {
         signs. It used to sit under a full-width rule, which reads as the
         start of the next section rather than the end of this one (owner
         report, 2026-08-06) — a hairline across the measure is a divider
-        wherever it lands. Space does the separating now, and the stroke
-        runs down the page instead of across it, so it leads the eye into
-        the line rather than fencing it off. The stroke fades up out of the
-        mark (a gradient on `currentColor`, so the colour is still the
-        token) and lands solid on the arrowhead.
+        wherever it lands, so the rule that closes this act is at the very
+        foot of it now, below the sentence, where it terminates rather than
+        introduces.
+
+        The connector's spacing is measured, not eyeballed. It read as
+        misplaced (owner report) for three compounding reasons, all fixed
+        here:
+
+        1. The stroke used to fade in from zero opacity over its first 60%,
+           so it did not become visible until a third of the way down and
+           the gap above it looked far larger than the gap below. It is
+           solid now — which also matches the arrow between the two panels,
+           keeping one drawing in the section rather than two.
+        2. The viewBox ran to 60 while the arrowhead ended at 56.25, leaving
+           dead space under the tip. The box is now exactly the drawing:
+           the line starts at y=0 with a butt cap, and the head's round join
+           carries half a stroke width past y=55.25 to land on 56.
+        3. `leading-tight` puts roughly 8px of empty line box above the
+           sentence's cap height, which no margin can see. The bottom margin
+           is therefore one step short of the top (24px against 32px) so the
+           two OPTICAL gaps match. Change one and change the other.
       */}
       <div className="mt-24 flex flex-col items-center text-center sm:mt-32">
-        <Wordmark className="h-11 sm:h-13" />
+        <Wordmark className="h-16 sm:h-20" />
 
         <svg
-          viewBox="0 0 16 60"
+          viewBox="0 0 16 56"
           fill="none"
           aria-hidden
-          className="text-terra my-7 h-15 w-4"
+          className="text-terra mt-8 mb-6 h-14 w-4"
         >
-          <defs>
-            <linearGradient
-              id="yuvoy-signoff-stroke"
-              x1="0"
-              y1="0"
-              x2="0"
-              y2="1"
-            >
-              <stop offset="0" stopColor="currentColor" stopOpacity="0" />
-              <stop offset="0.6" stopColor="currentColor" stopOpacity="1" />
-            </linearGradient>
-          </defs>
+          <path d="M8 0V54" stroke="currentColor" strokeWidth="1.5" />
           <path
-            d="M8 0V54"
-            stroke="url(#yuvoy-signoff-stroke)"
-            strokeWidth="1.5"
-          />
-          <path
-            d="M2.75 48.5L8 55.5L13.25 48.5"
+            d="M2.75 48.5L8 55.25L13.25 48.5"
             stroke="currentColor"
             strokeWidth="1.5"
             strokeLinecap="round"
@@ -263,6 +263,10 @@ export function WhyYuvoy() {
           <em className="text-terra font-turn italic">Better decisions.</em>
         </p>
       </div>
+
+      {/* The act's closing rule: two cream sections meet here, so without it
+          the boundary between this and the next is invisible. */}
+      <div aria-hidden className="border-cream-line mt-20 border-t sm:mt-24" />
     </Section>
   );
 }
