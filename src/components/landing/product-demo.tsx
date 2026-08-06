@@ -286,7 +286,7 @@ export function ProductDemo() {
         ref={rootRef}
         className="relative flex w-fit flex-none flex-col items-center"
       >
-        <div className="rounded-device ring-cream/15 bg-forest relative w-fit p-2 ring-1">
+        <div className="rounded-device ring-cream/15 bg-forest device-shadow relative w-fit p-2 ring-1">
           {/* Camera dot — hardware depiction, the one rounded object on the site. */}
           <span
             aria-hidden
@@ -577,7 +577,7 @@ function FeedScreen({ feedIndex }: { feedIndex: number }) {
               <p className="text-cream/75 flex items-center gap-1.5 text-[10px]">
                 <span
                   aria-hidden
-                  className="bg-terra inline-block size-3 rounded-full"
+                  className="bg-terra-soft inline-block size-3 rounded-full"
                 />
                 {reel.filmedBy}
               </p>

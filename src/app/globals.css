@@ -255,10 +255,16 @@
     animation: yuvoy-breathe 16s var(--ease-cinematic) infinite alternate;
   }
 
+  /* terra-soft, not terra (owner report, 2026-08-06: the accent read dull).
+     `terra` is the rung tuned for cream; over forest it loses its light and
+     the horizon glow turns brown rather than warm. terra-soft is the dark
+     surface's accent everywhere else in the cover, so the field and the
+     type now carry the same terracotta. The 22% is unchanged: the fix was
+     the wrong rung, not too little of it. */
   &::after {
     background: radial-gradient(
       70% 55% at 72% 108%,
-      color-mix(in oklab, var(--color-terra) 22%, transparent),
+      color-mix(in oklab, var(--color-terra-soft) 22%, transparent),
       transparent 65%
     );
     animation: yuvoy-breathe 21s var(--ease-cinematic) infinite
@@ -330,6 +336,25 @@
 @utility draw-line {
   transform-origin: left center;
   animation: yuvoy-draw 900ms var(--ease-cinematic) both;
+}
+
+/*
+  The only shadow in the system, and it exists because the preview frame is
+  the only OBJECT in it: hardware resting on the page, not a UI panel. The
+  direction is hairlines doing the work shadows do elsewhere (§4), so this is
+  an exception with a reason, not a licence — nothing but the device frame
+  may wear it.
+
+  Two layers, both soft: a tight contact shadow that seats the frame on the
+  surface, and a wide ambient one, offset down and pulled in by its negative
+  spread so it never spills sideways into a halo. The colour is `forest`
+  through color-mix, never black — a black shadow on cream turns the warmth
+  under it grey, and no value outside the palette may exist.
+*/
+@utility device-shadow {
+  box-shadow:
+    0 2px 6px color-mix(in oklab, var(--color-forest) 7%, transparent),
+    0 18px 40px -12px color-mix(in oklab, var(--color-forest) 18%, transparent);
 }
 
 /* ------------------------------------------------- the product preview */
