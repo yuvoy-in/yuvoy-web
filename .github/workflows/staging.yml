@@ -1,5 +1,12 @@
 name: Staging deployment
 
+# Staging deploys immediately on push, deliberately *not* gated on CI the way
+# production is. Staging exists to be looked at, and waiting ~7 minutes for the
+# browser suite before anyone can look would make the fast loop slow to protect
+# an audience of us. A broken staging is visible, cheap and one push from fixed.
+#
+# CI still runs on `dev` in parallel, so a red result is never silent — it just
+# does not hold the deploy.
 on:
   # Manual redeploy. NEXT_PUBLIC_* values are inlined at build time, so
   # changing one in Vercel does nothing until a rebuild — which previously
