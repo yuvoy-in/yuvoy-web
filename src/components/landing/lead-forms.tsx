@@ -7,11 +7,8 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PhoneField } from "@/components/ui/phone-field";
-import { cn } from "@/lib/cn";
 import { submitLead, type SubmitResult } from "@/lib/leads/api";
-import { useAnalytics } from "@/components/analytics/analytics-provider";
 import { useLeadAnalytics } from "@/lib/analytics/use-lead-analytics";
-import { audienceSelected } from "@/lib/analytics/events";
 import { formatForDisplay, phoneIssue } from "@/lib/contact/phone";
 import { OPERATOR_FORM_LIVE } from "@/lib/site/launch";
 import { ApplyComingSoon } from "@/components/operators/apply-coming-soon";
@@ -152,224 +149,85 @@ type ProviderValues = z.infer<typeof providerSchema>;
 /* ------------------------------------------------------------------- shell */
 
 /**
- * Registration, for one audience or both. Every form posts to POST /v1/leads
- * with the audience discriminator, and every outcome the API can produce —
- * recorded, updated, invalid, rate-limited, unavailable, offline — has its own
- * truthful UI state.
+ * The form for one audience — the traveller waitlist, or the operator
+ * application — and the single place the operator swap is decided.
  *
- * `audiences` decides the shape. With both, this is the tabbed picker
- * `/waitlist` uses. With one, there is nothing to pick, so no tablist renders
- * and the form is not a tabpanel: the homepage speaks to travellers and
- * `/operators` speaks to operators, and neither should show the other's door.
+ * The provider form is replaced by a notice while the API cannot accept what
+ * it sends (see `OPERATOR_FORM_LIVE`). That swap lives here rather than at
+ * each call site so the surfaces that render it — `/operators`, the
+ * `/waitlist` operator tab, and the `#providers` anchor that cached redirects
+ * and printed materials still point at — cannot disagree about whether
+ * applying works.
+ *
+ * Exported because `/waitlist` composes the two sides itself: there, the
+ * audience switch changes the whole page rather than only the form, so it
+ * needs the panel without the section around it.
  */
-const BOTH_AUDIENCES = ["traveller", "provider"] as const;
-
-export function LeadForms({
+export function LeadFormPanel({
+  audience,
   context,
-  initialAudience = "traveller",
-  heading = "Join the waitlist",
-  headingLevel = 2,
-  aside,
-  audiences = BOTH_AUDIENCES,
-  sectionId = "register",
-  eyebrow = "Get first access",
-  intro,
 }: {
+  audience: LeadAudience;
   context: LeadContext;
-  /**
-   * Which tab opens first, when there are tabs.
-   * `/waitlist?audience=provider` — the shape printed on operator materials —
-   * resolves to "provider" here.
-   */
-  initialAudience?: LeadAudience;
-  heading?: string;
-  /** `/waitlist` renders this as the page's h1; a section on a page as an h2. */
-  headingLevel?: 1 | 2;
-  /**
-   * Optional narrative column. When present the section renders as a split
-   * layout — aside left, form right — and the aside **must** contain an
-   * element with `id="${sectionId}-heading"` (see JoinAside), because it takes
-   * over the heading this component otherwise renders itself.
-   */
-  aside?: React.ReactNode;
-  /** Which audiences this instance offers. One of them hides the picker. */
-  audiences?: readonly LeadAudience[];
-  /** The section's anchor id; its heading is `<id>-heading`. */
-  sectionId?: string;
-  eyebrow?: string;
-  intro?: React.ReactNode;
 }) {
-  const offersProvider = audiences.includes("provider");
-  const single = audiences.length === 1 ? audiences[0] : null;
-  const headingId = `${sectionId}-heading`;
-  const [audience, setAudience] = React.useState<LeadAudience>(
-    single ?? initialAudience,
-  );
-  const Heading = headingLevel === 1 ? "h1" : "h2";
-  const { capture } = useAnalytics();
-
-  // audience_selected has three trigger points and one shape. The query-param
-  // preselect fires once on mount; the tab fires on an actual change, so a
-  // page opened at ?audience=provider does not double-fire.
-  const reportedPreselect = React.useRef(false);
-  React.useEffect(() => {
-    if (reportedPreselect.current) return;
-    reportedPreselect.current = true;
-    if (initialAudience !== "traveller") {
-      capture(
-        audienceSelected({ audience: initialAudience, trigger: "query_param" }),
-      );
-    }
-  }, [capture, initialAudience]);
-
-  function selectAudience(next: LeadAudience, trigger: "tab" | "cta") {
-    if (next === audience) return;
-    setAudience(next);
-    capture(audienceSelected({ audience: next, trigger }));
-  }
-
-  // #providers deep-links straight onto the provider tab. Those anchors are
-  // kept working indefinitely: /waitlist used to be a permanent (308) redirect
-  // to them, and browsers cache 308s forever, so a visitor who hit the old URL
-  // before the real page shipped still lands somewhere coherent.
-  React.useEffect(() => {
-    if (!offersProvider) return;
-    function syncFromHash() {
-      if (window.location.hash === "#providers")
-        setAudience((current) => {
-          if (current !== "provider") {
-            capture(audienceSelected({ audience: "provider", trigger: "cta" }));
-          }
-          return "provider";
-        });
-    }
-    syncFromHash();
-    window.addEventListener("hashchange", syncFromHash);
-    return () => window.removeEventListener("hashchange", syncFromHash);
-  }, [capture, offersProvider]);
-
-  /**
-   * One audience: the form on its own. Two: the picker above them. A single
-   * form is deliberately not a tabpanel — a tabpanel with no tablist is a
-   * promise to assistive tech that there is somewhere else to go.
-   */
-  /*
-    The provider form is replaced by a notice while the API cannot accept what
-    it sends (see `OPERATOR_FORM_LIVE`). Swapped here rather than at each call
-    site so the three surfaces that render it — `/operators`, the `/waitlist`
-    provider tab, and the `#providers` anchor those redirect through — cannot
-    disagree about whether applying works.
-  */
-  const providerPanel = OPERATOR_FORM_LIVE ? (
+  if (audience === "traveller") return <TravellerForm context={context} />;
+  return OPERATOR_FORM_LIVE ? (
     <ProviderForm context={context} />
   ) : (
     <ApplyComingSoon />
   );
+}
 
-  const forms = single ? (
-    single === "traveller" ? (
-      <TravellerForm context={context} />
-    ) : (
-      providerPanel
-    )
-  ) : (
-    <>
-      <div
-        role="tablist"
-        aria-label="I am a"
-        className="border-cream/20 rounded-edge flex border p-1"
-      >
-        {(
-          [
-            ["traveller", "I'm travelling"],
-            ["provider", "I run experiences"],
-          ] as const
-        ).map(([value, tabLabel]) => (
-          <button
-            key={value}
-            role="tab"
-            id={`tab-${value}`}
-            aria-selected={audience === value}
-            aria-controls={`panel-${value}`}
-            onClick={() => selectAudience(value, "tab")}
-            className={cn(
-              "focus-visible:ring-terra-soft rounded-edge flex-1 px-4 py-2.5 text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none",
-              audience === value
-                ? "bg-cream text-forest"
-                : "text-cream/70 hover:text-cream",
-            )}
-          >
-            {tabLabel}
-          </button>
-        ))}
-      </div>
-
-      <div
-        role="tabpanel"
-        id="panel-traveller"
-        aria-labelledby="tab-traveller"
-        hidden={audience !== "traveller"}
-        className="mt-10"
-      >
-        <TravellerForm context={context} />
-      </div>
-      <div
-        role="tabpanel"
-        id="panel-provider"
-        aria-labelledby="tab-provider"
-        hidden={audience !== "provider"}
-        className="mt-10"
-      >
-        {providerPanel}
-      </div>
-    </>
-  );
-
+/**
+ * Registration as a page section: the narrative on the left, the form on the
+ * right. Every form posts to POST /v1/leads with the audience discriminator,
+ * and every outcome the API can produce — recorded, updated, invalid,
+ * rate-limited, unavailable, offline — has its own truthful UI state.
+ *
+ * **One audience, always.** The homepage speaks to travellers and `/operators`
+ * speaks to operators, and neither should show the other's door. The audience
+ * picker that used to live here moved to `/waitlist`, which is the one surface
+ * that offers both — and it belongs there rather than here, because choosing a
+ * side changes everything on that page, not just which fields are on screen.
+ */
+export function LeadForms({
+  context,
+  audience,
+  aside,
+  sectionId = "register",
+}: {
+  context: LeadContext;
+  audience: LeadAudience;
+  /**
+   * The narrative column. It **must** contain an element with
+   * `id="${sectionId}-heading"` (see `JoinAside` / `ApplyAside`), because it
+   * carries the section's heading and this section points its
+   * `aria-labelledby` at it.
+   */
+  aside: React.ReactNode;
+  /** The section's anchor id; its heading is `<id>-heading`. */
+  sectionId?: string;
+}) {
   return (
     <section
       id={sectionId}
       className="bg-forest text-cream scroll-mt-16"
-      aria-labelledby={headingId}
+      aria-labelledby={`${sectionId}-heading`}
     >
-      {/* The legacy operator anchor, wherever a provider form actually lives.
-          It must exist even while the provider panel is hidden, or the browser
-          has nothing to scroll to. The homepage no longer offers that form and
-          redirects the anchor instead (see LegacyProviderAnchor). */}
-      {offersProvider && (
+      {/* The legacy operator anchor, wherever a provider form actually lives,
+          so the browser has something to scroll to. The homepage no longer
+          offers that form and redirects the anchor instead (see
+          LegacyProviderAnchor). */}
+      {audience === "provider" && (
         <span id="providers" className="block scroll-mt-20" aria-hidden />
       )}
       <div className="container-page py-20 sm:py-28">
-        {aside ? (
-          /* Split layout: narrative left (carrying the section heading), form
-             right. Used by the homepage's closing act. */
-          <div className="grid grid-cols-1 gap-14 lg:grid-cols-2 lg:gap-20">
-            <div>{aside}</div>
-            <div>{forms}</div>
+        <div className="grid grid-cols-1 gap-14 lg:grid-cols-2 lg:gap-20">
+          <div>{aside}</div>
+          <div>
+            <LeadFormPanel audience={audience} context={context} />
           </div>
-        ) : (
-          <div className="mx-auto max-w-xl">
-            <div>
-              <p className="eyebrow text-terra-soft">{eyebrow}</p>
-              <Heading
-                id={headingId}
-                className="font-display tracking-display mt-6 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-normal text-balance"
-              >
-                {heading}
-              </Heading>
-              <div className="text-cream/70 mt-6 text-lg leading-relaxed">
-                {intro ?? (
-                  <p>
-                    Tell us who you are and we will get in touch when the first
-                    experiences for your destination are ready. No spam, and no
-                    payment required.
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-10">{forms}</div>
-          </div>
-        )}
+        </div>
       </div>
     </section>
   );

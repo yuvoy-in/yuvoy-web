@@ -243,8 +243,7 @@ export default async function OperatorsPage({
       */}
       <LeadForms
         context={{ source, destinationKey: DEFAULT_DESTINATION.key }}
-        audiences={["provider"]}
-        initialAudience="provider"
+        audience="provider"
         sectionId="apply"
         aside={<ApplyAside />}
       />

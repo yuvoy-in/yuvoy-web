@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Wordmark } from "@/components/brand/wordmark";
 import { buttonVariants } from "@/components/ui/button";
 import { NavLinks } from "@/components/site/nav-links";
 import { SiteMenu } from "@/components/site/site-menu";
 import { useHeaderChrome } from "@/components/site/use-header-chrome";
 import { cn } from "@/lib/cn";
-import { PRIMARY_CTA } from "@/lib/site/nav";
+import { hidesSiteChrome, PRIMARY_CTA } from "@/lib/site/nav";
 
 /**
  * The site header: sticky, compact, present on every route, and out of the
@@ -37,9 +38,23 @@ import { PRIMARY_CTA } from "@/lib/site/nav";
  * `justify-between`, because the centre cell — the nav on desktop — has to sit
  * at the true centre of the page and not at the midpoint of whatever space the
  * mark and the button leave over.
+ *
+ * ## Where it does not render
+ *
+ * On the routes named by `hidesSiteChrome` — today that is `/waitlist` alone,
+ * which carries its own masthead (`WaitlistChrome`: the mark centred, one way
+ * back, no navigation). The decision lives in the registry rather than here so
+ * the two mastheads can never both render, and it is made in this component
+ * rather than in the root layout because the layout is a server component and
+ * has no pathname to read.
  */
 export function SiteHeader() {
+  const pathname = usePathname();
+  // Called before the early return, always: hook order cannot depend on the
+  // route. With nothing to attach `ref` to, the hook's effect no-ops.
   const { ref, overCover } = useHeaderChrome();
+
+  if (hidesSiteChrome(pathname)) return null;
 
   return (
     <header

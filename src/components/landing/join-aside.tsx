@@ -1,5 +1,5 @@
 import { FaqAccordion } from "@/components/site/faq-accordion";
-import { WAITLIST_FAQS } from "@/lib/site/faqs";
+import { AUDIENCE_COPY } from "@/lib/site/audiences";
 
 /**
  * The ask, narrated. Rendered by LeadForms as the left column of the
@@ -8,6 +8,13 @@ import { WAITLIST_FAQS } from "@/lib/site/faqs";
  * Contract: this component owns the section's heading and must render an
  * element with `id="register-heading"` — the LeadForms section points its
  * aria-labelledby at it.
+ *
+ * ## The words are not written here
+ *
+ * They come from `AUDIENCE_COPY.traveller` (2026-08-07), which is also what
+ * the `/waitlist` traveller tab and that route's `<title>` read. The same ask
+ * appears on two pages, and it used to be typed into both — this is the file
+ * that stopped one of them drifting.
  *
  * ## Three questions, not four
  *
@@ -24,22 +31,23 @@ import { WAITLIST_FAQS } from "@/lib/site/faqs";
  * promised dates.
  */
 export function JoinAside() {
+  const copy = AUDIENCE_COPY.traveller;
+
   return (
     <>
-      <p className="eyebrow text-terra-soft">Early access</p>
+      <p className="eyebrow text-terra-soft">{copy.eyebrow}</p>
       <h2
         id="register-heading"
         className="font-display tracking-display mt-6 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-normal text-balance"
       >
-        Be first to experience{" "}
-        <em className="text-terra-soft font-turn italic">Yuvoy.</em>
+        {copy.title}{" "}
+        <em className="text-terra-soft font-turn italic">{copy.accent}</em>
       </h2>
       <p className="text-cream/70 mt-6 max-w-md text-lg leading-relaxed">
-        Join the waitlist and we will contact you when the first experiences for
-        your destination are ready.
+        {copy.lede}
       </p>
 
-      <FaqAccordion items={WAITLIST_FAQS} tone="ink" className="mt-12" />
+      <FaqAccordion items={copy.faqs} tone="ink" className="mt-12" />
     </>
   );
 }
