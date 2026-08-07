@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { PageHeader } from "@/components/site/page-header";
+import { PageIntro } from "@/components/site/page-intro";
 import { Section, SectionHeading } from "@/components/ui/section";
-import { buttonVariants, ButtonArrow } from "@/components/ui/button";
-import { cn } from "@/lib/cn";
+import { StatusNotice } from "@/components/site/status-notice";
+import { Wordmark } from "@/components/brand/wordmark";
 
 export const metadata: Metadata = {
-  title: "About",
+  // Absolute: "About · Yuvoy" from the template reads as a section label,
+  // and "About Yuvoy · Yuvoy" is worse. This is the title the brief asks for.
+  title: { absolute: "About Yuvoy" },
   description:
-    "What Yuvoy is, what the name means, what we stand for, and why it starts from a dive operation in Havelock rather than from a spreadsheet.",
+    "Yuvoy connects people with real-world experiences and the people who run them. What it is, why it exists, and why it is opening first in the Andaman Islands.",
   alternates: { canonical: "/about" },
 };
 
@@ -18,183 +19,210 @@ export const metadata: Metadata = {
  * **This is the company's story, not a personal founder biography**, and that
  * is deliberate: the brand documents contain no founder names, background or
  * biography, and inventing a person is exactly the class of fabrication this
- * rebuild exists to undo.
+ * rebuild exists to undo. A personal section is a paragraph away once the
+ * owner supplies it (issue #48).
  *
- * Everything here is drawn from the owner's own brand and business documents:
- * the meaning of the name, the sonder idea, the four principles, and the fact
- * that Yuvoy is built around an established diving operation in Havelock.
+ * ## The 2026-08-06 simplification
  *
- * A personal section — who started it, and why — is a paragraph away once the
- * owner supplies it. See issue #48.
+ * The page opened by explaining the name. That is a charming fact and a poor
+ * first sentence: a visitor who has just arrived wants to know what this is,
+ * not what it is called. The etymology is still here, as a brand note near the
+ * foot, at the size it deserves.
+ *
+ * Four principles became three, and the "not open yet" section — four
+ * paragraphs enumerating what has not been built — became one status panel.
+ * Neither change removes a fact; both remove a second telling of one.
  */
+const CONTENTS = [
+  { href: "#what", label: "What Yuvoy is" },
+  { href: "#why", label: "Why it exists" },
+  { href: "#andaman", label: "Why Andaman first" },
+  { href: "#status", label: "Where we are" },
+];
+
 const PRINCIPLES = [
   {
-    title: "Participant, not spectator",
-    body: "You join the life of a place rather than watch it from the sidelines. That is the difference we are actually selling, and it is the hardest thing to fake.",
+    title: "Show the real experience",
+    body: "Use honest footage from the people running it.",
   },
   {
-    title: "The place as it actually is",
-    body: "Honest and rooted, never the brochure version. If a day is hard, or wet, or starts at five in the morning, that is what we will tell you.",
+    title: "Make expectations clear",
+    body: "Tell people what the day involves before they commit.",
   },
   {
-    title: "Premium through intimacy and craft",
-    body: "Quiet, considered and personal, not flashy. Small numbers of people, run properly, beats volume every time.",
-  },
-  {
-    title: "Earned, not borrowed",
-    body: "We tell stories from a place we genuinely operate in. It is why we are starting with three islands instead of a world map.",
+    title: "Build around operators",
+    body: "Create tools that support how experiences work in the real world.",
   },
 ];
 
 export default function AboutPage() {
   return (
     <main>
-      <PageHeader
-        eyebrow="About"
-        title="You, plus voyage."
-        accent="That is the whole idea."
-        lede={
-          <>
-            <p>
-              Yuvoy, <em className="not-italic">yoo-voy</em>, is built from two
-              words: <strong className="text-forest font-semibold">you</strong>{" "}
-              and <strong className="text-forest font-semibold">voyage</strong>.
-              It is a platform for finding and booking real-world experiences,
-              opening first in the Andaman Islands.
-            </p>
-            <p className="mt-4">
-              The idea underneath it is one most people have felt without
-              naming: that everybody around you is living a life as full and as
-              vivid as your own. A place you are visiting is somewhere other
-              people work, eat and belong. We would rather help you step into
-              that for a day than watch it go past a window.
-            </p>
-          </>
-        }
+      <PageIntro
+        eyebrow="About Yuvoy"
+        title="Built to help people"
+        accent="experience more of a place."
+        lede="Yuvoy connects people with real-world experiences and the people who run them."
+        contents={CONTENTS}
       />
 
-      <Section aria-labelledby="foundation-heading">
+      <Section id="what" aria-labelledby="what-heading">
         <SectionHeading
-          id="foundation-heading"
-          eyebrow="Where it comes from"
-          title="It starts from a dive boat,"
-          accent="not a spreadsheet."
-          body={
-            <>
-              <p>
-                Yuvoy is built around an established diving operation in
-                Havelock: its own boats, its own crew, and years of guests
-                already behind it. That is the foundation the rest is being
-                built on.
-              </p>
-              <p className="mt-4">
-                It matters because almost everything hard about this business is
-                operational rather than technical. Weather cancels days. Boats
-                have capacity. Guests overestimate what they are ready for. You
-                cannot design for any of that from a distance, and we are not
-                trying to.
-              </p>
-            </>
-          }
+          id="what-heading"
+          eyebrow="What Yuvoy is"
+          title="One place to discover and book"
+          accent="real experiences."
+          body="For travellers, Yuvoy makes it easier to see what an experience is really like before choosing it. For operators, it brings discovery, availability and bookings into one place."
         />
+
+        {/*
+          Traveller ↔ Yuvoy ↔ operator, drawn as three terms on one line
+          rather than as a diagram of boxes and arrows. Both sides are real
+          content; the connectors are the only decoration and are hidden from
+          assistive tech, so the relationship reads as three things rather
+          than as punctuation.
+        */}
+        <div className="border-cream-line mt-14 grid grid-cols-1 items-center gap-6 border-t pt-10 sm:grid-cols-[1fr_auto_1fr_auto_1fr] sm:gap-4">
+          <div>
+            <p className="label text-forest/75">Traveller</p>
+            <p className="text-forest/75 mt-3 leading-relaxed">
+              Sees the experience before choosing it.
+            </p>
+          </div>
+          <span
+            aria-hidden
+            className="bg-cream-line h-px w-10 justify-self-center sm:w-full sm:min-w-8"
+          />
+          {/* The lockup itself, not the name set in display type. This is the
+              one place on the site where Yuvoy is named *as a party* between
+              two others, so it should be the mark rather than a word — and
+              the mark already carries the name, the ensō and the tagline as
+              one drawing (design system §2). */}
+          <div className="flex justify-center sm:px-2">
+            <Wordmark className="h-14 sm:h-16" />
+          </div>
+          <span
+            aria-hidden
+            className="bg-cream-line h-px w-10 justify-self-center sm:w-full sm:min-w-8"
+          />
+          <div className="sm:text-right">
+            <p className="label text-forest/75">Operator</p>
+            <p className="text-forest/75 mt-3 leading-relaxed">
+              Shows what they run, and manages it in one place.
+            </p>
+          </div>
+        </div>
       </Section>
 
-      <Section tone="ink" aria-labelledby="problem-heading">
+      <Section tone="ink" id="why" aria-labelledby="why-heading">
         <SectionHeading
-          id="problem-heading"
+          id="why-heading"
           tone="ink"
-          eyebrow="What we are fixing"
-          title="The supply is real."
-          accent="The way you find it is broken."
+          eyebrow="Why it exists"
+          title="The experience is real."
+          accent="Finding it is the hard part."
+        />
+        <div className="border-cream/12 mt-14 grid grid-cols-1 gap-x-16 gap-y-10 border-t pt-10 sm:grid-cols-2">
+          <div>
+            <h3 className="font-display tracking-display text-xl leading-snug font-normal">
+              For travellers
+            </h3>
+            <p className="text-cream/70 mt-3 leading-relaxed">
+              Good experiences are scattered across social media, messages,
+              local counters and booking sites.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-display tracking-display text-xl leading-snug font-normal">
+              For operators
+            </h3>
+            <p className="text-cream/70 mt-3 leading-relaxed">
+              The people running them manage marketing, enquiries, schedules and
+              payments across disconnected tools.
+            </p>
+          </div>
+        </div>
+        <p className="font-display tracking-display mt-14 text-2xl leading-snug font-normal text-balance sm:text-3xl">
+          Yuvoy is being built to make{" "}
+          <em className="text-terra-soft font-turn italic">
+            both sides simpler.
+          </em>
+        </p>
+      </Section>
+
+      <Section id="andaman" aria-labelledby="andaman-heading">
+        <SectionHeading
+          id="andaman-heading"
+          eyebrow="Why Andaman first"
+          title="Starting close to"
+          accent="the experience."
           body={
             <>
               <p>
-                Experiences are the fastest-growing thing people spend on, and
-                they are still arranged through posters, brokers and long
-                WhatsApp threads. Meanwhile the people running them juggle
-                Instagram for marketing, a notebook for bookings and a calendar
-                that only exists in someone&rsquo;s head.
+                Yuvoy is opening first in the Andaman Islands, where experiences
+                depend on real operators, changing conditions and local
+                knowledge. It is the first launch, not the limit of the
+                platform.
               </p>
               <p className="mt-4">
-                Both sides lose. Travellers cannot see what a day is really like
-                before committing. Operators spend their time on admin instead
-                of on the water.
-              </p>
-              <p className="mt-4">
-                Yuvoy is being built as one place where an experience is shown
-                honestly in video, booked in the same motion, and run on tools
-                that do not fight the person using them.
+                It is also built around an established diving operation in
+                Havelock: its own boats, its own crew, and years of guests
+                behind it. Almost everything hard about this business is
+                operational rather than technical, and you cannot design for
+                weather, capacity and readiness from a distance.
               </p>
             </>
           }
         />
+
+        <div className="border-cream-line mt-16 border-t pt-10">
+          <p className="label text-forest/75">Principles</p>
+          <ul className="mt-8 grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-3">
+            {PRINCIPLES.map((principle) => (
+              <li key={principle.title}>
+                <h2 className="font-display text-forest tracking-display text-xl leading-snug font-normal">
+                  {principle.title}
+                </h2>
+                <p className="text-forest/75 mt-3 leading-relaxed">
+                  {principle.body}
+                </p>
+              </li>
+            ))}
+          </ul>
+
+          {/* The brand note, at the size it deserves. It opened the page
+              until 2026-08-06, where it answered a question nobody had asked
+              yet. */}
+          <p className="text-forest/75 mt-14 max-w-md text-sm leading-relaxed">
+            Yuvoy combines &ldquo;you&rdquo; and &ldquo;voyage&rdquo;: a journey
+            shaped around what you want to experience.
+          </p>
+        </div>
       </Section>
 
-      <Section aria-labelledby="principles-heading">
+      <Section tone="ink" id="status" aria-labelledby="status-heading">
         <SectionHeading
-          id="principles-heading"
-          eyebrow="What we stand for"
-          title="Four things we will not"
-          accent="trade away."
-        />
-        <ul className="border-cream-line mt-14 grid grid-cols-1 gap-px border-t sm:grid-cols-2">
-          {PRINCIPLES.map((principle, i) => (
-            <li key={principle.title} className="pt-10 sm:pr-10">
-              <span className="label text-forest/75">0{i + 1}</span>
-              <h3 className="font-display text-forest mt-5 text-xl font-normal tracking-tight">
-                {principle.title}
-              </h3>
-              <p className="text-forest/75 mt-3 leading-relaxed">
-                {principle.body}
-              </p>
-            </li>
-          ))}
-        </ul>
-      </Section>
-
-      <Section tone="ink" aria-labelledby="where-heading">
-        <SectionHeading
-          id="where-heading"
+          id="status-heading"
           tone="ink"
           eyebrow="Where we are"
-          title="Not open yet,"
-          accent="and saying so."
-          body={
-            <>
-              <p>
-                There is nothing to book on Yuvoy today. No prices, no
-                availability, no listings. The site says that on every page it
-                comes up, because the alternative, implying a product that does
-                not exist, is how trust gets spent before it is earned.
-              </p>
-              <p className="mt-4">
-                What is open is the waitlist, and the door for operators who
-                want a say in how this gets built.
-              </p>
-            </>
-          }
+          title="Preparing the"
+          accent="first launch."
         />
-        <div className="mt-12 flex flex-col gap-3 sm:flex-row">
-          <Link
-            href="/waitlist"
-            className={cn(
-              buttonVariants({ size: "lg" }),
-              "focus-visible:ring-offset-forest w-full sm:w-auto",
-            )}
-          >
-            Join the waitlist
-            <ButtonArrow />
-          </Link>
-          <Link
-            href="/waitlist?audience=provider"
-            className={cn(
-              buttonVariants({ variant: "outlineOnDark", size: "lg" }),
-              "w-full sm:w-auto",
-            )}
-          >
-            Apply as a founding operator
-          </Link>
-        </div>
+        <StatusNotice tone="ink" className="mt-10">
+          <p>
+            Yuvoy is currently preparing its first launch. The traveller
+            waitlist and founding-operator applications are open. Nothing on the
+            site is bookable yet.
+          </p>
+        </StatusNotice>
+        {/*
+          No call to action here (owner direction, 2026-08-07). The page
+          carried "Join the waitlist" in this section and met the footer's
+          standing "Be first to experience Yuvoy" a screen later, which is the
+          same ask twice inside one scroll. The header carries it on every
+          route, and this is the About page: its job is to explain the company,
+          not to convert. The status above is the honest close.
+        */}
       </Section>
     </main>
   );

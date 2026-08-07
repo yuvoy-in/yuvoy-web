@@ -1,4 +1,4 @@
-import { test, expect, type Page } from "@playwright/test";
+import { test, expect, type Page } from "./support/session";
 import {
   ALLOWED_TYPES,
   FORBIDDEN_TYPES,
@@ -7,13 +7,11 @@ import {
 /** Every route that is meant to be indexed. Must match sitemap.ts. */
 const INDEXABLE = [
   "/",
+  "/explore",
   "/waitlist",
-  "/how-it-works",
-  "/travellers",
   "/operators",
+  "/contact",
   "/safety",
-  "/experiences",
-  "/destinations",
   "/destinations/havelock",
   "/destinations/neil-island",
   "/destinations/port-blair",
@@ -170,7 +168,18 @@ test.describe("sitemap and robots", () => {
     request,
   }) => {
     const xml = await (await request.get("/sitemap.xml")).text();
-    for (const excluded of ["/go/", "/philosophy", "/privacy", "/terms"]) {
+    // The four consolidated routes are redirects now. A redirect in a
+    // sitemap is crawl budget spent on a URL that no longer answers.
+    for (const excluded of [
+      "/go/",
+      "/philosophy",
+      "/privacy",
+      "/terms",
+      "/how-it-works",
+      "/travellers",
+      "/experiences",
+      "/destinations<",
+    ]) {
       expect(xml, `sitemap must not list ${excluded}`).not.toContain(
         `${excluded}<`,
       );

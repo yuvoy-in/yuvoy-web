@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./support/session";
 
 /**
  * Live smoke test against the deployed API — no stubbing, no mocks.
@@ -15,6 +15,8 @@ import { test, expect } from "@playwright/test";
  * Rows it creates carry the phone prefix +91900000009* and the name "E2E Live
  * Check" so they are trivially identifiable and removable.
  */
+import { OPERATOR_FORM_LIVE } from "../src/lib/site/launch";
+
 const LIVE = process.env.LIVE_API_E2E === "1";
 
 /**
@@ -51,7 +53,6 @@ test.describe("live API", () => {
 
     await panel.getByLabel("Name").fill("E2E Live Check");
     await panel.getByLabel("WhatsApp number").fill(phone);
-    await panel.getByText("Diving & water").click();
     await panel.getByText(/I agree to the/).click();
     await panel.getByRole("button", { name: "Join the waitlist" }).click();
 
@@ -82,7 +83,6 @@ test.describe("live API", () => {
       const panel = page.getByRole("tabpanel", { name: /travelling/i });
       await panel.getByLabel("Name").fill(`E2E Live Check ${attempt}`);
       await panel.getByLabel("WhatsApp number").fill(phone);
-      await panel.getByText("Diving & water").click();
       await panel.getByText(/I agree to the/).click();
 
       // Wait on the response itself rather than only the rendered state, so a
@@ -110,6 +110,19 @@ test.describe("live API", () => {
     expect(statuses).toEqual([201, 200]); // created, then deduplicated
   });
 
+  /*
+    Skipped while `OPERATOR_FORM_LIVE` is false. The application is a notice
+    rather than a form: the deployed API still requires fields the form
+    stopped asking for (yuvoy-in/yuvoy-api#4), so there is nothing here to
+    submit. **Un-skip this in the change that flips the flag** — it is the
+    test that proves a real provider lead reaches the real API, and it is the
+    reason this file exists.
+  */
+  test.skip(
+    !OPERATOR_FORM_LIVE,
+    "the operator application is a notice until yuvoy-api#4 ships",
+  );
+
   test("a provider registration from a QR route carries its source", async ({
     page,
   }) => {
@@ -120,32 +133,49 @@ test.describe("live API", () => {
       }
     });
 
-    // Arriving from the printed ferry QR code. The campaign route still
-    // renders the full landing, including the embedded registration form —
-    // #register/#providers stay working indefinitely (see lead-forms.tsx).
+    /*
+      Arriving from the printed ferry QR code, on the operator side.
+
+      Since #63 the homepage — and therefore every `/go/<source>` route — is
+      travellers-only, so the operator anchor no longer opens a form in place.
+      `LegacyProviderAnchor` redirects to `/operators#apply`, where the
+      single-audience form renders with no tablist and no tabpanel, so this is
+      scoped to the section rather than to a panel (#71).
+
+      **The campaign source now survives that hop** (#70). It rides in the
+      query, because a client-side `replace` leaves no referrer for anything
+      downstream to infer from, and `/operators` validates it against the
+      contract's enum before it can reach the payload. The assertion below was
+      left deliberately failing by #71 rather than relaxed to "web"; this is
+      the change that turns it green.
+    */
     await page.goto("/go/ferry#providers");
-    await page.getByRole("tab", { name: /run experiences/i }).click();
-    const panel = page.getByRole("tabpanel", { name: /run experiences/i });
+    await expect(page).toHaveURL(/\/operators\?source=ferry#apply$/);
+    const panel = page.locator("#apply");
 
     const phone = uniquePhone();
     await panel.getByLabel("Your name").fill("E2E Live Contact");
     await panel.getByLabel("Business name").fill("E2E Live Dive Co");
+    await panel.getByLabel("Email").fill(`e2e-${Date.now()}@example.com`);
     await panel.getByLabel("WhatsApp number").fill(phone);
-    // Both are required: at least one coverage destination and exactly one
-    // primary interest.
-    await panel.getByText("Havelock").click();
-    await panel.getByText("Diving & water").click();
     await panel.getByText(/I agree to the/).click();
-    await panel.getByRole("button", { name: "Join the waitlist" }).click();
+    await panel
+      .getByRole("button", { name: "Apply as a founding operator" })
+      .click();
 
     await expect(panel.getByRole("status")).toContainText(
-      /you.re on the yuvoy waitlist|touch/i,
+      /application received|contact you/i,
       { timeout: 20_000 },
     );
 
-    // Attribution must survive the journey from QR route to API payload,
-    // otherwise campaign spend cannot be told apart from organic traffic.
     expect(sent?.audience).toBe("provider");
+
+    /*
+      Attribution must survive the journey from QR route to API payload, or
+      campaign spend cannot be told apart from organic traffic — and it cannot
+      be recovered afterwards, because a client-side redirect leaves no
+      referrer to infer from. This is the whole reason `/go/*` exists.
+    */
     expect(sent?.source).toBe("ferry");
   });
 });

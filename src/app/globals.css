@@ -5,9 +5,9 @@
   No hex, font, or tracking value may exist outside this @theme block.
 
   Palette: Brand Kit v2.1 (dark green unified 2026-08-03) — Forest,
-  Terracotta, Cream. Type: Brand Kit v2.2 (2026-08-03) — editorial serif
-  display, sans body, mono labels. Every pairing below is measured against
-  WCAG 2.2 AA; the
+  Terracotta, Cream. Type: Brand Kit v2.3 (2026-08-05) — grotesque display at
+  medium weight, one sans text voice, no mono, no italics. Every pairing
+  below is measured against WCAG 2.2 AA; the
   ratios and the terra / terra-deep / terra-soft usage rule live in
   docs/DESIGN_SYSTEM.md §1. Read that rule before using an accent on text —
   `terra` is NOT body-safe.
@@ -24,18 +24,34 @@
   --color-cream-line: #e5dcc9; /* hairline borders on cream */
   --color-forest: #16362e; /* primary ink AND every dark surface (11.44:1) */
   --color-terra: #be7149; /* accent — decoration + LARGE display text (3.24:1) */
-  --color-terra-deep: #985028; /* text-capable accent + CTA fill (5.21:1) */
+  --color-terra-deep: #985028; /* text-capable accent (5.21:1); never a CTA fill */
   --color-terra-soft: #d89772; /* accent text on forest (5.36:1) */
 
+  /* The preview device's bezel, and nothing else — an OBJECT's colour, not
+     a surface, which is why it does not break the one-dark-surface rule.
+     `forest` was tried here and reads green at bezel scale (owner report,
+     2026-08-06). Near-black rather than #000: pure black is harder than
+     anything else on the page and rims the frame against cream. This keeps
+     forest's hue at a fraction of its lightness, so the phone still belongs
+     to the family it sits in. Never use it for a section, text or fill. */
+  --color-device: #0a100e;
+
   /* ----------------------------------------------------------------- type */
-  /* v2.2: the display face is an editorial serif set large and light — mass
-     comes from size and leading, never weight (the face has no bold). The
-     wordmark deliberately stays on the sans so the mark reads engineered. */
-  --font-display: var(
-    --font-instrument-serif
-  ); /* headlines — editorial serif */
-  --font-sans: var(--font-inter); /* body + UI + wordmark */
-  --font-mono: var(--font-plex-mono); /* eyebrows, nav, stats, metadata */
+  /* v2.5: Fraunces, tuned into the site's own cut — optical size at 144
+     for display-grade contrast, SOFT 75 for sea-glass terminals, WONK 0.
+     The variation settings ride the `font-display` utility itself, so every
+     headline gets the cut for free. Display weight is 400; the turn is a
+     TRUE italic at `font-turn` (480). Satoshi remains the one text voice. */
+  --font-display: var(--font-fraunces); /* headlines — the Yuvoy serif cut */
+  --font-display--font-variation-settings: "opsz" 144, "SOFT" 75, "WONK" 0;
+  --font-sans: var(--font-satoshi); /* body + UI + labels + wordmark */
+  /* The handwriting face exists for exactly one element: the brand veil's
+     statement, written on by owner direction. Never page typography. */
+  --font-script: var(--font-dancing-script);
+
+  /* The turn's weight: 80 above the display's 400. A token, not a magic
+     number, so the upright/turn relationship is stated once. */
+  --font-weight-turn: 480;
 
   /* --------------------------------------------------------------- layout */
   --container-page: 70rem; /* the page measure — `max-w-page` */
@@ -58,6 +74,7 @@
   /* ------------------------------------------------------------- tracking */
   --tracking-wordmark: 0.34em;
   --tracking-label: 0.18em;
+  --tracking-display: -0.01em; /* Fraunces sets looser than a grotesque */
 }
 
 @layer base {
@@ -84,14 +101,22 @@
   }
 
   /*
-    The mobile menu is a native <dialog> opened with showModal(), so it lives
-    in the top layer — it can never be clipped by an ancestor's overflow or
+    The site menu is a native <dialog> opened with showModal(), so it lives in
+    the top layer — it can never be clipped by an ancestor's overflow or
     stacking context, which is the failure mode a portal was previously needed
     to work around.
+
+    Its backdrop is deliberately empty: no tint, no blur. A backdrop is not
+    animatable alongside the dialog's own dismissal, so whatever it paints
+    vanishes in one frame when the dialog closes — the page appeared to snap
+    from blurred to sharp, which read as a glitch rather than as an effect
+    (owner report, 2026-08-04). With nothing painted there is no state to
+    snap: the shutter simply rolls back and reveals the page it was covering.
+    Declared rather than deleted, because the UA stylesheet paints its own
+    translucent backdrop if we say nothing.
   */
   dialog[data-menu]::backdrop {
-    background-color: color-mix(in srgb, var(--color-forest) 78%, transparent);
-    backdrop-filter: blur(3px);
+    background: transparent;
   }
 
   /*
@@ -114,29 +139,32 @@
 /* ------------------------------------------------------------- typography */
 
 /**
- * Wide-tracked uppercase mono label — the brand's editorial voice.
- * On cream use `text-terra-deep` or `text-forest/75`; on forest use
- * `text-terra-soft` or `text-cream/70`. Never `text-terra` (fails AA at this
- * size), and never below `text-forest/70` on cream.
+ * Wide-tracked uppercase label — the brand's editorial voice, set in the
+ * text face (the mono was retired with Brand Kit v2.3: it read as terminal,
+ * not magazine). On cream use `text-terra-deep` or `text-forest/75`; on
+ * forest use `text-terra-soft` or `text-cream/70`. Never `text-terra` (fails
+ * AA at this size), and never below `text-forest/70` on cream.
  */
 @utility label {
-  @apply font-mono text-xs font-medium uppercase;
+  @apply font-sans text-xs font-medium uppercase;
   letter-spacing: var(--tracking-label);
 }
 
 /**
- * A section eyebrow — the label preceded by a short terracotta rule.
- * This is the brand's section-opening gesture; use it once per section.
+ * A section eyebrow — the label preceded by a terracotta dot, the same
+ * square `size-1` marker the fact rows use (square, not round: `rounded-full`
+ * is reserved for the device preview). This is the brand's section-opening
+ * gesture; use it once per section.
  */
 @utility eyebrow {
-  @apply inline-flex items-center gap-3 font-mono text-xs font-medium uppercase;
+  @apply inline-flex items-center gap-2.5 font-sans text-xs font-medium uppercase;
   letter-spacing: var(--tracking-label);
 
   &::before {
     content: "";
     flex: none;
-    width: 1.75rem;
-    height: 1px;
+    width: 0.25rem;
+    height: 0.25rem;
     background-color: var(--color-terra);
   }
 }
@@ -152,6 +180,28 @@
 @utility tap-target {
   @apply inline-flex items-center;
   min-height: 1.75rem;
+}
+
+/**
+ * A disclosure summary with no browser marker.
+ *
+ * `list-style: none` alone is not enough: WebKit draws its own triangle
+ * through `::-webkit-details-marker`, which ignores the list-style property
+ * entirely, so a `<summary>` styled only with `marker:hidden` keeps a grey
+ * arrow on Safari and iOS. Both are needed, and both live here rather than in
+ * a component so every accordion on the site is marker-free by construction.
+ *
+ * The site's accordions are native `<details>`/`<summary>` for the same
+ * reason the menu is a native `<dialog>`: the keyboard behaviour, the focus
+ * handling and the expanded/collapsed state come from the browser and cannot
+ * drift out of sync with the markup.
+ */
+@utility faq-summary {
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
 }
 
 /* ----------------------------------------------------------------- layout */
@@ -204,20 +254,188 @@
   animation: yuvoy-emerge 1100ms var(--ease-cinematic) both;
 }
 
-/* Mobile menu panel — interaction feedback, so it stays inside the 250ms budget. */
-@keyframes yuvoy-menu-in {
-  from {
-    opacity: 0;
-    transform: translateY(-0.75rem);
+/*
+  The cover's atmosphere (owner direction, 2026-08-05: "more dramatic"):
+  lagoon light, built from tokens the same way the preview's film is. Two
+  layers breathe on slow, offset cycles — a cream glow high in the water and
+  terra warmth low at the horizon — so the field reads as a place with light
+  moving through it rather than a flat panel. Fills are exempt from the
+  contrast floors, and the global reduced-motion rule collapses the breathing
+  to its resting (fully lit) state.
+
+  This is not the corner glow that was removed on 2026-08-04: that was an
+  ornament pinned to one edge; this is the field itself carrying light.
+*/
+@utility hero-atmosphere {
+  position: absolute;
+  inset: 0;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    inset: -20%;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  &::before {
+    background: radial-gradient(
+      55% 45% at 50% 8%,
+      color-mix(in oklab, var(--color-terra-soft) 13%, transparent),
+      transparent 70%
+    );
+    animation: yuvoy-breathe 16s var(--ease-cinematic) infinite alternate;
+  }
+
+  /* terra-soft, not terra (owner report, 2026-08-06: the accent read dull).
+     `terra` is the rung tuned for cream; over forest it loses its light and
+     the horizon glow turns brown rather than warm. terra-soft is the dark
+     surface's accent everywhere else in the cover, so the field and the
+     type now carry the same terracotta. The 22% is unchanged: the fix was
+     the wrong rung, not too little of it. */
+  &::after {
+    background: radial-gradient(
+      70% 55% at 72% 108%,
+      color-mix(in oklab, var(--color-terra-soft) 22%, transparent),
+      transparent 65%
+    );
+    animation: yuvoy-breathe 21s var(--ease-cinematic) infinite
+      alternate-reverse;
   }
 }
 
-@utility menu-in {
-  animation: yuvoy-menu-in 220ms var(--ease-interaction) both;
+@keyframes yuvoy-breathe {
+  from {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+/*
+  The cover artwork's drift: a very slow push-in, so the seascape reads as
+  filmed rather than pasted. It starts already scaled so no edge is ever
+  revealed, and reduced motion freezes it mid-drift.
+*/
+@utility hero-photo {
+  animation: yuvoy-photo-drift 38s var(--ease-cinematic) infinite alternate;
+}
+
+@keyframes yuvoy-photo-drift {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+/*
+  The scrim that merges the cover artwork into the forest field. Near-solid
+  at the very top (the transparent header needs forest behind it, and the
+  headline needs a quiet ground), thinnest across the horizon band where the
+  artwork's light lives, then rising again at the foot so the facts row and
+  its hairline sit on brand ink rather than on water. Token-built like every
+  other fill.
+*/
+@utility hero-scrim {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-forest) 94%, transparent) 0%,
+    color-mix(in oklab, var(--color-forest) 72%, transparent) 30%,
+    color-mix(in oklab, var(--color-forest) 34%, transparent) 58%,
+    color-mix(in oklab, var(--color-forest) 28%, transparent) 74%,
+    color-mix(in oklab, var(--color-forest) 66%, transparent) 100%
+  );
+}
+
+/*
+  A hairline that draws itself in from the left. Ends fully drawn, which is
+  also what reduced-motion visitors see.
+*/
+@keyframes yuvoy-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@utility draw-line {
+  transform-origin: left center;
+  animation: yuvoy-draw 900ms var(--ease-cinematic) both;
+}
+
+/*
+  The preview frame, built like the object it depicts rather than as a border
+  around it — a machined rail holding a black bezel. It is the only place in
+  the system with a gradient fill or a shadow at all: the direction is
+  hairlines doing the work shadows do elsewhere (§4), and the exception is
+  earned by this being the one OBJECT on the site rather than a surface
+  drawn on it. Nothing else may wear it.
+
+  Four things make a metal rail read as metal, and all four are here:
+
+  - It is not one colour. The gradient runs across the diagonal, brightest
+    at the top-left corner where a light source would strike it and lifting
+    again at the bottom-right where the surface bounces back into it, dark
+    through the middle. Flat colour is what makes a frame read as a drawn
+    rectangle.
+  - Its outer edge catches a specular line: a 1px inset ring, which sits
+    exactly on the boundary and separates the rail from the page the way a
+    machined chamfer does.
+  - Light falls from above, so the top edge takes a second, softer highlight
+    and the rest of the band stays dark. Without this the rail looks lit
+    from nowhere.
+  - It sits ON the page: the same two soft drop shadows as before, a tight
+    contact one and a wide ambient one whose negative spread stops it
+    blooming past the frame's own width.
+
+  `background-image`, not `background`: the shorthand would reset the
+  background-color, and `bg-device` is what actually paints the bezel — the
+  gradient only carries the light over it.
+
+  Every value is a color-mix on a palette token. There is no grey in this
+  palette and none is introduced here; the rail's highlights are `cream`
+  lifting the bezel's near-black, which is why the metal reads warm rather
+  than silver and belongs to the brand it frames.
+*/
+@utility device-frame {
+  background-image: linear-gradient(
+    152deg,
+    color-mix(in oklab, var(--color-device) 55%, var(--color-cream)) 0%,
+    color-mix(in oklab, var(--color-device) 90%, var(--color-cream)) 17%,
+    var(--color-device) 44%,
+    var(--color-device) 68%,
+    color-mix(in oklab, var(--color-device) 86%, var(--color-cream)) 88%,
+    color-mix(in oklab, var(--color-device) 60%, var(--color-cream)) 100%
+  );
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--color-cream) 15%, transparent),
+    inset 0 1px 2px color-mix(in srgb, var(--color-cream) 20%, transparent),
+    0 3px 10px color-mix(in oklab, var(--color-forest) 10%, transparent),
+    0 30px 64px -18px color-mix(in oklab, var(--color-forest) 32%, transparent);
+}
+
+/*
+  A side key — the volume pair and the wake button. Two pixels of rail
+  standing proud of the frame, lit along their length so they read as part
+  of the same milled piece. Position and length come from the call site;
+  they are hardware, so the rounded ends share the device's exemption from
+  the rectangular geometry (§4).
+*/
+@utility device-key {
+  position: absolute;
+  width: 2px;
+  border-radius: 1px;
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-device) 58%, var(--color-cream)),
+    color-mix(in oklab, var(--color-device) 90%, var(--color-cream))
+  );
 }
 
 /* ------------------------------------------------- the product preview */
@@ -343,6 +561,99 @@
 }
 
 /*
+  The why-section tour's act meter: each step's underline fills over that
+  act's real duration, so the rail reads like a video timeline. Duration and
+  play-state ride inline styles from ProductDemo (they are runtime state);
+  linear timing because a progress meter must move at constant speed. Under
+  reduced motion the global rule collapses it to a full bar, which is the
+  right resting state: the tour does not auto-play there, so the bar marks
+  the current step instead of timing it.
+*/
+@keyframes yuvoy-demo-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@utility demo-fill {
+  transform-origin: left;
+  animation-name: yuvoy-demo-fill;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+/*
+  The header sliding out of the way on the way down the page, and back on the
+  way up. HeaderShell sets the data attribute; the movement lives here so every
+  motion definition stays in one file.
+
+  250ms is the interaction budget (§3): this answers a gesture, so it has to
+  feel like a response rather than a performance.
+
+  The hide is inside a `no-preference` query rather than being switched off in
+  JavaScript. A header that teleports in and out is worse than one that stays
+  put, so under reduced motion it simply never moves — and the decision lives
+  in CSS with every other motion decision, which is the rule.
+
+  Not an `@utility`: this needs a companion attribute rule and a media query
+  around one of them, which reads better as plain CSS than as nesting.
+*/
+.header-slide {
+  /* The colours are in the same declaration as the transform on purpose: a
+     Tailwind `transition-*` utility would set the `transition` shorthand and
+     silently drop whichever of the two was declared first. */
+  transition:
+    transform 250ms var(--ease-interaction),
+    background-color 300ms var(--ease-interaction),
+    border-color 300ms var(--ease-interaction);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .header-slide[data-hidden="true"] {
+    transform: translateY(-100%);
+  }
+}
+
+/*
+  The site menu opening like a shutter: the panel unrolls from its top edge to
+  the bottom, and rolls back up to close. clip-path rather than a transform, so
+  the contents are revealed where they already are instead of sliding in behind
+  the frame.
+
+  This is an entrance, not interaction feedback — it is a whole surface
+  arriving — so it sits above the 250ms budget. Closing is quicker than
+  opening: waiting on a dismissal you already asked for feels like lag.
+*/
+@keyframes yuvoy-shutter-open {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes yuvoy-shutter-close {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+@utility menu-shutter {
+  animation: yuvoy-shutter-open 420ms var(--ease-cinematic) both;
+
+  &[data-state="closing"] {
+    animation: yuvoy-shutter-close 320ms var(--ease-interaction) both;
+  }
+}
+
+/*
   Filmic grain for immersive dark sections. Colourless by construction — the
   turbulence is desaturated, so it adds texture without adding a colour.
 */
@@ -352,4 +663,521 @@
   pointer-events: none;
   opacity: 0.05;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/*
+  The brand veil — the site's entrance (see BrandIntro). Not a flat card but a
+  scene from the brand's world: night water (the film-c gradient language,
+  an ember of terracotta warmth at the bottom edge), the owner's island
+  horizon along the foot (silhouettes and a moonlit glint, per the comp in
+  design/brand-source/intro.png), crossed by sparse particle swells — tiny cream
+  dots that roll in from either edge on slow, decorrelated periods and die
+  away before the centre, so the water moves while the lockup keeps a pool
+  of still dark — under filmic grain. On it the mark surfaces from depth,
+  the wordmark's letterforms arrive one by one in the cover's own emerge
+  grammar, "Experience more." is written on in the handwriting face with
+  the calligraphic swash as its underline, and the island's name grounds
+  the bottom of the frame. Then the camera pushes through: the veil grows
+  past the frame and dissolves while the cover runs its own emerge
+  entrance underneath (the handoff rule by the exit keyframes), so the
+  site arrives in the same breath the veil leaves.
+
+  Decisions, so they are not re-litigated ad hoc:
+
+  - The veil exists only when BrandIntro's inline script stamps `data-play`
+    before first paint. No stamp — a repeat pageload in the same tab, reduced
+    motion, JavaScript off — and the default `display: none` below means it
+    was never there. Every no-show path is flash-proof because showing, not
+    hiding, is the act that needs arguing for.
+  - CSS runs the whole timeline and ends it (the exit's last frame holds
+    `visibility: hidden`), so a slow or failed hydration can never strand an
+    opaque cover over a working page. React only tidies the node afterwards.
+  - This is entrance-class motion (§3): cinematic curve, and the one moment
+    that may exceed the `emerge` budget, because it is the moment the site
+    arrives. The sign-off stroke draws on the cinematic curve too — a pen
+    moves fast and settles at the end of the word, and the stroke is the
+    ensō's brush answering in miniature, not a progress bar.
+  - Any keypress dismisses it (`data-skip`): that answers a gesture, so it
+    runs on the interaction budget, and it keeps the cover from ever standing
+    between a keyboard user and the focus they just asked for.
+  - The timeline lives in the custom properties below; BrandIntro's fallback
+    timeout mirrors their total. Change them together.
+
+  Fixed-layer order: header 40 · staging badge and consent banner 50 · this
+  veil 60 (it must cover them; they return when it lifts). The site menu is a
+  top-layer <dialog> above everything and unreachable while the veil plays.
+*/
+.intro-veil {
+  --intro-mark-in: 1100ms;
+  --intro-rise: 850ms;
+  --intro-word-at: 200ms;
+  --intro-word-in: 1100ms;
+  --intro-kicker-at: 700ms;
+  --intro-write: 1300ms;
+  /* The swash (and the place line with it) leads the write's end by half
+     a second — still derived from it, so retuning the write moves them
+     together (owner direction, 2026-08-06: overlap the last letters). */
+  --intro-stroke-at: calc(var(--intro-kicker-at) + var(--intro-write) - 500ms);
+  --intro-stroke: 800ms;
+  /* The place line lands with the swash: the frame is signed and located
+     in the same gesture (owner direction). */
+  --intro-place-at: var(--intro-stroke-at);
+  --intro-close-at: 2500ms;
+  --intro-close: 450ms;
+  --intro-exit-at: 2700ms;
+  --intro-exit: 700ms;
+
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: none;
+  place-items: center;
+  /* The veil is a sealed scene: containment keeps its constant animation
+     work from invalidating the page underneath (and vice versa), and the
+     will-change pre-promotes its layer so the exit dissolve does not begin
+     with a promotion hitch 2.7s in. */
+  contain: layout paint;
+  will-change: transform, opacity;
+  /* Slightly more space below centre than above: the optical centre of the
+     lockup sits a touch high, which is where a still frame wants it. */
+  padding-bottom: 3rem;
+  /* Night water: a faint cream lift where the surface would be, forest
+     depths, and an ember of terracotta warmth at the bottom edge — all
+     color-mix on brand tokens, the film utilities' rule, so no second dark
+     ever exists. */
+  background:
+    radial-gradient(
+      100% 80% at 50% 36%,
+      color-mix(in oklab, var(--color-forest) 94%, var(--color-cream)),
+      transparent 62%
+    ),
+    linear-gradient(
+      175deg,
+      color-mix(in oklab, var(--color-forest) 90%, var(--color-cream)) 0%,
+      var(--color-forest) 52%,
+      color-mix(in oklab, var(--color-forest) 84%, var(--color-terra)) 100%
+    );
+}
+
+.intro-veil[data-play] {
+  display: grid;
+  animation: yuvoy-intro-exit var(--intro-exit) var(--ease-cinematic)
+    var(--intro-exit-at) both;
+}
+
+.intro-veil[data-skip] {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 200ms var(--ease-interaction);
+}
+
+/* will-change on the stage, the swash and the place line: their animations
+   start mid-choreography (2.5s, 1.5s, 1.5s in), and promoting a layer at
+   the moment its delay expires is exactly the kind of one-frame hitch this
+   entrance cannot afford. Elements that animate from first paint promote
+   naturally and need no hint. */
+.intro-stage {
+  will-change: transform, opacity;
+  animation: yuvoy-intro-close var(--intro-close) var(--ease-cinematic)
+    var(--intro-close-at) both;
+}
+
+.intro-mark {
+  animation: yuvoy-intro-surface var(--intro-mark-in) var(--ease-cinematic) both;
+}
+
+/*
+  A particle swell: two sparse dot grids (different densities, offset so
+  they never align) drifting on different periods inside an elliptical mask
+  anchored to one edge — dots that roll in and die away before the centre.
+  The right wing is the same element mirrored with scaleX(-1), so one mask
+  and one set of keyframes serve both sides, and "toward the centre" stays
+  a single direction in the maths.
+*/
+.intro-wave {
+  position: absolute;
+  inset: 0;
+  right: auto;
+  width: 46%;
+  pointer-events: none;
+  mask-image: radial-gradient(115% 75% at 0% 50%, black 25%, transparent 78%);
+  animation: yuvoy-intro-fade 1600ms var(--ease-cinematic) 300ms both;
+}
+
+.intro-wave-right {
+  right: 0;
+  left: auto;
+  transform: scaleX(-1);
+}
+
+/*
+  The particles are hand-scattered SVG tiles, not gradient grids: a grid
+  reads as straight rows however it moves, so each tile lays its dots along
+  gentle sine arcs. The SVGs are alpha stencils (mask-image), so the dots'
+  colour stays a brand token painted by background-color, and no colour
+  value lives inside the data URI.
+
+  Each wing holds FOUR planes with only a handful of dots each. Any two
+  neighbouring dots on screen almost always belong to different planes, and
+  every plane orbits its own ellipse (the --ox/--oy amplitudes) on its own
+  period, phase and direction — so the eye finds no group that moves
+  together, which is what "each dot moving differently" needs without a
+  canvas. Plane 4 alone carries the few larger dots.
+*/
+.intro-swell {
+  position: absolute;
+  inset: -12%;
+  animation: yuvoy-intro-orbit linear infinite;
+}
+
+.intro-swell-1 {
+  --ox: 2.2%;
+  --oy: 1.4%;
+  background-color: color-mix(in srgb, var(--color-cream) 30%, transparent);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cg fill='white'%3E%3Ccircle cx='18' cy='52' r='1.5'/%3E%3Ccircle cx='66' cy='34' r='1.3'/%3E%3Ccircle cx='114' cy='30' r='1.6'/%3E%3Ccircle cx='162' cy='44' r='1.4'/%3E%3Ccircle cx='40' cy='138' r='1.4'/%3E%3Ccircle cx='120' cy='158' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
+  mask-size: 200px 200px;
+  animation-duration: 9s;
+  animation-delay: -2s;
+}
+
+.intro-swell-2 {
+  --ox: 1.6%;
+  --oy: 2.2%;
+  background-color: color-mix(in srgb, var(--color-cream) 22%, transparent);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cg fill='white'%3E%3Ccircle cx='30' cy='80' r='1.4'/%3E%3Ccircle cx='92' cy='60' r='1.2'/%3E%3Ccircle cx='150' cy='52' r='1.5'/%3E%3Ccircle cx='210' cy='66' r='1.3'/%3E%3Ccircle cx='60' cy='190' r='1.5'/%3E%3Ccircle cx='170' cy='206' r='1.2'/%3E%3C/g%3E%3C/svg%3E");
+  mask-size: 240px 240px;
+  animation-duration: 13s;
+  animation-delay: -7s;
+  animation-direction: reverse;
+}
+
+.intro-swell-3 {
+  --ox: 2.8%;
+  --oy: 1.8%;
+  background-color: color-mix(in srgb, var(--color-cream) 26%, transparent);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cg fill='white'%3E%3Ccircle cx='36' cy='96' r='1.7'/%3E%3Ccircle cx='120' cy='70' r='1.5'/%3E%3Ccircle cx='200' cy='62' r='1.8'/%3E%3Ccircle cx='262' cy='84' r='1.5'/%3E%3Ccircle cx='80' cy='220' r='1.8'/%3E%3Ccircle cx='190' cy='240' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
+  mask-size: 280px 280px;
+  animation-duration: 16s;
+  animation-delay: -11s;
+}
+
+.intro-swell-4 {
+  --ox: 2%;
+  --oy: 2.6%;
+  background-color: color-mix(in srgb, var(--color-cream) 20%, transparent);
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='340'%3E%3Cg fill='white'%3E%3Ccircle cx='60' cy='110' r='2.4'/%3E%3Ccircle cx='200' cy='80' r='2.2'/%3E%3Ccircle cx='290' cy='180' r='2.6'/%3E%3C/g%3E%3C/svg%3E");
+  mask-size: 340px 340px;
+  animation-duration: 21s;
+  animation-delay: -5s;
+  animation-direction: reverse;
+}
+
+/* The word arrives exactly as the cover's headline does: ONE block
+   surfacing from depth in the yuvoy-emerge grammar at the cover's own
+   1100ms — not a letter cascade (owner direction, 2026-08-06, twice: the
+   per-letter stagger read as a different move). Deliberate reuse of the
+   cover's keyframes, not the `emerge` utility: the veil speaks the motion
+   language of the page it is about to unveil. */
+.intro-word {
+  animation: yuvoy-emerge var(--intro-word-in) var(--ease-cinematic)
+    var(--intro-word-at) both;
+}
+
+/* The statement is written, not shown: a soft-edged mask sweeps left to
+   right across the cursive line like a pen crossing the page. The swash
+   below starts only after the word is finished — you underline after you
+   write. */
+.intro-kicker {
+  mask-image: linear-gradient(to right, black 45%, transparent 55%);
+  mask-size: 250% 100%;
+  mask-repeat: no-repeat;
+  animation: yuvoy-intro-write var(--intro-write) var(--ease-cinematic)
+    var(--intro-kicker-at) both;
+}
+
+/* The sign-off swash is a filled calligraphic sliver (tapered tips, weight
+   in the middle), so it cannot be dash-drawn like a stroke: it is revealed
+   left to right by a clip wipe instead, which reads the same — a pen
+   crossing the page. The vertical insets are negative so the wipe can
+   never shave the swash's own curve. */
+.intro-stroke {
+  will-change: clip-path;
+  animation: yuvoy-intro-underline var(--intro-stroke) var(--ease-cinematic)
+    var(--intro-stroke-at) both;
+}
+
+/* The owner's island scene (cropped from the comp by
+   scripts/generate-intro-scene.mjs): silhouettes and the moonlit glint,
+   pinned to the foot of the veil and faded out upward into the field so
+   there is no seam. The band scales with the viewport but is clamped so it
+   neither swallows a phone screen nor thins to a strip on a tall one. */
+.intro-horizon {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: clamp(10rem, 30vh, 19rem);
+  background-image: url("/assets/intro-horizon.webp");
+  background-size: cover;
+  background-position: center bottom;
+  mask-image: linear-gradient(to top, black 65%, transparent 100%);
+  animation: yuvoy-intro-fade 1600ms var(--ease-cinematic) 200ms both;
+}
+
+/* The island's name, grounding the bottom of the frame. Real brand copy
+   (the cover's own opening line), not an atmospheric flourish. Wordmark
+   tracking rather than label tracking: at the foot of this frame it is a
+   signature, and the extra air is what keeps it from reading as a caption. */
+.intro-place {
+  letter-spacing: var(--tracking-wordmark);
+  will-change: transform, opacity, filter;
+  animation: yuvoy-intro-rise var(--intro-rise) var(--ease-cinematic)
+    var(--intro-place-at) both;
+}
+
+/* The mark's arrival — the emerge grammar (scale, settle, focus) retuned for
+   a single object: no travel, just surfacing. The blur clears early so the
+   brush strokes are sharp while the mark is still growing into place. */
+@keyframes yuvoy-intro-surface {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+    filter: blur(10px);
+  }
+
+  60% {
+    filter: blur(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes yuvoy-intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.45em);
+    filter: blur(5px);
+  }
+
+  65% {
+    filter: blur(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+/* With the mask 2.5x the box and no-repeat: at 100% the box shows the
+   mask's transparent tail (nothing), at 0% its solid head (everything).
+   The travel is clamped to 92% -> 8% because outside that range the mask
+   moves over pixels whose fate is already decided: the text is fully
+   hidden above 92% and fully shown below 8%. Sweeping the whole 100 -> 0
+   made the easing spend its long decelerating tail on invisible travel,
+   so the word LOOKED finished ~half a second before the animation ended
+   and the swash (which starts at the animation's end) seemed to lag
+   (owner report, twice). The end of this animation now IS the visual end. */
+@keyframes yuvoy-intro-write {
+  from {
+    mask-position: 92% 0;
+  }
+
+  to {
+    mask-position: 8% 0;
+  }
+}
+
+@keyframes yuvoy-intro-underline {
+  from {
+    clip-path: inset(-30% 100% -30% 0);
+  }
+
+  to {
+    clip-path: inset(-30% 0 -30% 0);
+  }
+}
+
+@keyframes yuvoy-intro-fade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Water moves its particles in circles, so the swell planes orbit rather
+   than slide: one closed elliptical loop, parameterised per plane by the
+   --ox/--oy amplitudes and run at each plane's own period, phase and
+   direction. Linear timing keeps the angular speed constant — easing an
+   orbit makes it pulse. */
+@keyframes yuvoy-intro-orbit {
+  0% {
+    transform: translate(calc(-1 * var(--ox, 2%)), 0);
+  }
+
+  25% {
+    transform: translate(0, var(--oy, 2%));
+  }
+
+  50% {
+    transform: translate(var(--ox, 2%), 0);
+  }
+
+  75% {
+    transform: translate(0, calc(-1 * var(--oy, 2%)));
+  }
+
+  100% {
+    transform: translate(calc(-1 * var(--ox, 2%)), 0);
+  }
+}
+
+/* The lockup steps back a beat before the veil itself dissolves, so the
+   scene empties before the camera moves through it. */
+@keyframes yuvoy-intro-close {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-0.375rem);
+  }
+}
+
+/* The exit is the emerge grammar reversed: the camera pushes through the
+   veil, which grows past the frame and dissolves while the cover performs
+   its own entrance underneath (the .emerge release below). `visibility`
+   rides along so the finished veil cannot intercept a pointer even if
+   React never gets to remove the node. */
+@keyframes yuvoy-intro-exit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+    visibility: visible;
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.045);
+    visibility: hidden;
+  }
+}
+
+/*
+  The handoff. The cover's `emerge` entrance used to play at first paint,
+  invisibly, behind the veil — by the time the veil left, the hero had
+  been still for two seconds and its arrival was simply never seen (owner
+  report, 2026-08-06). While the veil holds `data-intro-wait` (stamped by
+  its pre-paint script), the cover's entrance is suspended; the attribute
+  is removed the instant the exit starts, which re-applies the animations
+  from zero, so the hero surfaces through the dissolving veil.
+
+  Suspension is `animation: none` — the elements stand plainly VISIBLE
+  behind the opaque veil, not held at their from-frame — and the trigger
+  is :has() on the veil node itself. Both choices are the fail-open: if
+  JavaScript dies after the stamp, or the browser predates :has(), the
+  page shows a settled cover rather than an invisible one.
+*/
+body:has(#yuvoy-intro[data-intro-wait]) .emerge {
+  animation: none;
+}
+
+/*
+  The dissolve between a destination plate's photograph and its caption.
+
+  **This gradient is not what makes the caption readable.** The caption sits on
+  its own solid `bg-forest` block, so `cream` on it is the measured 11.44:1
+  pairing at every viewport, whatever the photograph does. This strip only
+  softens the join above it, so the image bleeds into the caption rather than
+  ending at a hard line.
+
+  That split is deliberate and was a bug fix. The first version made the
+  gradient itself reach solid forest "across the bottom 42%", sized to where
+  the caption was expected to fall. The caption's height depends on the
+  viewport, the plate's aspect ratio and how long the destination's name and
+  blurb are, so on a phone the block ran taller than the solid zone and the
+  secondary line ended up on roughly 62% forest over Neil's near-white sand —
+  about 3.2:1. **Nothing would have caught it**: axe reports text over a
+  gradient as "incomplete", not as a violation, so the accessibility gate
+  would have stayed green. Contrast now follows from the structure instead of
+  from arithmetic that changes with the layout.
+
+  Token-built (`color-mix` on `--color-forest`) like every other fill; no hex
+  may appear here.
+*/
+@utility plate-dissolve {
+  background: linear-gradient(
+    0deg,
+    var(--color-forest) 0%,
+    color-mix(in oklab, var(--color-forest) 72%, transparent) 38%,
+    color-mix(in oklab, var(--color-forest) 26%, transparent) 72%,
+    transparent 100%
+  );
+}
+
+/*
+  A very slight forest wash over the whole photograph, so a delivered frame
+  sits in the brand field rather than on it. Same idea as the cover's
+  multiply layer, at a fraction of the strength: enough to pull a stock-blue
+  sky toward the palette, not enough to read as a filter.
+*/
+@utility plate-wash {
+  background-color: color-mix(in oklab, var(--color-forest) 14%, transparent);
+  mix-blend-mode: multiply;
+}
+
+/*
+  `<summary>` ships a disclosure triangle in every engine, and each hides it
+  differently: `list-style: none` covers Firefox and Chromium, the WebKit
+  pseudo-element covers Safari. The FAQ draws its own marker, so both have to
+  go or the row carries two.
+*/
+@utility faq-summary {
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+}
+
+/*
+  The footer's backdrop, merged into the forest field.
+
+  The delivered frame is an underwater scene whose interest is all along the
+  bottom — seabed, coral, a turtle — under an almost empty upper half. So the
+  image is anchored to the bottom (`object-bottom`) and the crop happens at
+  the top, where there is nothing to lose. That is a CSS decision rather than
+  a baked crop because the footer's height changes with the page, the
+  breakpoint, and whether the closing call to action is shown.
+
+  This scrim's job is the SEAM, not contrast. Measured on the delivered file:
+  every eighth of the frame sits between 12.3:1 and 15.4:1 against `cream`,
+  which is *better* than the 11.44:1 of the flat forest it replaces — the
+  artwork is genuinely darker than the brand green. So there is no heavy
+  darkening here; there is a solid forest band at the top that dissolves
+  downward, so the footer begins as the same forest as the section above it
+  and the water arrives underneath rather than starting at a hard edge.
+
+  (The single brightest pixels — the specular highlights on the coral — reach
+  3.1:1 on their own. They are specks a few pixels across inside a large dark
+  field, not a background any glyph is read against; `plate-wash` over the
+  whole image takes the top off them anyway.)
+*/
+@utility footer-scrim {
+  background: linear-gradient(
+    180deg,
+    var(--color-forest) 0%,
+    var(--color-forest) 14%,
+    color-mix(in oklab, var(--color-forest) 78%, transparent) 38%,
+    color-mix(in oklab, var(--color-forest) 46%, transparent) 62%,
+    color-mix(in oklab, var(--color-forest) 30%, transparent) 100%
+  );
 }

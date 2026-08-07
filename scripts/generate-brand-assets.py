@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Derive the brand-mark assets from the official logo.
 
-Input:  public/yuvoy-logo.png — the official ensō mark as delivered: white
+Input:  design/brand-source/yuvoy-logo.png — the official ensō mark as delivered: white
         brush ring + terracotta dot on an OPAQUE black field with a radial
         glow (no alpha to lift).
 
@@ -24,18 +24,26 @@ the script depends on nothing. Re-run after replacing the source logo:
 
 from __future__ import annotations
 
+import math
 import struct
 import sys
 import zlib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCE = ROOT / "public" / "yuvoy-logo.png"
+SOURCE = ROOT / "design" / "brand-source" / "yuvoy-logo.png"
 MARK = ROOT / "public" / "brand" / "yuvoy-mark.png"
+MARK_ON_LIGHT = ROOT / "public" / "brand" / "yuvoy-mark-on-light.png"
+MARK_ON_DARK = ROOT / "public" / "brand" / "yuvoy-mark-on-dark.png"
 APP_ICON = ROOT / "src" / "app" / "icon.png"
 FAVICON = ROOT / "src" / "app" / "favicon.ico"
 
 FOREST = (0x16, 0x36, 0x2E)
+CREAM = (0xF4, 0xEF, 0xE4)
+
+# The cut-out marks are cropped tight: with no tile around them, padding just
+# makes the ensō smaller in its box for no reason.
+ALPHA_PAD = 0.03
 
 # Pixels at least this bright count as "the mark" when finding its extent;
 # the glow below it is kept only as far as the padded crop reaches.
@@ -238,7 +246,33 @@ def square_crop_bounds(
     return x0, y0, side
 
 
-def resize_bilinear(
+def _spans(start: float, window: float, out_size: int, limit: int):
+    """
+    For each output pixel, the source pixels it covers and by how much.
+
+    Area averaging, not the 4-tap bilinear this used to do. Bilinear is a
+    *magnifying* filter: shrinking with it samples four pixels out of the nine
+    or more that land in each output pixel and throws the rest away, which is
+    what made the mark look coarse and its thin brush strokes break up. Here
+    every source pixel contributes in proportion to how much of the output
+    pixel it covers, which is the whole difference between a resized image and
+    a degraded one.
+    """
+    scale = window / out_size
+    table = []
+    for o in range(out_size):
+        a = start + o * scale
+        b = a + scale
+        weights = []
+        for i in range(int(math.floor(a)), int(math.ceil(b))):
+            overlap = min(b, i + 1) - max(a, i)
+            if overlap > 0:
+                weights.append((max(0, min(limit - 1, i)), overlap))
+        table.append(weights)
+    return table
+
+
+def resample_rgb(
     rgb: bytearray,
     src_w: int,
     src_h: int,
@@ -247,28 +281,157 @@ def resize_bilinear(
     window: int,
     out_size: int,
 ) -> bytearray:
+    xs = _spans(x0, window, out_size, src_w)
+    ys = _spans(y0, window, out_size, src_h)
     out = bytearray(out_size * out_size * 3)
-    scale = window / out_size
-    for oy in range(out_size):
-        fy = y0 + (oy + 0.5) * scale - 0.5
-        y1 = max(0, min(src_h - 1, int(fy)))
-        y2 = min(src_h - 1, y1 + 1)
-        wy = fy - y1
-        for ox in range(out_size):
-            fx = x0 + (ox + 0.5) * scale - 0.5
-            x1 = max(0, min(src_w - 1, int(fx)))
-            x2 = min(src_w - 1, x1 + 1)
-            wx = fx - x1
+    for oy, yw in enumerate(ys):
+        for ox, xw in enumerate(xs):
+            acc = [0.0, 0.0, 0.0]
+            total = 0.0
+            for sy, wy in yw:
+                row = sy * src_w
+                for sx, wx in xw:
+                    w = wy * wx
+                    total += w
+                    i = (row + sx) * 3
+                    acc[0] += rgb[i] * w
+                    acc[1] += rgb[i + 1] * w
+                    acc[2] += rgb[i + 2] * w
             o = (oy * out_size + ox) * 3
             for c in range(3):
-                top = rgb[(y1 * src_w + x1) * 3 + c] * (1 - wx) + rgb[
-                    (y1 * src_w + x2) * 3 + c
-                ] * wx
-                bottom = rgb[(y2 * src_w + x1) * 3 + c] * (1 - wx) + rgb[
-                    (y2 * src_w + x2) * 3 + c
-                ] * wx
-                out[o + c] = int(top * (1 - wy) + bottom * wy + 0.5)
+                out[o + c] = int(acc[c] / total + 0.5)
     return out
+
+
+def build_cut_out(
+    rgb: bytearray, width: int, height: int, stroke: tuple[int, int, int]
+) -> bytearray:
+    """
+    The mark with a real alpha channel: strokes in `stroke`, the dot in the
+    colour it was delivered in, and nothing else painted at all.
+
+    This is what the UI needs. The tiled version below bakes forest into every
+    pixel, which is right for a favicon — an icon needs a body — and wrong
+    everywhere else: on a forest section it drew a green square around a logo
+    that should have had none.
+    """
+    out = bytearray(width * height * 4)
+    for i in range(width * height):
+        r, g, b = rgb[i * 3], rgb[i * 3 + 1], rgb[i * 3 + 2]
+        # The strokes are neutral; the glow around the dot is warm. Without
+        # the second term that glow passes the brightness test and paints a
+        # pale smudge around the dot.
+        ink = smoothstep(max(r, g, b), MASK_LOW, MASK_HIGH) * (
+            1 - smoothstep(r - b, 18, 42)
+        )
+        # Measured off the source rather than guessed: the solid disc holds
+        # r >= 209 and r-b >= 117 out to 12px, and the glow trails on for
+        # another 80px. The old window let that trail through at low alpha,
+        # which is what painted a pale square around the dot.
+        dot = smoothstep(r - b, 95, 115) * smoothstep(r, 196, 212)
+        alpha = min(1.0, max(ink, dot))
+        if alpha <= 0.002:
+            continue
+        o = i * 4
+        # The dot keeps the delivered colour; the strokes take the tone.
+        out[o] = int(stroke[0] * (1 - dot) + r * dot)
+        out[o + 1] = int(stroke[1] * (1 - dot) + g * dot)
+        out[o + 2] = int(stroke[2] * (1 - dot) + b * dot)
+        out[o + 3] = int(255 * alpha)
+    return out
+
+
+def alpha_bbox(rgba: bytearray, width: int, height: int) -> tuple[int, int, int, int]:
+    min_x, min_y, max_x, max_y = width, height, -1, -1
+    for y in range(height):
+        for x in range(width):
+            if rgba[(y * width + x) * 4 + 3] >= 24:
+                min_x, max_x = min(min_x, x), max(max_x, x)
+                min_y, max_y = min(min_y, y), max(max_y, y)
+    if max_x < 0:
+        sys.exit("the cut-out is empty — is the source image right?")
+    return min_x, min_y, max_x, max_y
+
+
+def resample_rgba(
+    rgba: bytearray,
+    src_w: int,
+    src_h: int,
+    x0: int,
+    y0: int,
+    window: int,
+    out_size: int,
+) -> bytearray:
+    """
+    Area averaging over *premultiplied* colour.
+
+    Straight alpha would drag the colour of fully transparent pixels into the
+    edges and fringe the whole mark.
+    """
+    xs = _spans(x0, window, out_size, src_w)
+    ys = _spans(y0, window, out_size, src_h)
+    out = bytearray(out_size * out_size * 4)
+    for oy, yw in enumerate(ys):
+        for ox, xw in enumerate(xs):
+            acc = [0.0, 0.0, 0.0, 0.0]
+            total = 0.0
+            for sy, wy in yw:
+                row = sy * src_w
+                for sx, wx in xw:
+                    w = wy * wx
+                    total += w
+                    i = (row + sx) * 4
+                    a = rgba[i + 3] / 255
+                    acc[0] += rgba[i] * a * w
+                    acc[1] += rgba[i + 1] * a * w
+                    acc[2] += rgba[i + 2] * a * w
+                    acc[3] += rgba[i + 3] * w
+            o = (oy * out_size + ox) * 4
+            alpha = acc[3] / total
+            out[o + 3] = int(min(255.0, max(0.0, alpha)) + 0.5)
+            if alpha <= 0.5:
+                continue
+            scale_back = 255 / (alpha * total)
+            for c in range(3):
+                out[o + c] = int(min(255.0, max(0.0, acc[c] * scale_back)) + 0.5)
+    return out
+
+
+def write_png_rgba(path: Path, size: int, rgba: bytearray) -> None:
+    raw = bytearray()
+    stride = size * 4
+    for y in range(size):
+        raw.append(0)
+        raw.extend(rgba[y * stride : (y + 1) * stride])
+
+    def chunk(ctype: bytes, body: bytes) -> bytes:
+        return (
+            struct.pack(">I", len(body))
+            + ctype
+            + body
+            + struct.pack(">I", zlib.crc32(ctype + body) & 0xFFFFFFFF)
+        )
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(
+        b"\x89PNG\r\n\x1a\n"
+        + chunk(b"IHDR", struct.pack(">IIBBBBB", size, size, 8, 6, 0, 0, 0))
+        + chunk(b"IDAT", zlib.compress(bytes(raw), 9))
+        + chunk(b"IEND", b"")
+    )
+
+
+def write_cut_out(
+    path: Path, rgb: bytearray, width: int, height: int, stroke: tuple[int, int, int]
+) -> None:
+    full = build_cut_out(rgb, width, height, stroke)
+    min_x, min_y, max_x, max_y = alpha_bbox(full, width, height)
+    side = max(max_x - min_x, max_y - min_y)
+    side = min(int(side * (1 + 2 * ALPHA_PAD)), width, height)
+    cx, cy = (min_x + max_x) // 2, (min_y + max_y) // 2
+    x0 = max(0, min(width - side, cx - side // 2))
+    y0 = max(0, min(height - side, cy - side // 2))
+    write_png_rgba(path, 512, resample_rgba(full, width, height, x0, y0, side, 512))
 
 
 def write_ico(path: Path, png_bytes: bytes, size: int) -> None:
@@ -289,18 +452,23 @@ def main() -> None:
         mark_bbox(width, height, toned), width, height
     )
 
-    mark512 = resize_bilinear(composited, width, height, x0, y0, window, 512)
+    mark512 = resample_rgb(composited, width, height, x0, y0, window, 512)
     write_png(MARK, 512, 512, mark512)
     APP_ICON.write_bytes(MARK.read_bytes())
 
-    mark256 = resize_bilinear(composited, width, height, x0, y0, window, 256)
+    mark256 = resample_rgb(composited, width, height, x0, y0, window, 256)
     tmp = MARK.parent / "_favicon-256.png"
     write_png(tmp, 256, 256, mark256)
     write_ico(FAVICON, tmp.read_bytes(), 256)
     tmp.unlink()
 
+    # The cut-outs the UI uses: one per surface, because a white ensō is
+    # invisible on cream and a forest one is invisible on forest.
+    write_cut_out(MARK_ON_DARK, rgb, width, height, CREAM)
+    write_cut_out(MARK_ON_LIGHT, rgb, width, height, FOREST)
+
     print(f"crop: {window}px window at ({x0},{y0}) of {width}×{height}")
-    for output in (MARK, APP_ICON, FAVICON):
+    for output in (MARK, MARK_ON_DARK, MARK_ON_LIGHT, APP_ICON, FAVICON):
         print(f"wrote {output.relative_to(ROOT)} ({output.stat().st_size:,} bytes)")
 
 

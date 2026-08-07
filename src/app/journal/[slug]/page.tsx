@@ -52,13 +52,13 @@ export async function generateMetadata({
 const components = {
   h2: (props: React.ComponentProps<"h2">) => (
     <h2
-      className="font-display text-forest mt-12 text-2xl font-normal tracking-tight first:mt-0"
+      className="font-display text-forest tracking-display mt-12 text-2xl font-normal first:mt-0"
       {...props}
     />
   ),
   h3: (props: React.ComponentProps<"h3">) => (
     <h3
-      className="font-display text-forest mt-8 text-xl font-normal tracking-tight"
+      className="font-display text-forest tracking-display mt-8 text-xl font-normal"
       {...props}
     />
   ),
@@ -75,7 +75,7 @@ const components = {
     <a className="text-forest underline underline-offset-2" {...props} />
   ),
   strong: (props: React.ComponentProps<"strong">) => (
-    <strong className="text-forest font-semibold" {...props} />
+    <strong className="text-forest font-bold" {...props} />
   ),
 };
 

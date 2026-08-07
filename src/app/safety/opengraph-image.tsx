@@ -6,8 +6,8 @@ export const alt = "Where Yuvoy stands on safety";
 
 export default function Image() {
   return renderOg({
-    eyebrow: "Safety",
-    title: "The sea deserves respect.",
+    eyebrow: "Trust & safety",
+    title: "Clear expectations before every experience.",
     footer: "Experience more.",
   });
 }

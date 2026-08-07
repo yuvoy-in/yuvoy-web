@@ -13,6 +13,9 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "src/lib/api/schema.ts",
+    // Agent worktrees are whole checkouts (with their own node_modules);
+    // linting them triples the run and reports on code that is not ours.
+    ".claude/**",
   ]),
 ]);
 

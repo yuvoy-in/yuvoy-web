@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it, expect } from "vitest";
 
@@ -44,8 +44,10 @@ const over = (fg: string, bg: string, alpha: number) =>
     .join("");
 
 const CREAM = "#f4efe4";
+const CREAM_DEEP = "#ece5d6";
 const FOREST = "#16362e";
 const TERRA_SOFT = "#d89772";
+const DEVICE = "#0a100e";
 
 describe("the dark surface", () => {
   it("is declared exactly once in the theme", () => {
@@ -54,6 +56,31 @@ describe("the dark surface", () => {
     // second dark surface is back, and with it the bug that was reported
     // three times.
     expect(THEME).not.toMatch(/--color-(teal|ink)\b/);
+  });
+
+  /*
+    `device` is the preview bezel's near-black. It is an OBJECT's colour,
+    not a second dark surface, and the only thing keeping those two facts
+    apart is that exactly one element in the app wears it. The moment a
+    section does, the site has two darks again — which is the bug that was
+    reported three times before it was fixed as one.
+  */
+  it("keeps the device colour on the device alone", () => {
+    expect(THEME).toContain(`--color-device: ${DEVICE}`);
+    // Darker than the ink, or it is not reading as hardware.
+    expect(luminance(DEVICE)).toBeLessThan(luminance(FOREST));
+
+    const source = readdirSync(join(process.cwd(), "src"), {
+      recursive: true,
+      withFileTypes: true,
+    })
+      .filter((entry) => entry.isFile() && /\.tsx?$/.test(entry.name))
+      .map((entry) => readFileSync(join(entry.parentPath, entry.name), "utf8"))
+      .join("\n");
+
+    // `rounded-device` and `device-shadow` are the frame's other two
+    // device-only rules and are matched out by the word boundary.
+    expect(source.match(/\bbg-device\b/g) ?? []).toHaveLength(1);
   });
 
   it("clears AAA for body text in both directions", () => {
@@ -75,6 +102,21 @@ describe("the dark surface", () => {
     expect(contrast(over(CREAM, FOREST, 0.7), FOREST)).toBeGreaterThanOrEqual(
       4.5,
     );
+  });
+
+  /*
+    The ladder's floors are measured against `cream`, and a recessed surface
+    spends the headroom they leave: the why act's inactive tab is `forest/5`
+    on `cream-deep`, and `forest/60` on it renders 3.41:1 — which is what
+    axe caught the first time that panel was built. Two rungs are pinned
+    here so the next panel that recesses a fill cannot rediscover it.
+  */
+  it("holds the ladder on a tinted raised surface", () => {
+    const recessed = over(FOREST, CREAM_DEEP, 0.05);
+    expect(contrast(over(FOREST, recessed, 0.6), recessed)).toBeLessThan(4.5);
+    expect(
+      contrast(over(FOREST, recessed, 0.75), recessed),
+    ).toBeGreaterThanOrEqual(4.5);
   });
 
   /*

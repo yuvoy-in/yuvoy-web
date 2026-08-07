@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import { instrumentSerif, inter, plexMono } from "@/lib/fonts";
+import { dancingScript, fraunces, satoshi } from "@/lib/fonts";
+import { BrandIntro } from "@/components/brand/brand-intro";
 import { Providers } from "@/components/providers";
 import { SITE_URL, IS_PRODUCTION } from "@/lib/site";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -12,37 +13,70 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  /*
+    The template appends " · Yuvoy" to every page title, so a page's own
+    `title` must never repeat the brand. The default (the homepage's) carries
+    the whole positioning in one line, because it is the one result most
+    people will see.
+  */
   title: {
-    default: "Yuvoy · See the experience. Feel if it's right. Then book.",
+    default: "Yuvoy · Discover real experiences through video",
     template: "%s · Yuvoy",
   },
   description:
-    "Yuvoy brings local dives, boat days, food and culture to life through honest video from the people who run them. Join the waitlist for first access in Havelock, Neil and Port Blair.",
+    "Discover real-world experiences through videos from the people who run them. Yuvoy is opening first in the Andaman Islands.",
   applicationName: "Yuvoy",
   robots: IS_PRODUCTION ? undefined : { index: false, follow: false },
   openGraph: {
     type: "website",
     siteName: "Yuvoy",
-    title: "Yuvoy · See the experience. Feel if it's right. Then book.",
+    title: "Yuvoy · Discover real experiences through video",
     description:
-      "Local dives, boat days, food and culture in the Andaman Islands, shown in honest video by the people who run them. Join the waitlist for first access.",
+      "Discover real-world experiences through videos from the people who run them. Yuvoy is opening first in the Andaman Islands.",
     url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Yuvoy · See the experience. Feel if it's right. Then book.",
+    title: "Yuvoy · Discover real experiences through video",
     description:
-      "Local experiences in the Andaman Islands, shown in honest video by the people who run them. Join the waitlist.",
+      "Discover real-world experiences through videos from the people who run them. Yuvoy is opening first in the Andaman Islands.",
   },
+};
+
+/*
+  Without an explicit theme-color, Safari tints its tab and URL chrome by
+  sampling the page's top pixels — which, while the brand veil plays, are
+  forest, so the chrome went green and then disagreed with the cream page
+  underneath (owner report, 2026-08-06). Pinned to the canvas token
+  `cream` (#F4EFE4 in globals.css @theme; a literal here because metadata
+  cannot read CSS variables — the OG frame does the same).
+*/
+export const viewport: Viewport = {
+  themeColor: "#f4efe4",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${instrumentSerif.variable} ${inter.variable} ${plexMono.variable} h-full`}
+      /*
+        Declares the `scroll-behavior: smooth` set in globals.css. Without it
+        Next warns, and more to the point it cannot suppress the smooth scroll
+        on a route change — every navigation would glide to the top of the new
+        page instead of arriving at it.
+      */
+      data-scroll-behavior="smooth"
+      className={`${fraunces.variable} ${satoshi.variable} ${dancingScript.variable} h-full`}
     >
       <body className="min-h-full">
+        {/*
+          First in the body so the veil and its pre-paint decision script are
+          parsed before anything else can paint on a slow connection. Its
+          z-order, not this source position, is what puts it above the fixed
+          banners. It renders nothing for repeat visits, reduced motion, or
+          JavaScript off.
+        */}
+        <BrandIntro />
         <a
           href="#content"
           className="focus:bg-forest focus:text-cream label rounded-edge sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-3"

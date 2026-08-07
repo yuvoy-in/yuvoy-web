@@ -2,13 +2,19 @@
 
 Single source of truth for visual design. **Every color, font, radius and tracking value used in the app must map to a token here.** Never invent a value that falls between tokens — add a token (with review) instead.
 
-Direction: **editorial, rectangular, confident.** Heavy geometric display type against wide-tracked mono labels; cream editorial surfaces alternating with forest immersive ones; hairline rules doing the work that boxes and shadows do elsewhere. Generous space, fast interactions, slow entrances.
+Direction: **editorial, rectangular, confident.** Geometric display type against wide-tracked caps labels; cream editorial surfaces alternating with forest immersive ones; hairline rules doing the work that boxes and shadows do elsewhere. Generous space, fast interactions, slow entrances.
 
 > **Brand Kit v2** (ratified 2026-08-01) supersedes v1. v1 was Fraunces + pill geometry on a warmer cream; v2 moves to Poppins + IBM Plex Mono and a rectangular geometry, retuning the palette to match. Rationale and the full contrast table are in §1.
 >
 > **v2.1 (2026-08-03)** replaces the two darks, `teal` `#0D3B3E` and `ink` `#22302E`, with a single `forest` `#16362E`. Nothing else changed.
 >
 > **v2.2 (2026-08-03, owner-directed)** replaces the display face: Poppins → **Instrument Serif**, the editorial serif the narrative-landing rebuild is set in. Owner brief: anything but the palette may change in service of a more premium register. The serif ships one weight (400 + italic), so display type is `font-normal` always — mass comes from size and leading, and there is no faux-bold to reach for. The wordmark deliberately stays on the sans (Inter semibold) so the mark reads engineered against the serif's warmth. Palette untouched. Adds `--radius-device` (§4) and the preview-surface rule (§8).
+>
+> **v2.3 (2026-08-05, owner-directed, skill-audited)** retires the serif stack entirely: Instrument Serif / Inter / IBM Plex Mono → **Cabinet Grotesk (display) + Satoshi (everything else)**, self-hosted from `src/fonts` via `next/font/local`. Driver: repeated external feedback that the site read as AI-generated, confirmed by the installed design skills — Instrument Serif is a named LLM-favourite face, the serif-over-Inter-with-mono-eyebrows structure is the documented generated-page house style, and headline emphasis by italic style-switch is a listed tell. Display is **medium (500)** with **700 reserved for the turn**; the turn is now **bold + colour in the same family, never italic** (no italic file exists); labels leave the mono for tracked Satoshi caps; buttons pick up `tracking-label`. Five font files total, no Google Fonts dependency. Palette untouched — the skills sanction deep green + bone + warm accent as a premium family.
+>
+> **v2.4 (2026-08-05, owner-directed)** swaps the display face only: Cabinet Grotesk → **Poppins** (600 + 700), taken from the original landing prototype kept in `claude-artifacts/`. This is the Brand Kit v2 display face returning — v2 shipped Poppins, v2.2 replaced it for a more premium register, v2.3 replaced that with Cabinet Grotesk. The owner asked to try it again on headlines **only**, so the prototype's Inter and IBM Plex Mono do **not** come back: Satoshi still carries body, UI, labels and the wordmark. Display weight moves from `font-medium` (500) to `font-semibold` (600), since those are the two files that ship. Poppins is also Indian Type Foundry, so both families share a foundry. Four font files total.
+>
+> **v2.5 (2026-08-06, owner-confirmed)** ends the search: display becomes **Fraunces**, the open-license member of the soft-serif family (Canela / Recoleta / GT Super) that premium travel and island-hospitality brands set their identities in — chosen over roughly 350 candidates across seven review rounds. It ships as a **variable font tuned into the site's own cut**: `opsz` 144, `SOFT` 75, `WONK` 0, pinned on the `font-display` utility itself via `--font-display--font-variation-settings`. Display weight is **400** (`font-normal`, owner pick from a six-weight strip); the turn is a **true drawn italic** at `--font-weight-turn` (480) via `italic font-turn` — the signature stops being a synthesized oblique. Display tracking moves to `--tracking-display` (-0.01em). Satoshi unchanged as the text voice. Five files total (two Fraunces variable + three Satoshi); `font-semibold` is banned everywhere again.
 
 ## 0. Architecture rule
 
@@ -20,15 +26,16 @@ Direction: **editorial, rectangular, confident.** Heavy geometric display type a
 
 Brand Kit v2. Every ratio below is measured (sRGB relative luminance, WCAG 2.2) — not estimated.
 
-| Token        | Hex       | Role                                                      |
-| ------------ | --------- | --------------------------------------------------------- |
-| `cream`      | `#F4EFE4` | Canvas — default page background                          |
-| `cream-deep` | `#ECE5D6` | Raised surfaces — cards, inputs, panels on cream          |
-| `cream-line` | `#E5DCC9` | Hairline borders on cream                                 |
-| `forest`     | `#16362E` | Primary ink **and** every dark surface (11.44:1 on cream) |
-| `terra`      | `#BE7149` | Accent — decoration and LARGE display text only (3.24:1)  |
-| `terra-deep` | `#985028` | Text-capable accent + primary CTA fill (5.21:1 on cream)  |
-| `terra-soft` | `#D89772` | Accent text on forest (5.36:1)                            |
+| Token        | Hex       | Role                                                           |
+| ------------ | --------- | -------------------------------------------------------------- |
+| `cream`      | `#F4EFE4` | Canvas — default page background                               |
+| `cream-deep` | `#ECE5D6` | Raised surfaces — cards, inputs, panels on cream               |
+| `cream-line` | `#E5DCC9` | Hairline borders on cream                                      |
+| `forest`     | `#16362E` | Primary ink **and** every dark surface (11.44:1 on cream)      |
+| `terra`      | `#BE7149` | Accent — decoration and LARGE display text only (3.24:1)       |
+| `terra-deep` | `#985028` | Text-capable accent (5.21:1 on cream); never a CTA fill        |
+| `terra-soft` | `#D89772` | Accent text on forest (5.36:1)                                 |
+| `device`     | `#0A100E` | **The preview bezel only** — an object's colour, not a surface |
 
 ### Measured contrast
 
@@ -39,7 +46,7 @@ Brand Kit v2. Every ratio below is measured (sRGB relative luminance, WCAG 2.2) 
 | `terra-deep` on `cream-deep` | 4.77:1  | AA body                     |
 | `terra` on `cream`           | 3.24:1  | **large text only** (≥24px) |
 | `terra` on `cream-deep`      | 2.96:1  | **fails everything**        |
-| `cream` on `terra-deep`      | 5.21:1  | AA body — the primary CTA   |
+| `cream` on `terra-deep`      | 5.21:1  | AA body                     |
 | `cream` on `forest`          | 11.44:1 | AA + AAA body               |
 | `terra-soft` on `forest`     | 5.36:1  | AA body                     |
 
@@ -79,8 +86,10 @@ for body copy, labels, nav, or button text.
   gets a failing accent with no warning, which is exactly what happened to the
   operators section — put the section on `cream` and raise its inner panels to
   `cream-deep` instead, which is how that section is now built.
-- Accent **fills** (the primary CTA) → `bg-terra-deep text-cream`. A `terra`
-  fill with any text on it fails AA; this is why the CTA is the deeper tone.
+- Accent **fills** are not a thing any more. CTAs are monochrome (§5): forest
+  on cream surfaces, cream on forest ones. A `terra` fill with text on it fails
+  AA, and the `terra-deep` fill that used to carry the CTA was retired on
+  2026-08-05 as a template tell.
 
 ### The opacity ladder (measured, not guessed)
 
@@ -99,16 +108,21 @@ Borders and fills are exempt from these floors — `border-forest/20`, `bg-fores
 
 ## 2. Typography
 
-- **Display — Instrument Serif** (`font-display`), single weight 400 + italic. Headlines are set large, light and tight (`font-normal tracking-tight`, leading ≈1.0) — the serif carries mass through **size**, never weight. `font-bold`/`font-extrabold` must never appear with `font-display`: the face has no bold, and the browser would synthesise an ugly one. **Italic is reserved for the terracotta "turn"** — the second thought of a headline — which stays the brand's most recognisable typographic move. Do not use italic display type for anything else.
-- **UI / body — Inter** (`font-sans`, the default). Bold weights live here.
-- **Label — IBM Plex Mono** (`font-mono`) via the `label` utility: uppercase, `text-xs`, `font-medium`, `tracking-label` (0.18em). Eyebrows, nav, stats, metadata, button labels. The engineered counterweight to the serif's warmth.
-- **`eyebrow` utility** — the `label` preceded by a short terracotta rule (a 1.75rem hairline). This is the section-opening gesture; **use it once per section**, at the top. Eyebrows are plain phrases: no act numbering (owner direction 2026-08-03).
-- **Wordmark** — `tracking-wordmark` (0.34em) on **sans** semibold caps (v2.2): the serif is the site's voice, the sans mark is the object that signs it. See `<Wordmark />`, which also carries the official mark and the "Experience more." kicker.
+- **Display — Fraunces, the Yuvoy cut** (`font-display`; variable, axes pinned by the utility). Headlines are set large and light (`font-normal tracking-display`, leading ≈1.02–1.05) — character comes from the letterforms, never from shouting. `font-medium`/`font-semibold`/`font-bold` must never appear with `font-display`: the display system is exactly two voices — `font-normal` (400) upright, and the turn at `italic font-turn` (480). `font-semibold` is banned everywhere (Satoshi ships no 600). **The italic terracotta turn** — the second thought of a headline, `italic font-turn` + accent colour — is the brand's most recognisable typographic move, and since v2.5 it is a **true drawn italic** (Fraunces ships the file). Italic remains reserved for turns inside display type; body text never slants — Satoshi has no italic file and emphasis there is `font-bold` upright.
+- **UI / body — Satoshi** (`font-sans`, the default), weights 400 / 500 / 700. There is no 600, so `font-semibold` must never appear on body text (the browser would synthesise it). Emphasis in running text is `font-bold`.
+- **Label — Satoshi** via the `label` utility: uppercase, `text-xs`, `font-medium`, `tracking-label` (0.18em). Eyebrows, nav, stats, metadata, button labels. The mono was retired in v2.3 — it read as terminal, not magazine.
+- **`eyebrow` utility** — the `label` preceded by a terracotta dot, the same square `size-1` marker the fact rows use (a hairline rule until 2026-08-05, replaced by owner direction). This is the section-opening gesture; **use it once per section**, at the top. Eyebrows are plain phrases: no act numbering (owner direction 2026-08-03). The one exception is the cover: the hero's opening line is a plain `label` with no marker (owner direction 2026-08-05).
+- **Wordmark** — the owner-delivered **horizontal lockup** (2026-08-06): ensō + terra dot, tracked YUVOY caps, handwritten "Experience more." and its underline, one drawing. `<Wordmark />` renders two surface variants generated by `scripts/generate-header-lockup.mjs` (cream/terra-soft on forest; forest/terra-deep on cream — the §1 pairings) and cross-fades them, so the header's colour change never waits on a fetch. Never hand-edit the generated SVGs. `--tracking-wordmark` survives for the veil's place-name line.
 - **Punctuation** — rendered copy never uses an em dash. Prefer a period, a colon, a comma or a parenthetical; ranges and pairings use a middot (owner direction 2026-08-03). Code comments are exempt.
-- **Launch timing** — never name a month. The season is described evocatively ("opening when the water clears", "when the sea turns to glass").
-- **The mark** — the official ensō (white brush ring + terracotta dot), always on its **forest tile**. The delivered source (`public/yuvoy-logo.png`) has an opaque black field, so the committed display assets are derived by `scripts/generate-brand-assets.py` (screen-blend onto forest, glow soft-knee, auto-crop): `public/brand/yuvoy-mark.png` (UI + OG), `src/app/icon.png` and `src/app/favicon.ico`. Re-run the script if the source logo is ever replaced; never hand-edit the derived files.
+- **Launch timing** — never name a month. The hero states it plainly ("Opening soon", owner direction 2026-08-05); deeper copy may describe the season evocatively ("when the water clears", "when the sea turns to glass").
+- **The mark** — the official ensō (brush ring + terracotta dot), **cut out, never tiled**. The delivered source (`design/brand-source/yuvoy-logo.png`) is white strokes on an opaque black field, so every display asset is derived by `scripts/generate-brand-assets.py`; never hand-edit them, and re-run it if the source is replaced.
+  - `yuvoy-mark-on-light.png` / `yuvoy-mark-on-dark.png` — transparent cut-outs, forest and cream strokes. **These are what the UI uses.** Two files rather than one recoloured file because a cream ensō is invisible on cream and a forest one is invisible on forest. `WaveMark` renders both and cross-fades on opacity, so the header's colour change never waits on a fetch.
+  - **Icons are generated from the vector by `scripts/generate-icons.mjs`** (2026-08-07): `src/app/icon.svg` (the primary favicon), `src/app/icon.png` (512, Android + the `Organization` logo), `src/app/apple-icon.png` (180), `src/app/favicon.ico` (16/32/48 PNG-in-ICO) and `public/brand/yuvoy-mark.png` (the OG card's mark). All carry the forest tile, because a favicon is drawn on a browser tab whose colour we do not control — **a tile must never appear in the page itself**; on a forest section it draws a green box around the mark. They previously came from the raster pipeline, which left a soft rectangular halo around the terracotta dot; the vector has none. Never hand-edit an output; re-run the script.
+  - The script resamples by **area averaging, not bilinear**. Bilinear is a magnifying filter; shrinking with it discards most of the source pixels and is what made the mark look coarse and its brush strokes break up. Masks are measured off the source, not guessed.
+  - **Delivered masters live in `design/brand-source/` and `design/photography-source/`, never under `public/`** (2026-08-07): anything in `public/` is deployed and publicly fetchable, and 4.6MB of print-weight PNGs were shipping on every deploy for no reason. Scripts read them from there.
+- **Vector assets** are derived from the delivered master `public/yuvoy-logo-vector.svg` by `scripts/generate-vector-brand.mjs`: `public/brand/yuvoy-mark-vector-{cream,forest}.svg`, `public/brand/yuvoy-lockup-vector-{cream,forest}.svg`, and the intro's per-letter module `src/components/brand/yuvoy-letter-paths.ts`. The tagline is stripped from all of them, and the delivered colours are re-expressed as tokens (cream or forest strokes, `terra` dot). Never hand-edit the outputs; re-run the script.
 
-Scale: Tailwind's type scale. Headlines `font-display`; everything else inherits Inter unless it is a label.
+Scale: Tailwind's type scale. Headlines `font-display`; everything else inherits Satoshi unless it is a label.
 
 ## 3. Motion
 
@@ -121,7 +135,11 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 
 - Tokens: `--ease-interaction` (`cubic-bezier(0.32,0.72,0,1)`), `--ease-cinematic` (`cubic-bezier(0.22,1,0.36,1)`). The cinematic curve's second control point was `0.16` until 2026-08-04, which made every entrance climb to full, sag back and climb again — a wobble halfway through the motion. If an entrance ever looks unsettled, check this number first.
 - CSS entrance: the `emerge` utility, used **only** for the homepage cover's first paint. It moves three properties at once — scale (toward the viewer), translate (settling) and blur (pulling into focus) — so the composition surfaces from depth rather than sliding up, and the blur clears at 65% so the type is sharp while it is still settling. It ships zero JS.
-- **No scroll-triggered motion.** Sections render in place, fully visible, the moment they are reached. The `<Reveal>` component and the operator grid's draw-on-scroll strike were both removed on owner direction (2026-08-03): content that animates itself into view reads as decoration, and on a pitch page it delays the thing the reader came for. Do not reintroduce either without that decision being revisited.
+- **The site menu opens like a shutter**: `menu-shutter` unrolls the panel from its top edge with `clip-path` (420ms, cinematic) and rolls it back up to close (320ms, quicker — waiting on a dismissal you already asked for reads as lag). `SiteMenu` holds the dialog open until the closing shutter has run, and skips that wait under reduced motion, where there is nothing to wait for.
+- **The brand veil (`BrandIntro`) is the site's entrance**, and the one composition allowed above the `emerge` budget: once per tab session, a night-water scene (film-gradient field, the comp's island horizon at the foot, particle swells rolling in from each edge and dying before the centre, grain) on which the mark surfaces, the wordmark's letterforms arrive in the cover's own emerge grammar, "Experience more." is written on in the veil-only handwriting face (`--font-script`, the one sanctioned use), a sloped calligraphic swash underlines it as the word finishes, and the island's name signs the foot of the frame (~3.4s all told, timeline in `globals.css`). The exit is the emerge grammar reversed — the camera pushes through the dissolving veil — and it hands off: the cover's `emerge` entrance is suspended (`animation: none`, fail-open visible) while the veil holds `data-intro-wait`, then re-applies from zero at exit start, so the hero surfaces through the dissolve. Page scroll is locked by the component only while it plays, never by pre-hydration code, so a hydration failure cannot strand a locked page. It is theatre over a live page, never a loading gate: the page renders and settles behind it, CSS alone runs and ends it, an inline script decides **before first paint** that repeat sessions, reduced motion and no-JS visitors never see it, and any keypress dismisses it on the interaction budget. It must never be given work to do — no data fetching, no font waiting, no route gating — and its session key is `yuvoy.intro-played`.
+- **The header wears the cover's colours at the very top** of a route whose first section is dark (`data-dark-hero`, currently `/` and `/go/*`): transparent bar, cream contents. Any scroll away from the top returns the solid bar (owner's choice, 2026-08-04, over tracking the whole cover). The swap is invisible in practice because it happens while the header is hidden — the only cross-fade seen is the deliberate one at the top edge. The cover carries `-mt-14` so it reaches up behind the bar; without that, "transparent" would show the page background rather than the cover.
+- **The header is the one exception to the no-scroll-motion rule** (owner direction, 2026-08-04): it slides out of the way going down the page and returns going up, via the `header-slide` utility and `HeaderShell`. It answers a gesture rather than decorating an arrival, which is why it sits in the interaction budget (250ms) and not the entrance one. It never hides near the top, always returns on focus, and does not run at all under reduced motion.
+- **No other scroll-triggered motion.** Sections render in place, fully visible, the moment they are reached. The `<Reveal>` component and the operator grid's draw-on-scroll strike were both removed on owner direction (2026-08-03): content that animates itself into view reads as decoration, and on a pitch page it delays the thing the reader came for. Do not reintroduce either without that decision being revisited.
 - JS motion: **none.** `motion/react` has no consumers, and `<MotionConfig>` was removed with its last one. If a genuine need for JS animation returns, restore `<MotionConfig reducedMotion="user">` in `providers.tsx` in the same change — it is what makes Motion honour the OS preference, which CSS-level reduced-motion cannot do for it.
 - **Reduced motion is handled globally**, once, in `globals.css`: a `prefers-reduced-motion: reduce` block neutralises every animation and transition. Individual components must not add their own reduced-motion branch — if a component needs one, the global rule is wrong and should be fixed instead.
 - Smooth scroll: **not implemented, and out of scope.** Lenis was removed in v2 rather than left as a dependency implying a feature that did not exist.
@@ -130,21 +148,29 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 
 - **Radius: `rounded-edge` (2px) — the editorial near-square.** Buttons, inputs, cards and panels all share it. **Pills are not part of the system** (v1 used them; v2 does not).
 - **`--radius-device` (2.25rem) — the one rounded object in the system**: the Season One phone-preview frame. It depicts hardware, not UI; nothing else may use it. (Tiny `rounded-full` dots inside the preview depict hardware/avatars and share this exemption.)
+- **`bg-device` — the bezel's near-black**, on that same frame and nothing else (owner direction, 2026-08-06). `forest` was tried and reads green at 4px of bezel. This is **not a second dark surface**: it is what a phone's frame is made of, and `Section` still offers one dark tone and no choice to make. `palette.test.ts` pins that exactly one element in `src` carries `bg-device`, and that it is darker than `forest` — the moment a section takes it, the site has two darks again. Not pure `#000`, which sits harder than anything else on the page and rims the frame against cream.
+- **The bezel's padding and the screen's radius are one measurement.** The screen is `calc(var(--radius-device) - <bezel padding>)`; change the padding without the radius and the two curves stop being concentric, which shows as an uneven bezel at the corners.
+- **`device-frame` — the one gradient and the one shadow in the system**, on that same frame and nothing else (owner direction, 2026-08-06). The frame is an object resting on the page rather than a panel drawn on it, which is the whole reason it may be lit or cast at all. It carries a diagonal rail gradient, a 1px specular edge and a top highlight (so it reads as milled metal rather than a border), then two soft drop shadows — a tight contact one and a wide ambient one with negative spread so it cannot bloom into a halo. Every value is a `color-mix` on a token: the highlights are `cream` lifting `device`, and the shadows are `forest`, never black, which would grey the cream under it. `device-key` draws the volume and wake buttons from the same mix. Everywhere else, hairlines still do the work shadows do elsewhere.
 - Spacing: Tailwind v4 dynamic scale (multiples of `0.25rem`). Stay on the scale.
 - Control heights: `sm` 36px (`h-9`), `md` 44px (`h-11`), `lg` 52px (`h-13`). Inputs are 48px (`h-12`).
+- **The header is 56px (`h-14`)**, and the menu panel's top bar matches it exactly — same height, same `container-page` gutters, same negative margin on the button — so the close button lands on the pixel the trigger occupied. Anything that offsets for the header (`scroll-mt-14`, the cover's `100dvh-3.5rem`) follows this number; change them together.
 - **Page measure: `container-page`** — `max-w-page` (70rem) with `px-6 sm:px-10` gutters. Every full-width section uses it; prose pages may narrow further (`max-w-2xl`).
 - **Editorial grid: `grid-page`** — 4 columns on mobile, 8 from `sm`, 12 from `lg`, with responsive gutters. Place children with `col-span-*` per breakpoint. Use it for content-heavy pages (destinations, journal, comparison layouts); simple stacked sections do not need it.
 
 ## 5. Components (current)
 
-- **`Button`** — variants `primary | outline | ink | ghost | outlineOnDark`, sizes `sm | md | lg`. Labels are uppercase mono.
-  - **`primary` and `outline` are the first-class pair.** Every screen should use those two; a page with three competing button styles is a bug.
-  - `ink` (solid forest), `ghost` (text-only) and `outlineOnDark` (secondary on forest sections) are **situational** — allowed, but justify them in review.
+- **`Button`** — variants `primary | outline | paper | ghost | outlineOnDark`, sizes `sm | md | lg`. Labels are uppercase bold at `tracking-label`; hover lifts a pixel, press compresses (`active:scale`), and the trailing arrow eases forward — all on `--ease-interaction`.
+  - **CTAs are monochrome** (owner direction 2026-08-05): on cream surfaces the pair is `primary` (solid forest) + `outline`; on forest surfaces it is `paper` (solid cream) + `outlineOnDark`. Both fills are 11.44:1. **Terracotta is never a button fill** — it is the accent for type, dots and marks; the old terra-deep CTA was retired as a template tell.
+  - `ghost` (text-only) is **situational** — allowed, but justify it in review. The former `ink` variant is gone: `primary` now is the forest fill.
   - Use `buttonVariants()` to style a `<Link>` as a button; `<ButtonArrow />` for the trailing arrow on a forward action.
 - **`Input`** — `rounded-edge` field on `cream-deep`, terra-deep focus ring.
 - **`WaveMotif`** — the three-line wave glyph, the island signature. Decorative accent only, at most once per section; tone follows the surface.
-- **`Wordmark`** / **`WaveMark`** — the official ensō mark on its forest tile, wordmark, "Experience more." kicker. `tone="onDark"` adds a hairline ring so the tile stays legible on forest surfaces.
-- **`SiteHeader`** / **`SiteFooter`** / **`MobileMenu`** — the shell, rendered by the root layout on every route. All navigation comes from the registry (§7).
+- **`Wordmark`** — the horizontal lockup, self-sized by a height class (`h-9` default; the footer passes `h-10`). `tone` follows the surface. The square cut-out marks still ship in `public/brand/` for the favicon, app icon and OG card; `WaveMark` (the standalone square-mark component) was removed with the lockup switch — nothing rendered it.
+- **`BrandIntro`** — the brand veil (§3), rendered first in the root layout's body. Owns only the pre-paint decision script and the post-play cleanup; every visual decision lives in `globals.css` under the `intro-*` classes.
+- **`SiteHeader`** / **`SiteFooter`** / **`SiteMenu`** — the shell, rendered by the root layout on every route. All navigation comes from the registry (§7).
+- **`DestinationPanel` / `DestinationGrid`** — the editorial plate and the triptych. The whole plate is the link (one target, not a heading plus a "read more" to the same page), edges are sharp, and the desktop stagger applies **only to a full row of three** — it is what makes three plates a composition, and on two or on four that wrap it just reads as a plate that slipped, so it is derived from the count rather than left as a prop.
+- **`ExperienceCategoryGrid`** — deliberately lighter than the triptych, and deliberately **not links**: four panels pointing at one anchor are four repeated links, and there is no per-category page because there is no inventory. One call to action beneath the grid instead.
+- **`FaqAccordion`** / **`StatusNotice`** — native `<details>`/`<summary>` (the browser owns the keyboard behaviour; the `faq-summary` utility kills the marker in Blink _and_ WebKit), and the compact panel that replaced the full-section "what this is not" blocks. A status notice is visible and never dominant: if it needs a heading and a list, the copy is too long and belongs in the FAQ.
 - Growing set: ExperienceCard, FeedPlayer, AvailabilityPicker, PriceBreakdown (as screens land).
 
 ## 6. Accessibility (release gate)
@@ -160,11 +186,46 @@ WCAG 2.2 AA, enforced not assumed:
 
 ## 7. Navigation registry
 
-`src/lib/site/nav.ts` is the single source of truth for every navigable route. The header, the mobile menu and the footer are all derived from it.
+`src/lib/site/nav.ts` is the single source of truth for every navigable route. The header, the site menu and the footer are all derived from it.
 
 - **A route is added to the registry in the same PR that ships its page** — never before. This makes a link to a non-existent page structurally impossible.
+- **The header names three routes and the call to action** (owner direction, 2026-08-06): Explore, For Operators, About, then Join Waitlist, inline from `lg` up. **Adding a fourth nav item is a design change, not a routing one** — it goes through review, and `e2e/shell.spec.ts` pins the link count so it cannot arrive by accident.
+- **Below `lg` the bar carries two things: the mark and the menu trigger.** It carried a centred operator link and a small CTA button until 2026-08-06; three competing targets in 64px reads as a toolbar rather than a masthead, and left the mark no room. Both live in the shutter menu now, where the CTA is pinned at full size at the foot of the panel.
+- **Journal stays out of the desktop bar** until there is enough of it to earn a slot. It is in `MENU_ITEMS` and the footer meanwhile. `inHeader`, `inMenu` and `footer` are set explicitly per route rather than derived — the menu carries Safety (a Trust-column route) and omits the legal pages (pinned separately), and every derived rule got one of those wrong.
+- **The site is addressed to travellers by default.** The homepage, and any future page that does not say otherwise, speaks to them; the operator _case_ belongs on `/operators`. The homepage carries a three-sentence introduction and one way out to it (`OperatorTeaser`) — that is the bound, and `e2e/home.spec.ts` holds it: no operator form, no audience picker, no tooling argument. A page that pitches both audiences at once ends up asking the visitor to self-identify before it has earned the right to (see `LeadForms`' `audiences` prop, which is how a page commits to one).
 - Footer columns with no entries are dropped rather than rendered empty.
 - `CONTACT_CHANNELS` is empty by design: an unmonitored address is worse than none, so the footer omits the whole row until a real channel is confirmed.
+
+### The information architecture (2026-08-06)
+
+Four pages — `/destinations`, `/experiences`, `/how-it-works`, `/travellers` —
+were one question answered in four places, so a visitor who read all of them
+met the same three benefits four times. They are now four sections of
+`/explore` and redirect onto it.
+
+Those redirects are **307, not 308, on purpose**. A browser caches a permanent
+redirect indefinitely, which would make the consolidation irreversible on every
+machine that ever saw one. They are promoted to permanent only once the shape
+has held for a season. (`/destinations/neil` → `/destinations/neil-island` _is_
+308: that is a canonical slug fix, not a structural bet.)
+
+Permanent public structure: `/` · `/explore` · `/operators` · `/about` ·
+`/safety` · `/journal` · `/waitlist` · `/privacy` · `/terms` ·
+`/destinations/[slug]`.
+
+### Destinations are data, not pages
+
+`src/lib/site/destinations.ts` is the only place a destination is described.
+The homepage triptych, Explore, the destination pages and the OG cards all read
+from it. **Adding a second market is an entry there plus one in the lead
+registry** — no component knows Andaman is the current launch, only that a
+destination has a `launchStatus`. Copying a blurb into a page file is the bug
+this shape exists to prevent.
+
+`heroMedia` is optional on both destinations and experience categories: with no
+image a panel renders as an editorial type plate, with one it renders as a
+full-bleed photograph plus a measured scrim. Photography is a data change and
+needs no redesign.
 
 ## 8. Figma / prototype → code
 
@@ -174,9 +235,16 @@ No Figma. The reference is the [pre-launch landing artifact](https://claude.ai/p
 
 ### The preview surface (owner-approved exception, 2026-08-03)
 
-The homepage's **Season One phone preview** is the one place illustrative product content may appear — prices, seat counts, operator lines — under three conditions, all enforced:
+The **Season One phone preview** (`ProductDemo`) is the one place illustrative product content may appear — prices, seat counts, operator lines — under three conditions, all enforced:
 
-1. The frame is **visibly labelled** ("Season One preview") and its wrapper carries `data-preview`; the homepage e2e guard bans invented numbers everywhere _outside_ that wrapper.
+0. **At most one per page.** It appears twice on the site — the homepage's why act and `/explore`'s how-it-works section — and each page carries exactly one, asserted by `e2e/home.spec.ts` and `e2e/explore.spec.ts`. Its rail copy may differ per page through `actCopy` (the homepage's headline has already made the argument, so the rail is a caption; `/explore` _is_ the explanation, so it is specific). Only the sentence changes: the acts, the script and the timings are the same object on both, because a page may describe the tour differently and must never restage it.
+
+1. The frame is **visibly captioned** ("Sample preview") and its wrapper carries `data-preview`; the frame's accessible name states outright that nothing is bookable yet, and the e2e guards ban invented numbers everywhere _outside_ that wrapper (see `e2e/support/text.ts`, which also strips Next's dev-mode RSC payload — `page.textContent("body")` includes `<script>` text and therefore sees every string twice).
+
+   > The wording moved twice on 2026-08-06 (owner direction): the "Season One preview" badge pinned to the frame, then the longer caption under it, then the present two words. **A caption must stay narrower than the screen it labels** — the long one was wider than a phone, and on a shared `w-fit` wrapper that sized the wrapper to the caption, stretched the frame block to match and left the screen's slack down its right edge. The frame carries its own `w-fit` now, but the rule stands.
+   >
+   > The caption says "sample", not "not bookable". The page's plain-language statement lives in the registration section's first answer — "Can I book something today? No, and we won't pretend otherwise." — which `home.spec.ts` asserts alongside the caption.
+
 2. Its "footage" is **moving colour built from brand tokens** (`film-*` + `caustics` utilities, `color-mix` only) — unmistakably an illustration, never a fake photograph or a real-looking screenshot.
 3. Claims **outside** the preview stay literally true (e.g. the "3 founding operators signed" count is owner-confirmed and must track reality).
 

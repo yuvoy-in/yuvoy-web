@@ -1,48 +1,109 @@
+"use client";
+
 import Link from "next/link";
 import { Wordmark } from "@/components/brand/wordmark";
 import { buttonVariants } from "@/components/ui/button";
 import { NavLinks } from "@/components/site/nav-links";
-import { MobileMenu } from "@/components/site/mobile-menu";
+import { SiteMenu } from "@/components/site/site-menu";
+import { useHeaderChrome } from "@/components/site/use-header-chrome";
 import { cn } from "@/lib/cn";
 import { PRIMARY_CTA } from "@/lib/site/nav";
 
 /**
- * The site header: sticky, compact, present on every route.
+ * The site header: sticky, compact, present on every route, and out of the
+ * way while you read.
  *
- * Deliberately short (64px) so it costs almost no viewport on scroll, and
- * translucent over a blur so long editorial pages read as one surface rather
- * than sliding under a hard bar.
+ * ## What it names
  *
- * It stays a server component and looks identical on every route. An adaptive
- * variant that turned forest over the homepage cover and carried a reading
- * progress bar was tried and reverted (owner direction, 2026-08-03): the
- * plain bar is the one that reads as considered.
+ * From `lg` up: the mark, three routes (Explore, For Operators, About) and the
+ * call to action. Below `lg`: the mark and the menu trigger, and nothing else.
+ *
+ * The phone bar carried a centred operator link and a small waitlist button
+ * until 2026-08-06. Three competing targets in 64 pixels is a toolbar, not a
+ * masthead, and it left the mark fighting for the room that makes it read as a
+ * mark. Both moved into the shutter menu, where the call to action is pinned
+ * to the panel's foot at full size and is the most prominent thing in it —
+ * one tap away rather than zero, and the header reads as a piece of print.
+ *
+ * ## What it does on scroll
+ *
+ * Two behaviours, both owned by `useHeaderChrome`: it slides up as you scroll
+ * down and returns as you scroll back, and at the very top of a page whose
+ * first section is a dark cover it goes transparent and turns its contents
+ * cream, so the top of that page reads as one uninterrupted field rather than
+ * a cream bar stuck on a green wall.
+ *
+ * The layout is a three-column grid rather than a flex row with
+ * `justify-between`, because the centre cell — the nav on desktop — has to sit
+ * at the true centre of the page and not at the midpoint of whatever space the
+ * mark and the button leave over.
  */
 export function SiteHeader() {
+  const { ref, overCover } = useHeaderChrome();
+
   return (
-    <header className="border-cream-line bg-cream/85 sticky top-0 z-40 border-b backdrop-blur-md">
-      <div className="container-page flex h-16 items-center justify-between gap-6">
+    <header
+      ref={ref}
+      data-hidden="false"
+      className={cn(
+        "header-slide sticky top-0 z-40 border-b backdrop-blur-md",
+        overCover
+          ? "border-transparent bg-transparent"
+          : "border-cream-line bg-cream/85",
+      )}
+    >
+      <div className="container-page grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4">
+        {/*
+          The mark sits on the bar's baseline, not in its middle (owner
+          direction, 2026-08-07): `self-end` overrides the row's `items-center`
+          for this cell alone, and `pb-1` is the optical gap — a lockup flush
+          against a hairline reads as a mistake, while a few pixels of air
+          reads as type set on a rule.
+
+          The padding is 4px and not 8px because the lockup is 48px in a 63px
+          bar: at `pb-2` the link stood 56px tall and the drawing landed 8px
+          from the top and 9px from the bottom, which is centred with extra
+          steps. The e2e assertion measures the LOCKUP's box rather than the
+          link's, so it cannot be satisfied by padding that moves neither.
+
+          `flex`, not the default: an inline-level child sits on the line box's
+          baseline and the strut reserves descender space under it. That dead
+          space is inside the link, so aligning the link would align the mark
+          *plus* the gap, and the mark would ride high of wherever it was
+          asked to sit.
+        */}
         <Link
           href="/"
           aria-label="Yuvoy home"
-          className="rounded-edge shrink-0"
+          className="rounded-edge flex items-end self-end justify-self-start pb-1"
         >
-          <Wordmark />
+          <Wordmark tone={overCover ? "onDark" : "onLight"} />
         </Link>
 
-        <NavLinks />
+        <div className="justify-self-center">
+          <NavLinks tone={overCover ? "onDark" : "onLight"} />
+        </div>
 
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex items-center gap-2 justify-self-end">
           <Link
             href={PRIMARY_CTA.href}
             className={cn(
-              buttonVariants({ size: "sm" }),
-              "hidden sm:inline-flex",
+              // Monochrome CTAs swap grounds with the bar: paper over the
+              // dark cover, forest on the cream bar.
+              buttonVariants({
+                variant: overCover ? "paper" : "primary",
+                size: "sm",
+              }),
+              // Desktop only. Below `lg` the menu carries it, at full size.
+              "hidden lg:inline-flex",
             )}
           >
             {PRIMARY_CTA.label}
           </Link>
-          <MobileMenu />
+          <SiteMenu
+            tone={overCover ? "onDark" : "onLight"}
+            className="lg:hidden"
+          />
         </div>
       </div>
     </header>

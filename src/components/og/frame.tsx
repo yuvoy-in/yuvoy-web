@@ -93,7 +93,7 @@ export function renderOg({
             style={{
               display: "flex",
               fontSize: 34,
-              fontWeight: 600,
+              fontWeight: 700,
               letterSpacing: "0.34em",
               color: OG.forest,
             }}

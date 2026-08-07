@@ -13,8 +13,11 @@ import { getJournalPosts } from "@/lib/journal/posts";
  *   join this list in the same change that lands approved legal copy and
  *   removes them from the robots disallow list, never before: an indexed
  *   placeholder is worse than a noindexed one.
- * - `/journal`, `/philosophy`, and retired `/experiences/<slug>` detail pages
- *   — 410 Gone. A 410 in a sitemap is a contradiction that slows de-indexing.
+ * - `/philosophy` and retired `/experiences/<slug>` detail pages — 410 Gone.
+ *   A 410 in a sitemap is a contradiction that slows de-indexing.
+ * - `/how-it-works`, `/travellers`, `/experiences`, `/destinations` — folded
+ *   into `/explore` on 2026-08-06 and now redirects. A redirect in a sitemap
+ *   is a crawl budget spent on a URL that no longer answers.
  *
  * Adding a route here without a `page.tsx` is a promise to a crawler we cannot
  * keep, so the e2e suite fetches every URL in this sitemap and fails on
@@ -30,15 +33,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
   }[] = [
     { path: "/", priority: 1, changeFrequency: "weekly" },
+    { path: "/explore", priority: 0.9, changeFrequency: "weekly" },
     { path: "/waitlist", priority: 0.9, changeFrequency: "monthly" },
-    { path: "/how-it-works", priority: 0.8, changeFrequency: "monthly" },
-    { path: "/travellers", priority: 0.8, changeFrequency: "monthly" },
     { path: "/operators", priority: 0.8, changeFrequency: "monthly" },
     { path: "/safety", priority: 0.8, changeFrequency: "monthly" },
     { path: "/about", priority: 0.6, changeFrequency: "yearly" },
+    { path: "/contact", priority: 0.6, changeFrequency: "yearly" },
     { path: "/journal", priority: 0.6, changeFrequency: "weekly" },
-    { path: "/experiences", priority: 0.7, changeFrequency: "monthly" },
-    { path: "/destinations", priority: 0.7, changeFrequency: "monthly" },
     ...posts.map((post) => ({
       path: `/journal/${post.slug}`,
       priority: 0.5,
