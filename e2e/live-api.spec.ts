@@ -15,8 +15,6 @@ import { test, expect } from "./support/session";
  * Rows it creates carry the phone prefix +91900000009* and the name "E2E Live
  * Check" so they are trivially identifiable and removable.
  */
-import { OPERATOR_FORM_LIVE } from "../src/lib/site/launch";
-
 const LIVE = process.env.LIVE_API_E2E === "1";
 
 /**
@@ -111,18 +109,13 @@ test.describe("live API", () => {
   });
 
   /*
-    Skipped while `OPERATOR_FORM_LIVE` is false. The application is a notice
-    rather than a form: the deployed API still requires fields the form
-    stopped asking for (yuvoy-in/yuvoy-api#4), so there is nothing here to
-    submit. **Un-skip this in the change that flips the flag** — it is the
-    test that proves a real provider lead reaches the real API, and it is the
-    reason this file exists.
+    This was `test.skip`-gated on `OPERATOR_FORM_LIVE` while the application was
+    a notice rather than a form: the deployed API still required fields the
+    form had stopped asking for, so there was nothing to submit. That shipped
+    on 2026-08-07 (yuvoy-in/yuvoy-api#4) and the gate came off with the flag.
+    It is the test that proves a real provider lead reaches the real API, and
+    it is the reason this file exists.
   */
-  test.skip(
-    !OPERATOR_FORM_LIVE,
-    "the operator application is a notice until yuvoy-api#4 ships",
-  );
-
   test("a provider registration from a QR route carries its source", async ({
     page,
   }) => {

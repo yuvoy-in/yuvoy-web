@@ -11,6 +11,7 @@ import {
   countryByIso2,
   countryForE164,
   nationalPart,
+  sanitizePhoneInput,
   toE164,
 } from "@/lib/contact/phone";
 
@@ -106,6 +107,43 @@ export function PhoneField({
     onChange(toE164(countryByIso2(nextIso2), typed || displayed));
   }
 
+  /**
+   * Everything typed, pasted, dropped or autofilled into the number cell.
+   *
+   * Sanitising here rather than only on submit is the point: `toE164` already
+   * ignores anything that is not a digit, so `9a0b0c` submitted correctly and
+   * *looked* wrong — a field showing something other than what it will send
+   * (owner report, 2026-08-08). `type="tel"` restricts nothing in any browser;
+   * it only asks for a keypad.
+   */
+  function handleInput(event: React.ChangeEvent<HTMLInputElement>) {
+    const element = event.target;
+    const raw = element.value;
+    const next = sanitizePhoneInput(raw);
+
+    /*
+      React re-renders when something it owns changes, and a rejected keystroke
+      frequently changes nothing: typing a letter into an empty field leaves
+      both `typed` and the E.164 value at "". With no re-render, the character
+      React never accepted would sit in the DOM anyway — the classic controlled
+      -input hole. So put the element back by hand.
+
+      And put the caret back with it. Assigning `value` alone drops it at the
+      end, which turns one fumbled key in the middle of a number into a jump to
+      the end of it. What is restored is the position minus however many
+      characters were dropped *before* it.
+    */
+    if (next !== raw) {
+      const caret = element.selectionStart ?? raw.length;
+      const dropped = caret - sanitizePhoneInput(raw.slice(0, caret)).length;
+      element.value = next;
+      const restored = Math.max(0, caret - dropped);
+      element.setSelectionRange(restored, restored);
+    }
+
+    typeNumber(next);
+  }
+
   function typeNumber(next: string) {
     setTyped(next);
     const e164 = toE164(country, next);
@@ -113,25 +151,32 @@ export function PhoneField({
 
     /*
       A pasted international number overrides the selector (see `toE164`), so
-      the selector has to follow it — otherwise the control would read
-      "India" above a Ukrainian number and the visitor would have no way to
-      tell which one the form believed.
+      the control has to settle back into its two halves — otherwise it reads
+      "India" above a Ukrainian number and the visitor has no way to tell which
+      one the form believed.
 
-      Only on an explicit international paste, and only when the code is one
-      we recognise: re-deriving on every keystroke would fight somebody
-      part-way through typing, since a half-typed number matches whatever
-      country its first digits happen to look like.
+      Only on an explicit international paste, and only when the code is one we
+      recognise: re-deriving on every keystroke would fight somebody part-way
+      through typing, since a half-typed number matches whatever country its
+      first digits happen to look like.
+
+      **The split is released whether or not the country changed** (fixed
+      2026-08-08). It used to be conditional on the country being different,
+      which left the one case nobody tests: pasting `+919000000000` while India
+      was already selected kept the whole international string in the *national*
+      cell, so the field read `+91` `+919000000000`. The submitted value was
+      right and the field looked broken — and it is the most likely paste there
+      is, since India is the default.
     */
     const international =
       next.trim().startsWith("+") || /^0{2}/.test(next.trim());
     if (!international) return;
     const derivedCountry = countryForE164(e164);
-    if (derivedCountry && derivedCountry.iso2 !== iso2) {
-      setIso2(derivedCountry.iso2);
-      // What is displayed is derived from `value`, so the raw paste must be
-      // released or it would keep winning over the national part.
-      setTyped("");
-    }
+    if (!derivedCountry) return;
+    if (derivedCountry.iso2 !== iso2) setIso2(derivedCountry.iso2);
+    // What is displayed is derived from `value`, so the raw paste has to be
+    // released or it would keep winning over the national part.
+    setTyped("");
   }
 
   /*
@@ -247,7 +292,7 @@ export function PhoneField({
         // a doubled dial code.
         autoComplete={isOther ? autoComplete : "tel-national"}
         value={displayed}
-        onChange={(event) => typeNumber(event.target.value)}
+        onChange={handleInput}
         onBlur={onBlur}
         placeholder={country.example}
         aria-invalid={invalid || undefined}

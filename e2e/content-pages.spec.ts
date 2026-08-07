@@ -172,12 +172,10 @@ test("/operators is an application, at the right proportions", async ({
 });
 
 /*
-  While `OPERATOR_FORM_LIVE` is false the application is a notice rather than a
-  form: the deployed API still requires fields this form stopped asking for
-  (yuvoy-in/yuvoy-api#4), so submitting would 400 every applicant. What has to
-  hold either way is that `#apply` exists, says what is happening, and offers a
-  channel that reaches a person today. Swap these assertions back to the form's
-  fields in the change that flips the flag.
+  The application was a "Coming soon" notice rather than a form until
+  2026-08-07, because the deployed API still required fields the form had
+  stopped asking for and answered 400 to every applicant. `yuvoy-in/yuvoy-api#4`
+  shipped and the real form returned to both surfaces at once.
 */
 test("audience pages send each audience to the right form", async ({
   page,
@@ -198,13 +196,15 @@ test("audience pages send each audience to the right form", async ({
     .first()
     .click();
   await expect(page).toHaveURL(/\/operators#apply$/);
-  await expect(page.locator("#apply")).toContainText(/coming soon/i);
-  // A way through to a person, not the channels themselves: the contact band
-  // sits directly beneath this section and carries the address and the number
-  // once (owner direction, 2026-08-07).
+  // The application itself, not a notice standing in for it.
   await expect(
-    page.locator("#apply").getByRole("link", { name: /send us a message/i }),
-  ).toHaveAttribute("href", "/contact");
+    page.locator("#apply").getByLabel("Business name"),
+  ).toBeVisible();
+  await expect(
+    page.locator("#apply").getByRole("button", {
+      name: "Apply as a founding operator",
+    }),
+  ).toBeVisible();
 });
 
 /*

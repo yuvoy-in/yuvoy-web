@@ -400,26 +400,96 @@ test.describe("header on scroll", () => {
   });
 
   /*
-    At the top of a page whose first section is a dark cover the bar is
-    transparent, so the cover reads as one field; anywhere else it is solid.
-    The change happens while the header is hidden, so the only cross-fade a
-    visitor sees is the deliberate one at the top edge.
+    The bar wears the cover for exactly as long as the cover is behind it, and
+    goes solid when the cover's bottom edge passes under it.
+
+    It used to release on a fixed 240px instead, which put a cream bar on a
+    green field partway down every cover route — 504px early on `/operators`,
+    whose cover is 744px tall (owner report, 2026-08-08). So what is asserted
+    is the *relationship* rather than a scroll position: the boundary is read
+    off the cover element, so this keeps holding as the covers change height.
   */
-  test("wears the cover at the top and the bar once you leave it", async ({
+  /*
+    Instant, not the site's own smooth scrolling. What these assert is a
+    geometric relationship — cover edge against bar — and a smooth scroll makes
+    that a race: the "not transparent" assertion resolves the moment the colour
+    changes, which can be mid-animation, and the next `scrollTo` then lands on
+    top of a scroll still in flight. That produced two failures out of three
+    routes at three workers, on logic that is correct at every position (probed
+    directly). The smooth path is the browser's, not ours, and is not what is
+    under test here.
+  */
+  const scrollTo = (page: Page, y: number) =>
+    page.evaluate((to) => window.scrollTo({ top: to, behavior: "instant" }), y);
+
+  /**
+   * The scroll position at which the cover's foot meets the bar's underside.
+   *
+   * Picks the cover that has layout. Under `next dev` a suspended route leaves
+   * a second, `display: none` copy of its markup in the document, and reading
+   * that one reports a 744px cover as 0px (see `support/ready.ts`).
+   */
+  const coverEdge = (page: Page) =>
+    page.evaluate(() => {
+      const cover = [...document.querySelectorAll("[data-dark-hero]")].find(
+        (el) => el.getBoundingClientRect().height > 0,
+      )!;
+      const bar = document.querySelector("header")!;
+      return (
+        window.scrollY + cover.getBoundingClientRect().bottom - bar.offsetHeight
+      );
+    });
+
+  for (const path of ["/", "/operators", "/explore"]) {
+    test(`${path} wears the cover for the whole cover, then the bar`, async ({
+      page,
+    }) => {
+      await page.goto(path);
+      await waitForRouteReady(page);
+      await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
+
+      const edge = await coverEdge(page);
+      expect(edge, `${path} has no cover to speak of`).toBeGreaterThan(200);
+
+      // Well inside the cover — the old rule had already gone cream here.
+      await scrollTo(page, Math.round(edge * 0.6));
+      await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
+
+      // A hair short of the edge: still the cover's colours.
+      await scrollTo(page, Math.max(0, Math.round(edge) - 8));
+      await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
+
+      // Past it: solid, because what is behind the bar is no longer forest.
+      await scrollTo(page, Math.round(edge) + 40);
+      await expect(header(page)).not.toHaveCSS("background-color", TRANSPARENT);
+
+      // All the way home: it returns to the cover's colours.
+      await scrollTo(page, 0);
+      await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
+    });
+  }
+
+  /*
+    The reduced-motion case, which the retired 240px constant existed to serve:
+    the bar never hides for these visitors, so the colour is the only thing
+    that can change — and it must still track the cover rather than releasing
+    early over it.
+  */
+  test("tracks the cover under prefers-reduced-motion too", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/operators");
+    await waitForRouteReady(page);
+
+    const edge = await coverEdge(page);
+    await scrollTo(page, Math.round(edge * 0.6));
+    await expect(header(page)).toBeInViewport();
     await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
 
-    // Down past the cover, then back up far enough to reveal the bar.
-    await page.mouse.wheel(0, 1200);
-    await page.mouse.wheel(0, -400);
+    await scrollTo(page, Math.round(edge) + 40);
     await expect(header(page)).toBeInViewport();
     await expect(header(page)).not.toHaveCSS("background-color", TRANSPARENT);
-
-    // All the way home: it returns to the cover's colours.
-    await page.mouse.wheel(0, -2000);
-    await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
   });
 
   // `/safety`, not `/about`: About gained a dark title spread on 2026-08-07,
@@ -469,6 +539,40 @@ test.describe("header on scroll", () => {
   test("is solid at the top of a page with no cover", async ({ page }) => {
     await page.goto("/safety");
     await expect(header(page)).not.toHaveCSS("background-color", TRANSPARENT);
+  });
+
+  /*
+    A cover route reached the way a visitor actually reaches it: by clicking,
+    not by typing the URL.
+
+    Every other cover assertion here navigates directly, which renders the page
+    on the server and puts the cover in the DOM before the header ever asks
+    about it. A *client-side* navigation to a route that suspends does not:
+    `loading.tsx` renders first, and the header asked its question against that
+    — got "no cover", correctly, for a cream loading screen — and never asked
+    again, because the pathname does not change a second time. The bar then sat
+    cream on top of a forest cover for the whole visit (owner report,
+    2026-08-08).
+
+    `/operators` is the case that showed it. It reads `searchParams`, so it is
+    dynamic and its navigation reliably passes through the fallback; `/go/*` is
+    dynamic for the same reason. A static cover route like `/explore` renders
+    instantly and never exposed the bug, which is why direct-navigation
+    assertions all passed while the defect was on screen.
+  */
+  test("wears the cover after a client-side navigation to a dynamic route", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page
+      .getByRole("banner")
+      .getByRole("link", { name: "For Operators", exact: true })
+      .click();
+
+    await expect(page).toHaveURL(/\/operators$/);
+    // The cover is the first thing on the page, and the page is at the top.
+    await waitForRouteReady(page);
+    await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
   });
 
   test("hides going down and returns going up", async ({ page }) => {

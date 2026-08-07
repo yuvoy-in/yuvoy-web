@@ -250,7 +250,9 @@ test("#providers now carries operators to the application itself", async ({
   // The homepage has no operator form to open any more, so the long-lived
   // anchor must land on the one that does rather than on nothing.
   await expect(page).toHaveURL(/\/operators#apply$/);
-  await expect(page.locator("#apply")).toContainText(/coming soon/i);
+  // And it lands on the application itself, not a notice standing in for it
+  // (yuvoy-in/yuvoy-api#4 shipped 2026-08-07).
+  await expect(page.locator("#apply")).toContainText(/Business name/i);
 });
 
 test("traveller form surfaces validation errors without a network call", async ({
