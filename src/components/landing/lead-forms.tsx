@@ -10,8 +10,6 @@ import { PhoneField } from "@/components/ui/phone-field";
 import { submitLead, type SubmitResult } from "@/lib/leads/api";
 import { useLeadAnalytics } from "@/lib/analytics/use-lead-analytics";
 import { formatForDisplay, phoneIssue } from "@/lib/contact/phone";
-import { OPERATOR_FORM_LIVE } from "@/lib/site/launch";
-import { ApplyComingSoon } from "@/components/operators/apply-coming-soon";
 import { isPlausibleEmail, suggestEmail } from "@/lib/contact/email";
 import {
   LAUNCH_MARKET,
@@ -127,10 +125,12 @@ const travellerSchema = z.object({
  * `whatsapp` also stopped being required, for the same reason it is optional
  * for travellers.
  *
- * **All three relaxations need `yuvoy-in/yuvoy-api#4`**, which marks them
- * required on `ProviderLeadInput`. Until that deploys the API answers 400 —
- * see `unknownFieldErrors` in `ProviderForm`, which makes that failure
- * visible rather than silent.
+ * **All three relaxations shipped on 2026-08-07** (`yuvoy-in/yuvoy-api#4`,
+ * verified against production with the exact email-only payload this form
+ * sends). Until they did, the deployed API answered 400 to every complete
+ * application and this form stood down behind a notice; `unknownFieldErrors`
+ * in `ProviderForm` is what made that failure visible rather than silent, and
+ * it stays for the next rejection nobody predicted.
  */
 const providerSchema = z.object({
   ...sharedSchema,
@@ -150,14 +150,14 @@ type ProviderValues = z.infer<typeof providerSchema>;
 
 /**
  * The form for one audience — the traveller waitlist, or the operator
- * application — and the single place the operator swap is decided.
+ * application.
  *
- * The provider form is replaced by a notice while the API cannot accept what
- * it sends (see `OPERATOR_FORM_LIVE`). That swap lives here rather than at
- * each call site so the surfaces that render it — `/operators`, the
- * `/waitlist` operator tab, and the `#providers` anchor that cached redirects
- * and printed materials still point at — cannot disagree about whether
- * applying works.
+ * The operator side stood as a "Coming soon" notice until 2026-08-07, because
+ * the deployed API still required three fields the form had stopped asking
+ * for and answered `400` to every complete application. `yuvoy-in/yuvoy-api#4`
+ * shipped and the notice went with it; both surfaces that render this — the
+ * `/waitlist` operator tab and `/operators` — got the real form in the same
+ * change, which is the point of there being one component.
  *
  * Exported because `/waitlist` composes the two sides itself: there, the
  * audience switch changes the whole page rather than only the form, so it
@@ -170,11 +170,10 @@ export function LeadFormPanel({
   audience: LeadAudience;
   context: LeadContext;
 }) {
-  if (audience === "traveller") return <TravellerForm context={context} />;
-  return OPERATOR_FORM_LIVE ? (
-    <ProviderForm context={context} />
+  return audience === "traveller" ? (
+    <TravellerForm context={context} />
   ) : (
-    <ApplyComingSoon />
+    <ProviderForm context={context} />
   );
 }
 
@@ -646,10 +645,20 @@ function TravellerForm({ context }: { context: LeadContext }) {
       website: values.website || undefined,
       primaryDestinationKey: attributedDestination,
     });
-    // Server-side field rejections map back onto the form fields.
+    /*
+      Server-side field rejections map back onto the form fields.
+
+      `contact` is the API's name for the "at least one way to reach you" rule
+      rather than for an input (yuvoy-in/yuvoy-api#4). This form always sends
+      an email address, so if that rule ever fails it is the email that was not
+      accepted — which is the field the visitor can do something about.
+    */
     if (res.kind === "invalid") {
       for (const [field, message] of Object.entries(res.fields)) {
-        setError(field as keyof TravellerValues, { message });
+        const target = field === "contact" ? "email" : field;
+        if (target in values) {
+          setError(target as keyof TravellerValues, { message });
+        }
       }
     }
     if (res.kind === "recorded" || res.kind === "updated") {
@@ -778,24 +787,30 @@ function ProviderForm({ context }: { context: LeadContext }) {
     if (res.kind === "invalid") {
       /*
         Server field errors are mapped back onto the form — but **only the
-        fields this form still has**.
+        fields this form actually has**.
 
-        This is the guard for the window before yuvoy-in/yuvoy-api#4 deploys.
-        The API currently marks `coverageDestinationKeys`, `primaryInterest`
-        and `whatsapp` required on a provider lead; this form no longer asks
-        for the first two and no longer requires the third, so a rejection
-        names fields with no input to attach an error to. Handing those to
-        `setError` puts the message on a field that never renders, and the
-        applicant sees the button do nothing at all — the worst failure a form
-        has, because it looks like a bug in their browser.
+        Handing an unknown field to `setError` puts the message on an input
+        that never renders, and the applicant sees the button do nothing at
+        all: the worst failure a form has, because it looks like a bug in
+        their browser.
 
-        Anything unrecognised is raised to the form's own error state instead,
-        where it is visible and truthful.
+        **`contact` is the one that matters now** (yuvoy-in/yuvoy-api#4). The
+        API reports "no way to reach you" on that name rather than on
+        `whatsapp`, precisely because a form may no longer render a WhatsApp
+        input to point at — so it names the rule, not a field. The rule is
+        about the email address here, since that is the channel this form
+        requires, so the message goes there where it can be acted on.
+
+        Anything else unrecognised is raised to the form's own error state,
+        where it is visible and truthful rather than swallowed. That guard
+        earned its keep once already, in the window before #4 deployed.
       */
       const unknown: string[] = [];
       for (const [field, message] of Object.entries(res.fields)) {
         if (field in values) {
           setError(field as keyof ProviderValues, { message });
+        } else if (field === "contact") {
+          setError("email", { message });
         } else {
           unknown.push(message);
         }
@@ -887,10 +902,12 @@ function ProviderForm({ context }: { context: LeadContext }) {
       />
 
       {/*
-        Server-side rejections that name a field this form does not render.
-        Until yuvoy-in/yuvoy-api#4 deploys, that is what a valid application
-        gets back — so it is shown, plainly, rather than being swallowed by a
-        `setError` call on an input that is not on screen.
+        Server-side rejections that name a field this form does not render and
+        that is not the `contact` rule handled above. Shown plainly rather than
+        swallowed by a `setError` call on an input that is not on screen — the
+        failure mode this caught in the window before yuvoy-in/yuvoy-api#4
+        deployed, when every valid application was rejected on three fields the
+        form no longer had.
       */}
       {unknownFieldErrors.length > 0 && (
         <div

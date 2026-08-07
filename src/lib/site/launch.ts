@@ -54,22 +54,15 @@ export const FOOTER_STATUS = "Opening first in the Andaman Islands.";
 export const EXPANSION_STATUS =
   "First launch now being prepared · More destinations joining later";
 
-/**
- * Whether the founding-operator application can actually be submitted.
- *
- * **False, and this is not a design choice.** The public form stopped asking
- * "Where do you operate?" and "What do you offer?" on 2026-08-07 (owner
- * direction), and stopped requiring a WhatsApp number in the same change. The
- * deployed API still marks all three required on a provider lead, so a
- * complete, valid application is answered with a 400.
- *
- * Given the choice between a form that silently rejects every operator who
- * fills it in and an honest "coming soon" beside two channels that reach a
- * person today, the second is the only defensible one.
- *
- * **Flip this to `true` when `yuvoy-in/yuvoy-api#4` deploys**, and delete it
- * once the form has shipped — a permanent flag is a permanent question about
- * which half of the code is real. The traveller waitlist is unaffected and
- * works today: everything it sends is already accepted.
- */
-export const OPERATOR_FORM_LIVE = false;
+/*
+  `OPERATOR_FORM_LIVE` used to live here, false, because the deployed API still
+  required "where do you operate?", "what do you offer?" and a WhatsApp number
+  that the public form had stopped asking for — so a complete, valid
+  application was answered `400`.
+
+  That shipped on 2026-08-07 (yuvoy-in/yuvoy-api#4, verified against production
+  with the exact email-only payload this form sends), and the flag was deleted
+  along with the "Coming soon" notice it gated, rather than left behind at
+  `true`: a permanent flag is a permanent question about which half of the code
+  is real.
+*/

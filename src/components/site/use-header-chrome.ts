@@ -21,39 +21,50 @@ import { usePathname } from "next/navigation";
  *   motion preference itself is the bug that silently disabled this whole
  *   behaviour once already.
  *
- * **It wears the cover's colours at the very top of a page that has one.** On
- * the homepage the first section is forest, and a cream bar sitting on top of
- * it looks stuck on; at the top the header is transparent instead and its
- * contents turn cream. Any scroll away from the top returns the solid bar
- * (owner's choice, 2026-08-04, over the alternative of tracking the whole
- * cover).
+ * **It wears the cover's colours for exactly as long as the cover is behind
+ * it.** On a page whose first section is forest, a cream bar sitting on top of
+ * it looks stuck on; the header is transparent instead and its contents turn
+ * cream, and it goes solid at the moment the cover's bottom edge passes under
+ * it — not a pixel before.
  *
- * The swap is **latched to the header being off-screen**, not to the scroll
- * position that triggers the hide. Those are the same instant, and doing the
- * obvious thing repainted the bar cream in the frame the hide began, so it
- * was seen sliding away in the wrong colour. Held until it has actually left,
- * the change happens where nobody can see it.
+ * ## Why it is measured rather than timed (owner report, 2026-08-08)
+ *
+ * It used to go solid 240px into the page, whatever the page was. That number
+ * came from a 2026-08-04 decision to release the cover on any scroll rather
+ * than track it, and it was wrong in proportion to how tall the cover is:
+ *
+ * | route | cover | cream bar begins |
+ * |---|---|---|
+ * | `/operators` | 744px | 240px — with **504px of forest still to go** |
+ * | `/about` | 592px | 240px |
+ * | `/explore`, `/contact` | 518px | 240px |
+ *
+ * So every cover route put a cream bar on a green field partway down, and
+ * `/operators` — the tallest cover on the site — wore it for two thirds of the
+ * cover. Reported as a bug on `/operators` specifically; it was on all of them,
+ * and it is the same defect the transparency exists to prevent.
+ *
+ * The cover's own bottom edge answers the question exactly, at every height, on
+ * every route, with no constant to keep in sync with a design that moves.
+ *
+ * The comparison is against the header's **resting** height (`offsetHeight`,
+ * which no transform touches) rather than its animated position. That is what
+ * stops the colour flickering as the bar slides back into view: a hidden bar
+ * sitting at `bottom: 0` would otherwise report itself clear of a cover it is
+ * about to be drawn on top of again.
+ *
+ * It also retires a latch and a reduced-motion backstop that both existed to
+ * paper over the timed rule — the swap now happens at a boundary that is
+ * genuinely there, so there is nothing to hide from the visitor and no case
+ * where a transparent bar can end up over cream content.
  *
  * `hidden` is written straight to the DOM so scrolling never re-renders React.
  * `overCover` is state because the tone genuinely changes the tree — but it
- * flips at most once per journey to the top, not per scroll event.
+ * flips only when the cover's edge crosses the bar, not per scroll event.
  */
 
-/** Never hide within this many pixels of the top, and wear the cover here. */
+/** Never hide within this many pixels of the top. */
 const REVEAL_ABOVE = 8;
-
-/**
- * How far down the page the cover's colours survive if the header never
- * actually leaves the screen.
- *
- * The swap normally waits until the header is off-screen, which is what keeps
- * it invisible. Under reduced motion the header does not hide at all, so that
- * moment never comes — and a transparent bar over page content is an
- * unreadable one. This is the backstop for that case only: far enough down
- * that a visitor whose header does hide has always swapped long before, and
- * still inside the cover, which is a viewport tall.
- */
-const COVER_RELEASE = 240;
 
 /** Total movement in one direction before the header changes its mind. */
 const DIRECTION_DELTA = 8;
@@ -98,7 +109,70 @@ export function useHeaderChrome() {
     const header = ref.current;
     if (!header) return;
 
-    const hasCover = document.querySelector("[data-dark-hero]") !== null;
+    /**
+     * The page's cover element — or `null` when this route has none, and also
+     * while the route's own markup is not on the page yet.
+     *
+     * **Those last two are different states, and the difference matters.** A
+     * client-side navigation to a route that suspends renders `loading.tsx`
+     * first, and this effect runs against *that*: `pathname` has already
+     * changed, so the DOM is asked the question while the answer on screen is
+     * a cream loading screen. Reading "no cover" there is correct for the
+     * fallback and wrong for the page arriving behind it — and nothing re-runs,
+     * because the pathname does not change a second time.
+     *
+     * So the unknown state is detected (`<main>` is the signal: every route
+     * renders exactly one and the fallback renders none) and settled by the
+     * observer at the bottom of this effect, rather than being guessed at.
+     */
+    /*
+      Only elements that have layout count.
+
+      React streams a suspended segment by appending it to the end of `<body>`
+      inside a `display: none` container and then swapping it in. While that
+      copy is parked there, `querySelector` can hand back the staged `<main>`
+      and the staged cover — elements whose every measurement is zero. Trusting
+      one would read a 744px cover as 0px tall and paint the solid bar over it.
+
+      Under `next dev` the container is not even removed afterwards, so the
+      document keeps two of each indefinitely (see `e2e/support/ready.ts`,
+      where the same trap is documented and measured). A production build
+      leaves one. Measuring rather than counting is correct for both.
+    */
+    function hasLayout(element: Element): boolean {
+      return element.getBoundingClientRect().height > 0;
+    }
+
+    function readCover(): { element: Element | null } | null {
+      const candidates = [...document.querySelectorAll("[data-dark-hero]")];
+      const laidOut = candidates.find(hasLayout);
+      if (laidOut) return { element: laidOut };
+
+      /*
+        Present but not yet measurable: the route is mid-arrival, and the only
+        copy in the document is React's staged one. That is *unknown*, not "no
+        cover" — recording the latter here would answer the question wrongly
+        and, worse, settle it: the observer below is only armed while the
+        answer is unknown, so a page with a cover would wear the solid bar for
+        the rest of the visit.
+      */
+      if (candidates.length > 0) return null;
+
+      /*
+        Nothing at all. Either this route genuinely has no cover, or its markup
+        has not arrived. `<main>` tells them apart: every route renders exactly
+        one and `loading.tsx` renders none.
+      */
+      const shell = [...document.querySelectorAll("main")].some(hasLayout);
+      return shell ? { element: null } : null;
+    }
+
+    /*
+      `null` while the answer is unknown, which paints the solid bar — the
+      right way round, because the fallback is a cream screen and a transparent
+      bar over it renders cream type on cream.
+    */
+    let coverElement = readCover()?.element ?? null;
 
     // Reveal on focus whatever the preference: a focus ring parked off-screen
     // is a defect (WCAG 2.4.11), not a motion choice. Closing the menu returns
@@ -108,9 +182,31 @@ export function useHeaderChrome() {
     };
     header.addEventListener("focusin", reveal);
 
+    /** Is the cover still drawn behind the bar's resting position? */
+    function isOverCover(): boolean {
+      if (!header) return false;
+      /*
+        Re-resolve a node React has replaced. The element is cached because
+        this runs on every scroll frame, and a cached node that has been
+        swapped out measures zero from wherever it now lives — which would read
+        as "the cover has scrolled past" while it is sitting on screen.
+      */
+      if (coverElement && !coverElement.isConnected) {
+        coverElement = readCover()?.element ?? null;
+      }
+      if (!coverElement) return false;
+      /*
+        `offsetHeight`, not the animated rect: the bar's resting bottom edge.
+        A hidden bar sits at `bottom: 0` and would otherwise report itself
+        clear of a cover it is about to be drawn on top of again, so the
+        colour would flicker through every slide back into view.
+      */
+      return coverElement.getBoundingClientRect().bottom > header.offsetHeight;
+    }
+
     let anchorY = window.scrollY;
     let hidden = false;
-    let cover = hasCover && window.scrollY <= REVEAL_ABOVE;
+    let cover = isOverCover();
     let frame = 0;
 
     setOverCover(cover);
@@ -124,24 +220,18 @@ export function useHeaderChrome() {
       const y = Math.max(0, window.scrollY);
 
       /*
-        The chrome is latched, not recomputed each frame, and that is the whole
-        trick. Falling straight from "at the top" to "not at the top" repainted
-        the bar cream in the same frame that started the hide, so a small
-        scroll showed a cream bar sliding away — read as a glitch, and rightly
-        (owner report, 2026-08-04).
+        The colour is a measurement, not a latch (owner report, 2026-08-08).
 
-        So the cover's colours are held until the header is genuinely off the
-        screen, measured rather than assumed: getBoundingClientRect() reports
-        the animated position, so this is only true once the slide has really
-        finished. The swap then happens where nobody can see it, and the only
-        cross-fade on screen is the deliberate one at the top edge.
+        It used to be held until the header had physically left the screen,
+        with a 240px backstop for the visitors whose header never leaves —
+        machinery that existed because the release point was a guess and the
+        guess had to be hidden. The cover's own bottom edge is not a guess, so
+        the swap can simply happen where it belongs, and the case that machinery
+        was protecting against (a cream bar seen sliding away over forest) does
+        not arise: inside the cover the bar is transparent, whether it is
+        sliding or sitting still.
       */
-      const offScreen = header.getBoundingClientRect().bottom <= 0;
-      let nextCover = cover;
-      if (!hasCover) nextCover = false;
-      else if (y <= REVEAL_ABOVE) nextCover = true;
-      else if (offScreen || y > COVER_RELEASE) nextCover = false;
-
+      const nextCover = isOverCover();
       if (nextCover !== cover) {
         cover = nextCover;
         setOverCover(nextCover);
@@ -175,9 +265,37 @@ export function useHeaderChrome() {
 
     update();
     window.addEventListener("scroll", schedule, { passive: true });
+
+    /*
+      Ask again when the route's markup actually commits.
+
+      Only when the first answer was unknown, and only until it is known: the
+      observer disconnects on the first real answer, so this costs nothing on
+      a page that was already there — which is every hard load, and every
+      navigation to a static route.
+
+      `childList` on the whole body rather than a narrower target, because
+      what arrives is a whole route segment replacing the fallback, and React
+      also stages streamed segments at the end of `<body>` before swapping
+      them in. A subtree observer is the only one that sees both.
+    */
+    let observer: MutationObserver | null = null;
+    if (readCover() === null) {
+      observer = new MutationObserver(() => {
+        const settled = readCover();
+        if (settled === null) return;
+        observer?.disconnect();
+        observer = null;
+        coverElement = settled.element;
+        update();
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+
     return () => {
       window.removeEventListener("scroll", schedule);
       header.removeEventListener("focusin", reveal);
+      observer?.disconnect();
       if (frame) cancelAnimationFrame(frame);
     };
     // Re-runs on navigation: a new page has a new cover, or none, and starts
