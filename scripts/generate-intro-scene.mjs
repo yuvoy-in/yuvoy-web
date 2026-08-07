@@ -1,6 +1,6 @@
 /**
  * Derives the intro veil's horizon band from the owner's composite
- * `public/assets/intro.png` (full veil comp with the lockup baked in).
+ * `design/brand-source/intro.png` (full veil comp with the lockup baked in).
  * Never hand-edit the output; change this script and re-run it:
  *
  *   node scripts/generate-intro-scene.mjs
@@ -26,7 +26,7 @@ const pnpmDir = join(root, "node_modules/.pnpm");
 const sharpEntry = readdirSync(pnpmDir).find((d) => d.startsWith("sharp@"));
 if (!sharpEntry) throw new Error("sharp not found in the pnpm store");
 const sharp = require(join(pnpmDir, sharpEntry, "node_modules/sharp"));
-const SRC = join(root, "public/assets/intro.png");
+const SRC = join(root, "design/brand-source/intro.png");
 const OUT = join(root, "public/assets/intro-horizon.webp");
 
 // Measured off the 1672x941 comp: the swash bottoms out near y 640 and the

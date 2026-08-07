@@ -58,9 +58,25 @@ const COVER_RELEASE = 240;
 /** Total movement in one direction before the header changes its mind. */
 const DIRECTION_DELTA = 8;
 
-/** Routes whose first section is a dark cover, for the first paint only. */
+/**
+ * Routes whose first section is a dark cover, for the first paint only.
+ *
+ * The effect below re-derives this from the DOM, which is the authority. This
+ * list exists so the server and the first client paint agree: a page that
+ * rendered a cream bar and flipped to transparent after hydration would flash
+ * on every load. Add a route here in the same change that gives it a
+ * `data-dark-hero` section.
+ */
+const COVER_ROUTES = new Set([
+  "/",
+  "/explore",
+  "/operators",
+  "/about",
+  "/contact",
+]);
+
 function isCoverRoute(pathname: string): boolean {
-  return pathname === "/" || pathname.startsWith("/go/");
+  return COVER_ROUTES.has(pathname) || pathname.startsWith("/go/");
 }
 
 export function useHeaderChrome() {

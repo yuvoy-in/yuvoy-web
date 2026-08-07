@@ -4,3 +4,8 @@ pnpm-lock.yaml
 coverage
 next-env.d.ts
 src/lib/api/schema.ts
+
+# Machine-written session memory. The plugin rewrites these files outside
+# Prettier's conventions, which fails `format:check` in CI on a file no
+# human edits.
+.memsearch

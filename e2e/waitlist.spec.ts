@@ -1,4 +1,5 @@
 import { test, expect } from "./support/session";
+import { pageText } from "./support/text";
 
 const FABRICATED = /₹|\breviews?\b|\bratings?\b/i;
 
@@ -27,6 +28,14 @@ test.describe("/waitlist", () => {
     still reach the operator form — this is a compatibility requirement, not
     polish.
   */
+  /*
+    While `OPERATOR_FORM_LIVE` is false the application is a notice rather than a
+    form: the deployed API still requires fields this form stopped asking for
+    (yuvoy-in/yuvoy-api#4), so submitting would 422 every applicant. What has to
+    hold either way is that `#apply` exists, says what is happening, and offers a
+    channel that reaches a person today. Swap these assertions back to the form's
+    fields in the change that flips the flag.
+  */
   test("?audience=provider preselects the operator form", async ({ page }) => {
     const response = await page.goto("/waitlist?audience=provider");
     expect(response?.status()).toBe(200);
@@ -34,7 +43,7 @@ test.describe("/waitlist", () => {
     await expect(
       page.getByRole("tab", { name: /run experiences/i }),
     ).toHaveAttribute("aria-selected", "true");
-    await expect(page.getByLabel(/business name/i)).toBeVisible();
+    await expect(page.locator("#panel-provider")).toContainText(/coming soon/i);
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
       "Apply as a founding operator",
     );
@@ -52,10 +61,10 @@ test.describe("/waitlist", () => {
 
   test("claims no price, rating or review", async ({ page }) => {
     await page.goto("/waitlist");
-    expect(await page.textContent("body")).not.toMatch(FABRICATED);
+    expect(await pageText(page)).not.toMatch(FABRICATED);
 
     await page.goto("/waitlist?audience=provider");
-    expect(await page.textContent("body")).not.toMatch(FABRICATED);
+    expect(await pageText(page)).not.toMatch(FABRICATED);
   });
 
   test("submits through the existing lead endpoint", async ({ page }) => {
@@ -78,8 +87,8 @@ test.describe("/waitlist", () => {
 
     const panel = page.getByRole("tabpanel", { name: /travelling/i });
     await panel.getByLabel("Name").fill("Test Person");
-    await panel.getByLabel("WhatsApp number").fill("+919000000000");
-    await panel.getByText("Diving & water").click();
+    await panel.getByLabel("Email").fill("test@example.com");
+    await panel.getByLabel("WhatsApp number").fill("9000000000");
     await panel.getByText(/I agree to the/).click();
     await panel.getByRole("button", { name: "Join the waitlist" }).click();
 
@@ -94,8 +103,10 @@ test.describe("/waitlist", () => {
   }) => {
     await page.goto("/waitlist");
     const footer = page.getByRole("contentinfo");
+    // The footer's closing CTA block, not its site map: the map may list the
+    // waitlist as a route, but the page must not ask twice.
     await expect(
-      footer.getByRole("link", { name: /join waitlist/i }),
+      footer.getByRole("heading", { name: /be first to experience yuvoy/i }),
     ).toHaveCount(0);
   });
 });

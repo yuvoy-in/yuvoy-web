@@ -527,12 +527,19 @@ components:
 
     LeadInputBase:
       type: object
-      required: [audience, contactName, privacyAccepted, marketKey]
+      required: [audience, contactName, email, privacyAccepted, marketKey]
       description: >
-        Contact rule (enforced server-side): a traveller must supply at least
-        one of `whatsapp` or `email`; a provider must supply `whatsapp` (the
-        onboarding conversation happens there). Deduplication uses the
-        normalised contact — WhatsApp number when present, else email.
+        Contact rule: `email` is required for both audiences — it is the
+        channel the launch announcement is sent on. `whatsapp` is optional for
+        both and is the channel for the conversation that follows.
+        Deduplication uses the normalised contact — WhatsApp number when
+        present, else email.
+
+        CHANGED 2026-08-07, tracking yuvoy-in/yuvoy-api#4. Until that ships on
+        the deployed API, `POST /v1/leads` still requires `whatsapp`,
+        `coverageDestinationKeys` and `primaryInterest` for a provider and will
+        answer 422 without them. The frontend surfaces that rejection rather
+        than swallowing it (see `unknownFieldErrors` in lead-forms.tsx).
       properties:
         audience: { $ref: "#/components/schemas/LeadAudience" }
         contactName: { type: string, minLength: 1, maxLength: 120 }
@@ -583,8 +590,14 @@ components:
       allOf:
         - $ref: "#/components/schemas/LeadInputBase"
         - type: object
-          required:
-            [whatsapp, businessName, coverageDestinationKeys, primaryInterest]
+          description: >
+            `coverageDestinationKeys` and `primaryInterest` are optional as of
+            2026-08-07 (yuvoy-in/yuvoy-api#4). Both are still accepted and
+            stored when supplied; the public application form no longer asks
+            for them, because an operator answers both in the onboarding
+            conversation and the destination list could not represent an
+            operator outside the launch market.
+          required: [businessName]
           properties:
             audience: { const: provider }
             businessName: { type: string, minLength: 1, maxLength: 160 }

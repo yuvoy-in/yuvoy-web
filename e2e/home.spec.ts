@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "./support/session";
+import { pageText } from "./support/text";
 
 /**
  * Nothing on the page may claim a price, a rating or a review count — with
@@ -24,49 +25,103 @@ const registerForm = (page: Page) => page.locator("#register");
 test("landing tells its story in headlines", async ({ page }) => {
   await page.goto("/");
 
-  // The billboard test: the acts, readable as headings alone.
+  // The billboard test: the acts, readable as headings alone, in order.
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
     "Watch real experiences. Make one yours.",
   );
-  await expect(
-    page.getByRole("heading", {
-      name: /from too many tabs to one simple place/i,
-    }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: /one destination, done completely/i }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: /be there when it opens/i }),
-  ).toBeVisible();
+  for (const heading of [
+    /from too many tabs to one simple place/i,
+    /opening in the andaman islands/i,
+    /you run the experience/i,
+    /be first to experience yuvoy/i,
+    /not sure where to start/i,
+  ]) {
+    await expect(page.getByRole("heading", { name: heading })).toBeVisible();
+  }
 });
 
 /*
-  The homepage is for travellers. The operator case has its own page, and the
-  header is what points at it — so the homepage must not pitch operators, and
-  must not ask an arriving visitor which of the two they are.
+  The homepage answers "what, where and how" before the form. Those three
+  sections are the whole reason the strategy act (three islands, one season,
+  100% operator-filmed) came off the page: it argued a launch wedge at someone
+  who had not yet been told what the product does or where it works.
 */
-test("the homepage speaks only to travellers", async ({ page }) => {
+test("the homepage says what Yuvoy is, where it opens and what you can do", async ({
+  page,
+}) => {
+  await page.goto("/");
+  // `pageText`, not `page.textContent("body")`: the helper waits for the
+  // route to have rendered, and a one-shot read can otherwise capture
+  // `loading.tsx` while the dev server is still compiling.
+  const body = await pageText(page);
+
+  // Where. Every destination, from the data layer, linked.
+  for (const slug of ["havelock", "neil-island", "port-blair"]) {
+    await expect(
+      page.locator(`a[href="/destinations/${slug}"]`).first(),
+    ).toBeVisible();
+  }
+
+  // What kind of day, and how to browse it, is /explore's job as of
+  // 2026-08-07 — the homepage points there rather than answering it a third
+  // time, so the way out is what must exist here.
+  await expect(
+    page.locator('a[href="/explore"], a[href^="/explore#"]').first(),
+  ).toBeVisible();
+
+  // Who runs the experiences, named once, with one way out to their page.
+  expect(body).toMatch(/you run the experience/i);
+});
+
+/*
+  Two things came off this page on 2026-08-07 and must not drift back: the
+  category grid, which /explore now carries with its photography, and the
+  "Don't be a tourist. Experience more." sign-off, which repeated the tagline
+  already drawn into the wordmark a screen below it.
+*/
+test("the homepage does not repeat what /explore and the mark already say", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const body = await pageText(page);
+
+  expect(body).not.toMatch(/don.t be a tourist/i);
+  expect(body).not.toMatch(/choose the kind of day/i);
+});
+
+/*
+  The homepage is addressed to travellers, and names the other audience once.
+
+  The operator pitch moved to /operators on 2026-08-04 because a traveller was
+  reading a case aimed at someone else on the way to a form that then asked
+  which of the two they were. A three-sentence introduction and a way out is
+  not that pitch — so what is asserted here is the boundary, not the absence:
+  no operator form, no audience picker, no operator tooling argument, and a
+  single exit to the page that carries all of it.
+*/
+test("the homepage speaks to travellers and points operators elsewhere", async ({
+  page,
+}) => {
   await page.goto("/");
 
   // No audience picker: there is nothing to choose between here.
   await expect(page.getByRole("tab")).toHaveCount(0);
-  await expect(page.getByRole("heading", { name: /six apps/i })).toHaveCount(0);
 
-  // No operator pitch and no operator call to action. The cover's "3 founding
-  // operators signed" is deliberately still here: it is proof the marketplace
-  // is real, which is a traveller's question too.
-  const body = (await page.textContent("body")) ?? "";
+  // The operator case itself is not argued here.
+  const body = await pageText(page);
   expect(body).not.toMatch(/Season One roster/i);
   expect(body).not.toMatch(/Experience OS/i);
-  await expect(
-    page.getByRole("link", { name: /apply as a founding operator/i }),
-  ).toHaveCount(0);
+  expect(body).not.toMatch(/six apps/i);
+
+  // But the way out exists, once, and lands on the application.
+  const operatorCta = page.getByRole("link", {
+    name: /apply as a founding operator/i,
+  });
+  await expect(operatorCta).toHaveCount(1);
+  await expect(operatorCta).toHaveAttribute("href", "/operators#apply");
 
   // The traveller form is the one that renders, with its own fields.
-  await expect(
-    registerForm(page).getByLabel("Where are you headed first?"),
-  ).toBeVisible();
+  await expect(registerForm(page).getByLabel("Name")).toBeVisible();
   await expect(registerForm(page).getByLabel("Business name")).toHaveCount(0);
 });
 
@@ -117,9 +172,24 @@ test("the page states that nothing is bookable yet", async ({ page }) => {
   await expect(
     page.getByRole("group", { name: /nothing is bookable yet/i }),
   ).toBeVisible();
+  // The registration FAQ's first answer, in the DOM whether or not the
+  // disclosure is open.
   await expect(
-    page.getByText("No, and we won't pretend otherwise.", { exact: false }),
+    page.getByText("Yuvoy is currently preparing its first collection", {
+      exact: false,
+    }),
   ).toBeAttached();
+});
+
+/*
+  Three questions at the form, not four. The two that went were a defence of
+  trusting an unlaunched waitlist and a restatement of the water-safety
+  position: both true, neither belonging at the point of conversion. The
+  safety position lives on /safety, where someone looking for it will go.
+*/
+test("the registration FAQ is three questions", async ({ page }) => {
+  await page.goto("/");
+  await expect(registerForm(page).locator("details")).toHaveCount(3);
 });
 
 test("the cover's momentum line states only true facts", async ({ page }) => {
@@ -135,7 +205,7 @@ test("the cover CTA lands on the registration form without leaving the page", as
 }) => {
   await page.goto("/");
 
-  const cover = page.locator("main > section").first();
+  const cover = page.locator("main > section[data-dark-hero]").first();
   await cover.getByRole("link", { name: "Join the waitlist" }).click();
   await expect(page).toHaveURL(/#register$/);
   await expect(registerForm(page)).toBeInViewport();
@@ -154,7 +224,7 @@ test("the header sends operators to their own page", async ({ page }) => {
     .click();
   await expect(page).toHaveURL(/\/operators$/);
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    /show it properly/i,
+    /yuvoy helps people find and book it/i,
   );
 });
 
@@ -180,9 +250,7 @@ test("#providers now carries operators to the application itself", async ({
   // The homepage has no operator form to open any more, so the long-lived
   // anchor must land on the one that does rather than on nothing.
   await expect(page).toHaveURL(/\/operators#apply$/);
-  await expect(
-    page.locator("#apply").getByLabel("Business name"),
-  ).toBeVisible();
+  await expect(page.locator("#apply")).toContainText(/coming soon/i);
 });
 
 test("traveller form surfaces validation errors without a network call", async ({
@@ -194,8 +262,15 @@ test("traveller form surfaces validation errors without a network call", async (
   const form = registerForm(page);
   await form.getByRole("button", { name: "Join the waitlist" }).click();
 
+  // Every failing field reports at once. Submitting an empty form used to
+  // report the name and the consent box but not the contact, because the
+  // contact rule was an object-level refinement that Zod skips once a field
+  // has already failed. Email being required outright removed that whole
+  // class of bug along with the custom resolver that worked around it.
   await expect(form.getByText("Enter your name.")).toBeVisible();
-  await expect(form.getByText("Enter your WhatsApp number.")).toBeVisible();
+  await expect(
+    form.getByRole("alert").filter({ hasText: /enter your email address/i }),
+  ).toBeVisible();
   await expect(form.getByText(/accept the privacy policy/i)).toBeVisible();
 });
 
@@ -216,8 +291,8 @@ test("traveller form success state (API stubbed)", async ({ page }) => {
 
   const form = registerForm(page);
   await form.getByLabel("Name").fill("Test Person");
-  await form.getByLabel("WhatsApp number").fill("+919000000000");
-  await form.getByText("Diving & water").click();
+  await form.getByLabel("Email").fill("test@example.com");
+  await form.getByLabel("WhatsApp number").fill("9000000000");
   await form.getByText(/I agree to the/).click();
   await form.getByRole("button", { name: "Join the waitlist" }).click();
 
@@ -225,9 +300,76 @@ test("traveller form success state (API stubbed)", async ({ page }) => {
     /You[’']re on the Yuvoy waitlist/,
   );
   // A future promise, never "check your inbox" — there is no autoresponder.
+  // Expressed per destination rather than per market, so it does not have to
+  // be rewritten the day a second one opens.
   await expect(form.getByRole("status")).toContainText(
-    /We[’']ll message you when the first Andaman experiences are ready\./,
+    /We will get in touch when experiences for your destination are ready\./,
   );
+});
+
+/*
+  The API contract has always said a traveller supplies "at least one of
+  whatsapp or email". The form required a number from everyone until
+  2026-08-06, which turned away anyone unwilling to hand a phone number to a
+  site that cannot yet sell them anything.
+*/
+test("traveller form accepts an email address instead of a number", async ({
+  page,
+}) => {
+  await page.goto("/#register");
+
+  let submitted: Record<string, unknown> | null = null;
+  await page.route("**/v1/leads", async (route) => {
+    submitted = route.request().postDataJSON();
+    await route.fulfill({
+      status: 201,
+      contentType: "application/json",
+      body: JSON.stringify({
+        id: "test-id",
+        audience: "traveller",
+        status: "recorded",
+        createdAt: new Date().toISOString(),
+      }),
+    });
+  });
+
+  const form = registerForm(page);
+  await form.getByLabel("Name").fill("Test Person");
+  await form.getByLabel("Email").fill("someone@example.com");
+  await form.getByText(/I agree to the/).click();
+  await form.getByRole("button", { name: "Join the waitlist" }).click();
+
+  await expect(form.getByRole("status")).toBeVisible();
+  // Omitted, not sent empty: "at least one of" is a contract rule about
+  // presence, and an empty string is a value.
+  expect(submitted).toMatchObject({ email: "someone@example.com" });
+  expect(submitted).not.toHaveProperty("whatsapp");
+});
+
+/*
+  Email is required and WhatsApp is not (owner direction, 2026-08-07): email
+  is the channel the launch announcement is actually sent on, and a number is
+  what the conversation afterwards runs on. Submitting without an address must
+  fail client-side, and must say so on the field.
+*/
+test("traveller form refuses to submit without an email address", async ({
+  page,
+}) => {
+  await page.goto("/#register");
+  await page.route("**/v1/leads", (route) => route.abort());
+
+  const form = registerForm(page);
+  await form.getByLabel("Name").fill("Test Person");
+  // Deliberately no email. A WhatsApp number alone is not enough any more,
+  // so it is filled to prove the rejection is about the address and not
+  // about the form simply being empty.
+  await form.getByLabel("WhatsApp number").fill("9000000000");
+  await form.getByText(/I agree to the/).click();
+  await form.getByRole("button", { name: "Join the waitlist" }).click();
+
+  await expect(
+    form.getByRole("alert").filter({ hasText: /enter your email address/i }),
+  ).toBeVisible();
 });
 
 test("unavailable API produces a truthful failure, never fake success", async ({
@@ -240,8 +382,8 @@ test("unavailable API produces a truthful failure, never fake success", async ({
 
   const form = registerForm(page);
   await form.getByLabel("Name").fill("Test Person");
-  await form.getByLabel("WhatsApp number").fill("+919000000000");
-  await form.getByText("Diving & water").click();
+  await form.getByLabel("Email").fill("test@example.com");
+  await form.getByLabel("WhatsApp number").fill("9000000000");
   await form.getByText(/I agree to the/).click();
   await form.getByRole("button", { name: "Join the waitlist" }).click();
 
@@ -267,10 +409,9 @@ test("campaign route renders with noindex and canonical to home", async ({
 });
 
 test("retired routes answer 410, not 404", async ({ request }) => {
-  // /experiences is a real page again, but the seeded detail slugs it used to
-  // publish — which carried invented prices and review counts, and are still
-  // in Google's index — must keep answering 410 so they get dropped rather
-  // than recrawled. /journal and /philosophy remain retired entirely.
+  // The seeded experience detail slugs carried invented prices and review
+  // counts and are still in Google's index, so they must keep answering 410
+  // and get dropped rather than recrawled. /philosophy remains retired.
   for (const path of [
     "/experiences/sunrise-scuba-dive",
     "/experiences/anything-else",
@@ -280,7 +421,8 @@ test("retired routes answer 410, not 404", async ({ request }) => {
     expect(res.status(), path).toBe(410);
   }
 
-  // ...and the index pages themselves are emphatically not 410 any more.
+  // The consolidated routes are redirects, not 410s: they had real content
+  // that now lives on /explore, and a 410 would throw away the link equity.
   expect((await request.get("/experiences")).status()).toBe(200);
   expect((await request.get("/journal")).status()).toBe(200);
 });

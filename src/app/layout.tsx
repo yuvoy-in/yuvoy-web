@@ -13,27 +13,33 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
+  /*
+    The template appends " · Yuvoy" to every page title, so a page's own
+    `title` must never repeat the brand. The default (the homepage's) carries
+    the whole positioning in one line, because it is the one result most
+    people will see.
+  */
   title: {
-    default: "Yuvoy · See the experience. Feel if it's right. Then book.",
+    default: "Yuvoy · Discover real experiences through video",
     template: "%s · Yuvoy",
   },
   description:
-    "Yuvoy brings local dives, boat days, food and culture to life through honest video from the people who run them. Join the waitlist for first access in Havelock, Neil and Port Blair.",
+    "Discover real-world experiences through videos from the people who run them. Yuvoy is opening first in the Andaman Islands.",
   applicationName: "Yuvoy",
   robots: IS_PRODUCTION ? undefined : { index: false, follow: false },
   openGraph: {
     type: "website",
     siteName: "Yuvoy",
-    title: "Yuvoy · See the experience. Feel if it's right. Then book.",
+    title: "Yuvoy · Discover real experiences through video",
     description:
-      "Local dives, boat days, food and culture in the Andaman Islands, shown in honest video by the people who run them. Join the waitlist for first access.",
+      "Discover real-world experiences through videos from the people who run them. Yuvoy is opening first in the Andaman Islands.",
     url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Yuvoy · See the experience. Feel if it's right. Then book.",
+    title: "Yuvoy · Discover real experiences through video",
     description:
-      "Local experiences in the Andaman Islands, shown in honest video by the people who run them. Join the waitlist.",
+      "Discover real-world experiences through videos from the people who run them. Yuvoy is opening first in the Andaman Islands.",
   },
 };
 

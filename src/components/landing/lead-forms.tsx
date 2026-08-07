@@ -1,21 +1,23 @@
 "use client";
 
 import * as React from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm, useWatch, type Control } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PhoneField } from "@/components/ui/phone-field";
 import { cn } from "@/lib/cn";
 import { submitLead, type SubmitResult } from "@/lib/leads/api";
 import { useAnalytics } from "@/components/analytics/analytics-provider";
 import { useLeadAnalytics } from "@/lib/analytics/use-lead-analytics";
 import { audienceSelected } from "@/lib/analytics/events";
+import { formatForDisplay, phoneIssue } from "@/lib/contact/phone";
+import { OPERATOR_FORM_LIVE } from "@/lib/site/launch";
+import { ApplyComingSoon } from "@/components/operators/apply-coming-soon";
+import { isPlausibleEmail, suggestEmail } from "@/lib/contact/email";
 import {
-  DEFAULT_DESTINATION,
-  INTERESTS,
   LAUNCH_MARKET,
-  type InterestGroup,
   type LeadAudience,
   type LeadSource,
 } from "@/lib/leads/registry";
@@ -28,14 +30,60 @@ export interface LeadContext {
 
 /* ------------------------------------------------------------------ schema */
 
-const phoneSchema = z
+/**
+ * Phone validation lives in `@/lib/contact/phone`, not in a regex here.
+ *
+ * `PhoneField` submits E.164 and nothing else, so what reaches this schema is
+ * already canonical (`+919000000000`) and the only remaining question is
+ * whether it is *possible* — the right number of digits for the country code
+ * it carries. `phoneIssue` answers that from the curated table and returns a
+ * message naming the country, which is the difference between "that looks too
+ * short for India" and an unactionable "invalid phone number".
+ *
+ * The old rule here was `/^\+[0-9()\-. ]{8,20}$/`: it accepted `+1` followed
+ * by seven of anything, could not tell a dropped digit from a complete number,
+ * and its message named India, which quietly told every other country they
+ * were in the wrong place.
+ */
+const phoneIssueCheck = (value: string, ctx: z.RefinementCtx) => {
+  const issue = phoneIssue(value);
+  if (issue) ctx.addIssue({ code: "custom", message: issue });
+};
+
+/**
+ * Optional on both forms, but still validated when supplied. An empty string
+ * is the browser's value for an untouched field and must pass; a half-typed
+ * number must not.
+ */
+const optionalPhoneSchema = z
   .string()
   .trim()
-  .min(1, "Enter your WhatsApp number.")
-  .regex(
-    /^\+[0-9()\-. ]{8,20}$/,
-    "Include your country code, for example +91.",
-  );
+  .superRefine((value, ctx) => {
+    if (!value) return;
+    phoneIssueCheck(value, ctx);
+  });
+
+/**
+ * **Email is the one contact detail we ask everybody for** (owner direction,
+ * 2026-08-07), on both forms. It is what the launch announcement will actually
+ * be sent on: free, no messaging-platform template approval, and it reaches
+ * every country. A WhatsApp number is the channel for the conversation
+ * afterwards, which is why it is offered and never required.
+ *
+ * The rule is deliberately looser than Zod's own `.email()`. `isPlausibleEmail`
+ * rejects only what cannot be delivered under any reading: no `@`, nothing
+ * either side of it, a domain with no dot, whitespace. Every rule beyond that
+ * is another way to refuse somebody's real address, and a person told their own
+ * email is invalid does not file a bug report. Typos are handled where they
+ * belong — as a *suggestion* next to the field, which the visitor can take or
+ * ignore.
+ */
+const requiredEmailSchema = z
+  .string()
+  .trim()
+  .min(1, "Enter your email address.")
+  .max(254, "That email address is too long.")
+  .refine(isPlausibleEmail, "Enter a valid email address.");
 
 const sharedSchema = {
   contactName: z
@@ -43,14 +91,6 @@ const sharedSchema = {
     .trim()
     .min(1, "Enter your name.")
     .max(120, "Name must be 120 characters or fewer."),
-  whatsapp: phoneSchema,
-  email: z
-    .string()
-    .trim()
-    .max(254)
-    .email("Enter a valid email address.")
-    .optional()
-    .or(z.literal("")),
   privacyAccepted: z.literal(true, {
     message: "Please accept the Privacy Policy and Terms to continue.",
   }),
@@ -58,34 +98,52 @@ const sharedSchema = {
   website: z.string().max(255).optional(), // honeypot
 };
 
+/**
+ * The traveller waitlist: a name, an email address, and consent.
+ *
+ * `whatsapp` is offered and never required. It used to be the other way round,
+ * then briefly "one of the two", which needed a cross-field refinement *and* a
+ * custom resolver to work around the fact that Zod skips object-level
+ * `.refine()` when a field-level check has already failed. Requiring the one
+ * channel we will definitely use removes the rule, the workaround and the
+ * class of bug that came with them.
+ */
 const travellerSchema = z.object({
   ...sharedSchema,
-  primaryDestinationKey: z
-    .string()
-    .refine((v) => LAUNCH_MARKET.destinations.some((d) => d.key === v), {
-      message: "Choose where you're headed.",
-    }),
-  interests: z
-    .array(z.string())
-    .min(1, "Choose at least one interest.")
-    .max(3, "Choose up to three interests."),
+  email: requiredEmailSchema,
+  whatsapp: optionalPhoneSchema,
 });
 
+/**
+ * The operator application: who you are, your business, and how to reach you.
+ *
+ * ## What came off it on 2026-08-07 (owner direction)
+ *
+ * `coverageDestinationKeys` ("Where do you operate?") and `primaryInterest`
+ * ("What do you offer?"). Both are answered in the conversation that follows,
+ * on the channel the applicant just gave us, and asking here made a
+ * thirty-second application collect structured data nobody acts on before a
+ * human is already talking to them. The destination list was also actively
+ * wrong: the page invites operators outside the Andamans, and offered them
+ * only Havelock, Neil and Port Blair to tick.
+ *
+ * `whatsapp` also stopped being required, for the same reason it is optional
+ * for travellers.
+ *
+ * **All three relaxations need `yuvoy-in/yuvoy-api#4`**, which marks them
+ * required on `ProviderLeadInput`. Until that deploys the API answers 422 —
+ * see `unknownFieldErrors` in `ProviderForm`, which makes that failure
+ * visible rather than silent.
+ */
 const providerSchema = z.object({
   ...sharedSchema,
+  email: requiredEmailSchema,
+  whatsapp: optionalPhoneSchema,
   businessName: z
     .string()
     .trim()
     .min(1, "Enter your business name.")
     .max(160, "Business name must be 160 characters or fewer."),
-  coverageDestinationKeys: z
-    .array(z.string())
-    .min(1, "Choose at least one destination you cover."),
-  primaryInterest: z
-    .string()
-    .refine((v) => INTERESTS.some((i) => i.key === v), {
-      message: "Choose what you mainly offer.",
-    }),
 });
 
 type TravellerValues = z.infer<typeof travellerSchema>;
@@ -195,11 +253,24 @@ export function LeadForms({
    * form is deliberately not a tabpanel — a tabpanel with no tablist is a
    * promise to assistive tech that there is somewhere else to go.
    */
+  /*
+    The provider form is replaced by a notice while the API cannot accept what
+    it sends (see `OPERATOR_FORM_LIVE`). Swapped here rather than at each call
+    site so the three surfaces that render it — `/operators`, the `/waitlist`
+    provider tab, and the `#providers` anchor those redirect through — cannot
+    disagree about whether applying works.
+  */
+  const providerPanel = OPERATOR_FORM_LIVE ? (
+    <ProviderForm context={context} />
+  ) : (
+    <ApplyComingSoon />
+  );
+
   const forms = single ? (
     single === "traveller" ? (
       <TravellerForm context={context} />
     ) : (
-      <ProviderForm context={context} />
+      providerPanel
     )
   ) : (
     <>
@@ -249,7 +320,7 @@ export function LeadForms({
         hidden={audience !== "provider"}
         className="mt-10"
       >
-        <ProviderForm context={context} />
+        {providerPanel}
       </div>
     </>
   );
@@ -288,9 +359,9 @@ export function LeadForms({
               <div className="text-cream/70 mt-6 text-lg leading-relaxed">
                 {intro ?? (
                   <p>
-                    Tell us who you are and we&rsquo;ll message you when the
-                    first Andaman experiences are ready. No spam, and no payment
-                    required.
+                    Tell us who you are and we will get in touch when the first
+                    experiences for your destination are ready. No spam, and no
+                    payment required.
                   </p>
                 )}
               </div>
@@ -353,35 +424,95 @@ function OutcomeNotice({
 function SuccessNotice({
   updated,
   audience,
+  contact,
 }: {
   updated: boolean;
   audience: LeadAudience;
+  /** What was actually recorded, read back so a typo can still be caught. */
+  contact: { email?: string; whatsapp?: string };
 }) {
+  const provider = audience === "provider";
+  const channels = [
+    contact.email,
+    contact.whatsapp ? formatForDisplay(contact.whatsapp) : undefined,
+  ].filter(Boolean) as string[];
+
   return (
     <div role="status" className="border-cream/20 rounded-edge border p-8">
       <p className="eyebrow text-terra-soft">
-        {updated ? "Details updated" : "You’re on the list"}
+        {updated
+          ? "Details updated"
+          : provider
+            ? "Application received"
+            : "You’re on the list"}
       </p>
       {/*
-        The confirmation heading is owner-approved canon (#27) and is quoted
-        verbatim. The post-submit line is too — note it promises a message
-        later, never an email now: there is no visitor-facing autoresponder,
-        so "check your inbox" would be a lie.
+        The traveller heading is owner-approved canon (#27) and is quoted
+        verbatim. The line under it promises a message later, never an email
+        now: there is no visitor-facing autoresponder, so "check your inbox"
+        would be a lie.
       */}
       <p className="font-display tracking-display mt-6 text-2xl font-normal text-balance">
         {updated
-          ? "We already had you; your preferences are updated."
-          : "You’re on the Yuvoy waitlist"}
+          ? "We already had you; your details are updated."
+          : provider
+            ? "Application received"
+            : "You’re on the Yuvoy waitlist"}
       </p>
-      <p className="text-cream/70 mt-4 leading-relaxed">
-        We&rsquo;ll message you when the first Andaman experiences are ready. No
-        spam, and no payment required.
-      </p>
-      {audience === "provider" && (
-        <p className="text-cream/70 mt-3 leading-relaxed">
-          Someone from Yuvoy will reach out on WhatsApp to talk through what you
-          offer.
+      {provider ? (
+        <p className="text-cream/70 mt-4 leading-relaxed">
+          The Yuvoy team will review it and contact you directly to talk through
+          what you offer.
         </p>
+      ) : (
+        <p className="text-cream/70 mt-4 leading-relaxed">
+          We will get in touch when experiences for your destination are ready.
+          No spam, and no payment required.
+        </p>
+      )}
+
+      {/*
+        The read-back, and the only thing here that catches a mistake no
+        validator can: an address or a number that is perfectly well-formed
+        and simply is not theirs. A person proofreads their own contact
+        details when they are shown; nobody proofreads what they typed.
+
+        The number is grouped (`+91 90000 00000`) for exactly that reason —
+        an unbroken run of digits is not checkable at a glance.
+
+        There is no inline "change it" control on purpose: the submission has
+        already been recorded, so a correction is a second submission, and the
+        API treats a repeat of the same contact as an update. Reloading the
+        form is the honest way to do that, and the reload link says so.
+      */}
+      {channels.length > 0 && (
+        <div className="border-cream/20 mt-6 border-t pt-6">
+          <p className="text-cream/70 text-sm leading-relaxed">
+            We will use{" "}
+            {channels.map((channel, i) => (
+              <React.Fragment key={channel}>
+                {i > 0 && " and "}
+                <strong className="text-cream font-bold">{channel}</strong>
+              </React.Fragment>
+            ))}
+            .
+          </p>
+          {/* A button, not a link: reading `window.location` during render
+              would differ between the server pass and the client one, which
+              is a hydration mismatch waiting for the day this notice renders
+              anywhere other than after a click. */}
+          <p className="text-cream/70 mt-2 text-sm leading-relaxed">
+            Not right?{" "}
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="text-cream focus-visible:ring-terra-soft rounded-edge underline underline-offset-2 focus-visible:ring-2 focus-visible:outline-none"
+            >
+              Send it again
+            </button>{" "}
+            with the correct details and we will update your entry.
+          </p>
+        </div>
       )}
     </div>
   );
@@ -446,6 +577,142 @@ function ConsentFields({
   );
 }
 
+/* ----------------------------------------------------------------- contact */
+
+/**
+ * The pair of ways to reach someone, as one group.
+ *
+ * Shared by both forms so the phone picker, the typo suggestion and the "one
+ * is enough" wording cannot drift between them. The two differ only in whether
+ * the number is required, which is the `phoneRequired` prop.
+ *
+ * ## Email is required, WhatsApp is not
+ *
+ * On both forms (owner direction, 2026-08-07). Email is what the launch
+ * announcement will actually be sent on: free, no messaging-platform template
+ * approval, and it reaches every country. WhatsApp is the channel for the
+ * conversation afterwards, which is worth having and never worth turning
+ * somebody away for withholding.
+ *
+ * ## The suggestion, not a correction
+ *
+ * A near-certain typo (`gmial.com`) offers a one-tap fix and never blocks
+ * submission. It is a `<button>` rather than an auto-correct because silently
+ * rewriting what someone typed into their own contact details is worse than
+ * the typo: they would never know it happened.
+ */
+function ContactFields({
+  audience,
+  control,
+  register,
+  setValue,
+  errors,
+}: {
+  audience: LeadAudience;
+  control: Control<TravellerValues> | Control<ProviderValues>;
+  register: object;
+  setValue: (value: string) => void;
+  errors: { whatsapp?: string; email?: string };
+}) {
+  const prefix = audience === "traveller" ? "t" : "p";
+  /*
+    `useWatch`, not the form's `watch()`. Both read the same value; only this
+    one subscribes to a single field rather than handing back a function whose
+    identity changes every render. The difference is not style: React
+    Compiler refuses to memoize any component that calls `watch()`, so the
+    form and everything under it would re-render on every keystroke of every
+    field, for a suggestion that depends on one of them.
+  */
+  const emailValue =
+    useWatch({
+      control: control as Control<TravellerValues>,
+      name: "email",
+    }) ?? "";
+  const suggestion = suggestEmail(emailValue);
+
+  return (
+    <fieldset className="flex flex-col gap-1.5">
+      <legend className="label text-cream/70">How can we reach you?</legend>
+      <p id={`${prefix}-contact-hint`} className="text-cream/70 mb-1 text-sm">
+        An email address is all we need. Add a WhatsApp number if you would
+        rather we message you there.
+      </p>
+
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor={`${prefix}-email`} className="label text-cream/70">
+          Email
+        </label>
+        <Input
+          tone="onDark"
+          id={`${prefix}-email`}
+          {...register}
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          aria-invalid={!!errors.email}
+          aria-describedby={
+            errors.email
+              ? `${prefix}-email-error ${prefix}-contact-hint`
+              : `${prefix}-contact-hint`
+          }
+        />
+        <FieldError id={`${prefix}-email-error`} message={errors.email} />
+        {suggestion && !errors.email && (
+          /*
+            Not `role="alert"`: this is an offer, not a problem, and
+            interrupting a screen reader mid-field to suggest a spelling is
+            worse than letting them reach it in reading order. `aria-live` is
+            deliberately absent for the same reason.
+          */
+          <p className="text-cream/70 text-sm">
+            Did you mean{" "}
+            <button
+              type="button"
+              onClick={() => setValue(suggestion)}
+              className="text-cream focus-visible:ring-terra-soft rounded-edge underline underline-offset-2 focus-visible:ring-2 focus-visible:outline-none"
+            >
+              {suggestion}
+            </button>
+            ?
+          </p>
+        )}
+      </div>
+
+      <div className="mt-4 flex flex-col gap-1.5">
+        <label htmlFor={`${prefix}-whatsapp`} className="label text-cream/70">
+          WhatsApp number <span className="normal-case">(optional)</span>
+        </label>
+        {/*
+          `Controller`, not `register`: the field is a composite (country plus
+          national number) whose value is computed from both halves, so it has
+          no single DOM node for RHF to attach to. The value it reports is
+          always E.164 — see PhoneField.
+        */}
+        <Controller
+          control={control as Control<TravellerValues>}
+          name="whatsapp"
+          render={({ field }) => (
+            <PhoneField
+              id={`${prefix}-whatsapp`}
+              value={field.value ?? ""}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              tone="onDark"
+              invalid={!!errors.whatsapp}
+              describedBy={
+                errors.whatsapp
+                  ? `${prefix}-whatsapp-error ${prefix}-contact-hint`
+                  : `${prefix}-contact-hint`
+              }
+            />
+          )}
+        />
+        <FieldError id={`${prefix}-whatsapp-error`} message={errors.whatsapp} />
+      </div>
+    </fieldset>
+  );
+}
+
 /** Visually hidden honeypot. Real visitors never see or fill it. */
 function Honeypot({ register }: { register: object }) {
   return (
@@ -463,37 +730,63 @@ function Honeypot({ register }: { register: object }) {
 
 /* -------------------------------------------------------------- traveller */
 
+/**
+ * The traveller waitlist: a name, one way to reach them, and consent.
+ *
+ * **Nothing else** (owner direction, 2026-08-07). It asked for a destination
+ * and up to three interests until then. Both were optional in the contract and
+ * optional on the form, and both were dropped for the same reason: a
+ * pre-launch waitlist that asks four questions converts worse than one that
+ * asks two, and neither answer changes anything we do — the destination and
+ * what somebody wants to do come up in the conversation that follows, on the
+ * channel they just gave us.
+ *
+ * `context.destinationKey` still rides along as **attribution**, and only when
+ * it is real. A campaign route can carry a destination in the URL; the plain
+ * homepage cannot, and sending its default would file every organic signup
+ * under Havelock — a number that would then be read as demand.
+ */
 function TravellerForm({ context }: { context: LeadContext }) {
   const [result, setResult] = React.useState<SubmitResult | null>(null);
+  const [submitted, setSubmitted] = React.useState<{
+    email?: string;
+    whatsapp?: string;
+  }>({});
   const track = useLeadAnalytics("traveller", context.source);
 
   const {
     register,
+    control,
+    setValue,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
   } = useForm<TravellerValues>({
     resolver: zodResolver(travellerSchema),
-    defaultValues: {
-      primaryDestinationKey: context.destinationKey || DEFAULT_DESTINATION.key,
-      interests: [],
-      marketingOptIn: false,
-    },
+    defaultValues: { whatsapp: "", email: "", marketingOptIn: false },
   });
+
+  // Attribution, never a default. `source === "web"` is organic traffic, which
+  // has no destination to attribute to.
+  const attributedDestination =
+    context.source !== "web" ? context.destinationKey || undefined : undefined;
 
   async function onSubmit(values: TravellerValues) {
     const res = await submitLead({
       audience: "traveller",
       contactName: values.contactName,
-      whatsapp: values.whatsapp.replace(/[^\d+]/g, ""),
-      email: values.email || undefined,
+      // Omitted, not sent empty: an optional field's absence is an absence,
+      // and an empty string is a value. Already E.164 by the time it gets
+      // here — PhoneField emits nothing else — which is what lets the API
+      // deduplicate on the normalised contact.
+      whatsapp: values.whatsapp || undefined,
+      email: values.email,
       privacyAccepted: true,
       marketingOptIn: values.marketingOptIn,
       marketKey: LAUNCH_MARKET.key,
       source: context.source,
       website: values.website || undefined,
-      primaryDestinationKey: values.primaryDestinationKey,
-      interests: values.interests as InterestGroup[],
+      primaryDestinationKey: attributedDestination,
     });
     // Server-side field rejections map back onto the form fields.
     if (res.kind === "invalid") {
@@ -502,10 +795,14 @@ function TravellerForm({ context }: { context: LeadContext }) {
       }
     }
     if (res.kind === "recorded" || res.kind === "updated") {
+      // Held for the success state, which reads the contact back. Kept in
+      // component state rather than read from the form, because a successful
+      // submit unmounts the fields.
+      setSubmitted({ email: values.email, whatsapp: values.whatsapp });
       track.submitted({
         marketKey: LAUNCH_MARKET.key,
-        destinationKeys: [values.primaryDestinationKey],
-        interests: values.interests as InterestGroup[],
+        destinationKeys: attributedDestination ? [attributedDestination] : [],
+        interests: [],
       });
     } else {
       track.submissionFailed(res);
@@ -515,7 +812,11 @@ function TravellerForm({ context }: { context: LeadContext }) {
 
   if (result?.kind === "recorded" || result?.kind === "updated") {
     return (
-      <SuccessNotice updated={result.kind === "updated"} audience="traveller" />
+      <SuccessNotice
+        updated={result.kind === "updated"}
+        audience="traveller"
+        contact={submitted}
+      />
     );
   }
 
@@ -551,94 +852,16 @@ function TravellerForm({ context }: { context: LeadContext }) {
         <FieldError id="t-name-error" message={errors.contactName?.message} />
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="t-whatsapp" className="label text-cream/70">
-          WhatsApp number
-        </label>
-        <Input
-          tone="onDark"
-          id="t-whatsapp"
-          {...register("whatsapp")}
-          type="tel"
-          inputMode="tel"
-          placeholder="+91"
-          autoComplete="tel"
-          aria-invalid={!!errors.whatsapp}
-          aria-describedby={errors.whatsapp ? "t-whatsapp-error" : undefined}
-        />
-        <FieldError id="t-whatsapp-error" message={errors.whatsapp?.message} />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="t-email" className="label text-cream/70">
-          Email <span className="normal-case">(optional)</span>
-        </label>
-        <Input
-          tone="onDark"
-          id="t-email"
-          {...register("email")}
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          aria-invalid={!!errors.email}
-          aria-describedby={errors.email ? "t-email-error" : undefined}
-        />
-        <FieldError id="t-email-error" message={errors.email?.message} />
-      </div>
-
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="t-destination" className="label text-cream/70">
-          Where are you headed first?
-        </label>
-        <select
-          id="t-destination"
-          {...register("primaryDestinationKey", {
-            onChange: (event) =>
-              track.destinationChanged(
-                context.destinationKey,
-                event.target.value,
-              ),
-          })}
-          className="border-cream/20 bg-cream/5 text-cream focus-visible:border-terra-soft focus-visible:ring-terra-soft/40 rounded-edge h-12 w-full border px-4 text-sm transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
-          aria-invalid={!!errors.primaryDestinationKey}
-        >
-          {LAUNCH_MARKET.destinations.map((d) => (
-            <option key={d.key} value={d.key}>
-              {d.label}
-            </option>
-          ))}
-        </select>
-        <FieldError
-          id="t-destination-error"
-          message={errors.primaryDestinationKey?.message}
-        />
-      </div>
-
-      <fieldset>
-        <legend className="label text-cream/70">
-          What draws you? <span className="normal-case">(up to three)</span>
-        </legend>
-        <div className="mt-2 flex flex-wrap gap-2 px-1">
-          {INTERESTS.map((interest) => (
-            <label
-              key={interest.key}
-              className="border-cream/20 text-cream/80 has-checked:bg-cream has-checked:text-forest has-checked:border-cream rounded-edge has-focus-visible:ring-terra-soft cursor-pointer border px-4 py-2 text-sm transition-colors duration-200 has-focus-visible:ring-2"
-            >
-              <input
-                type="checkbox"
-                value={interest.key}
-                {...register("interests")}
-                className="sr-only"
-              />
-              {interest.label}
-            </label>
-          ))}
-        </div>
-        <FieldError
-          id="t-interests-error"
-          message={errors.interests?.message}
-        />
-      </fieldset>
+      <ContactFields
+        audience="traveller"
+        control={control}
+        register={register("email")}
+        setValue={(value) => setValue("email", value, { shouldValidate: true })}
+        errors={{
+          whatsapp: errors.whatsapp?.message,
+          email: errors.email?.message,
+        }}
+      />
 
       <ConsentFields
         privacyError={errors.privacyAccepted?.message}
@@ -657,43 +880,78 @@ function TravellerForm({ context }: { context: LeadContext }) {
 
 function ProviderForm({ context }: { context: LeadContext }) {
   const [result, setResult] = React.useState<SubmitResult | null>(null);
+  const [submitted, setSubmitted] = React.useState<{
+    email?: string;
+    whatsapp?: string;
+  }>({});
+  /** Server-side rejections naming fields this form does not render. */
+  const [unknownFieldErrors, setUnknownFieldErrors] = React.useState<string[]>(
+    [],
+  );
   const track = useLeadAnalytics("provider", context.source);
 
   const {
     register,
+    control,
+    setValue,
     handleSubmit,
     setError,
     formState: { errors, isSubmitting },
   } = useForm<ProviderValues>({
     resolver: zodResolver(providerSchema),
-    defaultValues: { coverageDestinationKeys: [], marketingOptIn: false },
+    defaultValues: { whatsapp: "", email: "", marketingOptIn: false },
   });
 
   async function onSubmit(values: ProviderValues) {
     const res = await submitLead({
       audience: "provider",
       contactName: values.contactName,
-      whatsapp: values.whatsapp.replace(/[^\d+]/g, ""),
-      email: values.email || undefined,
+      // Already E.164 — PhoneField emits nothing else. Omitted rather than
+      // sent empty: absence is what the contract means by optional.
+      whatsapp: values.whatsapp || undefined,
+      email: values.email,
       privacyAccepted: true,
       marketingOptIn: values.marketingOptIn,
       marketKey: LAUNCH_MARKET.key,
       source: context.source,
       website: values.website || undefined,
       businessName: values.businessName,
-      coverageDestinationKeys: values.coverageDestinationKeys,
-      primaryInterest: values.primaryInterest as InterestGroup,
     });
     if (res.kind === "invalid") {
+      /*
+        Server field errors are mapped back onto the form — but **only the
+        fields this form still has**.
+
+        This is the guard for the window before yuvoy-in/yuvoy-api#4 deploys.
+        The API currently marks `coverageDestinationKeys`, `primaryInterest`
+        and `whatsapp` required on a provider lead; this form no longer asks
+        for the first two and no longer requires the third, so a rejection
+        names fields with no input to attach an error to. Handing those to
+        `setError` puts the message on a field that never renders, and the
+        applicant sees the button do nothing at all — the worst failure a form
+        has, because it looks like a bug in their browser.
+
+        Anything unrecognised is raised to the form's own error state instead,
+        where it is visible and truthful.
+      */
+      const unknown: string[] = [];
       for (const [field, message] of Object.entries(res.fields)) {
-        setError(field as keyof ProviderValues, { message });
+        if (field in values) {
+          setError(field as keyof ProviderValues, { message });
+        } else {
+          unknown.push(message);
+        }
       }
+      setUnknownFieldErrors(unknown);
+    } else {
+      setUnknownFieldErrors([]);
     }
     if (res.kind === "recorded" || res.kind === "updated") {
+      setSubmitted({ email: values.email, whatsapp: values.whatsapp });
       track.submitted({
         marketKey: LAUNCH_MARKET.key,
-        destinationKeys: values.coverageDestinationKeys,
-        interests: [values.primaryInterest as InterestGroup],
+        destinationKeys: [],
+        interests: [],
       });
     } else {
       track.submissionFailed(res);
@@ -703,7 +961,11 @@ function ProviderForm({ context }: { context: LeadContext }) {
 
   if (result?.kind === "recorded" || result?.kind === "updated") {
     return (
-      <SuccessNotice updated={result.kind === "updated"} audience="provider" />
+      <SuccessNotice
+        updated={result.kind === "updated"}
+        audience="provider"
+        contact={submitted}
+      />
     );
   }
 
@@ -755,86 +1017,41 @@ function ProviderForm({ context }: { context: LeadContext }) {
         />
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="p-whatsapp" className="label text-cream/70">
-          WhatsApp number
-        </label>
-        <Input
-          tone="onDark"
-          id="p-whatsapp"
-          {...register("whatsapp")}
-          type="tel"
-          inputMode="tel"
-          placeholder="+91"
-          autoComplete="tel"
-          aria-invalid={!!errors.whatsapp}
-        />
-        <FieldError id="p-whatsapp-error" message={errors.whatsapp?.message} />
-      </div>
+      <ContactFields
+        audience="provider"
+        control={control}
+        register={register("email")}
+        setValue={(value) => setValue("email", value, { shouldValidate: true })}
+        errors={{
+          whatsapp: errors.whatsapp?.message,
+          email: errors.email?.message,
+        }}
+      />
 
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="p-email" className="label text-cream/70">
-          Email <span className="normal-case">(optional)</span>
-        </label>
-        <Input
-          tone="onDark"
-          id="p-email"
-          {...register("email")}
-          type="email"
-          inputMode="email"
-          autoComplete="email"
-          aria-invalid={!!errors.email}
-        />
-        <FieldError id="p-email-error" message={errors.email?.message} />
-      </div>
-
-      <fieldset>
-        <legend className="label text-cream/70">Where you operate</legend>
-        <div className="mt-2 flex flex-wrap gap-2 px-1">
-          {LAUNCH_MARKET.destinations.map((d) => (
-            <label
-              key={d.key}
-              className="border-cream/20 text-cream/80 has-checked:bg-cream has-checked:text-forest has-checked:border-cream rounded-edge has-focus-visible:ring-terra-soft cursor-pointer border px-4 py-2 text-sm transition-colors duration-200 has-focus-visible:ring-2"
-            >
-              <input
-                type="checkbox"
-                value={d.key}
-                {...register("coverageDestinationKeys")}
-                className="sr-only"
-              />
-              {d.label}
-            </label>
-          ))}
+      {/*
+        Server-side rejections that name a field this form does not render.
+        Until yuvoy-in/yuvoy-api#4 deploys, that is what a valid application
+        gets back — so it is shown, plainly, rather than being swallowed by a
+        `setError` call on an input that is not on screen.
+      */}
+      {unknownFieldErrors.length > 0 && (
+        <div
+          role="alert"
+          className="border-terra-soft/40 rounded-edge border p-6"
+        >
+          <p className="font-display tracking-display text-xl font-normal">
+            We couldn&rsquo;t save that.
+          </p>
+          <ul className="text-cream/70 mt-2 flex flex-col gap-1 text-sm">
+            {unknownFieldErrors.map((message) => (
+              <li key={message}>{message}</li>
+            ))}
+          </ul>
+          <p className="text-cream/70 mt-3 text-sm">
+            Nothing was recorded. Please try again shortly.
+          </p>
         </div>
-        <FieldError
-          id="p-coverage-error"
-          message={errors.coverageDestinationKeys?.message}
-        />
-      </fieldset>
-
-      <fieldset>
-        <legend className="label text-cream/70">What you mainly offer</legend>
-        <div className="mt-2 flex flex-wrap gap-2 px-1">
-          {INTERESTS.map((interest) => (
-            <label
-              key={interest.key}
-              className="border-cream/20 text-cream/80 has-checked:bg-cream has-checked:text-forest has-checked:border-cream rounded-edge has-focus-visible:ring-terra-soft cursor-pointer border px-4 py-2 text-sm transition-colors duration-200 has-focus-visible:ring-2"
-            >
-              <input
-                type="radio"
-                value={interest.key}
-                {...register("primaryInterest")}
-                className="sr-only"
-              />
-              {interest.label}
-            </label>
-          ))}
-        </div>
-        <FieldError
-          id="p-interest-error"
-          message={errors.primaryInterest?.message}
-        />
-      </fieldset>
+      )}
 
       <ConsentFields
         privacyError={errors.privacyAccepted?.message}
@@ -842,8 +1059,13 @@ function ProviderForm({ context }: { context: LeadContext }) {
         registerMarketing={register("marketingOptIn")}
       />
 
+      {/* The operator button says what the operator is doing. It read "Join
+          the waitlist" until 2026-08-06, which is the traveller's action and
+          the wrong promise: an operator is applying, and the difference
+          between an application and a signup is the whole framing of the
+          page this form sits on. */}
       <Button type="submit" variant="paper" size="lg" disabled={isSubmitting}>
-        {isSubmitting ? "Sending…" : "Join the waitlist"}
+        {isSubmitting ? "Sending…" : "Apply as a founding operator"}
       </Button>
 
       <p className="text-cream/70 text-xs">

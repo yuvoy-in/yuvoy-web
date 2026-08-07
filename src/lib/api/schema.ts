@@ -317,7 +317,10 @@ export interface components {
             content?: string;
             term?: string;
         };
-        /** @description Contact rule (enforced server-side): a traveller must supply at least one of `whatsapp` or `email`; a provider must supply `whatsapp` (the onboarding conversation happens there). Deduplication uses the normalised contact — WhatsApp number when present, else email. */
+        /**
+         * @description Contact rule: `email` is required for both audiences — it is the channel the launch announcement is sent on. `whatsapp` is optional for both and is the channel for the conversation that follows. Deduplication uses the normalised contact — WhatsApp number when present, else email.
+         *     CHANGED 2026-08-07, tracking yuvoy-in/yuvoy-api#4. Until that ships on the deployed API, `POST /v1/leads` still requires `whatsapp`, `coverageDestinationKeys` and `primaryInterest` for a provider and will answer 422 without them. The frontend surfaces that rejection rather than swallowing it (see `unknownFieldErrors` in lead-forms.tsx).
+         */
         LeadInputBase: {
             audience: components["schemas"]["LeadAudience"];
             contactName: string;
@@ -327,7 +330,7 @@ export interface components {
              */
             whatsapp?: string;
             /** Format: email */
-            email?: string;
+            email: string;
             /**
              * @description Must be true. Acknowledges the Privacy Policy and Terms.
              * @constant
@@ -360,8 +363,8 @@ export interface components {
             /** @constant */
             audience?: "provider";
             businessName: string;
-            coverageDestinationKeys: components["schemas"]["DestinationKey"][];
-            primaryInterest: components["schemas"]["InterestGroup"];
+            coverageDestinationKeys?: components["schemas"]["DestinationKey"][];
+            primaryInterest?: components["schemas"]["InterestGroup"];
         } & {
             /**
              * @description discriminator enum property added by openapi-typescript

@@ -26,6 +26,14 @@ const baseURL = remoteBaseURL || `http://localhost:${PORT}`;
 
 export default defineConfig({
   testDir: "./e2e",
+  /*
+    Compile every route once before the workers start. See
+    `e2e/support/warm-routes.ts`: without it, the first test to touch a route
+    races `next dev`'s on-demand compile, and any spec that reads the DOM at a
+    fixed moment can measure `loading.tsx` instead of the page. It shows up as
+    unrelated failures that all pass in isolation.
+  */
+  globalSetup: "./e2e/support/warm-routes.ts",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,

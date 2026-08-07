@@ -48,21 +48,28 @@ export default function PrivacyPage() {
           <strong className="text-forest font-bold">
             If you join as a traveller:
           </strong>{" "}
-          your name, and one way to reach you: a WhatsApp number, an email
-          address, or both. Optionally, which island you are headed to and up to
-          three things that interest you.
+          your name, and one way to reach you: an email address, a WhatsApp
+          number, or both. That is the whole form. It asked which destination
+          you were headed to and what interested you until August 2026; both
+          were dropped, because neither changed what we do and a waitlist should
+          ask for the least it can.
         </p>
         <p>
           <strong className="text-forest font-bold">
             If you apply as an operator:
           </strong>{" "}
-          your name, your business name, a WhatsApp number, the destinations you
-          cover, and what you mainly offer. The number is required because
-          onboarding conversations happen there.
+          your name, your business name, a WhatsApp number, an email address if
+          you give one, the destinations you cover, and what you mainly offer.
         </p>
         <p>
-          We also record which link or QR code brought you to the site, so we
-          know which channels are worth continuing.
+          A phone number is stored in its full international form (for example
+          <span className="whitespace-nowrap"> +91 90000 00000</span>), which is
+          also how we recognise a repeat registration rather than creating a
+          second record of you.
+        </p>
+        <p>
+          We also record which link brought you to the site, so we know which
+          channels are worth continuing.
         </p>
       </LegalSection>
 
