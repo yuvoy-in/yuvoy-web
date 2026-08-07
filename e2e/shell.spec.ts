@@ -145,12 +145,14 @@ test.describe("site shell", () => {
         One budget per navigation, not one for all of them.
 
         This test loads the same route once per breakpoint — six full page
-        loads, each waiting on `networkidle`. Playwright's default 30s applies
-        to the *whole test*, so the budget was being shared across all six and
-        an ordinary CI runner blew through it on `/explore`, the heaviest page
-        (four category photographs plus the cover). It failed all three
-        attempts on `dev` after #72, which is exactly the point at which a
-        shared budget stops being a rounding error.
+        loads — while Playwright's default 30s applies to the *whole test*, so
+        the budget was shared across all six. `/explore` blew through it on CI
+        after #72 put photography on the pages.
+
+        Raising the budget alone was not the fix, and proved it: at 120s the
+        same test still hung. The wait condition was the real cause (see the
+        note on `page.goto` below). This stays because a shared budget is still
+        the wrong shape — six navigations deserve six navigations' worth.
 
         Derived from the array rather than hardcoded, so adding a seventh
         breakpoint cannot quietly make it tight again.
@@ -161,12 +163,24 @@ test.describe("site shell", () => {
 
       for (const viewport of BREAKPOINTS) {
         await page.setViewportSize(viewport);
-        await page.goto(path, { waitUntil: "networkidle" });
-        // `networkidle` is not "the route rendered": under `next dev` the
-        // settled state can still be `loading.tsx`, which has no <main> and
-        // no <h1>, so the heading count below would read 0 and the overflow
-        // check would measure the wrong document. Waiting on <main> is the
-        // same guard `pageText` uses, for the same reason.
+        /*
+          `domcontentloaded`, NOT `networkidle`.
+
+          `networkidle` waits for 500ms of network silence, which on `next dev`
+          means waiting for every responsive image variant to be optimised on
+          demand. This test loads the same route at six widths, and `next/image`
+          requests a different width at each — so `/explore`, with four category
+          photographs, asks the dev server for up to 24 separate WebP re-encodes.
+          On a CI runner that never settled: the test hung on `page.goto` and
+          failed even at a 120s budget, having passed locally throughout.
+
+          Nothing here needs the image bytes. Every image sits in a box with a
+          CSS aspect ratio, so layout — which is all the overflow and heading
+          checks measure — is final before a single pixel is decoded. Waiting on
+          `<main>` is the real guard, and it is what stops this measuring
+          `loading.tsx` while the route compiles.
+        */
+        await page.goto(path, { waitUntil: "domcontentloaded" });
         await page.locator("main").first().waitFor({ state: "attached" });
 
         // Horizontal overflow — the classic mobile defect, invisible in tests
@@ -278,7 +292,9 @@ test.describe("site shell", () => {
       // The narrowest phone still in use, not the common one: targets shrink
       // as the viewport does, so 390 can pass while 360 fails.
       await page.setViewportSize({ width: 360, height: 780 });
-      await page.goto(path, { waitUntil: "networkidle" });
+      // Same reasoning as the structure check above: tap-target size comes
+      // from layout, not from decoded image bytes.
+      await page.goto(path, { waitUntil: "domcontentloaded" });
       await page.locator("main").first().waitFor({ state: "attached" });
 
       const undersized = await page.evaluate(() =>
