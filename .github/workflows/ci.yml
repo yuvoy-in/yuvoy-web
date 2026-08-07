@@ -5,6 +5,17 @@ on:
     branches: [main, dev]
   pull_request:
 
+# Only the newest run of a branch matters. Pushing a fixup used to leave the
+# previous run burning a full e2e suite (~7 minutes) against code nobody would
+# merge — that happened twice on #72 alone.
+#
+# `cancel-in-progress` is deliberately limited to pull requests: on `main` and
+# `dev` a run is the gate in front of a deployment, and cancelling one of those
+# would leave a deploy with no record of having been checked.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   quality:
     runs-on: ubuntu-latest
@@ -36,5 +47,39 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm exec playwright install --with-deps chromium
+
+      # Chromium is ~130MB and was re-downloaded on every single run. The
+      # binary only changes when Playwright does, so the lockfile hash is the
+      # right key. System libraries are installed by apt and cannot be cached,
+      # so they are handled separately on a hit.
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install Playwright and its system dependencies
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Install Playwright system dependencies only
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: pnpm exec playwright install-deps chromium
+
       - run: pnpm test:e2e
+
+      # The traces and screenshots Playwright keeps for a failed test. Without
+      # this a red CI run gives a stack trace and nothing to look at, and the
+      # only way to see what the page actually looked like is to reproduce it
+      # locally — which is precisely what does not work for a failure that only
+      # happens on a slower machine.
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

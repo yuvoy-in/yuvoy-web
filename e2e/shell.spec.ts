@@ -118,28 +118,48 @@ test.describe("site shell", () => {
     Two whole-page structural checks that a screenshot cannot make for you,
     and that axe's WCAG-tagged rules do not cover.
   */
+  /*
+    The widths that actually break things, not a sample of them: the narrowest
+    phone still in use (360), the common one (390), the large one (430), the
+    tablet, the laptop where the `lg` inline nav appears, and the desktop.
+    Horizontal overflow is a defect that shows at one width and hides at the
+    next, so the cheap fix is to check the ones real devices report.
+
+    Hoisted out of the test so the timeout below can be derived from the count
+    rather than guessed at.
+  */
+  const BREAKPOINTS = [
+    { name: "phone-360", width: 360, height: 780 },
+    { name: "phone-390", width: 390, height: 844 },
+    { name: "phone-430", width: 430, height: 932 },
+    { name: "tablet-768", width: 768, height: 1024 },
+    { name: "laptop-1280", width: 1280, height: 800 },
+    { name: "desktop-1440", width: 1440, height: 900 },
+  ];
+
   for (const path of SHELL_ROUTES) {
     test(`${path} has sound structure at every breakpoint`, async ({
       page,
     }) => {
+      /*
+        One budget per navigation, not one for all of them.
+
+        This test loads the same route once per breakpoint — six full page
+        loads, each waiting on `networkidle`. Playwright's default 30s applies
+        to the *whole test*, so the budget was being shared across all six and
+        an ordinary CI runner blew through it on `/explore`, the heaviest page
+        (four category photographs plus the cover). It failed all three
+        attempts on `dev` after #72, which is exactly the point at which a
+        shared budget stops being a rounding error.
+
+        Derived from the array rather than hardcoded, so adding a seventh
+        breakpoint cannot quietly make it tight again.
+      */
+      test.setTimeout(BREAKPOINTS.length * 20_000);
+
       const problems: string[] = [];
 
-      /*
-        The widths that actually break things, not a sample of them: the
-        narrowest phone still in use (360), the common one (390), the large
-        one (430), the tablet, the laptop where the `lg` inline nav appears,
-        and the desktop. Horizontal overflow is a defect that shows at one
-        width and hides at the next, so the cheap fix is to check the ones
-        real devices report.
-      */
-      for (const viewport of [
-        { name: "phone-360", width: 360, height: 780 },
-        { name: "phone-390", width: 390, height: 844 },
-        { name: "phone-430", width: 430, height: 932 },
-        { name: "tablet-768", width: 768, height: 1024 },
-        { name: "laptop-1280", width: 1280, height: 800 },
-        { name: "desktop-1440", width: 1440, height: 900 },
-      ]) {
+      for (const viewport of BREAKPOINTS) {
         await page.setViewportSize(viewport);
         await page.goto(path, { waitUntil: "networkidle" });
         // `networkidle` is not "the route rendered": under `next dev` the
