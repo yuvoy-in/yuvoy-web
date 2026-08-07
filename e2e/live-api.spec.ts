@@ -120,32 +120,42 @@ test.describe("live API", () => {
       }
     });
 
-    // Arriving from the printed ferry QR code. The campaign route still
-    // renders the full landing, including the embedded registration form —
-    // #register/#providers stay working indefinitely (see lead-forms.tsx).
+    // Arriving from the printed ferry QR code. Since #63 the homepage (and
+    // therefore every /go/<source> route) is travellers-only, so the operator
+    // anchor no longer opens a form in place — LegacyProviderAnchor redirects
+    // to /operators#apply, where the single-audience form renders with no
+    // tablist and no tabpanel. Scope to the page, not to a panel.
     await page.goto("/go/ferry#providers");
-    await page.getByRole("tab", { name: /run experiences/i }).click();
-    const panel = page.getByRole("tabpanel", { name: /run experiences/i });
+    await page.waitForURL(/\/operators/, { timeout: 15_000 });
 
     const phone = uniquePhone();
-    await panel.getByLabel("Your name").fill("E2E Live Contact");
-    await panel.getByLabel("Business name").fill("E2E Live Dive Co");
-    await panel.getByLabel("WhatsApp number").fill(phone);
+    await page.getByLabel("Your name").fill("E2E Live Contact");
+    await page.getByLabel("Business name").fill("E2E Live Dive Co");
+    await page.getByLabel("WhatsApp number").fill(phone);
     // Both are required: at least one coverage destination and exactly one
-    // primary interest.
-    await panel.getByText("Havelock").click();
-    await panel.getByText("Diving & water").click();
-    await panel.getByText(/I agree to the/).click();
-    await panel.getByRole("button", { name: "Join the waitlist" }).click();
+    // primary interest. Exact strings — the page prose mentions both words.
+    await page.getByText("Havelock (Swaraj Dweep)").click();
+    await page.getByText("Diving & water", { exact: true }).click();
+    await page.getByText(/I agree to the/).click();
+    await page.getByRole("button", { name: "Join the waitlist" }).click();
 
-    await expect(panel.getByRole("status")).toContainText(
+    await expect(page.getByRole("status")).toContainText(
       /you.re on the yuvoy waitlist|touch/i,
       { timeout: 20_000 },
     );
 
+    expect(sent?.audience).toBe("provider");
+
     // Attribution must survive the journey from QR route to API payload,
     // otherwise campaign spend cannot be told apart from organic traffic.
-    expect(sent?.audience).toBe("provider");
+    //
+    // KNOWN DEFECT — yuvoy-web#70: the redirect to /operators drops the
+    // campaign source, and that page hardcodes `source: "web"`, so every
+    // provider who applies from printed ferry/kiosk/hotel/instagram material
+    // is recorded as organic. Asserted as currently-failing rather than
+    // relaxed to "web": weakening it would bless the data loss. This flips
+    // green the moment #70 lands, and the surrounding expectations still
+    // prove the round trip reaches the real API.
     expect(sent?.source).toBe("ferry");
   });
 });
