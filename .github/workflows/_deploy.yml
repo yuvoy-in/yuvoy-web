@@ -5,6 +5,17 @@ name: _deploy
 
 on:
   workflow_call:
+    inputs:
+      ref:
+        description: >
+          Commit to deploy. Leave empty for the checkout default (the commit
+          that triggered the caller). Production passes an explicit SHA because
+          it is triggered by `workflow_run`, where the default is the *default
+          branch's* head rather than the commit CI actually tested — which for a
+          staging-style caller would silently deploy the wrong branch.
+        type: string
+        required: false
+        default: ""
     secrets:
       VERCEL_TOKEN:
         required: true
@@ -23,6 +34,12 @@ jobs:
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+      # Deployed commit, recorded before .git is removed. Without this the only
+      # evidence of *what* went out is the Vercel dashboard, and a gated deploy
+      # is worth nothing if you cannot show it shipped the commit CI passed.
+      - run: echo "Deploying $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
       # Deploy without git-author metadata — Vercel Hobby blocks private-repo
       # deploys whose commit author isn't the account owner. No .git → no author.
       - run: rm -rf .git
