@@ -67,6 +67,27 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: pnpm exec playwright install-deps chromium
 
+      # Next.js's own build cache. In CI the suite serves a production build
+      # (see the `webServer` note in playwright.config.ts), so this job now
+      # compiles the app as well as running the browser tests, and an uncached
+      # `next build` is most of that step's time.
+      #
+      # Keyed on the lockfile plus the sources that actually affect output, so
+      # a dependency bump or a source change invalidates it; `restore-keys`
+      # then falls back to the newest previous cache rather than starting cold,
+      # which is the case that matters on a busy branch.
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**', 'public/**', '*.config.*') }}
+          restore-keys: |
+            next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+            next-${{ runner.os }}-
+
+      # Builds and starts the app, then runs the suite against it. Testing the
+      # dev server instead was both slower and less truthful — it leaves a
+      # duplicate copy of each route in the DOM that the shipped build does not.
       - run: pnpm test:e2e
 
       # The traces and screenshots Playwright keeps for a failed test. Without

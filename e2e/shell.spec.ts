@@ -1,7 +1,17 @@
 import { test, expect, type Page } from "./support/session";
 import AxeBuilder from "@axe-core/playwright";
 
-/** Routes that exist today and must all render inside the shell. */
+import { waitForRouteReady } from "./support/ready";
+
+/**
+ * Routes that exist today and must all render inside the shell.
+ *
+ * `/waitlist` is in here on purpose even though it suppresses the site header:
+ * what this list asserts is that every route has a `banner` carrying the mark
+ * and a `contentinfo` beneath it, and that route satisfies both with its own
+ * masthead (`WaitlistChrome`). What is *specific* to it — no site nav, a back
+ * control, a centred mark — is asserted in `waitlist.spec.ts`.
+ */
 const SHELL_ROUTES = [
   "/",
   "/explore",
@@ -177,11 +187,12 @@ test.describe("site shell", () => {
           Nothing here needs the image bytes. Every image sits in a box with a
           CSS aspect ratio, so layout — which is all the overflow and heading
           checks measure — is final before a single pixel is decoded. Waiting on
-          `<main>` is the real guard, and it is what stops this measuring
-          `loading.tsx` while the route compiles.
+          a *visible* `<main>` is the real guard, and it is what stops this
+          measuring `loading.tsx` while the route compiles, or React's hidden
+          streaming buffer while the route is still arriving.
         */
         await page.goto(path, { waitUntil: "domcontentloaded" });
-        await page.locator("main").first().waitFor({ state: "attached" });
+        await waitForRouteReady(page);
 
         // Horizontal overflow — the classic mobile defect, invisible in tests
         // that only assert on content.
@@ -253,15 +264,36 @@ test.describe("site shell", () => {
           problems.push(`${viewport.name}: ${offender}`);
         }
 
-        // Exactly one h1, and heading levels never skip on the way down.
-        const levels = await page.evaluate(() =>
-          [...document.querySelectorAll("h1,h2,h3,h4,h5,h6")].map((el) =>
-            Number(el.tagName.substring(1)),
-          ),
+        /*
+          Exactly one h1, and heading levels never skip on the way down.
+
+          Only headings that have layout are counted. React's streaming staging
+          container keeps a hidden second copy of the whole route in the DOM
+          (see `waitForRouteReady`), so counting every match reported "2 h1
+          elements" on pages that render one — which the served HTML proves,
+          and which is what a crawler is given.
+
+          Layout is also the honest test of the thing being asserted: a heading
+          with no box is not on the page and is not in the accessibility tree,
+          so it cannot be the second h1 a screen-reader user has to sort out.
+        */
+        const headings = await page.evaluate(() =>
+          [...document.querySelectorAll("h1,h2,h3,h4,h5,h6")]
+            .filter((el) => el.getClientRects().length > 0)
+            .map((el) => ({
+              level: Number(el.tagName.substring(1)),
+              text: (el.textContent ?? "").trim().slice(0, 40),
+            })),
         );
-        const h1Count = levels.filter((level) => level === 1).length;
-        if (h1Count !== 1) {
-          problems.push(`${viewport.name}: ${h1Count} h1 elements, expected 1`);
+        const levels = headings.map((h) => h.level);
+        const h1s = headings.filter((h) => h.level === 1);
+        if (h1s.length !== 1) {
+          const detail = h1s.map((h) => `"${h.text}"`).join(" + ");
+          problems.push(
+            `${viewport.name}: ${h1s.length} h1 elements, expected 1${
+              detail ? ` — ${detail}` : ""
+            }`,
+          );
         }
         for (let i = 1; i < levels.length; i++) {
           if (levels[i] - levels[i - 1] > 1) {
@@ -295,7 +327,7 @@ test.describe("site shell", () => {
       // Same reasoning as the structure check above: tap-target size comes
       // from layout, not from decoded image bytes.
       await page.goto(path, { waitUntil: "domcontentloaded" });
-      await page.locator("main").first().waitFor({ state: "attached" });
+      await waitForRouteReady(page);
 
       const undersized = await page.evaluate(() =>
         [...document.querySelectorAll("a,button")]
@@ -744,6 +776,11 @@ async function settle(page: Page) {
 
 /** Violations, flattened to one readable line per offending node. */
 async function axeViolations(page: Page) {
+  // Scanning a route that is still streaming means scanning the fallback, and
+  // a fallback has no violations — a clean report that examined nothing. These
+  // call sites navigate with the default `load`, which happens to make that
+  // safe today; saying so explicitly means it stays safe if one ever doesn't.
+  await waitForRouteReady(page);
   await settle(page);
   const { violations } = await new AxeBuilder({ page })
     .withTags(WCAG_TAGS)

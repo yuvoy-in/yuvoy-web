@@ -1,5 +1,7 @@
 import type { Page } from "@playwright/test";
 
+import { waitForRouteReady } from "./ready";
+
 /**
  * A page's text, as a reader would meet it — and never as the framework
  * leaves it lying around.
@@ -45,12 +47,15 @@ export async function pageText(
     reproduced twice under the suite's seven parallel workers and passed every
     time the test was run alone, which is exactly how this class of bug hides.
 
-    `<main>` is the signal because every route renders one and the loading
-    fallback renders none, so this is a structural check rather than a string
-    match against fallback copy that could be reworded. Every spec that reads
-    page text gets the fix by using this helper.
+    A *visible* `<main>` is the signal because every route renders one, the
+    loading fallback renders none, and React's streaming staging container is
+    hidden — so this is a structural check rather than a string match against
+    fallback copy that could be reworded. See `waitForRouteReady`: waiting for
+    `attached` instead was letting this read staged markup and pass without
+    examining the page. Every spec that reads page text gets the fix by using
+    this helper.
   */
-  await page.locator("main").first().waitFor({ state: "attached" });
+  await waitForRouteReady(page);
 
   return page.evaluate((dropPreview) => {
     const clone = document.body.cloneNode(true) as HTMLElement;
@@ -61,6 +66,22 @@ export async function pageText(
         "script, style, template, next-route-announcer, nextjs-portal",
       )
       .forEach((node) => node.remove());
+    /*
+      React's streaming staging container — `<div hidden id="S:0">` — holds a
+      full second copy of the route's markup and is never removed. Reading
+      through it doubles every string on the page, which is the exact failure
+      the note above describes for the dev flight payload, arriving by a
+      different door: "stated exactly once" assertions see two, and a phrase
+      forbidden on the page matches a copy nobody can read.
+
+      `[hidden]` is the right net rather than `#S\\:0` specifically: the
+      attribute means "not shown", so anything the site itself hides is not
+      text a reader meets either. Collapsed `<details>` are unaffected — a
+      closed disclosure is hidden by the UA, not by this attribute — so the
+      claims inside them still get checked, which is the point of walking the
+      DOM here instead of using `innerText`.
+    */
+    clone.querySelectorAll("[hidden]").forEach((node) => node.remove());
     if (dropPreview) {
       clone.querySelectorAll("[data-preview]").forEach((node) => node.remove());
     }

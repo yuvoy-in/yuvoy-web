@@ -1,11 +1,28 @@
 name: Production deployment
 
+# Production deploys only after CI has gone green on the exact commit.
+#
+# It used to deploy straight off `push: [main]`, which raced CI rather than
+# waiting for it: on the 2026-08-07 release the site was live and serving
+# before the e2e job finished, and that job then failed. Nothing was wrong with
+# the site that time — the failure was a bug in the test harness — but "we
+# found out afterwards" is not a release process, and branch protection does
+# not help here: it gates the *merge*, and a merge commit is not the commit any
+# PR run ever tested.
+#
+# `workflow_run` is the only trigger that can express "after CI, on this SHA".
+# Its cost is that the event carries the *default branch's* context, so the
+# commit to deploy has to be passed explicitly — see `ref` below and the note
+# in `_deploy.yml`.
 on:
   # Manual redeploy. NEXT_PUBLIC_* values are inlined at build time, so
   # changing one in Vercel does nothing until a rebuild — which previously
-  # meant pushing a commit for a config-only change.
+  # meant pushing a commit for a config-only change. Also the escape hatch when
+  # a release must go out with CI red on something known and accepted.
   workflow_dispatch:
-  push:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
     branches: [main]
 
 concurrency:
@@ -14,7 +31,16 @@ concurrency:
 
 jobs:
   deploy:
+    # A `workflow_run` fires on *completion*, success or not, so the conclusion
+    # has to be checked here or a red CI would deploy exactly as before.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
     uses: ./.github/workflows/_deploy.yml
+    with:
+      # Empty on manual dispatch, where checkout's default (the dispatched ref)
+      # is already what we want.
+      ref: ${{ github.event.workflow_run.head_sha || '' }}
     secrets:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
