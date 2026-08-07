@@ -118,35 +118,69 @@ test.describe("site shell", () => {
     Two whole-page structural checks that a screenshot cannot make for you,
     and that axe's WCAG-tagged rules do not cover.
   */
+  /*
+    The widths that actually break things, not a sample of them: the narrowest
+    phone still in use (360), the common one (390), the large one (430), the
+    tablet, the laptop where the `lg` inline nav appears, and the desktop.
+    Horizontal overflow is a defect that shows at one width and hides at the
+    next, so the cheap fix is to check the ones real devices report.
+
+    Hoisted out of the test so the timeout below can be derived from the count
+    rather than guessed at.
+  */
+  const BREAKPOINTS = [
+    { name: "phone-360", width: 360, height: 780 },
+    { name: "phone-390", width: 390, height: 844 },
+    { name: "phone-430", width: 430, height: 932 },
+    { name: "tablet-768", width: 768, height: 1024 },
+    { name: "laptop-1280", width: 1280, height: 800 },
+    { name: "desktop-1440", width: 1440, height: 900 },
+  ];
+
   for (const path of SHELL_ROUTES) {
     test(`${path} has sound structure at every breakpoint`, async ({
       page,
     }) => {
+      /*
+        One budget per navigation, not one for all of them.
+
+        This test loads the same route once per breakpoint — six full page
+        loads — while Playwright's default 30s applies to the *whole test*, so
+        the budget was shared across all six. `/explore` blew through it on CI
+        after #72 put photography on the pages.
+
+        Raising the budget alone was not the fix, and proved it: at 120s the
+        same test still hung. The wait condition was the real cause (see the
+        note on `page.goto` below). This stays because a shared budget is still
+        the wrong shape — six navigations deserve six navigations' worth.
+
+        Derived from the array rather than hardcoded, so adding a seventh
+        breakpoint cannot quietly make it tight again.
+      */
+      test.setTimeout(BREAKPOINTS.length * 20_000);
+
       const problems: string[] = [];
 
-      /*
-        The widths that actually break things, not a sample of them: the
-        narrowest phone still in use (360), the common one (390), the large
-        one (430), the tablet, the laptop where the `lg` inline nav appears,
-        and the desktop. Horizontal overflow is a defect that shows at one
-        width and hides at the next, so the cheap fix is to check the ones
-        real devices report.
-      */
-      for (const viewport of [
-        { name: "phone-360", width: 360, height: 780 },
-        { name: "phone-390", width: 390, height: 844 },
-        { name: "phone-430", width: 430, height: 932 },
-        { name: "tablet-768", width: 768, height: 1024 },
-        { name: "laptop-1280", width: 1280, height: 800 },
-        { name: "desktop-1440", width: 1440, height: 900 },
-      ]) {
+      for (const viewport of BREAKPOINTS) {
         await page.setViewportSize(viewport);
-        await page.goto(path, { waitUntil: "networkidle" });
-        // `networkidle` is not "the route rendered": under `next dev` the
-        // settled state can still be `loading.tsx`, which has no <main> and
-        // no <h1>, so the heading count below would read 0 and the overflow
-        // check would measure the wrong document. Waiting on <main> is the
-        // same guard `pageText` uses, for the same reason.
+        /*
+          `domcontentloaded`, NOT `networkidle`.
+
+          `networkidle` waits for 500ms of network silence, which on `next dev`
+          means waiting for every responsive image variant to be optimised on
+          demand. This test loads the same route at six widths, and `next/image`
+          requests a different width at each — so `/explore`, with four category
+          photographs, asks the dev server for up to 24 separate WebP re-encodes.
+          On a CI runner that never settled: the test hung on `page.goto` and
+          failed even at a 120s budget, having passed locally throughout.
+
+          Nothing here needs the image bytes. Every image sits in a box with a
+          CSS aspect ratio, so layout — which is all the overflow and heading
+          checks measure — is final before a single pixel is decoded. Waiting on
+          `<main>` is the real guard, and it is what stops this measuring
+          `loading.tsx` while the route compiles.
+        */
+        await page.goto(path, { waitUntil: "domcontentloaded" });
         await page.locator("main").first().waitFor({ state: "attached" });
 
         // Horizontal overflow — the classic mobile defect, invisible in tests
@@ -258,7 +292,9 @@ test.describe("site shell", () => {
       // The narrowest phone still in use, not the common one: targets shrink
       // as the viewport does, so 390 can pass while 360 fails.
       await page.setViewportSize({ width: 360, height: 780 });
-      await page.goto(path, { waitUntil: "networkidle" });
+      // Same reasoning as the structure check above: tap-target size comes
+      // from layout, not from decoded image bytes.
+      await page.goto(path, { waitUntil: "domcontentloaded" });
       await page.locator("main").first().waitFor({ state: "attached" });
 
       const undersized = await page.evaluate(() =>
