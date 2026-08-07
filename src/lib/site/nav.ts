@@ -157,6 +157,23 @@ export const PRIMARY_CTA = {
 } as const;
 
 /**
+ * Routes that render their own masthead instead of the site header.
+ *
+ * **One route, for one reason.** `/waitlist` exists to have a form filled in,
+ * and the standing header offers three ways off it plus a call to action
+ * pointing at the page the visitor is already on. It carries `WaitlistChrome`
+ * instead: the mark, centred, and one way back.
+ *
+ * This is a deliberately short list and should stay that way — a route that
+ * drops the site's navigation has to earn it by being a single-purpose flow,
+ * not by being important. `SiteHeader` is the only consumer; the footer still
+ * renders everywhere, so no page is ever a dead end.
+ */
+export function hidesSiteChrome(pathname: string): boolean {
+  return pathname === "/waitlist";
+}
+
+/**
  * Routes that suppress the footer's closing call to action.
  *
  * The footer repeats the ask on every page, which is right almost everywhere.
