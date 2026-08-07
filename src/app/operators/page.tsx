@@ -104,7 +104,7 @@ const CONTENTS = [
  *
  * **Validated, not trusted.** `campaignSourceFromParam` maps anything outside
  * the contract's enum to `web`, so a junk or hostile value can never reach the
- * API and come back as a 422 the applicant would read as a broken form.
+ * API and come back as a 400 the applicant would read as a broken form.
  *
  * **The canonical stays `/operators`, and the query is not stripped after
  * reading.** This page is indexable, unlike `/go/*`, so `?source=ferry` could

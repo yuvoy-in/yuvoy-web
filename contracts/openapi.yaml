@@ -538,7 +538,7 @@ components:
         CHANGED 2026-08-07, tracking yuvoy-in/yuvoy-api#4. Until that ships on
         the deployed API, `POST /v1/leads` still requires `whatsapp`,
         `coverageDestinationKeys` and `primaryInterest` for a provider and will
-        answer 422 without them. The frontend surfaces that rejection rather
+        answer 400 without them. The frontend surfaces that rejection rather
         than swallowing it (see `unknownFieldErrors` in lead-forms.tsx).
       properties:
         audience: { $ref: "#/components/schemas/LeadAudience" }

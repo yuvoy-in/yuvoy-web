@@ -131,7 +131,7 @@ const travellerSchema = z.object({
  * for travellers.
  *
  * **All three relaxations need `yuvoy-in/yuvoy-api#4`**, which marks them
- * required on `ProviderLeadInput`. Until that deploys the API answers 422 —
+ * required on `ProviderLeadInput`. Until that deploys the API answers 400 —
  * see `unknownFieldErrors` in `ProviderForm`, which makes that failure
  * visible rather than silent.
  */

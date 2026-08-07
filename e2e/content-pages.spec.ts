@@ -174,7 +174,7 @@ test("/operators is an application, at the right proportions", async ({
 /*
   While `OPERATOR_FORM_LIVE` is false the application is a notice rather than a
   form: the deployed API still requires fields this form stopped asking for
-  (yuvoy-in/yuvoy-api#4), so submitting would 422 every applicant. What has to
+  (yuvoy-in/yuvoy-api#4), so submitting would 400 every applicant. What has to
   hold either way is that `#apply` exists, says what is happening, and offers a
   channel that reaches a person today. Swap these assertions back to the form's
   fields in the change that flips the flag.

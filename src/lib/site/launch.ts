@@ -61,7 +61,7 @@ export const EXPANSION_STATUS =
  * "Where do you operate?" and "What do you offer?" on 2026-08-07 (owner
  * direction), and stopped requiring a WhatsApp number in the same change. The
  * deployed API still marks all three required on a provider lead, so a
- * complete, valid application is answered with a 422.
+ * complete, valid application is answered with a 400.
  *
  * Given the choice between a form that silently rejects every operator who
  * fills it in and an honest "coming soon" beside two channels that reach a

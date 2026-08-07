@@ -109,7 +109,7 @@ test.describe("campaign attribution", () => {
   /*
     The value reaches the database and the API rejects anything outside its
     enum, so an unrecognised or hostile query has to become `web` here rather
-    than travel to a 422 the applicant would read as a broken form.
+    than travel to a 400 the applicant would read as a broken form.
   */
   for (const junk of ["notreal", "../etc/passwd", "web", ""]) {
     test(`?source=${junk || "(empty)"} still renders the page`, async ({

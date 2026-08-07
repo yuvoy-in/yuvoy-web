@@ -319,7 +319,7 @@ export interface components {
         };
         /**
          * @description Contact rule: `email` is required for both audiences — it is the channel the launch announcement is sent on. `whatsapp` is optional for both and is the channel for the conversation that follows. Deduplication uses the normalised contact — WhatsApp number when present, else email.
-         *     CHANGED 2026-08-07, tracking yuvoy-in/yuvoy-api#4. Until that ships on the deployed API, `POST /v1/leads` still requires `whatsapp`, `coverageDestinationKeys` and `primaryInterest` for a provider and will answer 422 without them. The frontend surfaces that rejection rather than swallowing it (see `unknownFieldErrors` in lead-forms.tsx).
+         *     CHANGED 2026-08-07, tracking yuvoy-in/yuvoy-api#4. Until that ships on the deployed API, `POST /v1/leads` still requires `whatsapp`, `coverageDestinationKeys` and `primaryInterest` for a provider and will answer 400 without them. The frontend surfaces that rejection rather than swallowing it (see `unknownFieldErrors` in lead-forms.tsx).
          */
         LeadInputBase: {
             audience: components["schemas"]["LeadAudience"];

@@ -96,7 +96,7 @@ export function operatorHref(source: LeadSource, hash = ""): string {
  *
  * **Validated, never trusted.** This value reaches the database, and the API
  * rejects anything outside the contract's enum — so an unrecognised or hostile
- * value has to become `web` here rather than travel to a 422 that the visitor
+ * value has to become `web` here rather than travel to a 400 that the visitor
  * would see as a broken form.
  */
 export function campaignSourceFromParam(value: string | undefined): LeadSource {

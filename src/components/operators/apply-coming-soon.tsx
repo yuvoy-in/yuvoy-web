@@ -5,7 +5,7 @@ import Link from "next/link";
  *
  * ## Why a notice and not the form
  *
- * The form would take a complete, valid application and be answered `422` by
+ * The form would take a complete, valid application and be answered `400` by
  * the deployed API — see `OPERATOR_FORM_LIVE`. An operator would fill in four
  * fields, press a button, and be told something went wrong through no fault
  * of their own. That is worse than not offering the form: it spends the
