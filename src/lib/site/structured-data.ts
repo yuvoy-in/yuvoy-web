@@ -53,7 +53,14 @@ export function organizationSchema(): JsonLd {
     description:
       "Yuvoy is building an experience commerce platform, opening first in the Andaman Islands.",
     slogan: "Experience more.",
-    logo: `${SITE_URL}/opengraph-image`,
+    /*
+      A square mark on its own ground, not the Open Graph card. Google wants
+      an organisation logo it can crop to a square and place beside a result;
+      the OG card is 1200x630 of headline with the mark in a corner, which
+      crops to a slice of type. `/icon.png` is 512x512, generated from the
+      vector by scripts/generate-icons.mjs, and well over the 112px floor.
+    */
+    logo: `${SITE_URL}/icon.png`,
   };
 }
 

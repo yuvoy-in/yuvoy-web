@@ -7,7 +7,7 @@ export const alt = "About Yuvoy";
 export default function Image() {
   return renderOg({
     eyebrow: "About",
-    title: "You, plus voyage. That is the whole idea.",
+    title: "Built to help people experience more of a place.",
     footer: "Experience more.",
   });
 }

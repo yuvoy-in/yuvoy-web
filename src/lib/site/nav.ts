@@ -1,14 +1,29 @@
 /**
  * The site's route registry — the single source of truth for navigation.
  *
- * **A route appears here only once its page exists and renders.** The header
- * and footer are both derived from this list, so a link can never point at a
- * route that was planned but never shipped. Each rebuild issue that adds a
- * page adds its own entry here, in the same PR as the page.
+ * **A route appears here only once its page exists and renders.** The header,
+ * the site menu and the footer are all derived from this list, so a link can
+ * never point at a route that was planned but never shipped.
+ *
+ * ## The header names three routes and the call to action
+ *
+ * Explore, For Operators, About, then Join Waitlist (owner direction,
+ * 2026-08-06). That is the whole of the primary navigation, on every
+ * breakpoint. It replaced a five-item bar — Experiences, Destinations, How it
+ * works, For travellers, For operators — whose first four all answered the
+ * same question in four places; they are now one page, `/explore`, and the old
+ * URLs redirect onto its sections.
+ *
+ * Journal stays out of the desktop bar until there is enough of it to justify
+ * a slot, and lives in the menu and the footer meanwhile. **Adding a fifth
+ * header item is a design change, not a routing one** — it goes through review
+ * rather than through this file.
  */
 
+import { CONTACT_CHANNEL_LIST } from "@/lib/site/contact";
+
 /** Which footer column a route belongs to, if any. */
-export type FooterColumn = "discover" | "yuvoy" | "trust";
+export type FooterColumn = "explore" | "yuvoy" | "trust";
 
 export interface SiteRoute {
   href: string;
@@ -16,151 +31,181 @@ export interface SiteRoute {
   label: string;
   /** Show inline in the desktop (`lg`+) header nav. */
   inHeader?: boolean;
+  /**
+   * Show in the shutter menu, which is the whole of navigation below `lg`.
+   * Set explicitly rather than derived: the menu carries Safety, which sits in
+   * the footer's Trust column, and omits the legal pages, which are pinned
+   * along the bottom of the panel instead. A derived rule got both wrong.
+   */
+  inMenu?: boolean;
   /** Footer column placement; omit to keep the route out of the footer. */
   footer?: FooterColumn;
 }
 
 /**
  * Every navigable route on the site. Order is meaningful — it is the order
- * shown in the header and within each footer column.
+ * shown in the header, in the menu and within each footer column.
  */
 export const SITE_ROUTES: SiteRoute[] = [
-  // Discover column.
   {
-    href: "/experiences",
-    label: "Experiences",
+    href: "/explore",
+    label: "Explore",
     inHeader: true,
-    footer: "discover",
-  },
-  {
-    href: "/destinations",
-    label: "Destinations",
-    inHeader: true,
-    footer: "discover",
-  },
-  { href: "/journal", label: "Journal", footer: "discover" },
-  // Yuvoy column.
-  {
-    href: "/how-it-works",
-    label: "How it works",
-    inHeader: true,
-    footer: "yuvoy",
-  },
-  {
-    href: "/travellers",
-    label: "For travellers",
-    inHeader: true,
-    footer: "yuvoy",
+    inMenu: true,
+    footer: "explore",
   },
   {
     href: "/operators",
-    label: "For operators",
+    label: "For Operators",
     inHeader: true,
+    inMenu: true,
     footer: "yuvoy",
   },
-  { href: "/about", label: "About", footer: "yuvoy" },
-  { href: "/waitlist", label: "Join the waitlist", footer: "yuvoy" },
-  // Trust column.
-  { href: "/safety", label: "Safety", footer: "trust" },
+  {
+    href: "/about",
+    label: "About",
+    inHeader: true,
+    inMenu: true,
+    footer: "yuvoy",
+  },
+  { href: "/journal", label: "Journal", inMenu: true, footer: "explore" },
+  { href: "/contact", label: "Contact", inMenu: true, footer: "yuvoy" },
+  { href: "/safety", label: "Safety", inMenu: true, footer: "trust" },
+  { href: "/waitlist", label: "Join Waitlist", footer: "yuvoy" },
   { href: "/privacy", label: "Privacy", footer: "trust" },
   { href: "/terms", label: "Terms", footer: "trust" },
 ];
 
 /**
  * The desktop header nav, in registry order. From `lg` up these sit inline in
- * the bar — a desktop has the room, and a nav you can see beats one behind a
- * click (owner direction 2026-08-05, reverting the desktop menu concept).
- * Below `lg` the shutter menu carries navigation instead.
+ * the bar. Below `lg` the shutter menu carries navigation instead, and the bar
+ * holds only the mark and the menu trigger.
  */
 export const NAV_ITEMS: { href: string; label: string }[] = SITE_ROUTES.filter(
   (r) => r.inHeader,
 ).map(({ href, label }) => ({ href, label }));
 
 /**
- * What the site menu lists, in registry order.
- *
- * The menu is the whole of navigation below `lg`, so this is every route
- * except the two that are already on screen while it is open: the legal
- * links, pinned along the bottom of the panel, and the waitlist, which is
- * the panel's call to action.
+ * What the site menu lists. The waitlist is excluded because it is the
+ * panel's call to action, and the legal routes because they are pinned along
+ * its foot.
  */
 export const MENU_ITEMS: { href: string; label: string }[] = SITE_ROUTES.filter(
-  (r) => r.footer !== "trust" && r.href !== "/waitlist",
+  (r) => r.inMenu,
 ).map(({ href, label }) => ({ href, label }));
 
-/**
- * The one route the sub-`lg` header names outright. Travellers are the
- * homepage's audience, so operators get a permanent, centred way out to
- * their own page even where the inline nav does not fit.
- */
-export const OPERATOR_NAV = {
-  href: "/operators",
-  label: "For operators",
-} as const;
+/** The legal routes, pinned to the bottom of the menu panel. */
+export const LEGAL_ITEMS: { href: string; label: string }[] =
+  SITE_ROUTES.filter((r) => r.footer === "trust" && !r.inMenu).map(
+    ({ href, label }) => ({ href, label }),
+  );
 
 export const FOOTER_COLUMN_TITLES: Record<FooterColumn, string> = {
-  discover: "Discover",
+  explore: "Explore",
   yuvoy: "Yuvoy",
   trust: "Trust",
 };
 
-const FOOTER_ORDER: FooterColumn[] = ["discover", "yuvoy", "trust"];
+const FOOTER_ORDER: FooterColumn[] = ["explore", "yuvoy", "trust"];
+
+/**
+ * One extra footer entry that is a section rather than a route.
+ *
+ * The launch market deserves a named way in from the footer, and it has no
+ * page of its own — the homepage's first-launch section is where it lives.
+ * Kept out of `SITE_ROUTES` because that list's contract is "routes that
+ * exist", and a fragment is not a route.
+ */
+const FOOTER_EXTRAS: Partial<
+  Record<FooterColumn, { href: string; label: string }[]>
+> = {
+  explore: [{ href: "/#destinations", label: "Andaman Islands" }],
+};
 
 /**
  * Footer columns, empty ones dropped — an empty column heading reads as a
- * broken page, and the rebuild ships routes column by column.
+ * broken page.
  */
 export const FOOTER_COLUMNS: {
   key: FooterColumn;
   title: string;
   items: { href: string; label: string }[];
-}[] = FOOTER_ORDER.map((key) => ({
-  key,
-  title: FOOTER_COLUMN_TITLES[key],
-  items: SITE_ROUTES.filter((r) => r.footer === key).map(({ href, label }) => ({
-    href,
-    label,
-  })),
-})).filter((column) => column.items.length > 0);
+}[] = FOOTER_ORDER.map((key) => {
+  const routes = SITE_ROUTES.filter((r) => r.footer === key).map(
+    ({ href, label }) => ({ href, label }),
+  );
+  const extras = FOOTER_EXTRAS[key] ?? [];
+  // Extras sit after the first route so "Explore" leads its own column and
+  // the market reads as something within it.
+  const items =
+    key === "explore" ? [routes[0], ...extras, ...routes.slice(1)] : routes;
+  return {
+    key,
+    title: FOOTER_COLUMN_TITLES[key],
+    items: items.filter(Boolean),
+  };
+}).filter((column) => column.items.length > 0);
 
 /**
  * The canonical short-form call to action, repeated in the header, the mobile
- * menu and the footer. The long forms ("Join the traveller waitlist", "Apply
- * as a founding operator") are used where there is room to be specific.
+ * menu and the footer. The long forms ("Join the waitlist", "Apply as a
+ * founding operator") are used where there is room to be specific.
  */
 export const PRIMARY_CTA = {
   href: "/waitlist",
-  label: "Join waitlist",
+  label: "Join Waitlist",
 } as const;
 
 /**
- * Routes that already end in the registration form.
+ * Routes that suppress the footer's closing call to action.
  *
- * The footer repeats the call to action on every page, which is right almost
- * everywhere — but stacking it directly beneath the form itself reads as a
- * page that does not know what it just asked for. These routes suppress it.
+ * The footer repeats the ask on every page, which is right almost everywhere.
+ * Two kinds of route opt out, for two different reasons:
+ *
+ * 1. **They already made the ask.** `/`, `/waitlist`, `/operators`, `/explore`
+ *    and the campaign routes all end in a form or a call to action of their
+ *    own, and stacking a second one directly beneath reads as a page that has
+ *    lost track of what it just said.
+ * 2. **The ask does not belong there.** `/about` (owner direction,
+ *    2026-08-07). Its job is to explain the company, not to convert, and it
+ *    carried "Join the waitlist" twice — once in its own status section, once
+ *    in the footer's — inside a single scroll. The header carries the call to
+ *    action on every route regardless.
  */
-export function endsWithLeadForm(pathname: string): boolean {
+export function suppressesFooterCta(pathname: string): boolean {
   return (
     pathname === "/" ||
     pathname === "/waitlist" ||
     pathname === "/operators" ||
+    pathname === "/explore" ||
+    pathname === "/about" ||
     pathname.startsWith("/go/")
   );
 }
 
 /**
- * Contact and social channels for the footer.
+ * The footer's one-line description of what Yuvoy is.
  *
- * **Deliberately empty.** Publishing an unmonitored address is worse than
- * publishing none — the footer omits the whole row while this is empty. Add
- * entries only for channels a person actually reads.
+ * Consumer language, deliberately. "The experience commerce platform" is how
+ * the business is described internally and to investors; it is not what a
+ * traveller reading a footer needs to be told.
  */
-export const CONTACT_CHANNELS: { href: string; label: string }[] = [];
+export const FOOTER_DESCRIPTION =
+  "Discover real experiences through videos from the people who run them.";
 
 /**
- * Launch status, shown once in the footer. Facts only — no dates we cannot
- * hold to, no counts, no partner claims.
+ * Contact and social channels for the footer.
+ *
+ * Empty until 2026-08-07, on the rule that publishing an unmonitored address
+ * is worse than publishing none. The owner confirmed both of these are read
+ * by a person, so the row ships. Social stays out: an account nobody posts to
+ * is the same broken promise in a different shape.
+ *
+ * Derived from `CONTACT_CHANNEL_LIST` so the address and the number exist in
+ * exactly one file across the footer, `/contact` and the homepage glance.
  */
-export const LAUNCH_STATUS =
-  "Waitlist open for Havelock, Neil and Port Blair. Booking is not live yet.";
+export const CONTACT_CHANNELS: { href: string; label: string }[] =
+  CONTACT_CHANNEL_LIST.map((channel) => ({
+    href: channel.href,
+    label: channel.value,
+  }));

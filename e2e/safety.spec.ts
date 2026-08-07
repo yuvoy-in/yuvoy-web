@@ -1,4 +1,5 @@
 import { test, expect } from "./support/session";
+import { pageText } from "./support/text";
 
 /**
  * /safety is the highest-risk page on the site: a claim here that turns out to
@@ -14,13 +15,23 @@ test.describe("/safety", () => {
     page,
   }) => {
     await page.goto("/safety");
-    const body = (await page.textContent("body")) ?? "";
+    const body = await pageText(page);
 
-    // Each of these must be explicitly disclaimed somewhere on the page.
+    /*
+      Each of these must be explicitly disclaimed somewhere on the page.
+
+      The page was simplified on 2026-08-06 from two full sections into a list
+      of standards plus one status panel. **No disclosure was dropped**, which
+      is exactly what this test exists to hold: if a future edit tightens the
+      panel and one of these disappears, the gap has been hidden rather than
+      fixed, and on a page about open water that is the failure mode that
+      matters.
+    */
     for (const gap of [
       /no operator on yuvoy has been verified by us/i,
-      /no policy has been written or approved/i,
-      /none of it is built/i,
+      /no cancellation or refund policy has been written or approved/i,
+      /none of it is collected anywhere on this site/i,
+      /incident reporting and on-the-ground support are planned, not running/i,
     ]) {
       expect(body, `missing disclosure: ${gap}`).toMatch(gap);
     }
@@ -28,7 +39,7 @@ test.describe("/safety", () => {
 
   test("makes no assurance it cannot back", async ({ page }) => {
     await page.goto("/safety");
-    const body = (await page.textContent("body")) ?? "";
+    const body = await pageText(page);
 
     // Present-tense assurances that would be false today.
     const FALSE_ASSURANCES = [
@@ -46,19 +57,25 @@ test.describe("/safety", () => {
     }
   });
 
-  test("agrees with the homepage FAQ rather than contradicting it", async ({
+  test("agrees with /explore rather than contradicting it", async ({
     page,
   }) => {
-    // Both surfaces make the same promise: transparency about what a day
-    // requires, and a willingness to lose a booking over it. If one is ever
-    // softened without the other, this fails.
-    const PROMISE = /rather lose a booking than overstate/i;
+    /*
+      Both surfaces make the same promise about conditions, in the same
+      words: the sea decides, and a booking does not override that. If one is
+      ever softened without the other, this fails.
+
+      It used to be asserted between /safety and the homepage's registration
+      FAQ. That FAQ came down to three questions on 2026-08-06 and the safety
+      answer moved to where someone looking for it actually goes — /explore's
+      "what to expect" section, and this page.
+    */
+    const PROMISE = /take priority over completing a booking/i;
 
     await page.goto("/safety");
-    expect(await page.textContent("body")).toMatch(PROMISE);
+    expect(await pageText(page)).toMatch(PROMISE);
 
-    // The homepage FAQ is a collapsed <details>; its text is in the DOM.
-    await page.goto("/");
-    expect(await page.textContent("body")).toMatch(PROMISE);
+    await page.goto("/explore");
+    expect(await pageText(page)).toMatch(PROMISE);
   });
 });

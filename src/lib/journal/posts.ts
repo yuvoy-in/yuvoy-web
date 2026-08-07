@@ -22,7 +22,17 @@ export interface JournalPostMeta {
   description: string;
   publishedAt: string;
   readingMinutes: number;
+  /**
+   * What kind of note this is. Optional in frontmatter and defaulted, because
+   * a category is a way of grouping a journal that has enough posts to need
+   * grouping — it must never become a required field that blocks publishing
+   * the next one.
+   */
+  category: string;
 }
+
+/** Where a post with no `category` in its frontmatter lands. */
+const DEFAULT_CATEGORY = "Field notes";
 
 export interface JournalPost extends JournalPostMeta {
   body: string;
@@ -51,6 +61,10 @@ function parse(slug: string, raw: string): JournalPost {
     publishedAt: data.publishedAt as string,
     readingMinutes:
       typeof data.readingMinutes === "number" ? data.readingMinutes : 3,
+    category:
+      typeof data.category === "string" && data.category
+        ? data.category
+        : DEFAULT_CATEGORY,
     body: content,
   };
 }

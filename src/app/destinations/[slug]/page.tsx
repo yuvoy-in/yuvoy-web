@@ -6,11 +6,19 @@ import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { JsonLd } from "@/components/site/json-ld";
 import { breadcrumbSchema } from "@/lib/site/structured-data";
 import { Section, SectionHeading } from "@/components/ui/section";
+import { StatusNotice } from "@/components/site/status-notice";
+import { DestinationGrid } from "@/components/destinations/destination-panel";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
-import { DESTINATIONS, destinationBySlug } from "@/lib/site/destinations";
+import {
+  DESTINATIONS,
+  availabilityMessage,
+  destinationBySlug,
+  otherDestinations,
+} from "@/lib/site/destinations";
+import { LAUNCH_STATUS_LABEL } from "@/lib/site/launch";
 
-/** Only the three known destinations exist; anything else is a 404. */
+/** Only the known destinations exist; anything else is a 404. */
 export function generateStaticParams() {
   return DESTINATIONS.map((destination) => ({ slug: destination.slug }));
 }
@@ -27,8 +35,10 @@ export async function generateMetadata({
   if (!destination) return {};
 
   return {
-    title: destination.label,
-    description: destination.blurb,
+    // "Things to do in Havelock" is what a person actually searches for, and
+    // it is true of a page that lists the kinds of day the island offers.
+    title: `Things to do in ${destination.name}`,
+    description: destination.shortDescription,
     alternates: { canonical: `/destinations/${destination.slug}` },
   };
 }
@@ -36,10 +46,27 @@ export async function generateMetadata({
 /**
  * A destination page.
  *
+ * ## Built entirely from data
+ *
+ * Every word about the place comes from `DESTINATIONS`. Adding a destination
+ * is an entry in that file plus one in the lead registry — this page is not
+ * touched, and neither is any other. That is the property that stops the site
+ * being an Andaman site with three hardcoded pages.
+ *
+ * ## What it no longer repeats
+ *
+ * The Yuvoy product explanation, the platform disclaimer, and the other
+ * islands' descriptions all appeared here as well as on three other pages.
+ * What is left is what only this page can say: what the place is like, what
+ * kinds of day it offers, where it sits in the launch, and one way in.
+ *
+ * The pre-launch position appears exactly once, in the status notice, and is
+ * derived from the destination's own `launchStatus` rather than typed.
+ *
  * Content is geography and character only. **No operator names, no prices, no
- * counts of anything** — "the widest range of days on the water" is a
- * description of a place, "eleven dive schools" would be a claim we cannot
- * stand behind and would have to maintain.
+ * counts of anything** — "the widest range of days on the water" describes a
+ * place; "eleven dive schools" would be a claim we cannot stand behind and
+ * would have to maintain.
  */
 export default async function DestinationPage({
   params,
@@ -51,56 +78,83 @@ export default async function DestinationPage({
   // Unreachable with dynamicParams=false; belt and braces.
   if (!destination) notFound();
 
+  const related = otherDestinations(destination);
+
   return (
     <main>
       <JsonLd
         schemas={[
           breadcrumbSchema([
             { name: "Home", path: "/" },
-            { name: "Destinations", path: "/destinations" },
+            { name: "Destinations", path: "/#destinations" },
             {
-              name: destination.shortLabel,
+              name: destination.name,
               path: `/destinations/${destination.slug}`,
             },
           ]),
         ]}
       />
       <PageHeader
-        eyebrow={destination.label}
-        title={destination.shortLabel}
-        lede={destination.body.map((paragraph, i) => (
-          <p key={paragraph} className={i > 0 ? "mt-4" : undefined}>
-            {paragraph}
-          </p>
-        ))}
+        eyebrow={`${destination.region} · ${LAUNCH_STATUS_LABEL[destination.launchStatus]}`}
+        title={destination.name}
+        lede={
+          <>
+            {/*
+              The official name, once per page, under the heading.
+
+              It is the name on the ferry timetable and the one a visitor will
+              be looking for when they book a crossing, so it is real content
+              rather than trivia — and it is the registry's own label, which
+              is what the API contract uses. That makes this the single place
+              the site's name for a destination and the backend's have to
+              agree, and an e2e test asserts it here for exactly that reason.
+            */}
+            <p className="label text-forest/75 mb-6">
+              {destination.officialName}
+            </p>
+            <p>{destination.introDescription}</p>
+            {destination.fullDescription.map((paragraph) => (
+              <p key={paragraph} className="mt-4">
+                {paragraph}
+              </p>
+            ))}
+          </>
+        }
       >
         <Breadcrumbs
           trail={[
             { label: "Home", href: "/" },
-            { label: "Destinations", href: "/destinations" },
-            { label: destination.shortLabel },
+            { label: "Destinations", href: "/#destinations" },
+            { label: destination.name },
           ]}
         />
       </PageHeader>
 
-      <Section aria-labelledby="focus-heading">
+      <Section aria-labelledby="categories-heading">
         <SectionHeading
-          id="focus-heading"
-          eyebrow="The first season"
-          title="What we are"
-          accent="looking for here."
-          body="The kinds of day we are curating on this island. Not a catalogue: no experience on Yuvoy is listed or bookable yet."
+          id="categories-heading"
+          eyebrow="What you can do here"
+          title="The kinds of day"
+          accent={`${destination.name} is known for.`}
         />
-        <ul className="border-cream-line mt-12 grid grid-cols-1 gap-px border-t sm:grid-cols-3">
-          {destination.focus.map((item, i) => (
-            <li key={item} className="pt-8 sm:pr-8">
-              <span className="label text-forest/75">0{i + 1}</span>
-              <p className="font-display text-forest tracking-display mt-4 text-lg font-normal">
-                {item}
+        <ul className="border-cream-line mt-14 grid grid-cols-1 gap-x-8 gap-y-8 border-t sm:grid-cols-2 lg:grid-cols-4">
+          {destination.categories.map((category, i) => (
+            <li key={category} className="pt-8 sm:pr-6">
+              <span className="label text-forest/75">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <p className="font-display text-forest tracking-display mt-4 text-xl leading-snug font-normal">
+                {category}
               </p>
             </li>
           ))}
         </ul>
+
+        {/* The only pre-launch statement on this page, derived from the
+            destination's own status rather than typed into it. */}
+        <StatusNotice className="mt-14">
+          <p>{availabilityMessage(destination)}</p>
+        </StatusNotice>
       </Section>
 
       <Section tone="ink" aria-labelledby="cta-heading">
@@ -108,9 +162,9 @@ export default async function DestinationPage({
           id="cta-heading"
           tone="ink"
           eyebrow="Heading here?"
-          title={`Tell us you're going to`}
-          accent={`${destination.shortLabel}.`}
-          body="Pick this island when you join and it is where we start when we get in touch."
+          title="Tell us you are going to"
+          accent={`${destination.name}.`}
+          body="Pick this destination when you join and it is where we start when we get in touch."
         />
         <div className="mt-12 flex flex-col gap-3 sm:flex-row">
           <Link
@@ -120,11 +174,11 @@ export default async function DestinationPage({
               "w-full sm:w-auto",
             )}
           >
-            Join the traveller waitlist
+            Join the waitlist
             <ButtonArrow />
           </Link>
           <Link
-            href="/destinations"
+            href="/#destinations"
             className={cn(
               buttonVariants({ variant: "outlineOnDark", size: "lg" }),
               "w-full sm:w-auto",
@@ -134,6 +188,18 @@ export default async function DestinationPage({
           </Link>
         </div>
       </Section>
+
+      {related.length > 0 && (
+        <Section aria-labelledby="related-heading">
+          <h2
+            id="related-heading"
+            className="font-display text-forest tracking-display text-2xl leading-snug font-normal sm:text-3xl"
+          >
+            Also opening first
+          </h2>
+          <DestinationGrid destinations={related} className="mt-10" />
+        </Section>
+      )}
     </main>
   );
 }

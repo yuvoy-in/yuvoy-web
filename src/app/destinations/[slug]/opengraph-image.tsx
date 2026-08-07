@@ -19,8 +19,10 @@ export default async function Image({
   const destination = destinationBySlug(slug);
 
   return renderOg({
-    eyebrow: "Destinations",
-    title: destination?.label ?? "The Andaman Islands",
+    eyebrow: destination?.region ?? "Destinations",
+    title: destination
+      ? `Things to do in ${destination.name}`
+      : "The Andaman Islands",
     footer: "Experience more.",
   });
 }

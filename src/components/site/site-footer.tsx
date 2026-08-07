@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Wordmark } from "@/components/brand/wordmark";
 import { FooterCta } from "@/components/site/footer-cta";
@@ -6,23 +7,34 @@ import { cn } from "@/lib/cn";
 import {
   CONTACT_CHANNELS,
   FOOTER_COLUMNS,
-  LAUNCH_STATUS,
+  FOOTER_DESCRIPTION,
 } from "@/lib/site/nav";
+import { FOOTER_STATUS } from "@/lib/site/launch";
 
 /**
  * The site footer: the page's closing statement, then its map.
  *
- * Identity on the left, every link group evenly on the right, and a single
- * legal rule closing it. The map used to sit in a four-column grid that only
- * ever held three groups, so the columns bunched into the left of the page
- * with a column of dead space beside them, and the identity block sat in a
- * second row below with no relationship to them. One grid fixes both.
+ * ## What changed on 2026-08-06
+ *
+ * It used to publish most of the sitemap twice over: eleven routes across
+ * three columns, several of which the header also carried, under a description
+ * ("the experience commerce platform") written for an investor deck rather
+ * than for a traveller. The map is now nine links, none repeated, and the
+ * description says what the product does in the language its visitors use.
+ *
+ * ## Why there is no giant "EXPERIENCE MORE." signature
+ *
+ * Because the lockup already is one. The owner-delivered horizontal mark
+ * carries the ensō, the wordmark, the handwritten "Experience more." and its
+ * underline as a single drawing (design system §2), so setting the same words
+ * again at display scale below it would be the brand signing its name twice on
+ * one page. The mark is given the room instead.
  *
  * Every link comes from the route registry, so a column can only ever list
  * pages that exist. Empty columns are dropped rather than rendered as a
  * heading over nothing, and the contact row is omitted entirely while no
- * monitored channel is confirmed (publishing an unread address is worse than
- * publishing none).
+ * monitored channel is confirmed — publishing an unread address is worse than
+ * publishing none.
  */
 
 /**
@@ -33,7 +45,7 @@ import {
 const GROUP_GRID: Record<number, string> = {
   1: "grid-cols-1",
   2: "grid-cols-2",
-  3: "grid-cols-3",
+  3: "grid-cols-2 sm:grid-cols-3",
   4: "grid-cols-2 sm:grid-cols-4",
 };
 
@@ -45,24 +57,74 @@ export function SiteFooter() {
       : []),
   ];
 
-  // The top hairline matters: every dark surface is the same forest now, so on
-  // a route that ends in one (the registration form, a closing section) the
+  // The top hairline matters: every dark surface is the same forest, so on a
+  // route that ends in one (the registration form, a closing section) the
   // footer would otherwise run straight on from it with no seam at all.
   return (
-    <footer className="bg-forest text-cream border-cream/12 border-t">
+    <footer className="bg-forest text-cream border-cream/12 relative isolate border-t">
+      {/*
+        The owner-supplied underwater scene, merged into the field rather than
+        pasted onto it — the same construction as the homepage cover.
+
+        `object-bottom` is the whole reason this works: the frame's interest is
+        along its foot (seabed, coral, a turtle) beneath an almost empty upper
+        half, so anchoring it to the bottom means the crop always takes from
+        the top, where there is nothing to lose. The footer's height varies
+        with the page, the breakpoint and whether the closing call to action
+        renders, and this holds at every one of them.
+
+        `isolate` on the footer, and `-z-10` here, keep the artwork behind the
+        content without giving any child its own stacking context to escape
+        into. Every layer is inert and hidden from assistive tech.
+
+        Contrast is not this stack's job — the artwork measures 12.3:1 to
+        15.4:1 against `cream` across the frame, better than the flat forest
+        it replaces. See `footer-scrim` in globals.css for the measurements.
+      */}
+      <div aria-hidden className="absolute inset-0 -z-10 overflow-hidden">
+        <Image
+          src="/photography/footer.webp"
+          alt=""
+          fill
+          quality={75}
+          sizes="100vw"
+          /*
+            Eager, but not `priority`.
+
+            On a short route — /terms, /privacy, a journal post — the footer is
+            above the fold on arrival, and this 27KB backdrop becomes the
+            Largest Contentful Paint. Lazy-loading it there means the largest
+            thing on screen arrives last, which is precisely what LCP measures
+            (flagged by Next's own dev warning).
+
+            `priority` would fix that and overcorrect: it emits a preload hint
+            on *every* page, including the homepage, where this sits several
+            screens below a cover image that legitimately owns the preload.
+            `eager` starts the fetch when the markup is parsed without
+            competing for that hint — the right trade for a file this small.
+          */
+          loading="eager"
+          className="object-cover object-bottom"
+        />
+        <div className="plate-wash absolute inset-0" />
+        <div className="footer-scrim absolute inset-0" />
+        <div className="grain" />
+      </div>
+
       <FooterCta />
 
       <div className="container-page py-16 sm:py-20">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1.95fr)] lg:gap-20">
-          {/* Identity. */}
+        <div className="grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:gap-20">
+          {/* Identity. The lockup is the signature; the two lines under it
+              say what Yuvoy does and where it is, and nothing else. */}
           <div>
             <Wordmark tone="onDark" className="h-20" />
-            <p className="text-cream/70 mt-6 max-w-xs text-sm leading-relaxed">
-              The experience commerce platform. First stop: the Andaman Islands.
+            <p className="text-cream/70 mt-7 max-w-xs leading-relaxed">
+              {FOOTER_DESCRIPTION}
             </p>
-            <p className="text-cream/70 mt-5 flex max-w-xs items-start gap-2.5 text-sm leading-relaxed">
-              <span aria-hidden className="bg-terra mt-2 size-1 shrink-0" />
-              {LAUNCH_STATUS}
+            <p className="label text-cream/70 mt-6 flex items-start gap-2.5">
+              <span aria-hidden className="bg-terra mt-1.5 size-1 shrink-0" />
+              {FOOTER_STATUS}
             </p>
           </div>
 
@@ -71,12 +133,12 @@ export function SiteFooter() {
             <nav
               aria-label="Footer"
               className={cn(
-                "grid gap-x-4 gap-y-10 sm:gap-x-8",
+                "grid gap-x-6 gap-y-10 sm:gap-x-8 lg:justify-items-end",
                 GROUP_GRID[groups.length] ?? "grid-cols-2 sm:grid-cols-4",
               )}
             >
               {groups.map((group) => (
-                <div key={group.key}>
+                <div key={group.key} className="lg:min-w-36">
                   {/* h2, not h3: these are top-level footer sections, siblings
                       of the page's own sections. As h3 they skipped a level on
                       pages whose main content has no h2 (e.g. /waitlist). */}
@@ -87,14 +149,14 @@ export function SiteFooter() {
                         {item.href.startsWith("/") ? (
                           <Link
                             href={item.href}
-                            className="tap-target text-cream/70 hover:text-cream text-sm leading-snug transition-colors duration-200"
+                            className="tap-target text-cream/70 hover:text-cream focus-visible:ring-terra-soft rounded-edge text-sm leading-snug transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                           >
                             {item.label}
                           </Link>
                         ) : (
                           <a
                             href={item.href}
-                            className="tap-target text-cream/70 hover:text-cream text-sm leading-snug transition-colors duration-200"
+                            className="tap-target text-cream/70 hover:text-cream focus-visible:ring-terra-soft rounded-edge text-sm leading-snug transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                           >
                             {item.label}
                           </a>
@@ -108,10 +170,12 @@ export function SiteFooter() {
           )}
         </div>
 
-        {/* Legal. */}
-        <div className="border-cream/12 mt-14 flex flex-col-reverse items-start gap-4 border-t pt-8 sm:flex-row sm:items-center sm:justify-between">
+        {/* Legal. No social row: a link to an unmaintained account is a
+            promise nobody is keeping, so `CONTACT_CHANNELS` stays empty
+            until a real one is confirmed. */}
+        <div className="border-cream/12 mt-16 flex flex-col-reverse items-start gap-4 border-t pt-8 sm:flex-row sm:items-center sm:justify-between">
           <p className="label text-cream/60">
-            © {new Date().getFullYear()} Yuvoy · Andaman Islands, India
+            © {new Date().getFullYear()} Yuvoy · India
           </p>
           {/* Consent must be as easy to withdraw as it was to give. */}
           <PrivacyChoices />

@@ -38,7 +38,27 @@ test.describe("brand intro veil", () => {
    */
   test("locks the page while it plays and releases it on the way out", async ({
     page,
+    request,
   }) => {
+    /*
+      Compile the route before measuring it.
+
+      The lock is applied by an effect, so it lands at hydration — while the
+      veil's ~3.4s choreography has been running since first paint. Under
+      `next dev` with the suite's seven workers, a cold compile can push
+      hydration past the end of that window, and the lock is then applied to
+      a veil that is already leaving: the assertion sees an unlocked page and
+      the test fails on timing rather than on behaviour. It began failing when
+      the app grew a route, which is exactly how a marginal test announces
+      itself.
+
+      A server-side request compiles `/` without touching this context's
+      `sessionStorage`, so the veil still plays on the navigation below — the
+      subject of the test is untouched, only the dev server's warm-up is
+      taken out of the measurement.
+    */
+    await request.get("/");
+
     await page.goto("/");
     await expect(veil(page)).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute(

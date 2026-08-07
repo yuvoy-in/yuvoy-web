@@ -5,14 +5,20 @@
  * previously drawn on scroll; it is now simply there (owner direction,
  * 2026-08-03, removing scroll-triggered motion), which also makes this a
  * server component with no client JavaScript at all.
+ *
+ * Two of the six are named generically (spreadsheets, design tools) rather
+ * than by product. This is reportage, not endorsement, and an operator who
+ * uses Sheets rather than Excel or Figma rather than Canva should still see
+ * their own week described. The two that are named — Instagram and WhatsApp —
+ * are named because in this market they are the specific tools, not a category.
  */
 const STACK = [
   { tool: "Instagram", job: "Marketing" },
   { tool: "WhatsApp", job: "Enquiries" },
-  { tool: "Calendar", job: "Scheduling" },
-  { tool: "Excel", job: "Bookings" },
+  { tool: "Calendar", job: "Availability" },
+  { tool: "Spreadsheets", job: "Bookings" },
   { tool: "Payment links", job: "Payments" },
-  { tool: "Canva", job: "Content" },
+  { tool: "Design tools", job: "Content" },
 ];
 
 export function AppStack() {

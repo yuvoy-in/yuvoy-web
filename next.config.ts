@@ -30,10 +30,59 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
-  // No redirects. /waitlist used to be two permanent (308) redirects onto
-  // homepage anchors; it is now a real page. The anchors it pointed at are
-  // kept alive on the homepage anyway, because browsers cache a 308 forever
-  // and operator materials are printed with ?audience=provider on them.
+
+  /**
+   * The 2026-08-06 consolidation, kept honest.
+   *
+   * `/experiences`, `/destinations`, `/how-it-works` and `/travellers` were
+   * four pages answering one question in four places. They are now four
+   * sections of `/explore`, and these redirects are what stops the links
+   * already published, indexed and printed from breaking.
+   *
+   * **They are 307/302, not 308/301.** `permanent: false` is deliberate and
+   * load-bearing: a browser caches a permanent redirect indefinitely, so a
+   * 308 here would make the decision to fold these pages together
+   * irreversible on every machine that ever saw one. The IA is new enough
+   * that it must stay reversible. Promote these to permanent only once the
+   * shape has held for a season.
+   *
+   * Order matters. `/destinations/neil` is listed before nothing else can
+   * match it, and the bare `/destinations` source is exact, so the
+   * `/destinations/<slug>` pages are untouched by it.
+   */
+  async redirects() {
+    return [
+      // A legacy spelling of Neil that predates the `neil-island` slug, and
+      // the shape a person guesses. The page itself is `dynamicParams: false`,
+      // so without this it is a 404 rather than a near miss.
+      {
+        source: "/destinations/neil",
+        destination: "/destinations/neil-island",
+        permanent: true,
+      },
+      /*
+        `/destinations` and `/how-it-works` point at the HOMEPAGE, not at
+        `/explore`. Both sections lived on `/explore` until 2026-08-07 and were
+        removed as duplicates of the homepage's own — so these redirects follow
+        the content rather than the URL that used to hold it. `#destinations`
+        is `FirstLaunch` and `#how` is the why act; both ids are asserted by
+        the e2e suite precisely because a redirect that lands on a missing
+        anchor silently drops the reader at the top of a long page.
+      */
+      {
+        source: "/destinations",
+        destination: "/#destinations",
+        permanent: false,
+      },
+      { source: "/how-it-works", destination: "/#how", permanent: false },
+      { source: "/travellers", destination: "/explore", permanent: false },
+      {
+        source: "/experiences",
+        destination: "/explore#experiences",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -4,10 +4,11 @@ import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Wordmark } from "@/components/brand/wordmark";
-import { WaveMotif } from "@/components/brand/wave-motif";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
-import { MENU_ITEMS, PRIMARY_CTA, SITE_ROUTES } from "@/lib/site/nav";
+import { LEGAL_ITEMS, MENU_ITEMS, PRIMARY_CTA } from "@/lib/site/nav";
+import { campaignSourceFromPathname, operatorHref } from "@/lib/leads/registry";
+import { ANNOUNCEMENT } from "@/lib/site/launch";
 
 /**
  * The site navigation panel below `lg`.
@@ -158,7 +159,16 @@ export function SiteMenu({
     return () => desktop.removeEventListener("change", onChange);
   }, []);
 
-  const legalLinks = SITE_ROUTES.filter((r) => r.footer === "trust");
+  const legalLinks = LEGAL_ITEMS;
+
+  /*
+    On a `/go/<source>` route the operator link carries the campaign source,
+    or an operator who scanned a printed QR and navigated from here is
+    recorded as organic (yuvoy-web#70). Below `lg` this menu *is* the
+    navigation, so leaving it out would lose attribution for the majority of
+    scans — a printed code is read on a phone.
+  */
+  const campaignSource = campaignSourceFromPathname(pathname);
 
   return (
     <>
@@ -257,7 +267,11 @@ export function SiteMenu({
                           className="border-cream-line border-b last:border-b-0"
                         >
                           <Link
-                            href={item.href}
+                            href={
+                              item.href === "/operators"
+                                ? operatorHref(campaignSource)
+                                : item.href
+                            }
                             aria-current={current ? "page" : undefined}
                             onClick={() => close(false)}
                             className={cn(
@@ -285,16 +299,15 @@ export function SiteMenu({
               {/* The room a desktop has and a phone does not. Informational
                   only, so there is nothing here to miss on a small screen. */}
               <div className="hidden lg:col-span-5 lg:block lg:pt-2">
-                <WaveMotif />
-                <p className="font-display text-forest tracking-display mt-6 text-2xl leading-snug text-balance">
+                <p className="font-display text-forest tracking-display text-2xl leading-snug text-balance">
                   Season One opens in the Andaman Islands{" "}
                   <em className="text-terra font-turn italic">
                     when the water clears.
                   </em>
                 </p>
                 <p className="text-forest/75 mt-5 max-w-xs leading-relaxed">
-                  Havelock, Neil and Port Blair, covered properly, before
-                  anywhere else.
+                  {ANNOUNCEMENT.short}. More destinations join as their
+                  experiences and operators are ready.
                 </p>
               </div>
             </div>

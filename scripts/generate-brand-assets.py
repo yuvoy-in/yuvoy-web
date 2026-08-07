@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Derive the brand-mark assets from the official logo.
 
-Input:  public/yuvoy-logo.png — the official ensō mark as delivered: white
+Input:  design/brand-source/yuvoy-logo.png — the official ensō mark as delivered: white
         brush ring + terracotta dot on an OPAQUE black field with a radial
         glow (no alpha to lift).
 
@@ -31,7 +31,7 @@ import zlib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCE = ROOT / "public" / "yuvoy-logo.png"
+SOURCE = ROOT / "design" / "brand-source" / "yuvoy-logo.png"
 MARK = ROOT / "public" / "brand" / "yuvoy-mark.png"
 MARK_ON_LIGHT = ROOT / "public" / "brand" / "yuvoy-mark-on-light.png"
 MARK_ON_DARK = ROOT / "public" / "brand" / "yuvoy-mark-on-dark.png"

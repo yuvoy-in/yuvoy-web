@@ -4,13 +4,11 @@ import AxeBuilder from "@axe-core/playwright";
 /** Routes that exist today and must all render inside the shell. */
 const SHELL_ROUTES = [
   "/",
+  "/explore",
   "/waitlist",
-  "/how-it-works",
-  "/travellers",
   "/operators",
+  "/contact",
   "/safety",
-  "/experiences",
-  "/destinations",
   "/destinations/havelock",
   "/about",
   "/journal",
@@ -88,11 +86,32 @@ test.describe("site shell", () => {
     }
   });
 
-  test("footer publishes no placeholder contact channel", async ({ page }) => {
+  /*
+    The footer published no contact row at all until 2026-08-07, on the rule
+    that an unmonitored address is worse than none. The owner confirmed both
+    of these are read by a person, so the row ships — and what is asserted
+    now is that the channels are real links rather than decoration, and that
+    they match the single source they are derived from.
+  */
+  test("footer publishes the confirmed contact channels, as links", async ({
+    page,
+  }) => {
     await page.goto("/");
-    const footer = await page.getByRole("contentinfo").textContent();
-    // A contact row ships only when a real, monitored channel is confirmed.
-    expect(footer).not.toMatch(/@|mailto:|wa\.me/i);
+    const footer = page.getByRole("contentinfo");
+
+    await expect(
+      footer.getByRole("link", { name: "info@yuvoy.in" }),
+    ).toHaveAttribute("href", "mailto:info@yuvoy.in");
+    await expect(
+      footer.getByRole("link", { name: /\+91 81216 57657/ }),
+    ).toHaveAttribute("href", "https://wa.me/918121657657");
+
+    // No social row: an account nobody posts to is the same broken promise
+    // in a different shape.
+    const text = (await footer.textContent()) ?? "";
+    for (const network of ["instagram", "facebook", "twitter", "linkedin"]) {
+      expect(text.toLowerCase()).not.toContain(network);
+    }
   });
 
   /*
@@ -105,13 +124,30 @@ test.describe("site shell", () => {
     }) => {
       const problems: string[] = [];
 
+      /*
+        The widths that actually break things, not a sample of them: the
+        narrowest phone still in use (360), the common one (390), the large
+        one (430), the tablet, the laptop where the `lg` inline nav appears,
+        and the desktop. Horizontal overflow is a defect that shows at one
+        width and hides at the next, so the cheap fix is to check the ones
+        real devices report.
+      */
       for (const viewport of [
-        { name: "mobile", width: 390, height: 844 },
-        { name: "tablet", width: 834, height: 1112 },
-        { name: "desktop", width: 1440, height: 900 },
+        { name: "phone-360", width: 360, height: 780 },
+        { name: "phone-390", width: 390, height: 844 },
+        { name: "phone-430", width: 430, height: 932 },
+        { name: "tablet-768", width: 768, height: 1024 },
+        { name: "laptop-1280", width: 1280, height: 800 },
+        { name: "desktop-1440", width: 1440, height: 900 },
       ]) {
         await page.setViewportSize(viewport);
         await page.goto(path, { waitUntil: "networkidle" });
+        // `networkidle` is not "the route rendered": under `next dev` the
+        // settled state can still be `loading.tsx`, which has no <main> and
+        // no <h1>, so the heading count below would read 0 and the overflow
+        // check would measure the wrong document. Waiting on <main> is the
+        // same guard `pageText` uses, for the same reason.
+        await page.locator("main").first().waitFor({ state: "attached" });
 
         // Horizontal overflow — the classic mobile defect, invisible in tests
         // that only assert on content.
@@ -124,6 +160,63 @@ test.describe("site shell", () => {
           problems.push(
             `${viewport.name}: overflows horizontally by ${overflow}px`,
           );
+        }
+
+        /*
+          Element-level overflow, which the document-level check above can
+          miss entirely.
+
+          `globals.css` sets `overflow-x: clip` on the body as a guard. That
+          guard also *hides the evidence*: content wider than the viewport is
+          cut off rather than made scrollable, so the page can look fine to a
+          scrollWidth comparison while a button, a table or a long address is
+          silently sliced down the right edge. On a phone that is exactly the
+          class of defect nobody catches until a screenshot arrives.
+
+          Elements inside a deliberately clipping ancestor are skipped: the
+          hero's drifting artwork, a plate's hover scale and the menu shutter
+          all overflow on purpose and are contained by design. So are
+          off-screen positioned things — the skip link and the form honeypot
+          live at negative coordinates and are meant to.
+        */
+        const clipped = await page.evaluate((width) => {
+          const out: string[] = [];
+          for (const el of document.body.querySelectorAll<HTMLElement>("*")) {
+            const rect = el.getBoundingClientRect();
+            if (rect.width === 0 || rect.height === 0) continue;
+            // Deliberately off-screen (skip link, honeypot), not overflow.
+            if (rect.right <= 0 || rect.left >= width) continue;
+            const spill = Math.round(rect.right - width);
+            if (spill <= 1) continue;
+
+            let clipsSomewhere = false;
+            for (
+              let node: HTMLElement | null = el.parentElement;
+              node && node !== document.documentElement;
+              node = node.parentElement
+            ) {
+              const overflowX = getComputedStyle(node).overflowX;
+              if (overflowX !== "visible") {
+                clipsSomewhere = true;
+                break;
+              }
+            }
+            if (clipsSomewhere) continue;
+
+            const label =
+              el.tagName.toLowerCase() +
+              (el.className && typeof el.className === "string"
+                ? `.${el.className.trim().split(/\s+/).slice(0, 3).join(".")}`
+                : "");
+            out.push(`${label} spills ${spill}px`);
+          }
+          // One line per offender, deduplicated — a spilling wrapper usually
+          // drags its children with it and would otherwise report ten times.
+          return [...new Set(out)].slice(0, 5);
+        }, viewport.width);
+
+        for (const offender of clipped) {
+          problems.push(`${viewport.name}: ${offender}`);
         }
 
         // Exactly one h1, and heading levels never skip on the way down.
@@ -162,8 +255,11 @@ test.describe("site shell", () => {
   */
   for (const path of SHELL_ROUTES) {
     test(`${path} has no undersized tap target`, async ({ page }) => {
-      await page.setViewportSize(MOBILE);
+      // The narrowest phone still in use, not the common one: targets shrink
+      // as the viewport does, so 390 can pass while 360 fails.
+      await page.setViewportSize({ width: 360, height: 780 });
       await page.goto(path, { waitUntil: "networkidle" });
+      await page.locator("main").first().waitFor({ state: "attached" });
 
       const undersized = await page.evaluate(() =>
         [...document.querySelectorAll("a,button")]
@@ -258,8 +354,52 @@ test.describe("header on scroll", () => {
     await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
   });
 
+  // `/safety`, not `/about`: About gained a dark title spread on 2026-08-07,
+  // so it is a cover route now. This assertion needs a page that genuinely
+  // opens on cream, and the legal and safety pages are the ones that do.
+  /*
+    The server and the first paint must agree about whether a route opens on
+    a dark cover.
+
+    `useHeaderChrome` seeds itself from a hardcoded route list and then
+    re-derives the truth from the DOM. If a page gains a `data-dark-hero`
+    section and nobody adds it to that list, the server renders a cream bar,
+    hydration flips it to transparent, and the header flashes on every single
+    load — a defect that is invisible in any test that runs after hydration,
+    which is every other test in this file.
+
+    So this reads the **served HTML**, where the mismatch actually lives.
+    `/contact` shipped with exactly this bug on 2026-08-07 and was caught by
+    hand; this is why it cannot happen twice.
+  */
+  for (const path of SHELL_ROUTES) {
+    test(`${path} agrees with itself about having a cover`, async ({
+      request,
+    }) => {
+      const html = await (await request.get(path)).text();
+      const hasCover = html.includes("data-dark-hero");
+
+      /*
+        The header's OPENING TAG, not its subtree. Reading the whole element
+        matched `bg-transparent` on the mobile menu's `<dialog>`, which is a
+        child of it and transparent on every route — so this reported that
+        every page rendered a transparent bar, including the ones that do not.
+      */
+      const openingTag = /<header[^>]*>/.exec(html)?.[0] ?? "";
+      expect(openingTag, `${path} rendered no <header>`).not.toBe("");
+      const rendersTransparent = openingTag.includes("bg-transparent");
+
+      expect(
+        rendersTransparent,
+        hasCover
+          ? `${path} has a dark cover but the server rendered a solid bar — add it to COVER_ROUTES in use-header-chrome.ts`
+          : `${path} has no dark cover but the server rendered a transparent bar — remove it from COVER_ROUTES`,
+      ).toBe(hasCover);
+    });
+  }
+
   test("is solid at the top of a page with no cover", async ({ page }) => {
-    await page.goto("/about");
+    await page.goto("/safety");
     await expect(header(page)).not.toHaveCSS("background-color", TRANSPARENT);
   });
 
@@ -277,7 +417,7 @@ test.describe("header on scroll", () => {
     await scrollUntilHidden(page);
 
     // Any focusable in the bar; at this width that is the inline nav.
-    await header(page).getByRole("link", { name: "Experiences" }).focus();
+    await header(page).getByRole("link", { name: "Explore" }).focus();
     await expect(header(page)).toBeInViewport();
   });
 
@@ -293,10 +433,10 @@ test.describe("header on scroll", () => {
 });
 
 /*
-  From `lg` up the header lists the primary routes inline (owner direction
-  2026-08-05) and the menu trigger does not exist. Below `lg` the bar carries
-  three things — the mark, the one link to the other audience, and the call
-  to action — and everything else lives in the shutter menu.
+  From `lg` up the header lists three routes inline and the call to action,
+  and the menu trigger does not exist. Below `lg` the bar carries exactly two
+  things — the mark and the trigger — and everything else, including the call
+  to action, lives in the shutter menu (owner direction, 2026-08-06).
 */
 test.describe("header", () => {
   test.use({ viewport: { width: 1440, height: 900 } });
@@ -310,13 +450,7 @@ test.describe("header", () => {
     await expect(
       header.getByRole("link", { name: "Yuvoy home" }),
     ).toBeVisible();
-    for (const label of [
-      "Experiences",
-      "Destinations",
-      "How it works",
-      "For travellers",
-      "For operators",
-    ]) {
+    for (const label of ["Explore", "For Operators", "About"]) {
       await expect(
         header.getByRole("link", { name: label, exact: true }),
       ).toBeVisible();
@@ -324,30 +458,46 @@ test.describe("header", () => {
     await expect(
       header.getByRole("link", { name: /join waitlist/i }),
     ).toBeVisible();
-    // The mark, the five primary routes, the call to action — nothing else.
-    await expect(header.getByRole("link")).toHaveCount(7);
+    // The mark, the three primary routes, the call to action — nothing else.
+    // A fourth nav item is a design change, not a routing one, so it should
+    // fail here and be decided deliberately.
+    await expect(header.getByRole("link")).toHaveCount(5);
     await expect(
       header.getByRole("button", { name: "Open menu" }),
     ).toBeHidden();
   });
 
-  test("centres the mark in the bar", async ({ page }) => {
+  /*
+    The mark sits on the bar's baseline, not in its middle (owner direction,
+    2026-08-07). What is asserted is the relationship rather than a pixel
+    value: it is nearer the bottom edge than the top, and it still clears that
+    edge — flush against the hairline reads as a mistake, and overlapping it
+    reads as a bug.
+  */
+  test("sits the mark on the bar's baseline", async ({ page }) => {
     await page.goto("/");
     const bar = page.getByRole("banner");
     const mark = bar.getByRole("link", { name: "Yuvoy home" });
 
+    /*
+      The LOCKUP's own box, not the link's. The link is `self-end` with bottom
+      padding, so its box always ends at the bar's edge and measuring it would
+      report the same numbers wherever the drawing inside it sat — the test
+      would pass while the mark floated anywhere.
+    */
     const barBox = (await bar.boundingBox())!;
-    const markBox = (await mark.boundingBox())!;
+    const markBox = (await mark.getByRole("img").boundingBox())!;
     const above = markBox.y - barBox.y;
     const below = barBox.y + barBox.height - (markBox.y + markBox.height);
 
-    // Within a pixel, allowing for the bar's own bottom border. This once sat
-    // several pixels low because the link was not a flex container, so the
-    // mark inherited a line box and the strut's descender space under it.
     expect(
-      Math.abs(above - below),
-      `mark is off centre: ${above}px above, ${below}px below`,
-    ).toBeLessThanOrEqual(1.5);
+      below,
+      `lockup should clear the bar's bottom edge, sits ${below}px from it`,
+    ).toBeGreaterThan(1);
+    expect(
+      above,
+      `lockup should sit low in the bar: ${above}px above, ${below}px below`,
+    ).toBeGreaterThan(below);
   });
 
   /*
@@ -369,6 +519,50 @@ test.describe("header", () => {
     await expect(dialog).toBeHidden();
     // The scroll lock releases with it.
     await expect(page.locator("body")).not.toHaveCSS("overflow", "hidden");
+  });
+});
+
+/*
+  The phone masthead. Two targets in 64 pixels, not four: the bar carried a
+  centred operator link and a small waitlist button until 2026-08-06, which
+  read as a toolbar and left the mark fighting for room. Both moved into the
+  menu, where the call to action is pinned at full size.
+*/
+test.describe("header on a phone", () => {
+  test.use({ viewport: MOBILE });
+
+  test("carries only the mark and the menu trigger", async ({ page }) => {
+    await page.goto("/");
+    const header = page.getByRole("banner");
+
+    await expect(
+      header.getByRole("link", { name: "Yuvoy home" }),
+    ).toBeVisible();
+    await expect(
+      header.getByRole("button", { name: "Open menu" }),
+    ).toBeVisible();
+    await expect(header.getByRole("link")).toHaveCount(1);
+  });
+
+  test("reaches every primary route through the menu", async ({ page }) => {
+    await page.goto("/");
+    await openMenu(page);
+    const dialog = page.getByRole("dialog", { name: "Site menu" });
+
+    for (const label of [
+      "Explore",
+      "For Operators",
+      "About",
+      "Journal",
+      "Safety",
+    ]) {
+      await expect(
+        dialog.getByRole("link", { name: label, exact: true }),
+      ).toBeVisible();
+    }
+    await expect(
+      dialog.getByRole("link", { name: /join waitlist/i }),
+    ).toBeVisible();
   });
 });
 

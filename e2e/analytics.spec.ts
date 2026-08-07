@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "./support/session";
+import { pageText } from "./support/text";
 
 /**
  * Consent gating.
@@ -134,7 +135,7 @@ test.describe("Vercel Analytics removal", () => {
 
 test("the privacy page describes exactly what runs", async ({ page }) => {
   await page.goto("/privacy");
-  const body = (await page.textContent("body")) ?? "";
+  const body = await pageText(page);
 
   /*
     The page must describe what is running *now*, which is: no product

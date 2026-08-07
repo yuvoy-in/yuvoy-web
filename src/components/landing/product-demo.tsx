@@ -174,7 +174,21 @@ const GOOD_TO_KNOW = [
   "Ages 10 and up. Health form at check-in.",
 ];
 
-export function ProductDemo() {
+/**
+ * The rail's supporting sentences, overridable per page.
+ *
+ * The homepage's why act wants them short, because the headline above has
+ * already made the argument and the rail is a caption. `/explore` wants them
+ * specific, because that section *is* the explanation and "clear details you
+ * can trust" does not tell anyone what the details are.
+ *
+ * Only the sentence changes. The act titles, the script, the timings and the
+ * rail's accessible structure are the same object on both pages — a page may
+ * describe the tour differently, never restage it.
+ */
+export type ActCopy = Partial<Record<ActId, string>>;
+
+export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
   const rootRef = React.useRef<HTMLDivElement>(null);
   const detailRef = React.useRef<HTMLDivElement>(null);
   const detailContentRef = React.useRef<HTMLDivElement>(null);
@@ -495,7 +509,7 @@ export function ProductDemo() {
                     {act.title}
                   </span>
                   <span className="text-forest/70 mt-0.5 block text-sm leading-relaxed">
-                    {act.body}
+                    {actCopy?.[act.id] ?? act.body}
                   </span>
                   {/* The act meter: fills over the act's real duration. */}
                   <span

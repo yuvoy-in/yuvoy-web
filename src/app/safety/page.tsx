@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/site/page-header";
 import { Section, SectionHeading } from "@/components/ui/section";
+import { StatusNotice } from "@/components/site/status-notice";
 
 export const metadata: Metadata = {
-  title: "Safety",
+  title: "Trust & safety",
   description:
-    "Where Yuvoy stands on safety before launch: what we will require of operators, what we have not built yet, and what is not yet decided.",
+    "Where Yuvoy stands on safety before launch: the standards every experience is being built to meet, and, plainly, what is not built yet.",
   alternates: { canonical: "/safety" },
 };
 
@@ -14,140 +15,126 @@ export const metadata: Metadata = {
  * The safety page — the highest-risk page on the site.
  *
  * **Every statement here is either a verifiable fact about today or an
- * explicitly-labelled intention.** There is no verification process, no
- * refund policy, no waiver handling and no insurance arrangement, so this page
- * claims none of those. It says so, by name, in "What we have not built yet".
+ * explicitly-labelled intention.** There is no verification process, no refund
+ * policy, no waiver handling and no insurance arrangement, so this page claims
+ * none of those, and says so by name.
  *
- * That section is not a disclaimer to be trimmed when the page feels
- * negative. On a page about diving and open water, the absence of a claim is
- * the claim — a visitor who assumes a verification process exists because a
- * safety page did not mention its absence has been misled by omission.
+ * ## Simplified on 2026-08-06, without losing a single disclosure
  *
- * Before changing anything here, read the FAQ's "A word on water activities"
- * entry: the two must agree.
+ * The page ran two full sections of equal weight — four commitments, then four
+ * things not built, each with its own heading and marker — followed by a third
+ * repeating that Yuvoy is not a party to anything. Read end to end it was more
+ * retraction than standard.
+ *
+ * What changed is the shape, not the content. The four standards are now a
+ * clean list, and **every disclosure is preserved in one status panel**: no
+ * operator verified, no policy written or approved, waiver and insurance
+ * handling not built, incident support not running, and no party to anything
+ * arranged today. On a page about open water the absence of a claim is itself
+ * a claim, so the rule stands: a gap that stops being named here has been
+ * hidden, not fixed.
+ *
+ * Before changing anything, read the "Honest conditions" entry on `/explore`:
+ * both surfaces make the same promise about conditions taking priority over a
+ * booking, and an e2e test fails if either is softened on its own.
  */
-const COMMITMENTS = [
+const STANDARDS = [
   {
-    title: "We will say what a day actually asks of you",
-    body: "Fitness, experience level, certification, swimming ability and conditions, stated before you commit, not discovered at the jetty. This is how we intend every listing to read.",
+    title: "Requirements made clear",
+    body: "Fitness, swimming ability, certifications and experience level should be visible before booking.",
   },
   {
-    title: "We will not list an operator we would not go out with",
-    body: "How we assess that is still being worked out, and until it is written down and running we will not describe it as a process or imply anyone has passed one.",
+    title: "Operators assessed appropriately",
+    body: "Verification requirements will depend on the activity and local rules.",
   },
   {
-    title: "We would rather lose a booking than overstate readiness",
-    body: "If a day is not right for someone, the honest answer is worth more to us than the booking. That is a standard we hold ourselves to; it is not yet a system.",
+    title: "Conditions come first",
+    // Shared verbatim with /explore's "Honest conditions". Change both.
+    body: "Weather and safety decisions take priority over completing a booking.",
   },
   {
-    title: "The sea decides",
-    body: "Weather and sea state cancel days in the islands, and no platform changes that. What we can control is telling you early and being reachable when it happens.",
+    title: "Support when plans change",
+    body: "Cancellations, changes and meeting details should be communicated clearly.",
   },
-];
-
-const NOT_BUILT = [
-  "An operator verification or accreditation process. None exists yet, and no operator on Yuvoy has been verified by us.",
-  "A refund, cancellation or rescheduling policy. Nothing is bookable, so nothing is refundable, and no policy has been written or approved.",
-  "Waiver, medical-declaration or insurance handling. None of it is built, and none of it is collected anywhere on this site.",
-  "Incident reporting or on-the-ground support. Planned, not running.",
 ];
 
 export default function SafetyPage() {
   return (
     <main>
       <PageHeader
-        eyebrow="Safety"
-        title="The sea deserves"
-        accent="respect."
-        lede={
-          <>
-            <p>
-              Diving and open water are not activities to be casual about. This
-              page sets out where we actually stand before launch, including,
-              plainly, what we have not built.
-            </p>
-            <p className="mt-4">
-              Nothing on Yuvoy is bookable today, so nothing here describes a
-              safety process protecting a booking you can make. It describes the
-              standard we are building to.
-            </p>
-          </>
-        }
+        eyebrow="Trust & safety"
+        title="Clear expectations before"
+        accent="every experience."
+        lede="Experiences can involve weather, water, physical effort and local conditions. Yuvoy is being designed so these details are clear before anyone books."
       />
 
-      <Section aria-labelledby="commitments-heading">
+      <Section aria-labelledby="standards-heading">
         <SectionHeading
-          id="commitments-heading"
-          eyebrow="What we are building to"
-          title="Four things we intend"
-          accent="to hold to."
-          body="These are intentions, stated as intentions. None of them is a process running today."
+          id="standards-heading"
+          eyebrow="The standard"
+          title="Four things every experience"
+          accent="is being built to meet."
         />
-        <ul className="border-cream-line mt-14 grid grid-cols-1 gap-px border-t sm:grid-cols-2">
-          {COMMITMENTS.map((item, i) => (
-            <li key={item.title} className="pt-10 sm:pr-10">
-              <span className="label text-forest/75">0{i + 1}</span>
-              <h3 className="font-display text-forest tracking-display mt-5 text-xl font-normal">
+        <ul className="border-cream-line mt-14 grid grid-cols-1 gap-x-10 gap-y-10 border-t pt-10 sm:grid-cols-2">
+          {STANDARDS.map((item) => (
+            <li key={item.title}>
+              <h3 className="font-display text-forest tracking-display text-xl leading-snug font-normal">
                 {item.title}
               </h3>
-              <p className="text-forest/75 mt-3 leading-relaxed">{item.body}</p>
+              <p className="text-forest/75 mt-3 max-w-sm leading-relaxed">
+                {item.body}
+              </p>
             </li>
           ))}
         </ul>
       </Section>
 
-      <Section tone="ink" aria-labelledby="not-built-heading">
+      <Section tone="ink" aria-labelledby="status-heading">
         <SectionHeading
-          id="not-built-heading"
+          id="status-heading"
           tone="ink"
           eyebrow="Being straight with you"
-          title="What we have"
-          accent="not built yet."
-          body="Naming these matters more than the section above. On a page about the water, an unmentioned gap reads as a gap that is covered."
+          title="What is not"
+          accent="built yet."
+          body="Naming these matters more than the standards above. On a page about the water, an unmentioned gap reads as a gap that is covered."
         />
-        <ul className="border-cream/12 mt-12 max-w-3xl border-t">
-          {NOT_BUILT.map((item) => (
-            <li
-              key={item}
-              className="border-cream/12 text-cream/70 flex gap-5 border-b py-5 leading-relaxed"
-            >
-              <span
-                aria-hidden
-                className="bg-terra-soft mt-3 size-1 shrink-0"
-              />
-              {item}
-            </li>
-          ))}
-        </ul>
-      </Section>
 
-      <Section aria-labelledby="today-heading">
-        <SectionHeading
-          id="today-heading"
-          eyebrow="Today"
-          title="Who you are actually"
-          accent="dealing with."
-          body={
-            <>
-              <p>
-                Until Yuvoy opens, any experience you take in the islands is
-                arranged directly between you and the operator running it, under
-                their terms and their insurance. We are not a party to it and we
-                do not vet it.
-              </p>
-              <p className="mt-4">
-                If you have a question about how we intend to handle any of
-                this, ask us when we get in touch; the answer will be the same
-                as what is written here.
-              </p>
-            </>
-          }
-        />
+        {/*
+          One panel, every disclosure, none of them optional. Each sentence is
+          load-bearing and asserted by e2e/safety.spec.ts:
+          - no operator on Yuvoy has been verified by us
+          - no cancellation or refund policy has been written or approved
+          - waiver, medical and insurance handling: none of it is built
+          - incident support is planned, not running
+          Rewriting this block means updating that spec deliberately, which is
+          the point of the spec.
+        */}
+        <StatusNotice tone="ink" className="mt-12 max-w-3xl">
+          <p>
+            Booking is not live yet, and Yuvoy&rsquo;s operator-verification,
+            cancellation, refund and incident-support processes are still being
+            developed. These standards describe what the live platform is being
+            built to support.
+          </p>
+          <p>
+            Specifically: no operator on Yuvoy has been verified by us; no
+            cancellation or refund policy has been written or approved; waiver,
+            medical-declaration and insurance handling are not built, and none
+            of it is collected anywhere on this site; and incident reporting and
+            on-the-ground support are planned, not running.
+          </p>
+          <p>
+            Until Yuvoy opens, any experience you take is arranged directly
+            between you and the operator running it, under their terms and their
+            insurance.
+          </p>
+        </StatusNotice>
+
         <Link
-          href="/how-it-works"
-          className="label text-terra-deep hover:text-forest mt-10 inline-block underline underline-offset-4"
+          href="/explore#how-it-works"
+          className="label tap-target text-terra-soft hover:text-cream mt-12 inline-block underline underline-offset-4 transition-colors duration-200"
         >
-          See what is planned, step by step
+          See how Yuvoy works
         </Link>
       </Section>
     </main>

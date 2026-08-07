@@ -59,20 +59,12 @@ const COSTS = [
 export function WhyYuvoy() {
   return (
     /*
-      The closing rule is the section's own bottom border, not a child of it.
-      As a child it sat inside `Section`'s container, so below it came this
-      act's bottom padding AND the next act's top padding: 224px of empty
-      page between the rule and "The first market" (owner report,
-      2026-08-06). On the boundary it separates what it is meant to
-      separate, and the gap either side is each section's own padding, the
-      same rhythm as every other section join. Two cream sections meet here,
-      which is why the join needs drawing at all.
+      No bottom rule any more. It existed because two cream sections met
+      here and the join needed drawing; since 2026-08-07 the act below is
+      forest, so the tone change does that work and a hairline on top of it
+      would just be a line for its own sake.
     */
-    <Section
-      id="how"
-      aria-labelledby="why-heading"
-      className="border-cream-line border-b"
-    >
+    <Section id="how" aria-labelledby="why-heading">
       <SectionHeading
         id="why-heading"
         className="mx-auto text-center"

@@ -4,13 +4,12 @@ import { submitLead, type LeadInput } from "./api";
 const INPUT: LeadInput = {
   audience: "traveller",
   contactName: "Test Person",
+  email: "test@example.com",
   whatsapp: "+919000000000",
   privacyAccepted: true,
   marketingOptIn: false,
   marketKey: "andaman",
   source: "web",
-  primaryDestinationKey: "andaman/havelock",
-  interests: ["diving_water"],
 };
 
 function jsonResponse(status: number, body: unknown): Response {

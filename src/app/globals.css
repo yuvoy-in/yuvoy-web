@@ -182,6 +182,28 @@
   min-height: 1.75rem;
 }
 
+/**
+ * A disclosure summary with no browser marker.
+ *
+ * `list-style: none` alone is not enough: WebKit draws its own triangle
+ * through `::-webkit-details-marker`, which ignores the list-style property
+ * entirely, so a `<summary>` styled only with `marker:hidden` keeps a grey
+ * arrow on Safari and iOS. Both are needed, and both live here rather than in
+ * a component so every accordion on the site is marker-free by construction.
+ *
+ * The site's accordions are native `<details>`/`<summary>` for the same
+ * reason the menu is a native `<dialog>`: the keyboard behaviour, the focus
+ * handling and the expanded/collapsed state come from the browser and cannot
+ * drift out of sync with the markup.
+ */
+@utility faq-summary {
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+}
+
 /* ----------------------------------------------------------------- layout */
 
 /** The standard page measure and gutters. Every section uses this. */
@@ -648,7 +670,7 @@
   scene from the brand's world: night water (the film-c gradient language,
   an ember of terracotta warmth at the bottom edge), the owner's island
   horizon along the foot (silhouettes and a moonlit glint, per the comp in
-  public/assets/intro.png), crossed by sparse particle swells — tiny cream
+  design/brand-source/intro.png), crossed by sparse particle swells — tiny cream
   dots that roll in from either edge on slow, decorrelated periods and die
   away before the centre, so the water moves while the lockup keeps a pool
   of still dark — under filmic grain. On it the mark surfaces from depth,
@@ -1066,4 +1088,96 @@
 */
 body:has(#yuvoy-intro[data-intro-wait]) .emerge {
   animation: none;
+}
+
+/*
+  The dissolve between a destination plate's photograph and its caption.
+
+  **This gradient is not what makes the caption readable.** The caption sits on
+  its own solid `bg-forest` block, so `cream` on it is the measured 11.44:1
+  pairing at every viewport, whatever the photograph does. This strip only
+  softens the join above it, so the image bleeds into the caption rather than
+  ending at a hard line.
+
+  That split is deliberate and was a bug fix. The first version made the
+  gradient itself reach solid forest "across the bottom 42%", sized to where
+  the caption was expected to fall. The caption's height depends on the
+  viewport, the plate's aspect ratio and how long the destination's name and
+  blurb are, so on a phone the block ran taller than the solid zone and the
+  secondary line ended up on roughly 62% forest over Neil's near-white sand —
+  about 3.2:1. **Nothing would have caught it**: axe reports text over a
+  gradient as "incomplete", not as a violation, so the accessibility gate
+  would have stayed green. Contrast now follows from the structure instead of
+  from arithmetic that changes with the layout.
+
+  Token-built (`color-mix` on `--color-forest`) like every other fill; no hex
+  may appear here.
+*/
+@utility plate-dissolve {
+  background: linear-gradient(
+    0deg,
+    var(--color-forest) 0%,
+    color-mix(in oklab, var(--color-forest) 72%, transparent) 38%,
+    color-mix(in oklab, var(--color-forest) 26%, transparent) 72%,
+    transparent 100%
+  );
+}
+
+/*
+  A very slight forest wash over the whole photograph, so a delivered frame
+  sits in the brand field rather than on it. Same idea as the cover's
+  multiply layer, at a fraction of the strength: enough to pull a stock-blue
+  sky toward the palette, not enough to read as a filter.
+*/
+@utility plate-wash {
+  background-color: color-mix(in oklab, var(--color-forest) 14%, transparent);
+  mix-blend-mode: multiply;
+}
+
+/*
+  `<summary>` ships a disclosure triangle in every engine, and each hides it
+  differently: `list-style: none` covers Firefox and Chromium, the WebKit
+  pseudo-element covers Safari. The FAQ draws its own marker, so both have to
+  go or the row carries two.
+*/
+@utility faq-summary {
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+}
+
+/*
+  The footer's backdrop, merged into the forest field.
+
+  The delivered frame is an underwater scene whose interest is all along the
+  bottom — seabed, coral, a turtle — under an almost empty upper half. So the
+  image is anchored to the bottom (`object-bottom`) and the crop happens at
+  the top, where there is nothing to lose. That is a CSS decision rather than
+  a baked crop because the footer's height changes with the page, the
+  breakpoint, and whether the closing call to action is shown.
+
+  This scrim's job is the SEAM, not contrast. Measured on the delivered file:
+  every eighth of the frame sits between 12.3:1 and 15.4:1 against `cream`,
+  which is *better* than the 11.44:1 of the flat forest it replaces — the
+  artwork is genuinely darker than the brand green. So there is no heavy
+  darkening here; there is a solid forest band at the top that dissolves
+  downward, so the footer begins as the same forest as the section above it
+  and the water arrives underneath rather than starting at a hard edge.
+
+  (The single brightest pixels — the specular highlights on the coral — reach
+  3.1:1 on their own. They are specks a few pixels across inside a large dark
+  field, not a background any glyph is read against; `plate-wash` over the
+  whole image takes the top off them anyway.)
+*/
+@utility footer-scrim {
+  background: linear-gradient(
+    180deg,
+    var(--color-forest) 0%,
+    var(--color-forest) 14%,
+    color-mix(in oklab, var(--color-forest) 78%, transparent) 38%,
+    color-mix(in oklab, var(--color-forest) 46%, transparent) 62%,
+    color-mix(in oklab, var(--color-forest) 30%, transparent) 100%
+  );
 }
