@@ -53,3 +53,14 @@ next-env.d.ts
 
 # Agent worktrees are whole checkouts; never part of this repo.
 .claude/worktrees/
+
+# Agent session notes. Written by a local plugin, not by anyone reviewing this
+# repo, and they summarise whatever the machine was doing at the time — local
+# paths, tooling outside this project, and details of an environment that has
+# nothing to do with Yuvoy. That is not repository content, and a private repo
+# is not a reason to publish it.
+#
+# Untracked on 2026-08-08 (owner direction). The eight files already in history
+# stay there; removing them from the tip does not remove them from the log, so
+# this stops the leak growing rather than undoing it.
+/.memsearch/
