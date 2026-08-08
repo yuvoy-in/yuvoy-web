@@ -7,6 +7,7 @@ import { SITE_URL, IS_PRODUCTION } from "@/lib/site";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { ConsentBanner } from "@/components/analytics/consent-banner";
 import { SiteHeader } from "@/components/site/site-header";
+import { NavigationHistory } from "@/components/site/navigation-history";
 import { SiteFooter } from "@/components/site/site-footer";
 import { StagingBanner } from "@/components/site/staging-banner";
 import "./globals.css";
@@ -83,6 +84,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         >
           Skip to content
         </a>
+        {/* Renders nothing. It records that the router has moved during this
+            visit, which is the only reliable way a back control can tell "there
+            is a page of ours behind me" from "this is where the visit began".
+            See navigation-history.tsx. */}
+        <NavigationHistory />
         <Providers>
           <div className="flex min-h-dvh flex-col">
             <SiteHeader />

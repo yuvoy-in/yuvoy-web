@@ -17,6 +17,11 @@
  * would be decoration with a privacy cost.
  */
 
+import type { components } from "@/lib/api/schema";
+
+/** The topics the endpoint accepts. Anything else is a 400. */
+type MessageTopic = components["schemas"]["MessageTopic"];
+
 export interface ContactChannel {
   key: string;
   label: string;
@@ -58,6 +63,17 @@ export const CONTACT_CHANNEL_LIST: ContactChannel[] = [
 ];
 
 /**
+ * How long a message may be.
+ *
+ * 4000 **characters, not bytes** (yuvoy-in/yuvoy-api#5): 4000 multi-byte
+ * characters is still 4000 characters, so a message written in Hindi is not
+ * silently penalised. Named here rather than typed into the schema and the
+ * counter separately — a cap the form and the API disagree about is a
+ * rejection after the message has been written.
+ */
+export const MESSAGE_MAX = 4000;
+
+/**
  * What a message can be about.
  *
  * **No "a trip or experience" option** (owner direction, 2026-08-07): nothing
@@ -68,22 +84,16 @@ export const CONTACT_CHANNEL_LIST: ContactChannel[] = [
  * rather than the visible labels — renaming a label must not silently split
  * a category's history in two.
  */
-export const CONTACT_TOPICS: { value: string; label: string }[] = [
+export const CONTACT_TOPICS: { value: MessageTopic; label: string }[] = [
   { value: "general", label: "General enquiry" },
   { value: "feedback", label: "Feedback" },
   { value: "listing", label: "Listing my business" },
   { value: "partnership", label: "Partnership" },
 ];
 
-/**
- * Whether the message form can actually send.
- *
- * `POST /v1/messages` does not exist yet (yuvoy-in/yuvoy-api#5). Until it
- * does, the form renders complete but disabled behind a "Coming soon" badge,
- * and the two channels above it carry the traffic — they are live today.
- *
- * **Flip this to `true` in the same change that wires the endpoint**, and
- * delete it once the form has shipped. A permanent flag is a permanent
- * question about which half of the code is real.
- */
-export const MESSAGE_FORM_LIVE = false;
+/*
+  `MESSAGE_FORM_LIVE` used to live here, false, while `POST /v1/messages` did
+  not exist. The endpoint shipped on 2026-08-07 (yuvoy-in/yuvoy-api#5) and the
+  flag was deleted with the disabled form rather than left behind at `true`: a
+  permanent flag is a permanent question about which half of the code is real.
+*/

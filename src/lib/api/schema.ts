@@ -26,6 +26,32 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Send a message from the public contact form
+         * @description Public, rate-limited free-text contact. Shipped 2026-08-07 (yuvoy-in/yuvoy-api#5) and verified against production.
+         *
+         *     **A message is not a lead, and the schema enforces it rather than trusting anyone to remember.** There is no marketing-consent field — its absence is the guarantee, because there is nothing here for a later change to flip to true. Messages are never deduplicated: two questions from one address are two questions. There is no lifecycle status; triage happens in the inbox the alert lands in.
+         *
+         *     **`202`, never `201`.** It acknowledges receipt and promises nothing about a reply, because the site publishes no reply time and an acknowledgement that implied one would be a commitment nobody made.
+         *
+         *     Rate limiting has its own bucket, separate from `/leads`: a burst of spam on a public free-text endpoint must not lock a real visitor out of the waitlist, or the reverse.
+         */
+        post: operations["createMessage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/waitlist": {
         parameters: {
             query?: never;
@@ -318,8 +344,11 @@ export interface components {
             term?: string;
         };
         /**
-         * @description Contact rule: `email` is required for both audiences — it is the channel the launch announcement is sent on. `whatsapp` is optional for both and is the channel for the conversation that follows. Deduplication uses the normalised contact — WhatsApp number when present, else email.
-         *     CHANGED 2026-08-07, tracking yuvoy-in/yuvoy-api#4. Until that ships on the deployed API, `POST /v1/leads` still requires `whatsapp`, `coverageDestinationKeys` and `primaryInterest` for a provider and will answer 400 without them. The frontend surfaces that rejection rather than swallowing it (see `unknownFieldErrors` in lead-forms.tsx).
+         * @description Contact rule, as deployed (yuvoy-in/yuvoy-api#4, live 2026-08-07): **at least one of `whatsapp` or `email`**, for both audiences. Deduplication uses the normalised contact — WhatsApp number when present, else email — so an operator with no phone number deduplicates on their address.
+         *
+         *     A request carrying neither is rejected on the field name **`contact`**, not `whatsapp`, because a form may legitimately no longer render a WhatsApp input to point an error at.
+         *
+         *     **The frontend is deliberately stricter than this and requires `email` of everyone** (owner direction, 2026-08-07): it is the channel the launch announcement is actually sent on — free, no messaging-platform template approval, and it reaches every country. That is a product decision enforced in the forms, not a contract constraint; the API accepts either channel and this document describes the API.
          */
         LeadInputBase: {
             audience: components["schemas"]["LeadAudience"];
@@ -330,7 +359,7 @@ export interface components {
              */
             whatsapp?: string;
             /** Format: email */
-            email: string;
+            email?: string;
             /**
              * @description Must be true. Acknowledges the Privacy Policy and Terms.
              * @constant
@@ -373,6 +402,32 @@ export interface components {
             audience: "provider";
         };
         LeadInput: components["schemas"]["TravellerLeadInput"] | components["schemas"]["ProviderLeadInput"];
+        /** @description A message from the public contact form. Deliberately not a lead: no marketing consent, no market or destination, no attribution beyond the campaign `source`. */
+        MessageInput: {
+            name: string;
+            /** Format: email */
+            email: string;
+            topic: components["schemas"]["MessageTopic"];
+            /** @description Capped at 4000 **characters, not bytes** — 4000 multi-byte characters is still 4000 characters, so a message written in Hindi is not silently penalised. 4001 is a 400. */
+            message: string;
+            source?: components["schemas"]["LeadSource"];
+            /** @description Honeypot. A filled value answers `202` exactly as a real submission does, and writes neither a row nor a notification — a bot must not be able to tell it was caught. */
+            website?: string;
+        };
+        /**
+         * @description What the message is about. Anything outside this list is a 400. There is deliberately no "a trip or experience" option: nothing is bookable yet, so offering it would invite a question nobody can answer.
+         * @enum {string}
+         */
+        MessageTopic: "general" | "feedback" | "listing" | "partnership";
+        /** @description Acknowledges receipt and nothing else. No reply-time promise, because the site publishes none. */
+        MessageAcceptance: {
+            /** Format: uuid */
+            id: string;
+            /** @constant */
+            status: "received";
+            /** Format: date-time */
+            createdAt: string;
+        };
         /** @description Deliberately minimal. It confirms the lead was recorded and carries no queue position, priority, or follow-up guarantee. */
         LeadAcceptance: {
             /** Format: uuid */
@@ -476,6 +531,33 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LeadAcceptance"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            429: components["responses"]["RateLimited"];
+            503: components["responses"]["ServiceUnavailable"];
+        };
+    };
+    createMessage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MessageInput"];
+            };
+        };
+        responses: {
+            /** @description Message received */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageAcceptance"];
                 };
             };
             400: components["responses"]["BadRequest"];

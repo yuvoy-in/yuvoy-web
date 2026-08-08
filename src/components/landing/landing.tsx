@@ -79,11 +79,7 @@ export function Landing({ context }: { context: LeadContext }) {
       <WhyYuvoy />
       <FirstLaunch />
       <OperatorTeaser source={context.source} />
-      <LeadForms
-        context={context}
-        audiences={["traveller"]}
-        aside={<JoinAside />}
-      />
+      <LeadForms context={context} audience="traveller" aside={<JoinAside />} />
       {/* After the ask, not before it: a visitor who has just been asked to
           join and did not is exactly the visitor with a question. It is also
           the cream breath between the form and the footer, both forest. */}

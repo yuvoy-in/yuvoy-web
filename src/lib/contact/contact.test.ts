@@ -5,6 +5,7 @@ import {
   formatForDisplay,
   nationalPart,
   phoneIssue,
+  sanitizePhoneInput,
   toE164,
 } from "@/lib/contact/phone";
 import { COUNTRIES, OTHER_COUNTRY } from "@/lib/contact/countries";
@@ -12,6 +13,84 @@ import { isPlausibleEmail, suggestEmail } from "@/lib/contact/email";
 
 const india = countryByIso2("IN");
 const uk = countryByIso2("GB");
+
+describe("sanitizePhoneInput", () => {
+  /*
+    The defect this exists for: `toE164` ignores everything that is not a
+    digit, so a number with letters in it submitted correctly and displayed
+    wrongly. `type="tel"` restricts nothing in any browser.
+  */
+  it("drops letters and anything else that is not part of a number", () => {
+    expect(sanitizePhoneInput("abc")).toBe("");
+    expect(sanitizePhoneInput("9a0b0c0d0e0f0g0h0i0")).toBe("9000000000");
+    // The separators around a dropped word survive; toE164 ignores them and
+    // the visitor's next keystroke tidies them up.
+    expect(sanitizePhoneInput("90000 00000; DROP TABLE")).toBe("90000 00000  ");
+    expect(sanitizePhoneInput("९००००")).toBe("");
+  });
+
+  it("keeps the separators people actually write numbers with", () => {
+    expect(sanitizePhoneInput("+91 (90000) 00000")).toBe("+91 (90000) 00000");
+    expect(sanitizePhoneInput("07400-000.000")).toBe("07400-000.000");
+    expect(sanitizePhoneInput("0091 90000 00000")).toBe("0091 90000 00000");
+  });
+
+  it("allows a plus only where it means something", () => {
+    // Leading: "this is the whole international number" to toE164.
+    expect(sanitizePhoneInput("+919000000000")).toBe("+919000000000");
+    expect(sanitizePhoneInput("  +91 900")).toBe("+91 900");
+    // Anywhere else it is noise, whatever the visitor meant by it.
+    expect(sanitizePhoneInput("900+000")).toBe("900000");
+    expect(sanitizePhoneInput("+91+90")).toBe("+9190");
+  });
+
+  it("leaves a half-typed number alone", () => {
+    // Every prefix of a real entry has to survive, or the field fights back.
+    expect(sanitizePhoneInput("")).toBe("");
+    expect(sanitizePhoneInput("+")).toBe("+");
+    expect(sanitizePhoneInput("9")).toBe("9");
+    expect(sanitizePhoneInput("90000 ")).toBe("90000 ");
+  });
+
+  it("cleans up a pasted tel: link into something submittable", () => {
+    const pasted = sanitizePhoneInput("tel:+919000000000");
+    expect(pasted).toBe("+919000000000");
+    expect(toE164(india, pasted)).toBe("+919000000000");
+  });
+
+  /*
+    For everything that was already going to submit correctly, sanitising
+    changes nothing — both ends agree that only digits count. It only stops the
+    field displaying what it was about to throw away.
+  */
+  it("does not change a number that already submitted correctly", () => {
+    for (const raw of [
+      "9a0b0c0d0e0f0g0h0i0",
+      "90000 00000 (mobile)",
+      "+91 90000 00000",
+      "call me on 9000000000",
+    ]) {
+      expect(toE164(india, sanitizePhoneInput(raw))).toBe(toE164(india, raw));
+    }
+  });
+
+  /*
+    And in one case it repairs the submitted value outright.
+
+    A pasted `tel:` link starts with a letter, so `toE164` did not read it as
+    international, stripped the letters to digits and appended the selector's
+    dial code on top of the one already in the number — a silently wrong
+    `+91 91 9000000000` that passes a length check and is only discovered when
+    the message never arrives. Sanitising first makes the paste announce itself
+    as international, which is what it always was.
+  */
+  it("repairs a pasted tel: link that used to double the dial code", () => {
+    expect(toE164(india, "tel:+919000000000")).toBe("+91919000000000");
+    expect(toE164(india, sanitizePhoneInput("tel:+919000000000"))).toBe(
+      "+919000000000",
+    );
+  });
+});
 
 describe("toE164", () => {
   it("joins the dial code to the national number", () => {

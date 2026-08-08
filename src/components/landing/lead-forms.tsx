@@ -7,14 +7,9 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PhoneField } from "@/components/ui/phone-field";
-import { cn } from "@/lib/cn";
 import { submitLead, type SubmitResult } from "@/lib/leads/api";
-import { useAnalytics } from "@/components/analytics/analytics-provider";
 import { useLeadAnalytics } from "@/lib/analytics/use-lead-analytics";
-import { audienceSelected } from "@/lib/analytics/events";
 import { formatForDisplay, phoneIssue } from "@/lib/contact/phone";
-import { OPERATOR_FORM_LIVE } from "@/lib/site/launch";
-import { ApplyComingSoon } from "@/components/operators/apply-coming-soon";
 import { isPlausibleEmail, suggestEmail } from "@/lib/contact/email";
 import {
   LAUNCH_MARKET,
@@ -130,10 +125,12 @@ const travellerSchema = z.object({
  * `whatsapp` also stopped being required, for the same reason it is optional
  * for travellers.
  *
- * **All three relaxations need `yuvoy-in/yuvoy-api#4`**, which marks them
- * required on `ProviderLeadInput`. Until that deploys the API answers 400 —
- * see `unknownFieldErrors` in `ProviderForm`, which makes that failure
- * visible rather than silent.
+ * **All three relaxations shipped on 2026-08-07** (`yuvoy-in/yuvoy-api#4`,
+ * verified against production with the exact email-only payload this form
+ * sends). Until they did, the deployed API answered 400 to every complete
+ * application and this form stood down behind a notice; `unknownFieldErrors`
+ * in `ProviderForm` is what made that failure visible rather than silent, and
+ * it stays for the next rejection nobody predicted.
  */
 const providerSchema = z.object({
   ...sharedSchema,
@@ -152,224 +149,84 @@ type ProviderValues = z.infer<typeof providerSchema>;
 /* ------------------------------------------------------------------- shell */
 
 /**
- * Registration, for one audience or both. Every form posts to POST /v1/leads
- * with the audience discriminator, and every outcome the API can produce —
- * recorded, updated, invalid, rate-limited, unavailable, offline — has its own
- * truthful UI state.
+ * The form for one audience — the traveller waitlist, or the operator
+ * application.
  *
- * `audiences` decides the shape. With both, this is the tabbed picker
- * `/waitlist` uses. With one, there is nothing to pick, so no tablist renders
- * and the form is not a tabpanel: the homepage speaks to travellers and
- * `/operators` speaks to operators, and neither should show the other's door.
+ * The operator side stood as a "Coming soon" notice until 2026-08-07, because
+ * the deployed API still required three fields the form had stopped asking
+ * for and answered `400` to every complete application. `yuvoy-in/yuvoy-api#4`
+ * shipped and the notice went with it; both surfaces that render this — the
+ * `/waitlist` operator tab and `/operators` — got the real form in the same
+ * change, which is the point of there being one component.
+ *
+ * Exported because `/waitlist` composes the two sides itself: there, the
+ * audience switch changes the whole page rather than only the form, so it
+ * needs the panel without the section around it.
  */
-const BOTH_AUDIENCES = ["traveller", "provider"] as const;
+export function LeadFormPanel({
+  audience,
+  context,
+}: {
+  audience: LeadAudience;
+  context: LeadContext;
+}) {
+  return audience === "traveller" ? (
+    <TravellerForm context={context} />
+  ) : (
+    <ProviderForm context={context} />
+  );
+}
 
+/**
+ * Registration as a page section: the narrative on the left, the form on the
+ * right. Every form posts to POST /v1/leads with the audience discriminator,
+ * and every outcome the API can produce — recorded, updated, invalid,
+ * rate-limited, unavailable, offline — has its own truthful UI state.
+ *
+ * **One audience, always.** The homepage speaks to travellers and `/operators`
+ * speaks to operators, and neither should show the other's door. The audience
+ * picker that used to live here moved to `/waitlist`, which is the one surface
+ * that offers both — and it belongs there rather than here, because choosing a
+ * side changes everything on that page, not just which fields are on screen.
+ */
 export function LeadForms({
   context,
-  initialAudience = "traveller",
-  heading = "Join the waitlist",
-  headingLevel = 2,
+  audience,
   aside,
-  audiences = BOTH_AUDIENCES,
   sectionId = "register",
-  eyebrow = "Get first access",
-  intro,
 }: {
   context: LeadContext;
+  audience: LeadAudience;
   /**
-   * Which tab opens first, when there are tabs.
-   * `/waitlist?audience=provider` — the shape printed on operator materials —
-   * resolves to "provider" here.
+   * The narrative column. It **must** contain an element with
+   * `id="${sectionId}-heading"` (see `JoinAside` / `ApplyAside`), because it
+   * carries the section's heading and this section points its
+   * `aria-labelledby` at it.
    */
-  initialAudience?: LeadAudience;
-  heading?: string;
-  /** `/waitlist` renders this as the page's h1; a section on a page as an h2. */
-  headingLevel?: 1 | 2;
-  /**
-   * Optional narrative column. When present the section renders as a split
-   * layout — aside left, form right — and the aside **must** contain an
-   * element with `id="${sectionId}-heading"` (see JoinAside), because it takes
-   * over the heading this component otherwise renders itself.
-   */
-  aside?: React.ReactNode;
-  /** Which audiences this instance offers. One of them hides the picker. */
-  audiences?: readonly LeadAudience[];
+  aside: React.ReactNode;
   /** The section's anchor id; its heading is `<id>-heading`. */
   sectionId?: string;
-  eyebrow?: string;
-  intro?: React.ReactNode;
 }) {
-  const offersProvider = audiences.includes("provider");
-  const single = audiences.length === 1 ? audiences[0] : null;
-  const headingId = `${sectionId}-heading`;
-  const [audience, setAudience] = React.useState<LeadAudience>(
-    single ?? initialAudience,
-  );
-  const Heading = headingLevel === 1 ? "h1" : "h2";
-  const { capture } = useAnalytics();
-
-  // audience_selected has three trigger points and one shape. The query-param
-  // preselect fires once on mount; the tab fires on an actual change, so a
-  // page opened at ?audience=provider does not double-fire.
-  const reportedPreselect = React.useRef(false);
-  React.useEffect(() => {
-    if (reportedPreselect.current) return;
-    reportedPreselect.current = true;
-    if (initialAudience !== "traveller") {
-      capture(
-        audienceSelected({ audience: initialAudience, trigger: "query_param" }),
-      );
-    }
-  }, [capture, initialAudience]);
-
-  function selectAudience(next: LeadAudience, trigger: "tab" | "cta") {
-    if (next === audience) return;
-    setAudience(next);
-    capture(audienceSelected({ audience: next, trigger }));
-  }
-
-  // #providers deep-links straight onto the provider tab. Those anchors are
-  // kept working indefinitely: /waitlist used to be a permanent (308) redirect
-  // to them, and browsers cache 308s forever, so a visitor who hit the old URL
-  // before the real page shipped still lands somewhere coherent.
-  React.useEffect(() => {
-    if (!offersProvider) return;
-    function syncFromHash() {
-      if (window.location.hash === "#providers")
-        setAudience((current) => {
-          if (current !== "provider") {
-            capture(audienceSelected({ audience: "provider", trigger: "cta" }));
-          }
-          return "provider";
-        });
-    }
-    syncFromHash();
-    window.addEventListener("hashchange", syncFromHash);
-    return () => window.removeEventListener("hashchange", syncFromHash);
-  }, [capture, offersProvider]);
-
-  /**
-   * One audience: the form on its own. Two: the picker above them. A single
-   * form is deliberately not a tabpanel — a tabpanel with no tablist is a
-   * promise to assistive tech that there is somewhere else to go.
-   */
-  /*
-    The provider form is replaced by a notice while the API cannot accept what
-    it sends (see `OPERATOR_FORM_LIVE`). Swapped here rather than at each call
-    site so the three surfaces that render it — `/operators`, the `/waitlist`
-    provider tab, and the `#providers` anchor those redirect through — cannot
-    disagree about whether applying works.
-  */
-  const providerPanel = OPERATOR_FORM_LIVE ? (
-    <ProviderForm context={context} />
-  ) : (
-    <ApplyComingSoon />
-  );
-
-  const forms = single ? (
-    single === "traveller" ? (
-      <TravellerForm context={context} />
-    ) : (
-      providerPanel
-    )
-  ) : (
-    <>
-      <div
-        role="tablist"
-        aria-label="I am a"
-        className="border-cream/20 rounded-edge flex border p-1"
-      >
-        {(
-          [
-            ["traveller", "I'm travelling"],
-            ["provider", "I run experiences"],
-          ] as const
-        ).map(([value, tabLabel]) => (
-          <button
-            key={value}
-            role="tab"
-            id={`tab-${value}`}
-            aria-selected={audience === value}
-            aria-controls={`panel-${value}`}
-            onClick={() => selectAudience(value, "tab")}
-            className={cn(
-              "focus-visible:ring-terra-soft rounded-edge flex-1 px-4 py-2.5 text-sm font-medium transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none",
-              audience === value
-                ? "bg-cream text-forest"
-                : "text-cream/70 hover:text-cream",
-            )}
-          >
-            {tabLabel}
-          </button>
-        ))}
-      </div>
-
-      <div
-        role="tabpanel"
-        id="panel-traveller"
-        aria-labelledby="tab-traveller"
-        hidden={audience !== "traveller"}
-        className="mt-10"
-      >
-        <TravellerForm context={context} />
-      </div>
-      <div
-        role="tabpanel"
-        id="panel-provider"
-        aria-labelledby="tab-provider"
-        hidden={audience !== "provider"}
-        className="mt-10"
-      >
-        {providerPanel}
-      </div>
-    </>
-  );
-
   return (
     <section
       id={sectionId}
       className="bg-forest text-cream scroll-mt-16"
-      aria-labelledby={headingId}
+      aria-labelledby={`${sectionId}-heading`}
     >
-      {/* The legacy operator anchor, wherever a provider form actually lives.
-          It must exist even while the provider panel is hidden, or the browser
-          has nothing to scroll to. The homepage no longer offers that form and
-          redirects the anchor instead (see LegacyProviderAnchor). */}
-      {offersProvider && (
+      {/* The legacy operator anchor, wherever a provider form actually lives,
+          so the browser has something to scroll to. The homepage no longer
+          offers that form and redirects the anchor instead (see
+          LegacyProviderAnchor). */}
+      {audience === "provider" && (
         <span id="providers" className="block scroll-mt-20" aria-hidden />
       )}
       <div className="container-page py-20 sm:py-28">
-        {aside ? (
-          /* Split layout: narrative left (carrying the section heading), form
-             right. Used by the homepage's closing act. */
-          <div className="grid grid-cols-1 gap-14 lg:grid-cols-2 lg:gap-20">
-            <div>{aside}</div>
-            <div>{forms}</div>
+        <div className="grid grid-cols-1 gap-14 lg:grid-cols-2 lg:gap-20">
+          <div>{aside}</div>
+          <div>
+            <LeadFormPanel audience={audience} context={context} />
           </div>
-        ) : (
-          <div className="mx-auto max-w-xl">
-            <div>
-              <p className="eyebrow text-terra-soft">{eyebrow}</p>
-              <Heading
-                id={headingId}
-                className="font-display tracking-display mt-6 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-normal text-balance"
-              >
-                {heading}
-              </Heading>
-              <div className="text-cream/70 mt-6 text-lg leading-relaxed">
-                {intro ?? (
-                  <p>
-                    Tell us who you are and we will get in touch when the first
-                    experiences for your destination are ready. No spam, and no
-                    payment required.
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="mt-10">{forms}</div>
-          </div>
-        )}
+        </div>
       </div>
     </section>
   );
@@ -788,10 +645,20 @@ function TravellerForm({ context }: { context: LeadContext }) {
       website: values.website || undefined,
       primaryDestinationKey: attributedDestination,
     });
-    // Server-side field rejections map back onto the form fields.
+    /*
+      Server-side field rejections map back onto the form fields.
+
+      `contact` is the API's name for the "at least one way to reach you" rule
+      rather than for an input (yuvoy-in/yuvoy-api#4). This form always sends
+      an email address, so if that rule ever fails it is the email that was not
+      accepted — which is the field the visitor can do something about.
+    */
     if (res.kind === "invalid") {
       for (const [field, message] of Object.entries(res.fields)) {
-        setError(field as keyof TravellerValues, { message });
+        const target = field === "contact" ? "email" : field;
+        if (target in values) {
+          setError(target as keyof TravellerValues, { message });
+        }
       }
     }
     if (res.kind === "recorded" || res.kind === "updated") {
@@ -920,24 +787,30 @@ function ProviderForm({ context }: { context: LeadContext }) {
     if (res.kind === "invalid") {
       /*
         Server field errors are mapped back onto the form — but **only the
-        fields this form still has**.
+        fields this form actually has**.
 
-        This is the guard for the window before yuvoy-in/yuvoy-api#4 deploys.
-        The API currently marks `coverageDestinationKeys`, `primaryInterest`
-        and `whatsapp` required on a provider lead; this form no longer asks
-        for the first two and no longer requires the third, so a rejection
-        names fields with no input to attach an error to. Handing those to
-        `setError` puts the message on a field that never renders, and the
-        applicant sees the button do nothing at all — the worst failure a form
-        has, because it looks like a bug in their browser.
+        Handing an unknown field to `setError` puts the message on an input
+        that never renders, and the applicant sees the button do nothing at
+        all: the worst failure a form has, because it looks like a bug in
+        their browser.
 
-        Anything unrecognised is raised to the form's own error state instead,
-        where it is visible and truthful.
+        **`contact` is the one that matters now** (yuvoy-in/yuvoy-api#4). The
+        API reports "no way to reach you" on that name rather than on
+        `whatsapp`, precisely because a form may no longer render a WhatsApp
+        input to point at — so it names the rule, not a field. The rule is
+        about the email address here, since that is the channel this form
+        requires, so the message goes there where it can be acted on.
+
+        Anything else unrecognised is raised to the form's own error state,
+        where it is visible and truthful rather than swallowed. That guard
+        earned its keep once already, in the window before #4 deployed.
       */
       const unknown: string[] = [];
       for (const [field, message] of Object.entries(res.fields)) {
         if (field in values) {
           setError(field as keyof ProviderValues, { message });
+        } else if (field === "contact") {
+          setError("email", { message });
         } else {
           unknown.push(message);
         }
@@ -1029,10 +902,12 @@ function ProviderForm({ context }: { context: LeadContext }) {
       />
 
       {/*
-        Server-side rejections that name a field this form does not render.
-        Until yuvoy-in/yuvoy-api#4 deploys, that is what a valid application
-        gets back — so it is shown, plainly, rather than being swallowed by a
-        `setError` call on an input that is not on screen.
+        Server-side rejections that name a field this form does not render and
+        that is not the `contact` rule handled above. Shown plainly rather than
+        swallowed by a `setError` call on an input that is not on screen — the
+        failure mode this caught in the window before yuvoy-in/yuvoy-api#4
+        deployed, when every valid application was rejected on three fields the
+        form no longer had.
       */}
       {unknownFieldErrors.length > 0 && (
         <div

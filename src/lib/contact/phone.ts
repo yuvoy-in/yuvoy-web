@@ -53,6 +53,41 @@ import {
  * then re-derives the country from it, so the two agree again on the next
  * render.
  */
+/**
+ * What a person is allowed to have typed into a phone field.
+ *
+ * ## Why the field needs this at all
+ *
+ * `toE164` strips everything that is not a digit, so a number typed as
+ * `9a0b0c0` still *submits* correctly — which is exactly what made this
+ * invisible. The field is a plain `type="tel"` input, and `type="tel"` does
+ * not restrict characters in any browser; it only hints at a keypad. So the
+ * letters sat there on screen, in a field that had silently agreed to ignore
+ * them, and the visitor had no way to know which of the two was real (owner
+ * report, 2026-08-08).
+ *
+ * Showing something other than what will be sent is the defect. A field that
+ * refuses the keystroke is honest; one that accepts it and quietly drops it is
+ * not.
+ *
+ * ## What survives
+ *
+ * Digits, and the separators people genuinely type or paste — spaces, hyphens,
+ * dots and brackets — because `+91 (90000) 00000` is how numbers are written
+ * down and rejecting the punctuation would reject the paste. `+` survives only
+ * at the very start, where it means "this is the whole international number"
+ * to `toE164`; anywhere else it is noise.
+ *
+ * Everything else is dropped, which includes the letters in a pasted
+ * `tel:+919000000000` — so that paste lands as a clean `+919000000000`.
+ */
+export function sanitizePhoneInput(input: string): string {
+  const kept = input.replace(/[^\d\s()+.-]/g, "");
+  const international = /^\s*\+/.test(kept);
+  const withoutPlus = kept.replace(/\+/g, "");
+  return international ? `+${withoutPlus.replace(/^\s+/, "")}` : withoutPlus;
+}
+
 export function toE164(country: Country, nationalInput: string): string {
   const trimmed = nationalInput.trim();
   const digits = trimmed.replace(/\D/g, "");

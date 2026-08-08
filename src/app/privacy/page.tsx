@@ -33,12 +33,13 @@ export default function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy"
-      updated="2 August 2026"
+      updated="8 August 2026"
       intro={
         <p>
           Yuvoy is not open yet. The only personal information this site
-          collects is what you type into the waitlist form. This page describes
-          exactly what that is, what happens to it, and how to get it removed.
+          collects is what you type into one of its two forms — the waitlist and
+          operator application, or the contact form. This page describes exactly
+          what that is, what happens to it, and how to get it removed.
         </p>
       }
     >
@@ -48,18 +49,30 @@ export default function PrivacyPage() {
           <strong className="text-forest font-bold">
             If you join as a traveller:
           </strong>{" "}
-          your name, and one way to reach you: an email address, a WhatsApp
-          number, or both. That is the whole form. It asked which destination
-          you were headed to and what interested you until August 2026; both
-          were dropped, because neither changed what we do and a waitlist should
-          ask for the least it can.
+          your name and your email address, plus a WhatsApp number if you would
+          rather we message you there. That is the whole form. It asked which
+          destination you were headed to and what interested you until August
+          2026; both were dropped, because neither changed what we do and a
+          waitlist should ask for the least it can.
         </p>
         <p>
           <strong className="text-forest font-bold">
             If you apply as an operator:
           </strong>{" "}
-          your name, your business name, a WhatsApp number, an email address if
-          you give one, the destinations you cover, and what you mainly offer.
+          your name, your business name and your email address, plus a WhatsApp
+          number if you give one. It asked which destinations you cover and what
+          you mainly offer until August 2026; both were dropped, because they
+          are answered in the conversation that follows and an application
+          should take thirty seconds.
+        </p>
+
+        <p>
+          <strong className="text-forest font-bold">
+            If you send us a message:
+          </strong>{" "}
+          your name, your email address, the topic you picked, and whatever you
+          write. Nothing else — a message is not a registration, and it does not
+          put you on any list.
         </p>
         <p>
           A phone number is stored in its full international form (for example
@@ -77,6 +90,11 @@ export default function PrivacyPage() {
         <p>
           To contact you about Yuvoy opening and, for operators, to have a
           conversation about what you offer. That is the whole purpose.
+        </p>
+        <p>
+          A message you send through the contact form is used to answer you, and
+          nothing else. There is no marketing option on that form and no place
+          to store one, so it cannot quietly become a mailing list later.
         </p>
         <p>
           If you ticked the separate optional box, we may also send occasional
@@ -109,9 +127,13 @@ export default function PrivacyPage() {
 
       <LegalSection heading="If you register more than once">
         <p>
-          Submitting the form again with the same contact updates your existing
-          entry rather than creating a second one. Each individual submission is
-          kept as history so we can see what changed.
+          Submitting the waitlist or operator form again with the same contact
+          updates your existing entry rather than creating a second one. Each
+          individual submission is kept as history so we can see what changed.
+        </p>
+        <p>
+          Messages work the other way round: they are never merged. Two
+          questions from the same address are two questions, and both are kept.
         </p>
       </LegalSection>
 
@@ -145,7 +167,8 @@ export default function PrivacyPage() {
         </p>
         <p>
           Deleting your registration removes you from the waitlist. There is no
-          penalty for it and no obligation to explain.
+          penalty for it and no obligation to explain. The same applies to a
+          message you have sent us.
         </p>
       </LegalSection>
 
