@@ -174,30 +174,55 @@ export function hidesSiteChrome(pathname: string): boolean {
 }
 
 /**
- * Routes that suppress the footer's closing call to action.
+ * Routes that close with the waitlist call to action — an **allowlist**.
  *
- * The footer repeats the ask on every page, which is right almost everywhere.
- * Two kinds of route opt out, for two different reasons:
+ * ## Why it is stated the other way round (owner direction, 2026-08-08)
  *
- * 1. **They already made the ask.** `/`, `/waitlist`, `/operators`, `/explore`
- *    and the campaign routes all end in a form or a call to action of their
- *    own, and stacking a second one directly beneath reads as a page that has
- *    lost track of what it just said.
- * 2. **The ask does not belong there.** `/about` (owner direction,
- *    2026-08-07). Its job is to explain the company, not to convert, and it
- *    carried "Join the waitlist" twice — once in its own status section, once
- *    in the footer's — inside a single scroll. The header carries the call to
- *    action on every route regardless.
+ * It used to be a suppression list: the footer asked on every route and six
+ * opted out, so the ask ran under the legal pages, the safety page, the
+ * contact page and the journal index. That is the wrong default. The header
+ * carries "Join Waitlist" on every page already, so a visitor who wants it is
+ * one glance away wherever they are — and a full-width act repeating the same
+ * ask underneath every page reads as a site that does not trust its own
+ * navigation. Asked constantly it stops being an invitation and starts being
+ * pressure.
+ *
+ * So it is asked where the ask is **earned**: at the foot of a page somebody
+ * chose to read to the bottom, about one specific place or one specific idea,
+ * that has no conversion of its own.
+ *
+ * - **A destination page** (`/destinations/<slug>`) — somebody reading about
+ *   Havelock is deciding whether to go there. The waitlist is the next step of
+ *   the thing they are already doing.
+ * - **A journal post** (`/journal/<slug>`) — somebody who finished the piece.
+ *
+ * The journal *index* is excluded on purpose: a list is browsing, not
+ * finishing. Everything else says nothing at the foot of the page, because the
+ * routes that convert already do it in their own words:
+ *
+ * | route | how it asks |
+ * |---|---|
+ * | `/`, `/go/*` | closes on the registration form itself |
+ * | `/waitlist` | is the form |
+ * | `/operators` | closes on the application |
+ * | `/explore` | its own closing act |
+ * | `/about` | explains the company; does not convert |
+ * | `/contact` | a conversation, not a conversion |
+ * | `/safety`, `/privacy`, `/terms` | nothing to sell on a page of undertakings |
+ *
+ * **Adding a route here is a design decision, not a routing one.** That is the
+ * point of an allowlist: it grows only by a deliberate act, where a
+ * suppression list grew silently every time a page was added.
  */
-export function suppressesFooterCta(pathname: string): boolean {
-  return (
-    pathname === "/" ||
-    pathname === "/waitlist" ||
-    pathname === "/operators" ||
-    pathname === "/explore" ||
-    pathname === "/about" ||
-    pathname.startsWith("/go/")
-  );
+const FOOTER_CTA_ROOTS = ["/destinations/", "/journal/"] as const;
+
+export function showsFooterCta(pathname: string): boolean {
+  return FOOTER_CTA_ROOTS.some((root) => {
+    if (!pathname.startsWith(root)) return false;
+    // A leaf page under the root — not the root itself, not a deeper path.
+    const rest = pathname.slice(root.length);
+    return rest.length > 0 && !rest.includes("/");
+  });
 }
 
 /**

@@ -4,14 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
-import { suppressesFooterCta, PRIMARY_CTA } from "@/lib/site/nav";
+import { showsFooterCta, PRIMARY_CTA } from "@/lib/site/nav";
 
 /**
  * The footer's closing call to action.
  *
- * Hidden on routes that already close with the ask — the form itself, or a
- * section that just made the same request. Repeating it immediately below
- * reads as a page that has lost track of what it just said.
+ * Shown on the two kinds of page where the ask is earned — a destination page
+ * and a journal post — and nowhere else. The header carries "Join Waitlist"
+ * everywhere, so repeating it at the foot of every route was pressure rather
+ * than invitation; `showsFooterCta` holds the reasoning and the list.
  *
  * The headline used to be "The islands first. Then everywhere worth going."
  * It was replaced on 2026-08-06: "everywhere worth going" is an expansion
@@ -21,7 +22,7 @@ import { suppressesFooterCta, PRIMARY_CTA } from "@/lib/site/nav";
  */
 export function FooterCta() {
   const pathname = usePathname();
-  if (suppressesFooterCta(pathname)) return null;
+  if (!showsFooterCta(pathname)) return null;
 
   return (
     <div className="container-page border-cream/12 border-b py-20 sm:py-24">
