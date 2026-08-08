@@ -262,3 +262,59 @@ test("the primary routes appear in the site navigation", async ({ page }) => {
     ).toBeVisible();
   }
 });
+
+/*
+  The closing waitlist act is an allowlist, not a habit (owner direction,
+  2026-08-08).
+
+  It used to run under every route that did not explicitly opt out, which put
+  the same full-width ask beneath the legal pages, the safety page, the contact
+  page and the journal index. The header carries "Join Waitlist" on every page,
+  so the footer asks only where the ask is earned: at the foot of a page
+  somebody read to the bottom, about one place or one idea, with no conversion
+  of its own.
+
+  Asserted both ways round. A test that only checks the absences would pass
+  just as happily if the act were deleted altogether.
+*/
+test.describe("the footer's closing call to action", () => {
+  const CLOSES_WITH_THE_ASK = [
+    "/destinations/havelock",
+    "/journal/why-the-andamans",
+  ];
+
+  const DOES_NOT = [
+    "/", // closes on the registration form itself
+    "/waitlist", // is the form
+    "/operators", // closes on the application
+    "/explore",
+    "/about",
+    "/contact", // a conversation, not a conversion
+    "/safety",
+    "/privacy",
+    "/terms",
+    "/journal", // a list is browsing, not finishing
+  ];
+
+  for (const path of CLOSES_WITH_THE_ASK) {
+    test(`${path} closes with it`, async ({ page }) => {
+      await page.goto(path);
+      await expect(
+        page
+          .getByRole("contentinfo")
+          .getByRole("heading", { name: /be first to experience yuvoy/i }),
+      ).toBeVisible();
+    });
+  }
+
+  for (const path of DOES_NOT) {
+    test(`${path} does not`, async ({ page }) => {
+      await page.goto(path);
+      await expect(
+        page
+          .getByRole("contentinfo")
+          .getByRole("heading", { name: /be first to experience yuvoy/i }),
+      ).toHaveCount(0);
+    });
+  }
+});

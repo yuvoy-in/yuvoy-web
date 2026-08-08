@@ -57,12 +57,27 @@ const SRC = join(root, "public/brand/yuvoy-mark-vector-cream.svg");
 /**
  * How much of the tile is margin, per side.
  *
- * 11% is measured rather than picked: the ensō's brush strokes already carry
- * their own optical margin where the ring opens, so the usual 15–20% icon
- * padding leaves it looking small and lost in its tile at 16px, which is the
- * size that decides whether a favicon is recognisable at all.
+ * **6%, down from 11% (owner direction, 2026-08-08): "I should see only full
+ * green colour and our core logo design on it."**
+ *
+ * The reasoning behind 11% was right and the number was still too generous.
+ * The ensō carries its own optical margin where the ring opens, so the tile's
+ * padding is added on top of margin the drawing already has — at 16px, the
+ * size that decides whether a favicon is recognisable at all, the ring was
+ * landing about two thirds the width of its tile and reading as a thin pale
+ * circle rather than as the mark.
+ *
+ * 6% keeps the ring clear of the tile edge at every size — it must never look
+ * cropped, which is the failure the padding exists to prevent — while giving
+ * the drawing the room. Below about 4% the brush ends start touching the edge
+ * at 16px.
+ *
+ * Changing this changes every icon's bytes, which is a feature: browsers cache
+ * favicons per host in a store that ignores the URL's content hash, so a
+ * genuinely new file is the reliable way to retire one somebody is still
+ * being served from disk.
  */
-const PADDING = 0.11;
+const PADDING = 0.06;
 
 const source = readFileSync(SRC, "utf8");
 
