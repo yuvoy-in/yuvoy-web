@@ -55,7 +55,23 @@ export function Section({
       className={cn(SURFACE[tone], "scroll-mt-16", className)}
       {...rest}
     >
-      <div className="container-page py-20 sm:py-28">{children}</div>
+      {/*
+        The section's own rhythm, and the one place the mobile step is set.
+
+        `py-20` (80px) was a desktop measure a phone inherited unchanged. On a
+        1440px page 80px of air above a section is a fifth of the measure; on a
+        342px column it is a quarter of the screen, spent twice per act. Across
+        the homepage's six sections that alone was ~290px of scroll — and the
+        reported problem is that a phone scrolls too far to reach the content
+        (owner report, 2026-08-09: "good on desktop, but on mobile people feel
+        they need to scroll a lot to actually know the content").
+
+        56px still separates two acts unambiguously at this measure, which is
+        the job. Nothing changes from `sm` up, so the desktop page this
+        feedback did NOT complain about is untouched — that constraint is what
+        makes every mobile step in this change safe to make.
+      */}
+      <div className="container-page py-14 sm:py-28">{children}</div>
     </section>
   );
 }
@@ -102,7 +118,7 @@ export function SectionHeading({
       <Heading
         id={id}
         className={cn(
-          "font-display tracking-display mt-6 font-normal text-balance",
+          "font-display tracking-display mt-4 font-normal text-balance sm:mt-6",
           level === 1
             ? "text-[clamp(2.5rem,7vw,4.5rem)] leading-none"
             : "text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04]",
@@ -116,8 +132,28 @@ export function SectionHeading({
           </>
         )}
       </Heading>
+      {/*
+        `text-base` on a phone, `text-lg` from `sm`.
+
+        18px is the right size for this lede on a wide measure and the wrong
+        one on a 342px column: it fits ~38 characters to the line, so a
+        two-sentence intro runs to four or five lines and the section's actual
+        content is pushed a screen further down. At 16px the same sentence
+        takes ~43 characters — closer to a readable measure, not further from
+        it — and it matches every other paragraph on the page, which carries
+        no size class at all and has always been 16px. The 18px lede was the
+        outlier on a phone, not the standard.
+
+        Display sizes are deliberately NOT touched here or anywhere in this
+        change: the headline scale is owner-settled (Brand Kit v2.5, six
+        weights and seven review rounds), the reported problem is length
+        rather than size, and shrinking headlines to buy height is exactly
+        how a page starts reading as cramped.
+      */}
       {body && (
-        <div className={cn("mt-6 text-lg leading-relaxed", BODY[tone])}>
+        <div
+          className={cn("mt-5 leading-relaxed sm:mt-6 sm:text-lg", BODY[tone])}
+        >
           {body}
         </div>
       )}

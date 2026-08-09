@@ -247,7 +247,7 @@ export function PhoneField({
         <div
           aria-hidden
           className={cn(
-            "pointer-events-none flex h-full items-center gap-1.5 pr-3 pl-4 text-sm",
+            "pointer-events-none flex h-full items-center gap-1.5 pr-3 pl-4 text-base pointer-fine:text-sm",
             dark ? "text-cream" : "text-forest",
           )}
         >
@@ -298,7 +298,7 @@ export function PhoneField({
         aria-invalid={invalid || undefined}
         aria-describedby={describedBy}
         className={cn(
-          "h-full min-w-0 flex-1 border-0 bg-transparent px-4 text-sm focus:outline-none",
+          "h-full min-w-0 flex-1 border-0 bg-transparent px-4 text-base focus:outline-none pointer-fine:text-sm",
           dark
             ? "text-cream placeholder:text-cream/60"
             : "text-forest placeholder:text-forest/70",

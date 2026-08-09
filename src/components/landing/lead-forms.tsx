@@ -220,8 +220,8 @@ export function LeadForms({
       {audience === "provider" && (
         <span id="providers" className="block scroll-mt-20" aria-hidden />
       )}
-      <div className="container-page py-20 sm:py-28">
-        <div className="grid grid-cols-1 gap-14 lg:grid-cols-2 lg:gap-20">
+      <div className="container-page py-14 sm:py-28">
+        <div className="grid grid-cols-1 gap-10 sm:gap-14 lg:grid-cols-2 lg:gap-20">
           <div>{aside}</div>
           <div>
             <LeadFormPanel audience={audience} context={context} />

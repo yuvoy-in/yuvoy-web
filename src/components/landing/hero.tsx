@@ -68,7 +68,37 @@ export function Hero() {
           // The scrim and grain sit over this, so nothing finer would show.
           quality={75}
           sizes="100vw"
-          className="hero-photo object-cover object-[center_75%]"
+          /*
+            The artwork is framed by ORIENTATION, not by width, and on a
+            portrait screen it is framed on the sunset.
+
+            The delivered frame is 1672x941 — a 1.78:1 landscape seascape with
+            karst islands at the far left, open water through the middle, and
+            the setting sun, its reflection column and a stand of palms at the
+            far right. A 390x844 phone covering that frame sees a 435px-wide
+            window of it, about a quarter of the picture. Centred, that window
+            lands on the one part of the composition that contains nothing:
+            empty sky over flat water. Every phone visitor was getting a plain
+            dark-teal gradient where desktop gets a seascape (owner request,
+            2026-08-09: make the hero background look good on mobile).
+
+            At 86% the same window holds the sun's glow, the reflection on the
+            water, the palm silhouettes and the distant rocks — the picture's
+            whole subject, and the one warm note in the frame, which is what
+            ties the cover to the terracotta accent.
+
+            `portrait:` rather than a width breakpoint because the fault is the
+            container's shape, not the device's size: a tablet at 768px is just
+            as empty centred, and a phone turned landscape shows the full
+            width and wants the original framing back. Orientation is the axis
+            that actually describes the problem.
+
+            The vertical term stays where it was. It is inert at every real
+            viewport — the image is always scaled to fit the height with the
+            overflow on the horizontal axis — and is kept only so the
+            landscape framing reads unchanged from the original.
+          */
+          className="hero-photo object-cover portrait:object-[86%_50%] landscape:object-[center_75%]"
         />
         <div className="bg-forest/30 absolute inset-0 mix-blend-multiply" />
         <div className="hero-scrim absolute inset-0" />
@@ -79,7 +109,16 @@ export function Hero() {
       {/* Top padding is the header (4rem) plus the section's own, so the
           composition lands exactly where it did before the cover was pulled
           up behind the bar. */}
-      <div className="container-page relative flex min-h-dvh flex-col pt-32 pb-8 sm:pt-36 sm:pb-10">
+      {/*
+        `pt-24` on a phone, `pt-36` from `sm`. The cover is the one section on
+        the site with a height floor (`min-h-dvh`), so its padding is not
+        buying separation from anything — it is pushing the promise down
+        inside a box that is already a full screen tall. At `pt-32` the
+        composition ran ~100px past the fold on a 390x844 phone, which put the
+        call to action and the momentum line below it; the whole cover now
+        lands inside one screen, which is what a cover is for.
+      */}
+      <div className="container-page relative flex min-h-dvh flex-col pt-24 pb-8 sm:pt-36 sm:pb-10">
         <div className="flex flex-1 flex-col items-center justify-center text-center">
           {/* Plain `label`, not `eyebrow`: the cover line carries no marker
               (owner direction, 2026-08-05). */}
@@ -104,7 +143,7 @@ export function Hero() {
             weight.
           */}
           <h1
-            className="font-display emerge tracking-display mt-9 max-w-5xl text-[clamp(2.625rem,7.2vw,5.5rem)] leading-[1.06] font-normal"
+            className="font-display emerge tracking-display mt-6 max-w-5xl text-[clamp(2.625rem,7.2vw,5.5rem)] leading-[1.06] font-normal sm:mt-9"
             style={{ animationDelay: "0.14s" }}
           >
             <span className="block">
@@ -124,9 +163,16 @@ export function Hero() {
 
           {/* A narrower measure than the title's: roughly 68 characters, the
               readable column, so the lede reads as considered prose under
-              the statement rather than a second banner. */}
+              the statement rather than a second banner.
+
+              16px on a phone, 18px from `sm`. On a 342px column 18px fits
+              about 38 characters to the line, so this three-sentence lede ran
+              to six lines and became the tallest single block above the fold
+              — a paragraph standing between the promise and the button. At
+              16px it takes five, on a slightly better measure, and matches
+              every other paragraph on the site. */}
           <p
-            className="text-cream/75 emerge mt-10 max-w-xl text-lg leading-relaxed"
+            className="text-cream/75 emerge mt-6 max-w-xl leading-relaxed sm:mt-10 sm:text-lg"
             style={{ animationDelay: "0.28s" }}
           >
             Every video is filmed by the people who host the experience. Book
@@ -135,7 +181,7 @@ export function Hero() {
           </p>
 
           <div
-            className="emerge mt-12 flex w-full flex-col justify-center gap-3 sm:w-auto sm:flex-row"
+            className="emerge mt-8 flex w-full flex-col justify-center gap-3 sm:mt-12 sm:w-auto sm:flex-row"
             style={{ animationDelay: "0.4s" }}
           >
             {/*
@@ -174,7 +220,7 @@ export function Hero() {
             The margin is now only a floor for short viewports. Its rule
             draws itself in as the row arrives. */}
         <div
-          className="emerge relative mt-12 flex flex-col items-center gap-4 pt-6 text-center sm:mt-16 sm:flex-row sm:justify-between sm:gap-x-10 sm:text-left"
+          className="emerge relative mt-10 flex flex-col items-center gap-3 pt-5 text-center sm:mt-16 sm:flex-row sm:justify-between sm:gap-x-10 sm:gap-y-4 sm:pt-6 sm:text-left"
           style={{ animationDelay: "0.52s" }}
         >
           <span

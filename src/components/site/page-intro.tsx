@@ -64,11 +64,11 @@ export function PageIntro({
         <div className="grain" />
       </div>
 
-      <div className="container-page relative pt-32 pb-20 sm:pt-36 sm:pb-24">
-        <div className="grid grid-cols-1 gap-x-10 gap-y-14 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)]">
+      <div className="container-page relative pt-24 pb-14 sm:pt-36 sm:pb-24">
+        <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:gap-y-14 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)]">
           <div>
             <p className="label text-terra-soft">{eyebrow}</p>
-            <h1 className="font-display tracking-display mt-6 max-w-3xl text-[clamp(2.5rem,6.5vw,4.5rem)] leading-[1.02] font-normal text-balance">
+            <h1 className="font-display tracking-display mt-4 max-w-3xl text-[clamp(2.5rem,6.5vw,4.5rem)] leading-[1.02] font-normal text-balance sm:mt-6">
               {title}
               {accent && (
                 <>
@@ -77,15 +77,15 @@ export function PageIntro({
                 </>
               )}
             </h1>
-            <div className="text-cream/75 mt-8 max-w-xl text-lg leading-relaxed">
+            <div className="text-cream/75 mt-6 max-w-xl leading-relaxed sm:mt-8 sm:text-lg">
               {lede}
             </div>
-            {children && <div className="mt-10">{children}</div>}
+            {children && <div className="mt-8 sm:mt-10">{children}</div>}
           </div>
 
           <nav aria-label="On this page" className="lg:pt-3">
             <p className="label text-cream/70">On this page</p>
-            <ol className="border-cream/12 mt-5 border-t">
+            <ol className="border-cream/12 mt-4 border-t sm:mt-5">
               {contents.map((item, i) => (
                 <li key={item.href} className="border-cream/12 border-b">
                   {/*

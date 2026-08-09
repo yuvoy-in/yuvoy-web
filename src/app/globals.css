@@ -89,6 +89,33 @@
     overflow-x: clip; /* guard against accidental horizontal scroll on mobile */
   }
 
+  /*
+    The touch highlight, in the brand's own colour.
+
+    WebKit and Blink paint a translucent BLACK-BLUE rectangle over any tapped
+    link or button by default, sized to the element's box. On a cream editorial
+    page that flash is the one colour on the site that belongs to no palette,
+    and it fires on every single tap on the platform that carries most of the
+    traffic — which is a large part of why a carefully built page can still
+    feel unbranded on a phone.
+
+    Tinted rather than set to `transparent`: killing it outright is the common
+    fix and it removes the only feedback a touch has, since none of these
+    elements can hover. `forest` at 10% reads as the page acknowledging the tap
+    in its own voice. Buttons keep their `active:scale` compression on top.
+  */
+  a,
+  button,
+  summary,
+  label,
+  [role="button"] {
+    -webkit-tap-highlight-color: color-mix(
+      in srgb,
+      var(--color-forest) 10%,
+      transparent
+    );
+  }
+
   ::selection {
     @apply bg-terra-deep text-cream;
   }

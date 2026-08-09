@@ -135,10 +135,29 @@ export function DestinationPanel({
         wants the opposite — a crisp edge, the way a printed caption panel
         sits on a plate — and a gradient to forest above it would read as a
         shadow nobody asked for.
+
+        ## The phone rhythm is one step tighter, and that is a photography
+        ## decision rather than a spacing one
+
+        The plate is an aspect-ratio box and this caption is a solid block
+        pinned to its foot, so on a 342px column the caption was taking 211 of
+        the plate's 256 pixels and leaving a 45px strip of photograph — a
+        full-bleed photographic plate showing almost no photograph. One step
+        off each gap here gives the image back roughly half again as much room
+        without making the plate any taller, which the page cannot afford
+        (owner report, 2026-08-09: mobile scrolls too far).
+
+        The caption stays SOLID and never becomes an overlay, at any width.
+        That is load-bearing rather than stylistic: `cream` on `forest` is
+        11.44:1 whatever the photograph underneath is doing, and the gradient
+        version of this was a real bug — on Neil's near-white sand the
+        secondary line measured about 3.2:1, and axe reports text over a
+        gradient as "incomplete" rather than as a violation, so nothing would
+        have caught it.
       */}
       <div
         className={cn(
-          "relative p-6 sm:p-7",
+          "relative p-5 sm:p-7",
           onInk ? "bg-cream text-forest" : "bg-forest text-cream",
         )}
       >
@@ -153,7 +172,7 @@ export function DestinationPanel({
         >
           {LAUNCH_STATUS_LABEL[destination.launchStatus]}
         </p>
-        <h3 className="font-display tracking-display mt-3 text-3xl leading-none font-normal sm:text-4xl">
+        <h3 className="font-display tracking-display mt-2 text-3xl leading-none font-normal sm:mt-3 sm:text-4xl">
           {destination.name}
         </h3>
         {/*
@@ -173,7 +192,7 @@ export function DestinationPanel({
         */}
         <p
           className={cn(
-            "mt-4 line-clamp-2 min-h-11.5 text-sm leading-relaxed",
+            "mt-3 line-clamp-2 min-h-11.5 text-sm leading-relaxed sm:mt-4",
             onInk ? "text-forest/75" : "text-cream/70",
           )}
         >
@@ -184,7 +203,7 @@ export function DestinationPanel({
             of the site's text links do. */}
         <span
           className={cn(
-            "label mt-6 inline-flex items-center gap-2",
+            "label mt-4 inline-flex items-center gap-2 sm:mt-6",
             onInk ? "text-terra-deep" : "text-cream",
           )}
         >
@@ -238,7 +257,7 @@ export function DestinationGrid({
   return (
     <ul
       className={cn(
-        "grid grid-cols-1 gap-5 lg:gap-6",
+        "grid grid-cols-1 gap-4 sm:gap-5 lg:gap-6",
         destinations.length === 2 ? "sm:grid-cols-2" : "md:grid-cols-3",
         className,
       )}

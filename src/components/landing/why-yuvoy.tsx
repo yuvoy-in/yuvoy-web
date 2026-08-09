@@ -79,7 +79,7 @@ export function WhyYuvoy() {
         its rail side by side, and an even split leaves the rail about 130px
         wide at the lg breakpoint, where every line of it wraps three ways.
       */}
-      <div className="mt-14 grid grid-cols-1 gap-x-8 gap-y-8 sm:mt-20 lg:grid-cols-[minmax(0,4fr)_auto_minmax(0,6fr)] lg:grid-rows-[auto_1fr] lg:gap-x-10">
+      <div className="mt-10 grid grid-cols-1 gap-x-8 gap-y-6 sm:mt-20 sm:gap-y-8 lg:grid-cols-[minmax(0,4fr)_auto_minmax(0,6fr)] lg:grid-rows-[auto_1fr] lg:gap-x-10">
         {/* ---------------------------------------- without Yuvoy · header */}
         <div className="lg:col-start-1 lg:row-start-1">
           <p className="label text-forest/75">Without Yuvoy</p>
@@ -93,7 +93,7 @@ export function WhyYuvoy() {
           {/* The open tabs, one card each: the headline's "too many tabs",
               drawn. Six cards, six cells, so the grid reads as finished
               rather than clipped (owner report, 2026-08-06). */}
-          <div aria-hidden className="p-5 select-none">
+          <div aria-hidden className="p-4 select-none sm:p-5">
             <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
               {SOURCES.map((source) => (
                 <li
@@ -111,17 +111,44 @@ export function WhyYuvoy() {
             </ul>
           </div>
 
-          {/* The comparison that never resolves. Every cell is a question
-              mark on purpose: inventing depths and levels here would be the
-              same fabrication the page bans, and the unknowns are the point. */}
-          <div aria-hidden className="flex flex-1 flex-col p-5 select-none">
+          {/*
+            The comparison that never resolves. Every cell is a question mark
+            on purpose: inventing depths and levels here would be the same
+            fabrication the page bans, and the unknowns are the point.
+
+            ## Why it is not drawn on a phone (2026-08-09)
+
+            This block and the tab strip above it are two drawings of one
+            idea, and both are `aria-hidden` illustration — the section's real
+            content is the cost list below them, which is why that list is the
+            only part of this panel exposed to assistive tech. On a wide
+            column the pair reads as reportage: the tabs you opened, then the
+            table you tried to build from them. Stacked in a 342px phone
+            column it is 275px of the same argument a second time, immediately
+            under the first, on the page whose reported fault is that it takes
+            too long to reach the content.
+
+            So the phone gets the stronger of the two drawings and the desktop
+            keeps both. **No information is lost at any width** — that is what
+            makes this a composition decision rather than hiding content on
+            mobile, which the responsive rules rightly ban.
+
+            The column cells are `w-16`, not `w-12`. At 10px with
+            `tracking-label`'s 0.18em, "Worth it" measures ~62px and a 48px
+            cell was overflowing into its neighbour's gutter at every width —
+            visible from `sm` up, where this block now starts.
+          */}
+          <div
+            className="hidden flex-1 flex-col p-5 select-none sm:flex"
+            aria-hidden
+          >
             <div className="text-forest/75 flex items-center justify-between gap-4 pb-3">
               <span className="label text-[10px]">The shortlist</span>
               <span className="flex gap-3">
                 {COMPARE.columns.map((column) => (
                   <span
                     key={column}
-                    className="label w-12 text-center text-[10px]"
+                    className="label w-16 text-center text-[10px]"
                   >
                     {column}
                   </span>
@@ -139,7 +166,7 @@ export function WhyYuvoy() {
                   {COMPARE.columns.map((column) => (
                     <span
                       key={column}
-                      className="text-terra-deep w-12 text-center text-sm font-bold"
+                      className="text-terra-deep w-16 text-center text-sm font-bold"
                     >
                       ?
                     </span>
@@ -155,7 +182,7 @@ export function WhyYuvoy() {
           </div>
 
           {/* The real content of this panel: what the hunt costs. */}
-          <ul className="grid grid-cols-1 gap-x-6 gap-y-3 p-5 sm:grid-cols-2">
+          <ul className="grid grid-cols-2 gap-x-4 gap-y-3 p-4 sm:gap-x-6 sm:p-5">
             {COSTS.map((cost) => (
               <li
                 key={cost}
@@ -252,14 +279,21 @@ export function WhyYuvoy() {
            is therefore one step short of the top (24px against 32px) so the
            two OPTICAL gaps match. Change one and change the other.
       */}
-      <div className="mt-24 flex flex-col items-center text-center sm:mt-32">
-        <Wordmark className="h-16 sm:h-20" />
+      <div className="mt-16 flex flex-col items-center text-center sm:mt-32">
+        <Wordmark className="h-14 sm:h-20" />
 
         <svg
           viewBox="0 0 16 28"
           fill="none"
           aria-hidden
-          className="text-terra mt-8 mb-6 h-7 w-4"
+          /* The 8px asymmetry is the point, at both steps: `leading-tight`
+             leaves ~8px of empty line box above the sentence's cap height
+             that no margin can see, so the bottom margin is one 8px step
+             short of the top and the two OPTICAL gaps match. The mobile pair
+             (24/16) keeps that same 8px difference rather than scaling it —
+             the dead space comes from the font's metrics, not from the
+             margin, so it does not shrink with the viewport. */
+          className="text-terra mt-6 mb-4 h-7 w-4 sm:mt-8 sm:mb-6"
         >
           <path d="M8 0V26" stroke="currentColor" strokeWidth="1.5" />
           <path

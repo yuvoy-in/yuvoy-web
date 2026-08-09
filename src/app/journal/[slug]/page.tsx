@@ -114,7 +114,7 @@ export default async function JournalArticlePage({
         />
       </PageHeader>
 
-      <div className="container-page py-16 sm:py-20">
+      <div className="container-page py-12 sm:py-20">
         <article className="max-w-2xl">
           <MDXRemote source={post.body} components={components} />
         </article>

@@ -22,9 +22,9 @@ export function PageHeader({
 }) {
   return (
     <header className="border-cream-line border-b">
-      <div className="container-page py-20 sm:py-28">
+      <div className="container-page py-14 sm:py-28">
         <p className="eyebrow text-terra-deep">{eyebrow}</p>
-        <h1 className="font-display tracking-display mt-6 max-w-4xl text-[clamp(2.5rem,6.5vw,4.25rem)] leading-[1.01] font-normal text-balance">
+        <h1 className="font-display tracking-display mt-4 max-w-4xl text-[clamp(2.5rem,6.5vw,4.25rem)] leading-[1.01] font-normal text-balance sm:mt-6">
           {title}
           {accent && (
             <>
@@ -34,11 +34,11 @@ export function PageHeader({
           )}
         </h1>
         {lede && (
-          <div className="text-forest/75 mt-8 max-w-2xl text-lg leading-relaxed">
+          <div className="text-forest/75 mt-6 max-w-2xl leading-relaxed sm:mt-8 sm:text-lg">
             {lede}
           </div>
         )}
-        {children && <div className="mt-10">{children}</div>}
+        {children && <div className="mt-8 sm:mt-10">{children}</div>}
       </div>
     </header>
   );
