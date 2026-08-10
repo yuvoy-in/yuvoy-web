@@ -29,20 +29,20 @@ import { Wordmark } from "@/components/brand/wordmark";
  */
 
 /**
- * The improvised stack every traveller actually uses, and what each one leaves
- * them holding. Real product names, no logos: this is reportage, not
- * endorsement, and every line is literally true of that source today.
+ * The hunt, as it actually goes: six places, in the order a person tries them,
+ * and what each one hands back.
  *
- * This is the section's argument, so it is **real content** — not the
- * `aria-hidden` illustration it used to be. See the note on the index below.
+ * Reportage, not endorsement — real product names, no logos, and every line
+ * literally true of that source today. It is the section's argument, so it is
+ * real content rather than the `aria-hidden` illustration it used to be.
  */
-const SOURCES = [
-  { name: "Instagram", note: "Clips, no prices" },
-  { name: "Google", note: "Ten blue links" },
-  { name: "YouTube", note: "Vlogs from 2019" },
-  { name: "Tripadvisor", note: "Verdicts, no video" },
-  { name: "WhatsApp", note: "A number, if you ask" },
-  { name: "The hotel desk", note: "Whoever they know" },
+const HUNT = [
+  ["Instagram", "shows you a clip. No price."],
+  ["Google", "returns ten blue links."],
+  ["YouTube", "has a vlog, filmed in 2019."],
+  ["Tripadvisor", "has verdicts, no video."],
+  ["WhatsApp", "gets you a number, if you ask."],
+  ["The hotel desk", "sends whoever they know."],
 ];
 
 export function WhyYuvoy() {
@@ -77,78 +77,59 @@ export function WhyYuvoy() {
           </p>
         </div>
 
-        {/* ----------------------------------------- without Yuvoy · index */}
+        {/* ------------------------------------------- without Yuvoy · hunt */}
         {/*
-          The hunt as a ruled index, not as a panel of cards.
+          The hunt as six sentences, because it is a story and not a dataset.
 
-          ## Why this stopped being a card (2026-08-10)
+          ## Three versions of this have been rejected, and why
 
-          It was a bordered, tinted, rounded panel containing a grid of six
-          bordered cards and a mocked comparison table — a box of boxes, which
-          is the one structure this site's design law names and rejects
-          outright: "a plain list on a rule, not three bordered cards; boxes
-          inside a box is the SaaS grid this rebuild exists to get away from"
-          (design system §5, written about the operator list and true here).
-          Owner report, 2026-08-10: present the concept better than "just like
-          a card".
+          1. A bordered, tinted panel of six bordered cards plus a mocked
+             comparison table: a box of boxes, the one structure the design
+             system names and rejects outright (§5).
+          2. A ruled two-column index: no boxes, but a name on the left and a
+             note on the right with a rule between is the shape of every
+             pricing table ever built, and read as generic (owner, 2026-08-10).
+          3. The names as one run of display type: it overflowed its column at
+             `lg`, and a row of brand names separated by middots reads as an
+             "as seen in" logo strip — the opposite of the intended meaning.
 
-          What replaces it is the brand's own editorial language — hairlines
-          doing the work boxes do elsewhere, the display face carrying the
-          names, wide-tracked metadata beside them. It reads as an index in a
-          printed magazine: the six places you already look, and what each one
-          actually gives you. Six large names stacked IS "too many places",
-          drawn by the type rather than by a container.
+          ## What this is
 
-          ## Two things it deletes
+          Six short sentences, one per place, in the order a person actually
+          tries them, each naming what it hands back. It reads the way the
+          experience feels: you go somewhere, you get a fragment, you go
+          somewhere else. The repetition IS the argument, so no container has
+          to draw it and nothing has to be tabulated.
 
-          The mocked shortlist table has gone. It was a second drawing of the
-          same idea sitting directly under the first, and its every cell was a
-          question mark; the sentence at the foot of this block says what it
-          was trying to say, in words, in one line. The four-item cost grid has
-          gone with it for the same reason — it restated the notes on the right
-          of every row.
+          The left edge is the composition: every line opens with the place, so
+          the six names stack into a hard vertical rule of proper nouns down
+          the column while the shortfalls trail off to the right in a lighter
+          tone. That contrast — solid names, fading answers — is the whole
+          picture, and it is made of nothing but type.
 
-          ## And one thing it fixes
-
-          The old panel's two illustrations were `aria-hidden`, so a screen
-          reader got the argument only through a separate cost list bolted
-          underneath. Here the names and their notes are the argument, in
-          text, so there is one thing to read and everybody reads the same
-          thing. A `<dl>` because that is exactly the shape of the content: a
-          source, and what it leaves you with.
+          Set in the display face at reading size rather than the text face:
+          this is the argument, opposite a phone, and Satoshi at 16px would
+          read as a caption next to it. The closing line is the only thing
+          here at full display scale, because it is the conclusion the six
+          lines have earned.
         */}
         <div className="lg:col-start-1 lg:row-start-2">
-          <dl className="border-cream-line divide-cream-line divide-y border-t border-b">
-            {SOURCES.map((source) => (
-              <div
-                key={source.name}
-                className="flex items-baseline justify-between gap-4 py-3.5 sm:py-4"
+          <ul className="space-y-3.5 sm:space-y-4">
+            {HUNT.map(([place, outcome]) => (
+              <li
+                key={place}
+                className="font-display tracking-display text-xl leading-snug font-normal sm:text-[1.375rem]"
               >
-                <dt className="font-display tracking-display text-forest min-w-0 text-xl leading-snug font-normal sm:text-2xl">
-                  {source.name}
-                </dt>
-                {/* Right-aligned and quiet: this is the annotation on the
-                    name, not a second column of content competing with it. */}
-                <dd className="text-forest/70 shrink-0 text-right text-sm leading-snug">
-                  {source.note}
-                </dd>
-              </div>
+                <span className="text-forest">{place}</span>{" "}
+                <span className="text-forest/70">{outcome}</span>
+              </li>
             ))}
-          </dl>
+          </ul>
 
-          {/* The closing statement, carrying what the mocked table used to
-              draw. Body rather than display: the section's typographic turn
-              belongs to the headline, and this is the evidence under the
-              index, not a second headline.
-
-              It counts the rows above it. The line read "Four sources, three
-              answers" while it sat under a mocked table of its own; directly
-              beneath an index of six named places that was simply wrong, and
-              the kind of wrong a reader checks. Anything added to or removed
-              from SOURCES has to move this number with it. */}
-          <p className="text-forest/75 mt-5 max-w-md leading-relaxed sm:mt-6">
-            Six places to look, no two that agree, and no way to tell which was
-            written this season.
+          {/* The conclusion the six lines earn. It counts them: anything added
+              to or removed from HUNT has to move this number. */}
+          <p className="font-display tracking-display text-forest mt-8 text-2xl leading-snug text-balance sm:mt-10 sm:text-3xl">
+            Six places. Still no idea what the day actually looks like.
           </p>
         </div>
 
