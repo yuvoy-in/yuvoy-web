@@ -37,15 +37,18 @@ const FACTS = [
 export function Hero() {
   return (
     /*
-      `-mt-16` pulls the cover up behind the header's own 64px of flow, and the
-      inner `pt-14` puts the content back exactly where it was. Without this a
-      transparent header would show the page background above the cover, not
-      the cover itself. `data-dark-hero` is how the header knows this page has
-      one.
+      The negative top margin pulls the cover up behind the header's full run
+      of flow — 4rem of bar plus the top safe-area inset the header now wears
+      (site-header.tsx) — and the inner padding puts the content back exactly
+      where it was. Without this a transparent header would show the page
+      background above the cover, not the cover itself; short by the inset, it
+      would show a cream strip exactly under the Dynamic Island. The two
+      calc() values must move with the header's height together.
+      `data-dark-hero` is how the header knows this page has one.
     */
     <section
       data-dark-hero
-      className="bg-forest text-cream relative -mt-16 overflow-hidden"
+      className="bg-forest text-cream relative -mt-[calc(4rem+env(safe-area-inset-top))] overflow-hidden"
     >
       {/*
         The field, in five layers (owner artwork + direction, 2026-08-06):
@@ -139,7 +142,7 @@ export function Hero() {
         `SiteMenu` deliberately keeps `dvh`: it is a fullscreen dialog over the
         page and *should* track the live viewport.
       */}
-      <div className="container-page relative flex min-h-svh flex-col pt-24 pb-8 sm:pt-36 sm:pb-10">
+      <div className="container-page relative flex min-h-svh flex-col pt-[calc(6rem+env(safe-area-inset-top))] pb-8 sm:pt-[calc(9rem+env(safe-area-inset-top))] sm:pb-10">
         <div className="flex flex-1 flex-col items-center justify-center text-center">
           {/* Plain `label`, not `eyebrow`: the cover line carries no marker
               (owner direction, 2026-08-05). */}

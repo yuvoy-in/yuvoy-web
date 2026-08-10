@@ -291,7 +291,7 @@ export function IntroVeil({ ref }: { ref?: Ref<HTMLDivElement> }) {
       </div>
       {/* The island's name grounds the frame — the cover's own opening
           words, so the veil and the page tell one story. */}
-      <span className="intro-place label text-cream/70 absolute inset-x-0 bottom-10 text-center">
+      <span className="intro-place label text-cream/70 absolute inset-x-0 bottom-[max(2.5rem,calc(env(safe-area-inset-bottom)+1.25rem))] text-center">
         Andaman Islands
       </span>
     </div>

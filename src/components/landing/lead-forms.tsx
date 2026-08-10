@@ -212,7 +212,7 @@ export function LeadForms({
   return (
     <section
       id={sectionId}
-      className="bg-forest text-cream scroll-mt-16"
+      className="bg-forest text-cream scroll-mt-[calc(4rem+env(safe-area-inset-top))]"
       aria-labelledby={`${sectionId}-heading`}
     >
       {/* The legacy operator anchor, wherever a provider form actually lives,
@@ -220,7 +220,11 @@ export function LeadForms({
           offers that form and redirects the anchor instead (see
           LegacyProviderAnchor). */}
       {audience === "provider" && (
-        <span id="providers" className="block scroll-mt-20" aria-hidden />
+        <span
+          id="providers"
+          className="block scroll-mt-[calc(5rem+env(safe-area-inset-top))]"
+          aria-hidden
+        />
       )}
       {/*
         Three cells, and the source order is the PHONE's order: headline, then

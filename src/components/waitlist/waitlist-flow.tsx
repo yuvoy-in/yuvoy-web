@@ -147,7 +147,11 @@ export function WaitlistFlow({
     <main className="bg-forest text-cream">
       {/* The legacy operator anchor. It must exist for the browser to have
           something to scroll to when the hash arrives with the document. */}
-      <span id="providers" className="block scroll-mt-24" aria-hidden />
+      <span
+        id="providers"
+        className="block scroll-mt-[calc(6rem+env(safe-area-inset-top))]"
+        aria-hidden
+      />
 
       <div className="container-page pt-10 pb-20 sm:pt-14 sm:pb-28">
         <AudienceTabs

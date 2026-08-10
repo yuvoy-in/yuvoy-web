@@ -55,7 +55,7 @@ export function PageIntro({
   return (
     <section
       data-dark-hero
-      className="bg-forest text-cream relative -mt-16 overflow-hidden"
+      className="bg-forest text-cream relative -mt-[calc(4rem+env(safe-area-inset-top))] overflow-hidden"
     >
       {/* The field: the same breathing lagoon light and filmic grain the
           homepage cover uses, without its photography. Decorative, inert. */}
@@ -64,7 +64,7 @@ export function PageIntro({
         <div className="grain" />
       </div>
 
-      <div className="container-page relative pt-24 pb-14 sm:pt-36 sm:pb-24">
+      <div className="container-page relative pt-[calc(6rem+env(safe-area-inset-top))] pb-14 sm:pt-[calc(9rem+env(safe-area-inset-top))] sm:pb-24">
         <div className="grid grid-cols-1 gap-x-10 gap-y-10 sm:gap-y-14 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)]">
           <div>
             <p className="label text-terra-soft">{eyebrow}</p>

@@ -97,14 +97,17 @@ export default function ContactPage() {
               */}
               <h2
                 id="channels"
-                className="label text-cream/70 mt-14 scroll-mt-24"
+                className="label text-cream/70 mt-14 scroll-mt-[calc(6rem+env(safe-area-inset-top))]"
               >
                 Reach us directly
               </h2>
               <ContactChannels tone="ink" className="mt-6" />
             </div>
 
-            <div id="message" className="scroll-mt-24">
+            <div
+              id="message"
+              className="scroll-mt-[calc(6rem+env(safe-area-inset-top))]"
+            >
               <MessageForm />
             </div>
           </div>

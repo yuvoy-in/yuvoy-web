@@ -54,6 +54,26 @@ export const metadata: Metadata = {
 */
 export const viewport: Viewport = {
   themeColor: "#f4efe4",
+  /*
+    Own the notch, deterministically.
+
+    Without `viewport-fit=cover`, iOS Safari decides for itself when a page
+    extends under the Dynamic Island: edge-to-edge while its chrome is
+    collapsed at the top of the page, then an opaque theme-colour bar once
+    scrolled. On `/` that flipped between the forest cover bleeding under the
+    island and a cream band capping it — two different treatments of the same
+    edge in one scroll, either of which can collide the header's lockup with
+    the clock (owner report, 2026-08-11, iPhone Safari).
+
+    `cover` removes the heuristic: the page always extends under the island,
+    and — the actual point — `env(safe-area-inset-*)` stops being zero, which
+    is what lets the header, the covers, the menu and every fixed element
+    position around the sensor housing instead of underneath it. Every one of
+    those offsets is written as `max(<the old value>, env(...))` or
+    `calc(<the old value> + env(...))`, so on hardware without insets the
+    layout is byte-for-byte what it was.
+  */
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -80,7 +100,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <BrandIntro />
         <a
           href="#content"
-          className="focus:bg-forest focus:text-cream label rounded-edge sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-3"
+          className="focus:bg-forest focus:text-cream label rounded-edge sr-only focus:not-sr-only focus:absolute focus:top-[max(1rem,env(safe-area-inset-top))] focus:left-4 focus:z-50 focus:px-4 focus:py-3"
         >
           Skip to content
         </a>

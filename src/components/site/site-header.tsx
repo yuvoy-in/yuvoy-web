@@ -85,8 +85,18 @@ export function SiteHeader() {
         Over the cover the bar stays fully transparent at every width. That is
         the deliberate behaviour (design system §3) and is unaffected.
       */
+      /*
+        `pt-[env(safe-area-inset-top)]`: the bar's CONTENT sits below the
+        Dynamic Island while its background runs up under it. The viewport
+        declares `viewport-fit=cover` (see layout.tsx), so the sticky bar's
+        `top: 0` is the physical top of the screen — without this padding the
+        lockup renders beneath the clock. The inset is part of the header's
+        height, so `translateY(-100%)` still hides all of it, and
+        `useHeaderChrome` reads `offsetHeight`, which includes padding, so the
+        cover handoff needs no change. Zero on hardware without insets.
+      */
       className={cn(
-        "header-slide sticky top-0 z-40 border-b",
+        "header-slide sticky top-0 z-40 border-b pt-[env(safe-area-inset-top)]",
         overCover
           ? "border-transparent bg-transparent"
           : "border-cream-line bg-cream lg:bg-cream/85 lg:backdrop-blur-md",

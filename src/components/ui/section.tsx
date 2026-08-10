@@ -52,7 +52,11 @@ export function Section({
   return (
     <section
       id={id}
-      className={cn(SURFACE[tone], "scroll-mt-16", className)}
+      className={cn(
+        SURFACE[tone],
+        "scroll-mt-[calc(4rem+env(safe-area-inset-top))]",
+        className,
+      )}
       {...rest}
     >
       {/*

@@ -233,10 +233,26 @@
 
 /* ----------------------------------------------------------------- layout */
 
-/** The standard page measure and gutters. Every section uses this. */
+/**
+ * The standard page measure and gutters. Every section uses this.
+ *
+ * The gutters are floors, not fixed values: `max()` against the side safe
+ * areas. With `viewport-fit=cover` (layout.tsx) the page owns the full screen,
+ * and in landscape on a notched phone the sensor housing sits ~59px into one
+ * long edge — more than either gutter — so without this, body text would run
+ * underneath it. Portrait and desktop resolve the env() terms to 0 and get
+ * exactly the old 24/40px.
+ */
 @utility container-page {
-  @apply mx-auto w-full px-6 sm:px-10;
+  @apply mx-auto w-full;
   max-width: var(--container-page);
+  padding-left: max(1.5rem, env(safe-area-inset-left));
+  padding-right: max(1.5rem, env(safe-area-inset-right));
+
+  @variant sm {
+    padding-left: max(2.5rem, env(safe-area-inset-left));
+    padding-right: max(2.5rem, env(safe-area-inset-right));
+  }
 }
 
 /**
