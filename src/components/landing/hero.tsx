@@ -106,19 +106,40 @@ export function Hero() {
         <div className="grain" />
       </div>
 
-      {/* Top padding is the header (4rem) plus the section's own, so the
-          composition lands exactly where it did before the cover was pulled
-          up behind the bar. */}
       {/*
-        `pt-24` on a phone, `pt-36` from `sm`. The cover is the one section on
-        the site with a height floor (`min-h-dvh`), so its padding is not
-        buying separation from anything — it is pushing the promise down
-        inside a box that is already a full screen tall. At `pt-32` the
-        composition ran ~100px past the fold on a 390x844 phone, which put the
-        call to action and the momentum line below it; the whole cover now
-        lands inside one screen, which is what a cover is for.
+        The top padding is the header (4rem) plus the section's own, so the
+        composition lands where it did before the cover was pulled up behind
+        the bar: `pt-24` on a phone, `pt-36` from `sm`.
+
+        The cover is the one section on the site with a height floor, so that
+        padding is not buying separation from anything — it is pushing the
+        promise down inside a box that is already a full screen tall. At
+        `pt-32` the composition ran ~100px past the fold on a 390x844 phone,
+        putting the call to action and the momentum line below it.
+
+        ## The floor is `svh`, and that is a bug fix rather than a preference
+
+        `dvh` is the *dynamic* viewport: on a phone it grows and shrinks as the
+        browser's address bar collapses and returns during a scroll. A height
+        floor written in it re-measures mid-gesture, so the cover grew by
+        60-100px and pushed every section below it down while the visitor was
+        reading — the page appeared to jump to a different position under
+        their thumb (owner report, 2026-08-10: "automatically it's scrolling to
+        some other point on the screen"). Nothing was scrolling; the document
+        was getting taller underneath the scroll position.
+
+        `svh` is the SMALL viewport — the height with the browser chrome
+        showing — so it is constant for the life of the page and the layout
+        below it cannot move. It is also the conservative choice for a cover:
+        the whole composition fits even with the address bar on screen, which
+        is the state the page loads in. The trade is a sliver of the next
+        section showing once the bar collapses, which is how a cover should
+        behave anyway.
+
+        `SiteMenu` deliberately keeps `dvh`: it is a fullscreen dialog over the
+        page and *should* track the live viewport.
       */}
-      <div className="container-page relative flex min-h-dvh flex-col pt-24 pb-8 sm:pt-36 sm:pb-10">
+      <div className="container-page relative flex min-h-svh flex-col pt-24 pb-8 sm:pt-36 sm:pb-10">
         <div className="flex flex-1 flex-col items-center justify-center text-center">
           {/* Plain `label`, not `eyebrow`: the cover line carries no marker
               (owner direction, 2026-08-05). */}

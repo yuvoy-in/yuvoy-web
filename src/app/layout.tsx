@@ -90,7 +90,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             See navigation-history.tsx. */}
         <NavigationHistory />
         <Providers>
-          <div className="flex min-h-dvh flex-col">
+          <div className="flex min-h-svh flex-col">
             <SiteHeader />
             <div id="content" tabIndex={-1} className="flex-1 outline-none">
               {children}

@@ -60,11 +60,36 @@ export function SiteHeader() {
     <header
       ref={ref}
       data-hidden="false"
+      /*
+        The bar is SOLID below `lg`, and frosted only where frosting works.
+
+        `bg-cream/85` + `backdrop-blur-md` is a translucent bar that relies on
+        `backdrop-filter` to read as cream. On the phone it does not: WebKit
+        will not sample a backdrop through an element that is itself
+        transformed, and this element is — `.header-slide` puts a
+        `translateY` on it to slide it out of the way. The blur is dropped and
+        the 85% is not, so the bar renders as plain 15%-transparent cream with
+        the forest sections showing through and tinting it green, while the
+        same markup on desktop looks like solid cream (owner report,
+        2026-08-10: "on mobile the header bg is kind of transparent, it's not
+        always cream the same way we had for desktop").
+
+        Making it opaque is the fix rather than moving the blur to an inner
+        layer: at 64px of bar there is nothing for a blur to do that a solid
+        colour does not do better and more predictably, and an opaque header
+        is what the report asks for. From `lg` up — where the bar does not
+        slide over a cover on most routes and the effect renders correctly —
+        the frosted treatment is kept exactly as it was, because desktop is
+        not what was reported.
+
+        Over the cover the bar stays fully transparent at every width. That is
+        the deliberate behaviour (design system §3) and is unaffected.
+      */
       className={cn(
-        "header-slide sticky top-0 z-40 border-b backdrop-blur-md",
+        "header-slide sticky top-0 z-40 border-b",
         overCover
           ? "border-transparent bg-transparent"
-          : "border-cream-line bg-cream/85",
+          : "border-cream-line bg-cream lg:bg-cream/85 lg:backdrop-blur-md",
       )}
     >
       <div className="container-page grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4">

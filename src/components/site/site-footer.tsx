@@ -104,7 +104,28 @@ export function SiteFooter() {
             competing for that hint — the right trade for a file this small.
           */
           loading="eager"
-          className="object-cover object-bottom"
+          /*
+            Anchored to the bottom always, and to the turtle on a portrait
+            screen.
+
+            The frame is 1774x887 and its subject is not centred: coral runs
+            along the bottom left, the seabed flattens out through the middle,
+            and the turtle and its school of fish are in the right fifth. A
+            390px phone covering that frame sees a 384px window — 22% of the
+            width — and centred, that window lands on the emptiest part of the
+            picture: flat sand under empty water, with the coral off one edge
+            and the turtle off the other (owner report, 2026-08-10).
+
+            At 90% the window holds the turtle whole, the fish above it and
+            coral in the bottom corner. Past that it starts clipping the
+            turtle's tail against the edge; below about 85% its head is cut.
+
+            The vertical term stays at `100%` in both cases — that is
+            `object-bottom`, and it is load-bearing for the reason documented
+            above: the crop must always be taken from the empty top of the
+            frame, never from the seabed. Only the horizontal anchor moves.
+          */
+          className="object-cover portrait:object-[90%_100%] landscape:object-bottom"
         />
         <div className="plate-wash absolute inset-0" />
         <div className="footer-scrim absolute inset-0" />

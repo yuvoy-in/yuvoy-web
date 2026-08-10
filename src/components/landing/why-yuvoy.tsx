@@ -29,10 +29,12 @@ import { Wordmark } from "@/components/brand/wordmark";
  */
 
 /**
- * The improvised stack every traveller actually uses, one card each, with
- * what that source leaves you holding. Real product names and no logos: this
- * is reportage, not endorsement, and a card carries the name at a readable
- * size instead of a clipped tab strip. Six of them fill the grid exactly.
+ * The improvised stack every traveller actually uses, and what each one leaves
+ * them holding. Real product names, no logos: this is reportage, not
+ * endorsement, and every line is literally true of that source today.
+ *
+ * This is the section's argument, so it is **real content** — not the
+ * `aria-hidden` illustration it used to be. See the note on the index below.
  */
 const SOURCES = [
   { name: "Instagram", note: "Clips, no prices" },
@@ -41,19 +43,6 @@ const SOURCES = [
   { name: "Tripadvisor", note: "Verdicts, no video" },
   { name: "WhatsApp", note: "A number, if you ask" },
   { name: "The hotel desk", note: "Whoever they know" },
-];
-
-/** The comparison every traveller tries to build, and cannot finish. */
-const COMPARE = {
-  columns: ["Depth", "Level", "Worth it"],
-  rows: ["Nemo Reef", "Lighthouse", "Mangrove Wall"],
-};
-
-const COSTS = [
-  "Scattered sources",
-  "Hard to compare",
-  "Uncertain choices",
-  "Hours of guesswork",
 ];
 
 export function WhyYuvoy() {
@@ -88,123 +77,79 @@ export function WhyYuvoy() {
           </p>
         </div>
 
-        {/* ----------------------------------------- without Yuvoy · panel */}
-        <div className="border-cream-line divide-cream-line bg-cream-deep rounded-edge flex flex-col divide-y border lg:col-start-1 lg:row-start-2">
-          {/* The open tabs, one card each: the headline's "too many tabs",
-              drawn. Six cards, six cells, so the grid reads as finished
-              rather than clipped (owner report, 2026-08-06). */}
-          <div aria-hidden className="p-4 select-none sm:p-5">
-            <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-              {SOURCES.map((source) => (
-                <li
-                  key={source.name}
-                  className="border-cream-line bg-cream rounded-edge border px-3 py-2.5"
-                >
-                  <span className="text-forest block truncate text-sm">
-                    {source.name}
-                  </span>
-                  <span className="text-forest/70 mt-1 block text-xs">
-                    {source.note}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+        {/* ----------------------------------------- without Yuvoy · index */}
+        {/*
+          The hunt as a ruled index, not as a panel of cards.
 
-          {/*
-            The comparison that never resolves. Every cell is a question mark
-            on purpose: inventing depths and levels here would be the same
-            fabrication the page bans, and the unknowns are the point.
+          ## Why this stopped being a card (2026-08-10)
 
-            ## Why it is not drawn on a phone (2026-08-09)
+          It was a bordered, tinted, rounded panel containing a grid of six
+          bordered cards and a mocked comparison table — a box of boxes, which
+          is the one structure this site's design law names and rejects
+          outright: "a plain list on a rule, not three bordered cards; boxes
+          inside a box is the SaaS grid this rebuild exists to get away from"
+          (design system §5, written about the operator list and true here).
+          Owner report, 2026-08-10: present the concept better than "just like
+          a card".
 
-            This block and the tab strip above it are two drawings of one
-            idea, and both are `aria-hidden` illustration — the section's real
-            content is the cost list below them, which is why that list is the
-            only part of this panel exposed to assistive tech. On a wide
-            column the pair reads as reportage: the tabs you opened, then the
-            table you tried to build from them. Stacked in a 342px phone
-            column it is 275px of the same argument a second time, immediately
-            under the first, on the page whose reported fault is that it takes
-            too long to reach the content.
+          What replaces it is the brand's own editorial language — hairlines
+          doing the work boxes do elsewhere, the display face carrying the
+          names, wide-tracked metadata beside them. It reads as an index in a
+          printed magazine: the six places you already look, and what each one
+          actually gives you. Six large names stacked IS "too many places",
+          drawn by the type rather than by a container.
 
-            So the phone gets the stronger of the two drawings and the desktop
-            keeps both. **No information is lost at any width** — that is what
-            makes this a composition decision rather than hiding content on
-            mobile, which the responsive rules rightly ban.
+          ## Two things it deletes
 
-            The column cells are `w-16`, not `w-12`. At 10px with
-            `tracking-label`'s 0.18em, "Worth it" measures ~62px and a 48px
-            cell was overflowing into its neighbour's gutter at every width —
-            visible from `sm` up, where this block now starts.
-          */}
-          <div
-            className="hidden flex-1 flex-col p-5 select-none sm:flex"
-            aria-hidden
-          >
-            <div className="text-forest/75 flex items-center justify-between gap-4 pb-3">
-              <span className="label text-[10px]">The shortlist</span>
-              <span className="flex gap-3">
-                {COMPARE.columns.map((column) => (
-                  <span
-                    key={column}
-                    className="label w-16 text-center text-[10px]"
-                  >
-                    {column}
-                  </span>
-                ))}
-              </span>
-            </div>
+          The mocked shortlist table has gone. It was a second drawing of the
+          same idea sitting directly under the first, and its every cell was a
+          question mark; the sentence at the foot of this block says what it
+          was trying to say, in words, in one line. The four-item cost grid has
+          gone with it for the same reason — it restated the notes on the right
+          of every row.
 
-            {COMPARE.rows.map((row) => (
+          ## And one thing it fixes
+
+          The old panel's two illustrations were `aria-hidden`, so a screen
+          reader got the argument only through a separate cost list bolted
+          underneath. Here the names and their notes are the argument, in
+          text, so there is one thing to read and everybody reads the same
+          thing. A `<dl>` because that is exactly the shape of the content: a
+          source, and what it leaves you with.
+        */}
+        <div className="lg:col-start-1 lg:row-start-2">
+          <dl className="border-cream-line divide-cream-line divide-y border-t border-b">
+            {SOURCES.map((source) => (
               <div
-                key={row}
-                className="border-cream-line flex items-center justify-between gap-4 border-t py-3.5"
+                key={source.name}
+                className="flex items-baseline justify-between gap-4 py-3.5 sm:py-4"
               >
-                <span className="text-forest truncate text-sm">{row}</span>
-                <span className="flex gap-3">
-                  {COMPARE.columns.map((column) => (
-                    <span
-                      key={column}
-                      className="text-terra-deep w-16 text-center text-sm font-bold"
-                    >
-                      ?
-                    </span>
-                  ))}
-                </span>
+                <dt className="font-display tracking-display text-forest min-w-0 text-xl leading-snug font-normal sm:text-2xl">
+                  {source.name}
+                </dt>
+                {/* Right-aligned and quiet: this is the annotation on the
+                    name, not a second column of content competing with it. */}
+                <dd className="text-forest/70 shrink-0 text-right text-sm leading-snug">
+                  {source.note}
+                </dd>
               </div>
             ))}
+          </dl>
 
-            <p className="text-forest/70 border-cream-line mt-auto border-t pt-4 text-sm leading-relaxed">
-              Four sources, three answers, and no way to tell which one was
-              written this season.
-            </p>
-          </div>
+          {/* The closing statement, carrying what the mocked table used to
+              draw. Body rather than display: the section's typographic turn
+              belongs to the headline, and this is the evidence under the
+              index, not a second headline.
 
-          {/* The real content of this panel: what the hunt costs. */}
-          <ul className="grid grid-cols-2 gap-x-4 gap-y-3 p-4 sm:gap-x-6 sm:p-5">
-            {COSTS.map((cost) => (
-              <li
-                key={cost}
-                className="text-forest/75 flex items-center gap-2.5 text-sm"
-              >
-                <svg
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  className="text-terra-deep size-2.5 flex-none"
-                  aria-hidden
-                >
-                  <path
-                    d="M2 2l8 8M10 2l-8 8"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                {cost}
-              </li>
-            ))}
-          </ul>
+              It counts the rows above it. The line read "Four sources, three
+              answers" while it sat under a mocked table of its own; directly
+              beneath an index of six named places that was simply wrong, and
+              the kind of wrong a reader checks. Anything added to or removed
+              from SOURCES has to move this number with it. */}
+          <p className="text-forest/75 mt-5 max-w-md leading-relaxed sm:mt-6">
+            Six places to look, no two that agree, and no way to tell which was
+            written this season.
+          </p>
         </div>
 
         {/* The turn of the story: one arrow, chaos into flow. */}

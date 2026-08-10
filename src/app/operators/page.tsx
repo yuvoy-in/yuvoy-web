@@ -176,16 +176,36 @@ export default async function OperatorsPage({
           title="Join in four"
           accent="clear steps."
         />
-        <ol className="border-cream/12 mt-14 grid grid-cols-1 gap-x-8 gap-y-10 border-t sm:grid-cols-2 lg:grid-cols-4">
+        {/*
+          Four steps as four columns from `sm` up, and as a ruled sequence on a
+          phone.
+
+          Stacked, the column treatment spent 72px between every step — `pt-8`
+          under each item's top rule plus a 40px row gap — because both are
+          measured for a layout where the items sit side by side and the row
+          gap never applies. Four short steps therefore took most of a phone
+          screen (owner report, 2026-08-10: "too spacious ... just for 4
+          points we are occupying the entire screen").
+
+          A hairline between rows does what the gap was doing, at a quarter of
+          the cost, and reads as an ordered sequence rather than four blocks
+          that happen to be numbered — which is what an `<ol>` of steps should
+          look like on a narrow measure anyway. The rules are dropped again at
+          `sm`, where the items are columns and a horizontal rule between them
+          would be drawing across the grid.
+        */}
+        <ol className="divide-cream/12 border-cream/12 mt-10 grid grid-cols-1 divide-y border-t sm:mt-14 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-10 sm:divide-y-0 lg:grid-cols-4">
           {STEPS.map((step, i) => (
-            <li key={step.title} className="pt-8 sm:pr-6">
+            <li key={step.title} className="py-4 sm:py-0 sm:pt-8 sm:pr-6">
               <span className="label text-terra-soft">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <h3 className="font-display tracking-display mt-4 text-xl leading-snug font-normal">
+              <h3 className="font-display tracking-display mt-2 text-xl leading-snug font-normal sm:mt-4">
                 {step.title}
               </h3>
-              <p className="text-cream/70 mt-3 leading-relaxed">{step.body}</p>
+              <p className="text-cream/70 mt-2 leading-relaxed sm:mt-3">
+                {step.body}
+              </p>
             </li>
           ))}
         </ol>
