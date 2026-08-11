@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import { ContactAssurances } from "@/components/site/contact-assurances";
 import { ContactChannels } from "@/components/site/contact-channels";
+import { HorizonRule } from "@/components/site/contact-icons";
 import { MessageForm } from "@/components/site/message-form";
 import { VIEWPORT_ON_FOREST } from "@/lib/site/theme";
 
@@ -54,6 +57,21 @@ export const metadata: Metadata = {
  * server and the first paint agree; **if this section ever stops being dark,
  * remove it from that list in the same change.**
  *
+ * ## The field (owner artwork + direction, 2026-08-11)
+ *
+ * It used to be the lagoon light alone. It is now the owner's moody bay merged
+ * into that light the same way the homepage cover merges its seascape — photo,
+ * forest multiply, scrim, atmosphere, grain — with one layer the cover never
+ * needed: a lateral falloff that deepens the field toward the side the note
+ * card lands on. The bay's palm and its horizon glow sit on the left, which is
+ * the side the headline reads from, and the right half stays quiet enough for
+ * a form to be filled in on.
+ *
+ * At the top edge the scrim still resolves to near-solid forest, because the
+ * transparent header has to meet flat green rather than a photograph. That is
+ * the same constraint the cover works under and the reason neither section may
+ * simply drop an image behind itself.
+ *
  * The homepage carries a glance at this (`ContactGlance`), not a copy of it,
  * and the footer's closing waitlist call to action does not run here — the
  * page is a conversation, not a conversion (see `showsFooterCta`).
@@ -67,14 +85,37 @@ export default function ContactPage() {
         aria-labelledby="contact-heading"
         className="bg-forest text-cream relative -mt-16 overflow-hidden"
       >
-        {/* The field: the same breathing lagoon light and filmic grain the
-            homepage cover uses, without its photography. Decorative, inert. */}
+        {/* The field, in six layers. All decorative, all inert. */}
         <div aria-hidden className="pointer-events-none absolute inset-0">
+          <Image
+            src="/photography/contact-bay.webp"
+            alt=""
+            fill
+            // `priority`: this is the page's cover art, above the fold on
+            // every viewport, and the LCP candidate on a phone. 75 is the
+            // photography quality the optimiser's allowlist permits.
+            priority
+            quality={75}
+            sizes="100vw"
+            /*
+              22%, not centre. The bay is a 1.74 frame and this act is nearer
+              1.3, so `cover` crops several hundred pixels off the sides — at
+              centre that cut lands squarely through the palm at the left edge,
+              which is the one thing in the photograph that reads as a place
+              rather than as weather. Biasing the crop left keeps it whole and
+              still holds the islands and the boat in frame on a wide screen.
+            */
+            className="hero-photo object-cover object-[22%_center]"
+          />
+          <div className="bg-forest/25 absolute inset-0 mix-blend-multiply" />
+          <div className="contact-scrim absolute inset-0" />
+          {/* Only where the two-column layout exists — see the utility. */}
+          <div className="contact-scrim-lateral absolute inset-0 hidden lg:block" />
           <div className="hero-atmosphere" />
           <div className="grain" />
         </div>
 
-        <div className="container-page relative pt-32 pb-20 sm:pt-36 sm:pb-28">
+        <div className="container-page relative pt-32 pb-20 sm:pt-36 sm:pb-24">
           <div className="grid grid-cols-1 gap-x-16 gap-y-16 lg:grid-cols-2 lg:gap-x-20">
             <div>
               <p className="eyebrow text-terra-soft">Contact</p>
@@ -91,6 +132,17 @@ export default function ContactPage() {
               </p>
 
               {/*
+                The turn from the statement into the practical half of the
+                page, drawn as a horizon rather than the straight hairline the
+                rest of the site divides with — a 1px rule here would read as
+                the end of a section rather than as a breath inside one. It is
+                the act's one decorative mark, and it is `terra`, not
+                `terra-soft`: this is decoration, which is the rung `terra` is
+                for, and it sits on the field rather than on a raised surface.
+              */}
+              <HorizonRule className="text-terra/60 mt-10 h-5 max-w-md sm:max-w-lg" />
+
+              {/*
                 `#channels` keeps its id: it was the second entry in the page
                 index this act replaced, and an anchor that has been published
                 is a contract even when the section around it changes shape.
@@ -102,7 +154,7 @@ export default function ContactPage() {
               */}
               <h2
                 id="channels"
-                className="label text-cream/70 mt-14 scroll-mt-[calc(6rem+env(safe-area-inset-top))]"
+                className="label text-cream/70 mt-12 scroll-mt-[calc(6rem+env(safe-area-inset-top))]"
               >
                 Reach us directly
               </h2>
@@ -116,6 +168,15 @@ export default function ContactPage() {
               <MessageForm />
             </div>
           </div>
+
+          {/*
+            The closing strip: four standing facts about how these channels are
+            run, under both columns rather than inside either. It answers the
+            question a form leaves behind (who is going to see this?) and it is
+            the last thing on the page, because after it there is nothing left
+            to say that the footer does not.
+          */}
+          <ContactAssurances className="mt-16 sm:mt-20" />
         </div>
       </section>
     </main>

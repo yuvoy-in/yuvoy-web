@@ -172,6 +172,8 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 - **`SiteHeader`** / **`SiteFooter`** / **`SiteMenu`** — the shell, rendered by the root layout on every route. All navigation comes from the registry (§7).
 - **`DestinationPanel` / `DestinationGrid`** — the editorial plate and the triptych. The whole plate is the link (one target, not a heading plus a "read more" to the same page), edges are sharp, and the desktop stagger applies **only to a full row of three** — it is what makes three plates a composition, and on two or on four that wrap it just reads as a plate that slipped, so it is derived from the count rather than left as a prop.
 - **`ExperienceCategoryGrid`** — deliberately lighter than the triptych, and deliberately **not links**: four panels pointing at one anchor are four repeated links, and there is no per-category page because there is no inventory. One call to action beneath the grid instead.
+- **`ContactChannels` / `ContactAssurances` / `contact-icons`** — the `/contact` act's three pieces: the ruled pair of live channels, the four-up strip of standing facts beneath them, and the glyph set both draw with. `ContactAssurances` carries **no response-time claim** — the reference it was drawn from puts "we usually reply within 24 hours" in that row, and the site publishes no reply window anywhere (owner direction, stated in `src/lib/site/contact.ts` and asserted by `e2e/contact.spec.ts`); the slot says a person reads every message instead, which is a statement about who and not about when.
+- **Icons exist on `/contact` and nowhere else** (2026-08-11). Everywhere else hairlines and type do the work an icon would, and that stays the rule — `/contact` is the site's one _utility_ page, where a visitor arrives having decided to act and scans for the fastest way to do it. The set is **drawn, not imported**, to the spec `ButtonArrow` already set: `1.5` stroke at 20-24px (its own `1.75` is tuned for 14px), `square` caps, `miter` joins, no fill, `currentColor`. Square and mitred because the brand is rectangular — a rounded-cap set would be the one soft object on a page of sharp ones. **No glyph carries meaning alone**: every one is `aria-hidden` beside the words it illustrates. Adding an icon to a second page is a design change, not a component one.
 - **`FaqAccordion`** / **`StatusNotice`** — native `<details>`/`<summary>` (the browser owns the keyboard behaviour; the `faq-summary` utility kills the marker in Blink _and_ WebKit), and the compact panel that replaced the full-section "what this is not" blocks. A status notice is visible and never dominant: if it needs a heading and a list, the copy is too long and belongs in the FAQ.
 - Growing set: ExperienceCard, FeedPlayer, AvailabilityPicker, PriceBreakdown (as screens land).
 
@@ -234,6 +236,47 @@ needs no redesign.
 No Figma. The reference is the [pre-launch landing artifact](https://claude.ai/public/artifacts/b099d827-a565-4679-91c2-38d242feeed7) plus the brand docs.
 
 **The artifact is a visual reference, not a content one.** Its layout, density, type treatment and motion are the target. Its copy is not: it shows prices, live availability, named listings and completed-booking screens, none of which exist. Those are barred by the project's truthfulness rules (see `CLAUDE.md` and issue #32) and several of its own colour pairings fail AA — the palette in §1 is the corrected version, not a transcription.
+
+### Photography on a dark field (2026-08-06, extended 2026-08-11)
+
+A photograph is never dropped behind a forest section. It is **merged into the
+field** in a fixed order — artwork, a `forest/25-30` multiply wash, a
+token-built scrim, `hero-atmosphere`, `grain` — so the brand green stays the
+ground and the picture reads as depth within it. Two sections do this: the
+homepage cover (`hero-scrim`) and `/contact` (`contact-scrim` plus
+`contact-scrim-lateral`).
+
+They need different scrims and that is the point rather than an oversight.
+`hero-scrim`'s thin band sits at 58% of a **viewport**; `/contact` is one act
+about two thirds that tall, so the same stops would run the brightest water
+straight through its headline. **A new photographic section gets its own scrim,
+measured against its own height** — and every one of them must resolve to
+near-solid forest at the top edge, because a `data-dark-hero` route's
+transparent header has to meet flat green rather than a picture.
+
+`contact-scrim-lateral` is the one falloff the cover never needed: a horizontal
+deepening toward the side the note card lands on, applied only at `lg` where
+that two-column layout exists. Glass over a lit photograph is a form nobody can
+fill in.
+
+**Masters never live under `public/`** (§2) and shipped derivatives come from
+`scripts/optimise-photography.mjs`. Full-bleed backdrops go in its `BACKDROPS`
+table, which does not crop — a backdrop's height is whatever its section turns
+out to be, so the crop belongs in CSS (`object-position`) where it can respond.
+
+### Glass, and where it is allowed
+
+`/contact`'s note card is 5% cream with a backdrop blur, on `rounded-edge` like
+every other panel. It is glass rather than a fill because a solid panel would
+punch a hole in the photograph the act is built on, and the blur is what keeps
+its type legible over whatever part of the field it lands on.
+
+**This is not a licence for translucent panels generally.** It is allowed here
+because there is a photograph behind it that the page wants to keep; on a plain
+forest or cream section glass has nothing to be glass over and reads as a panel
+somebody forgot to finish. The reference this was drawn from rounds its card;
+ours does not, for the reason in §4 — a soft card would be the one rounded
+object on a page of square ones.
 
 ### The preview surface (owner-approved exception, 2026-08-03)
 

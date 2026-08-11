@@ -105,7 +105,25 @@ const QUALITY = 78;
  * They keep more resolution than a panel does, because they stretch to the
  * viewport rather than to a third of the measure.
  */
-const BACKDROPS = [{ file: "footer-bg.png", slug: "footer", maxEdge: 2048 }];
+const BACKDROPS = [
+  { file: "footer-bg.png", slug: "footer", maxEdge: 2048 },
+  /*
+    `/contact`'s field, and the horizon inside its note card — the two frames
+    of the same moody bay the owner delivered for that page (2026-08-11).
+
+    `contact-note` keeps far less resolution than the field does, and that is
+    the rule rather than a saving: it renders inside a card that is at most
+    ~34rem wide, masked, dimmed and sat under a forest wash. Shipping the
+    field's 1653px into a 544px slot would cost a second full-weight
+    photograph on a page that already carries one.
+
+    `moody-tropical-bay-02.png` is delivered and kept as a master but ships
+    nothing: it is the alternate frame of the same scene, held so a crop
+    decision can be revisited without asking for the artwork again.
+  */
+  { file: "moody-tropical-bay-01.png", slug: "contact-bay", maxEdge: 2048 },
+  { file: "moody-tropical-bay-03.png", slug: "contact-note", maxEdge: 1100 },
+];
 
 if (!existsSync(SRC_DIR)) {
   throw new Error(`no source directory at ${SRC_DIR}`);
