@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { ContactChannels } from "@/components/site/contact-channels";
 import { MessageForm } from "@/components/site/message-form";
+import { VIEWPORT_ON_FOREST } from "@/lib/site/theme";
+
+/** This route opens on a forest cover; Safari's top glass follows
+    theme-color, so the chrome must agree with it (see lib/site/theme). */
+export const viewport = VIEWPORT_ON_FOREST;
 
 export const metadata: Metadata = {
   title: "Contact Yuvoy",

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { VIEWPORT_ON_CREAM } from "@/lib/site/theme";
 import type { ReactNode } from "react";
 import { dancingScript, fraunces, satoshi } from "@/lib/fonts";
 import { BrandIntro } from "@/components/brand/brand-intro";
@@ -45,36 +46,13 @@ export const metadata: Metadata = {
 };
 
 /*
-  Without an explicit theme-color, Safari tints its tab and URL chrome by
-  sampling the page's top pixels — which, while the brand veil plays, are
-  forest, so the chrome went green and then disagreed with the cream page
-  underneath (owner report, 2026-08-06). Pinned to the canvas token
-  `cream` (#F4EFE4 in globals.css @theme; a literal here because metadata
-  cannot read CSS variables — the OG frame does the same).
+  The default chrome: cream, matching the canvas. Routes that open on a
+  forest cover export VIEWPORT_ON_FOREST themselves — Safari's top glass
+  follows theme-color, so each route's chrome has to agree with its first
+  surface. The full story, the measured iOS behaviour and the sampling bug
+  this replaces are documented once, in lib/site/theme.ts.
 */
-export const viewport: Viewport = {
-  themeColor: "#f4efe4",
-  /*
-    Own the notch, deterministically.
-
-    Without `viewport-fit=cover`, iOS Safari decides for itself when a page
-    extends under the Dynamic Island: edge-to-edge while its chrome is
-    collapsed at the top of the page, then an opaque theme-colour bar once
-    scrolled. On `/` that flipped between the forest cover bleeding under the
-    island and a cream band capping it — two different treatments of the same
-    edge in one scroll, either of which can collide the header's lockup with
-    the clock (owner report, 2026-08-11, iPhone Safari).
-
-    `cover` removes the heuristic: the page always extends under the island,
-    and — the actual point — `env(safe-area-inset-*)` stops being zero, which
-    is what lets the header, the covers, the menu and every fixed element
-    position around the sensor housing instead of underneath it. Every one of
-    those offsets is written as `max(<the old value>, env(...))` or
-    `calc(<the old value> + env(...))`, so on hardware without insets the
-    layout is byte-for-byte what it was.
-  */
-  viewportFit: "cover",
-};
+export const viewport: Viewport = VIEWPORT_ON_CREAM;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

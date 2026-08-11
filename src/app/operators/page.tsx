@@ -8,10 +8,15 @@ import { StatusNotice } from "@/components/site/status-notice";
 import { LeadForms } from "@/components/landing/lead-forms";
 import { ApplyAside } from "@/components/operators/apply-aside";
 import { ContactGlance } from "@/components/site/contact-glance";
+import { VIEWPORT_ON_FOREST } from "@/lib/site/theme";
 import {
   campaignSourceFromParam,
   DEFAULT_DESTINATION,
 } from "@/lib/leads/registry";
+
+/** This route opens on a forest cover; Safari's top glass follows
+    theme-color, so the chrome must agree with it (see lib/site/theme). */
+export const viewport = VIEWPORT_ON_FOREST;
 
 export const metadata: Metadata = {
   // Absolute: the layout template appends " · Yuvoy", and this title already

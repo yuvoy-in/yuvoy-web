@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Landing } from "@/components/landing/landing";
+import { VIEWPORT_ON_FOREST } from "@/lib/site/theme";
 import {
   CAMPAIGN_SOURCES,
   DEFAULT_DESTINATION,
@@ -16,6 +17,10 @@ import {
  * Noindex by design; canonical points at the homepage so campaign URLs never
  * compete with it in search.
  */
+
+/** This route opens on a forest cover; Safari's top glass follows
+    theme-color, so the chrome must agree with it (see lib/site/theme). */
+export const viewport = VIEWPORT_ON_FOREST;
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },

@@ -3,6 +3,11 @@ import { PageIntro } from "@/components/site/page-intro";
 import { Section, SectionHeading } from "@/components/ui/section";
 import { StatusNotice } from "@/components/site/status-notice";
 import { Wordmark } from "@/components/brand/wordmark";
+import { VIEWPORT_ON_FOREST } from "@/lib/site/theme";
+
+/** This route opens on a forest cover; Safari's top glass follows
+    theme-color, so the chrome must agree with it (see lib/site/theme). */
+export const viewport = VIEWPORT_ON_FOREST;
 
 export const metadata: Metadata = {
   // Absolute: "About · Yuvoy" from the template reads as a section label,
