@@ -90,6 +90,36 @@
   }
 
   /*
+    The page CANVAS follows the page's first surface.
+
+    The canvas — the colour the browser paints where the document is not —
+    shows in two places a phone visitor meets constantly: the rubber-band
+    overscroll above the page on every bounce, and iOS Safari's own status
+    strip, which takes the page's background into account when its chrome is
+    expanded. With a cream canvas under every route, both flashed CREAM above
+    the FOREST covers — a pale band capping a dark page, which is most of what
+    read as "the top edge glitches" on the iPhone (owner reports, 2026-08-10
+    and 2026-08-11; the on-device probe at /debug/safe-area ruled out the
+    layout itself, since iOS reports every safe-area inset as 0 in-browser and
+    never lays the page under the island).
+
+    `:has()` keys the canvas off the same `data-dark-hero` marker the header
+    already uses to go transparent, so a route's canvas and its chrome always
+    agree by construction — a new dark-cover route gets both behaviours from
+    the one attribute, and none of the seven pages carries a second flag.
+    Browsers without :has() keep the cream canvas, which is exactly today's
+    behaviour.
+
+    The bottom rubber band on CREAM-topped routes still flashes cream under
+    the forest footer. That is the one edge a single canvas colour cannot
+    serve — the top follows the first surface, the foot would want the
+    footer's — and the top is the edge every report has been about.
+  */
+  body:has([data-dark-hero]) {
+    background-color: var(--color-forest);
+  }
+
+  /*
     The touch highlight, in the brand's own colour.
 
     WebKit and Blink paint a translucent BLACK-BLUE rectangle over any tapped

@@ -522,9 +522,25 @@ test.describe("header on scroll", () => {
         matched `bg-transparent` on the mobile menu's `<dialog>`, which is a
         child of it and transparent on every route — so this reported that
         every page rendered a transparent bar, including the ones that do not.
+
+        The SITE header specifically, named by its `header-slide` class. The
+        bare `<header>` pattern used to grab whichever header came first,
+        which on `/waitlist` is the WaitlistChrome masthead — so this spec
+        was asserting the site-header invariant against a component that is
+        not the site header, and passed only because that route carried no
+        `data-dark-hero`. Since 2026-08-11 it does (the marker also drives
+        the page CANVAS via body:has() in globals.css, and /waitlist is a
+        dark page), which surfaced the imprecision: on a route that hides
+        the site chrome the invariant is vacuous, and the assertion below
+        only requires that the route still renders some banner.
       */
-      const openingTag = /<header[^>]*>/.exec(html)?.[0] ?? "";
-      expect(openingTag, `${path} rendered no <header>`).not.toBe("");
+      const openingTag = /<header[^>]*header-slide[^>]*>/.exec(html)?.[0] ?? "";
+      if (!openingTag) {
+        expect(html, `${path} rendered no header at all`).toMatch(
+          /<header[^>]*>/,
+        );
+        return;
+      }
       const rendersTransparent = openingTag.includes("bg-transparent");
 
       expect(
