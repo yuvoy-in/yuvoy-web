@@ -29,13 +29,35 @@ import type { Viewport } from "next";
  * per-route colours keep that fixed: on the forest routes the veil, the
  * cover and the chrome are now all the same forest.
  *
- * `viewportFit: "cover"` rides in both objects so a page-level export can
- * never silently drop it, whatever Next's viewport merge rules do. It is
- * inert in-browser on iOS today (insets read 0) but is what makes the
- * safe-area plumbing live the day the page is opened from the home screen,
- * in an in-app browser that honours it, or on a Safari that changes its
- * mind — and the plumbing is all max()/calc() over the old values, so it
- * costs nothing meanwhile.
+ * ## Why there is no `viewportFit: "cover"` (measured, 2026-08-11)
+ *
+ * It was added, tested on device, and removed — it is the cause of the
+ * flip-flop, not a fix for it. With `cover`, iOS Safari ties the layout
+ * viewport's top to its OWN chrome state: scrolling down collapses the top
+ * chrome and slides the page edge-to-edge under the Dynamic Island; scrolling
+ * up re-expands it and drops the page back below the island. A sticky header
+ * at `top: 0` therefore rides under the clock and back out again on every
+ * change of direction, and its background changes with whatever section
+ * happens to be behind it (owner report, 2026-08-11: "header under island and
+ * transparent, then under island and cream, then not under the island at
+ * all").
+ *
+ * Nothing in CSS can compensate: `env(safe-area-inset-top)` reads 0 in every
+ * one of those states, so the header cannot know which one it is in. The only
+ * lever that removes the instability is removing `cover`, which is what the
+ * default does — Safari then keeps the layout viewport below the unsafe area
+ * permanently, in every chrome state, and the top edge simply never moves.
+ *
+ * The immersive look survives without it, because the strip Safari owns above
+ * the page is painted from `themeColor` and the canvas: on a forest route both
+ * are forest, so the screen reads as one continuous field from the very top
+ * whether the chrome is expanded or collapsed. That is the appearance the
+ * owner liked, delivered by the mechanism that holds still.
+ *
+ * The `env()`-based plumbing in the shell stays. It is all max()/calc() over
+ * the previous values, so it is inert at zero insets, and it is what makes the
+ * layout correct the day the site is opened from the home screen or in an
+ * in-app browser that does report insets.
  */
 export const CHROME = {
   cream: "#f4efe4",
@@ -45,7 +67,6 @@ export const CHROME = {
 /** For routes whose first surface is the cream canvas (the default). */
 export const VIEWPORT_ON_CREAM: Viewport = {
   themeColor: CHROME.cream,
-  viewportFit: "cover",
 };
 
 /**
@@ -58,5 +79,4 @@ export const VIEWPORT_ON_CREAM: Viewport = {
  */
 export const VIEWPORT_ON_FOREST: Viewport = {
   themeColor: CHROME.forest,
-  viewportFit: "cover",
 };
