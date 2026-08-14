@@ -83,40 +83,40 @@ const SOURCES: Source[] = [
     gives: "Clips, no prices",
     icon: "noPrice",
     media: { kind: "photo", frame: "/photography/diving-water.webp" },
-    at: { "--x": "0%", "--y": "0%", "--w": "31%", "--r": "-5deg" },
+    at: { "--x": "0%", "--y": "0%", "--w": "34%", "--r": "-5deg" },
   },
   {
     place: "Google",
     gives: "Ten blue links",
     icon: "links",
     media: { kind: "bars" },
-    at: { "--x": "35%", "--y": "6%", "--w": "30%", "--r": "3deg" },
+    at: { "--x": "33%", "--y": "5%", "--w": "34%", "--r": "3deg" },
   },
   {
     place: "YouTube",
     gives: "Vlogs from 2019",
     icon: "dated",
     media: { kind: "photo", frame: "/photography/local-unexpected.webp" },
-    at: { "--x": "69%", "--y": "1%", "--w": "31%", "--r": "-2deg" },
+    at: { "--x": "66%", "--y": "0%", "--w": "34%", "--r": "-2deg" },
   },
   {
     place: "Tripadvisor",
     gives: "Verdicts, no video",
     icon: "noVideo",
     media: { kind: "dots" },
-    at: { "--x": "2%", "--y": "58%", "--w": "30%", "--r": "4deg" },
+    at: { "--x": "2.3%", "--y": "56%", "--w": "30%", "--r": "3deg" },
   },
   {
     place: "WhatsApp",
     gives: "A number, if you ask",
     icon: "ask",
-    at: { "--x": "36%", "--y": "64%", "--w": "31%", "--r": "-4deg" },
+    at: { "--x": "35.5%", "--y": "61%", "--w": "29%", "--r": "-3deg" },
   },
   {
     place: "The hotel site",
     gives: "Whoever may know",
     icon: "unknown",
-    at: { "--x": "70%", "--y": "56%", "--w": "30%", "--r": "2deg" },
+    at: { "--x": "68%", "--y": "55%", "--w": "30.3%", "--r": "2deg" },
   },
 ];
 
@@ -166,7 +166,7 @@ function ShortfallIcon({ kind }: { kind: Shortfall }) {
     <svg
       viewBox="0 0 24 24"
       aria-hidden
-      className="text-terra-deep size-5 lg:size-4"
+      className="text-terra-deep size-5 lg:size-[1.125rem]"
     >
       {kind === "noPrice" && (
         <>
@@ -254,37 +254,46 @@ export function ScatteredSources() {
           exempt from the contrast floors that govern text.
         */}
         <svg
-          viewBox="0 0 362 272"
+          viewBox="0 0 362 312"
           fill="none"
           className="text-terra pointer-events-none absolute inset-0 hidden h-full w-full lg:block"
         >
+          {/*
+            Drawn onto the cards' measured edges at `lg`, where the column is
+            a fixed 362px and this box is 312 tall — the viewBox must equal
+            that or every path is stretched and nothing lines up, which is
+            exactly what a stale 272 did.
+
+            Three connectors, each joining the card above to the card below
+            it, and the question sits ON the middle one: Google leads to a
+            question, the question leads to WhatsApp. Re-measure the card
+            rects before moving any of these.
+          */}
           <g
             stroke="currentColor"
             strokeWidth="1.25"
             strokeDasharray="5 6"
-            opacity="0.32"
+            opacity="0.34"
           >
-            <path d="M26 124C64 100 108 104 132 128" />
-            <path d="M158 132C196 106 248 108 286 130" />
-            <path d="M112 40C126 22 132 78 116 106" />
-            <path d="M248 34C264 20 268 76 250 104" />
-            <path d="M18 150C-4 168 4 200 30 206" />
-            <path d="M344 148C368 166 360 198 334 206" />
+            <path d="M62 157C54 162 51 167 55 172" />
+            <path d="M180 143C175 149 174 152 177 155" />
+            <path d="M179 177C180 181 180 184 181 188" />
+            <path d="M300 154C295 159 296 165 300 170" />
           </g>
           <g
             stroke="currentColor"
             strokeWidth="1.25"
             strokeDasharray="4 5"
-            opacity="0.38"
+            opacity="0.4"
           >
-            <circle cx="176" cy="140" r="11" />
+            <circle cx="178" cy="166" r="11" />
           </g>
-          <g fill="currentColor" opacity="0.5">
+          <g fill="currentColor" opacity="0.55">
             <text
-              x="176"
-              y="146"
+              x="178"
+              y="171"
               textAnchor="middle"
-              fontSize="14"
+              fontSize="13"
               fontWeight="500"
             >
               ?
@@ -296,7 +305,7 @@ export function ScatteredSources() {
           <article
             key={source.place}
             style={source.at}
-            className="border-cream-line bg-cream card-lift rounded-lg border p-3.5 sm:p-4 lg:p-2.5"
+            className="border-cream-line bg-cream card-lift rounded-lg border p-3.5 sm:p-4 lg:p-3"
           >
             {/*
               The icon sits ABOVE the words wherever the card is narrow, and
@@ -310,14 +319,14 @@ export function ScatteredSources() {
               truncated. Stacked, the words get the card's whole width.
             */}
             <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-2.5 lg:flex-col lg:items-start lg:gap-1.5">
-              <span className="bg-cream-deep rounded-edge flex size-8 flex-none items-center justify-center lg:size-6">
+              <span className="bg-cream-deep rounded-edge flex size-8 flex-none items-center justify-center lg:size-7">
                 <ShortfallIcon kind={source.icon} />
               </span>
-              <span className="min-w-0">
-                <span className="text-forest block truncate text-sm font-bold sm:text-base lg:text-[0.8125rem]">
+              <span className="min-w-0 lg:w-full">
+                <span className="text-forest block truncate text-sm font-bold sm:text-base lg:overflow-visible lg:text-sm lg:whitespace-normal">
                   {source.place}
                 </span>
-                <span className="text-forest/70 block truncate text-xs sm:text-sm lg:text-[0.6875rem]">
+                <span className="text-forest/70 block truncate text-xs sm:text-sm lg:overflow-visible lg:text-xs lg:whitespace-normal">
                   {source.gives}
                 </span>
               </span>
@@ -332,7 +341,7 @@ export function ScatteredSources() {
               whole argument.
             */}
             {source.media?.kind === "photo" && (
-              <span className="rounded-edge relative mt-3 hidden h-20 overflow-hidden sm:block lg:mt-2 lg:h-11">
+              <span className="rounded-edge relative mt-3 hidden h-20 overflow-hidden sm:block lg:mt-2 lg:h-12">
                 <Image
                   src={source.media.frame}
                   alt=""
