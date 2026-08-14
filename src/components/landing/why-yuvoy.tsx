@@ -69,16 +69,25 @@ export function WhyYuvoy() {
         to escape into any ancestor's stacking context.
       */}
       {/*
-        Wrapped around the heading and the two halves ONLY, so the drawing's
-        foot lands on the foot of the act rather than on the foot of the
-        section (owner direction, 2026-08-15). Everything below this — the
-        sign-off and its closing line — sits on plain cream, which is what
+        The wrapper exists ONLY to set the drawing's foot: it ends where the
+        two halves end, so the artwork ends there too rather than at the foot
+        of the section (owner direction, 2026-08-15). Everything below it —
+        the sign-off and its closing line — sits on plain cream, which is what
         gives that line the quiet it needs to land.
+
+        Vertically anchored here, horizontally still edge-to-edge: the wrapper
+        sits inside `container-page`, which is 70rem at most and padded, and
+        the drawing shrank to that measure when it moved in (owner report,
+        2026-08-15 — "it should be outside only as same as before"). It breaks
+        back out to the full page width with the usual centre-and-widen pair.
+        `100vw` counts a classic scrollbar, so on a platform that has one the
+        drawing runs a few pixels past each edge and `body`'s `overflow-x:
+        clip` absorbs it — no horizontal scroll, no visible difference.
       */}
       <div className="relative">
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 overflow-hidden"
+          className="pointer-events-none absolute bottom-0 left-1/2 -z-10 w-screen -translate-x-1/2 overflow-hidden"
         >
           <Image
             src="/assets/without-yuvoy-artwork.webp"
