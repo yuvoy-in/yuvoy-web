@@ -494,6 +494,160 @@
 }
 
 /*
+  The hunt's scatter: one set of cards, two layouts.
+
+  On a phone the cards are a two-column grid — a scatter needs width to read
+  as one, and at 342px an overlapping spread is a pile of collisions. From
+  `lg` they become absolutely placed, each card carrying its own position,
+  width and angle as custom properties set at the call site.
+
+  One DOM either way. The alternative — a mobile block and a desktop block,
+  one of them hidden — duplicates every card, and duplicated illustration is
+  how a screen reader ends up reading the same six things twice.
+
+  Plain CSS rather than an `@utility`: this needs a child selector and a media
+  query around it, which reads better here than nested in a utility. Same
+  reasoning as `.header-slide`.
+*/
+.hunt-scatter {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+}
+
+@media (width >= 64rem) {
+  .hunt-scatter {
+    display: block;
+    position: relative;
+    /* The scatter's own canvas.
+
+       Two rows of three, sized against a budget rather than to taste: the
+       product preview opposite is 615px of intrinsic content, and the left
+       half must not run past it (owner direction, 2026-08-15) or the act
+       reads as lopsided. This canvas plus the shortlist card, the chips and
+       the gaps between them is what has to fit inside that number, which is
+       why the cards here are smaller than a card elsewhere on the site. */
+    height: 19.5rem;
+  }
+
+  .hunt-scatter > * {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--w);
+    transform: rotate(var(--r));
+  }
+}
+
+/*
+  The why act's deck: six cards cycling through a stack, the front one sliding
+  away downward as the one behind it rises into its place (owner direction,
+  2026-08-15).
+
+  ## Why this is one keyframe and no JavaScript state
+
+  A cycling stack is usually built by reordering an array and letting each
+  card transition to its new slot. That has a wrap bug at its heart: the card
+  leaving the FRONT has to become the card at the BACK, and any transition
+  between those two positions animates it backwards through the whole stack.
+  Every fix for that — disabling the transition for a frame, a `leaving`
+  flag, cloning nodes — is a state machine that can desynchronise.
+
+  One continuous keyframe cannot. Each card runs the identical animation with
+  its start shifted by a sixth of the cycle, so at any instant one is at the
+  front, four are stacked behind it, and one is off-stage. The wrap happens
+  where the keyframe loops, which is exactly where the card is invisible.
+  Nothing to get out of step, and no re-render per tick.
+
+  ## The static state is the base, not a fallback
+
+  Every value here is also written on the card itself, so the fan exists
+  without this animation ever running. That is what makes the global
+  reduced-motion rule correct for this component rather than destructive:
+  it collapses the animation to nothing and the cards stay exactly where
+  their own styles put them. There is deliberately no `fill-mode` — with
+  `both`, a neutralised animation would strand every card on its final
+  frame, which is off-stage and invisible.
+
+  The fade finishes well before the travel does, so the departing card is
+  gone before it can reach the block below it.
+*/
+@keyframes yuvoy-deck {
+  0% {
+    transform: translateY(-2.75rem) scale(0.88);
+    opacity: 0;
+    z-index: 1;
+  }
+
+  7% {
+    transform: translateY(-2.5rem) scale(0.89);
+    opacity: 1;
+    z-index: 1;
+  }
+
+  32% {
+    transform: translateY(-1.75rem) scale(0.925);
+    opacity: 1;
+    z-index: 2;
+  }
+
+  57% {
+    transform: translateY(-0.9rem) scale(0.962);
+    opacity: 1;
+    z-index: 3;
+  }
+
+  74% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    z-index: 6;
+  }
+
+  92% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    z-index: 6;
+  }
+
+  97% {
+    transform: translateY(1.5rem) scale(1);
+    opacity: 0;
+    z-index: 6;
+  }
+
+  100% {
+    transform: translateY(2.5rem) scale(1);
+    opacity: 0;
+    z-index: 6;
+  }
+}
+
+@utility deck-card {
+  animation: yuvoy-deck var(--deck-cycle, 21s) var(--ease-cinematic) infinite;
+}
+
+/*
+  The lift on those cards, and on the sheet the shortlist sits on.
+
+  This is the **second** shadow in the system and the only one outside the
+  preview frame. §4's rule stands everywhere else — hairlines do the work
+  shadows do elsewhere — and this is a named exception the owner signed off
+  (2026-08-14, restated 2026-08-15): the cards depict paper in a stack, and
+  stacked paper without a shadow reads as flat rectangles printed on the page
+  rather than as sheets lying on each other. The depth IS the idea here.
+
+  Built like `device-frame`'s: a tight contact shadow plus a wide ambient one
+  with negative spread so it cannot bloom into a halo, and both are `forest`
+  rather than black — black greys the cream underneath and is what makes a
+  drop shadow look cheap on a warm ground.
+*/
+@utility card-lift {
+  box-shadow:
+    0 1px 2px color-mix(in oklab, var(--color-forest) 7%, transparent),
+    0 10px 24px -10px color-mix(in oklab, var(--color-forest) 20%, transparent);
+}
+
+/*
   A side key — the volume pair and the wake button. Two pixels of rail
   standing proud of the frame, lit along their length so they read as part
   of the same milled piece. Position and length come from the call site;
@@ -656,6 +810,76 @@
   animation-name: yuvoy-demo-fill;
   animation-timing-function: linear;
   animation-fill-mode: both;
+}
+
+/*
+  The same meter, drawn by the tile's OWN border below `lg`.
+
+  Three SVG-overlay versions failed in a row (owner reports, 2026-08-15): an
+  overlay reproduces the box's geometry from the outside, and CSS borders and
+  SVG strokes rasterise independently — at a fractional layout position or a
+  non-integer zoom they snap to device pixels differently and a hairline of
+  the underlying edge survives beside the drawn one. A border cannot misalign
+  with itself, so the meter IS the border: a conic sweep repaints the border
+  band terra as the act runs, from 12 o'clock, clockwise.
+
+  `@property` registers the stop as a real percentage, which is what lets a
+  gradient animate smoothly instead of flipping at the keyframe midpoint. The
+  `background` shorthand carries the tile's forest fill on its padding-box
+  layer — a shorthand resets background-color, so the fill must ride here.
+  The sweep's rest colour is that same forest: the border vanishes into the
+  fill at 0% and the terra edge grows out of it.
+
+  Duration and play-state ride inline styles from ProductDemo, exactly like
+  `demo-fill` above. Under reduced motion the global rule collapses it to a
+  full border, the right resting state: nothing auto-plays there, so the
+  border marks the current step rather than timing it.
+*/
+@property --yuvoy-trace {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+@keyframes yuvoy-demo-trace {
+  from {
+    --yuvoy-trace: 0%;
+  }
+  to {
+    --yuvoy-trace: 100%;
+  }
+}
+
+@utility demo-trace {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--color-forest), var(--color-forest)) padding-box,
+    conic-gradient(var(--color-terra) var(--yuvoy-trace), var(--color-forest) 0)
+      border-box;
+  animation-name: yuvoy-demo-trace;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+/*
+  The active step's sentence, arriving under that row. Only one is ever shown,
+  so it has to announce the change itself — a swap with no movement reads as a
+  glitch. Short and small: this answers a step change, so it sits inside the
+  250ms interaction budget rather than performing an entrance.
+*/
+@keyframes yuvoy-demo-copy {
+  from {
+    opacity: 0;
+    transform: translateY(0.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility demo-copy {
+  animation: yuvoy-demo-copy 250ms var(--ease-interaction) both;
 }
 
 /*
