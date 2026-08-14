@@ -494,6 +494,29 @@
 }
 
 /*
+  The scattered source cards' lift (owner direction, 2026-08-14).
+
+  This is the **second** shadow in the system and the only one outside the
+  preview frame. §4's rule stands everywhere else — hairlines do the work
+  shadows do elsewhere — and this is a named exception, not a loosening:
+  those cards depict loose paper dropped on a desk, and paper at an angle
+  with no shadow reads as a rotated rectangle rather than as a thing lying
+  on something. The rotation and the shadow are one effect; neither works
+  alone.
+
+  Built like `device-frame`'s: a tight contact shadow plus a wide ambient one
+  with negative spread so it cannot bloom into a halo, and both are `forest`
+  rather than black — black greys the cream underneath and is what makes a
+  drop shadow look cheap on a warm ground. Far lighter than the frame's,
+  because these are sheets of paper and that is a machined object.
+*/
+@utility card-lift {
+  box-shadow:
+    0 1px 2px color-mix(in oklab, var(--color-forest) 7%, transparent),
+    0 10px 24px -10px color-mix(in oklab, var(--color-forest) 20%, transparent);
+}
+
+/*
   A side key — the volume pair and the wake button. Two pixels of rail
   standing proud of the frame, lit along their length so they read as part
   of the same milled piece. Position and length come from the call site;

@@ -25,10 +25,13 @@ import { cn } from "@/lib/cn";
  * - **Sharp edges.** `rounded-edge` (2px), not the comp's ~12px cards. The
  *   editorial near-square is the system (design system §4); the one rounded
  *   object on the site is the preview phone.
- * - **Hairlines, not shadows.** The comp floats its cards on soft drop
- *   shadows. Here each card is a hairline on `cream-deep`, which is how every
- *   other raised surface on the site is drawn (§4), and the *rotation* does
- *   the lifting the shadows were doing.
+ * - **A hairline AND a lift.** The comp floats its cards on soft drop
+ *   shadows and the site's rule is that hairlines do that work (§4). Owner
+ *   direction, 2026-08-14: these cards keep the shadow, because paper at an
+ *   angle with none reads as a rotated rectangle rather than as a sheet lying
+ *   on something. It is the `card-lift` utility — forest-tinted, never black
+ *   — and a named exception recorded in the design system, not a loosening
+ *   of the rule.
  * - **Our photography, never a competitor's screenshot.** The comp puts real
  *   posts and real search results in the cards. The two cards that stand for
  *   footage carry OUR OWN frames, washed back with `plate-wash`; the rest are
@@ -160,7 +163,7 @@ function CardMedia({
   }
 
   return (
-    <span className="rounded-edge relative mt-2.5 block h-14 overflow-hidden sm:h-16">
+    <span className="rounded-edge relative mt-2.5 block h-11 overflow-hidden sm:h-16">
       {frame && (
         <Image
           src={frame}
@@ -227,7 +230,7 @@ export function ScatteredSources() {
             <li
               key={source.name}
               className={cn(
-                "border-cream-line bg-cream-deep rounded-edge border p-3 sm:p-3.5",
+                "border-cream-line bg-cream-deep rounded-edge card-lift border p-3 sm:p-3.5",
                 // Transform only: layout is untouched, so the grid geometry
                 // holds at every width and nothing can overlap its neighbour.
                 "transition-transform duration-200",
@@ -267,9 +270,9 @@ export function ScatteredSources() {
       */}
       <div
         aria-hidden
-        className="border-cream-line mt-7 border-t select-none sm:mt-9"
+        className="border-cream-line mt-6 border-t select-none sm:mt-8"
       >
-        <div className="text-forest/75 flex items-center justify-between gap-3 pt-4 pb-3">
+        <div className="text-forest/75 flex items-center justify-between gap-3 pt-3.5 pb-2.5">
           <span className="label min-w-0 truncate text-[10px]">
             The shortlist
           </span>
@@ -288,7 +291,7 @@ export function ScatteredSources() {
         {SHORTLIST.rows.map((row) => (
           <div
             key={row}
-            className="border-cream-line flex items-center justify-between gap-3 border-t py-3"
+            className="border-cream-line flex items-center justify-between gap-3 border-t py-2.5"
           >
             <span className="text-forest min-w-0 truncate text-sm">{row}</span>
             <span className="flex gap-2 sm:gap-3">
@@ -305,24 +308,18 @@ export function ScatteredSources() {
         ))}
       </div>
 
-      {/* The reading of the table above it, in words. It counts what is
-          actually drawn: six cards, three shortlisted rows. Changing either
-          list has to move these numbers. */}
-      <p className="text-forest/75 border-cream-line mt-5 border-t pt-5 text-sm leading-relaxed">
-        Six places, three shortlisted, and no way to tell which one is worth
-        your time.
-      </p>
-
       {/*
-        What it costs, as four quiet chips. This is the only part of the block
-        exposed to assistive tech: the cards and the table are drawings of a
-        feeling, and this is the content.
+        What it costs, as four quiet chips — and the block's closing line,
+        since the sentence that used to sit above them said the same thing at
+        four times the height. This is the only part exposed to assistive
+        tech: the cards and the table are drawings of a feeling, and this is
+        what they add up to.
       */}
-      <ul className="mt-6 flex flex-wrap gap-2 sm:mt-7 sm:gap-2.5">
+      <ul className="mt-6 flex flex-wrap gap-2 sm:mt-8 sm:gap-2.5">
         {COSTS.map((cost) => (
           <li
             key={cost}
-            className="border-cream-line text-forest/75 rounded-edge inline-flex items-center gap-2 border px-3 py-2 text-xs sm:text-sm"
+            className="border-cream-line text-forest/75 rounded-edge inline-flex items-center gap-2 border px-3 py-1.5 text-xs sm:text-sm"
           >
             <svg
               viewBox="0 0 12 12"
