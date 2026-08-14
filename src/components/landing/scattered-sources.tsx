@@ -1,110 +1,57 @@
-import Image from "next/image";
-import { cn } from "@/lib/cn";
-
 /**
- * The hunt, drawn: the places you already look, the shortlist you cannot
- * finish, and what it costs you. The left half of the why act.
+ * The hunt, as one object: a sheet of notes on a small pile of others.
  *
- * ## The concept (owner comp, 2026-08-14)
+ * ## Why one sheet
  *
- * A scatter of cards — one per place, each showing what that place hands back
- * — then the comparison table every traveller tries to build, then the four
- * things the whole exercise leaves you with. The pile is the argument: six
- * near-identical cards at slightly different angles read as "too many places"
- * before a single word is read.
+ * This is the left half of a two-sided act and the right half is a single
+ * clean device. The left has to answer it with a single thing — the argument
+ * is *one tidy object against one untidy one*, and it only lands if both
+ * sides read as objects rather than as regions of a page.
  *
- * ## What was adapted from the comp, and why
+ * Four earlier versions failed on that. A bordered panel of bordered cards; a
+ * ruled two-column index; a grid of cards over a table over a row of chips
+ * (three stacked widgets, correctly called generic); and a fan of six
+ * overlapping strips. The fan was the right instinct and the wrong mechanism:
+ * a sheet turned three degrees dips about nine pixels at its corner, so the
+ * sheet in front covered the line on the sheet behind it, and no combination
+ * of padding and angle fixed that without flattening the effect it existed
+ * for.
  *
- * - **No third-party logos.** The comp carries the real Instagram, Google,
- *   YouTube, Tripadvisor and WhatsApp marks. This file names the products and
- *   draws none of them: it is the site's standing rule (reportage, not
- *   endorsement — see the note in `why-yuvoy.tsx`), it keeps someone else's
- *   trademark and someone else's brand colours off a page that is otherwise
- *   three tokens, and the owner's instruction was to bring the comp into this
- *   theme rather than to transcribe it.
- * - **Sharp edges.** `rounded-edge` (2px), not the comp's ~12px cards. The
- *   editorial near-square is the system (design system §4); the one rounded
- *   object on the site is the preview phone.
- * - **A hairline AND a lift.** The comp floats its cards on soft drop
- *   shadows and the site's rule is that hairlines do that work (§4). Owner
- *   direction, 2026-08-14: these cards keep the shadow, because paper at an
- *   angle with none reads as a rotated rectangle rather than as a sheet lying
- *   on something. It is the `card-lift` utility — forest-tinted, never black
- *   — and a named exception recorded in the design system, not a loosening
- *   of the rule.
- * - **Our photography, never a competitor's screenshot.** The comp puts real
- *   posts and real search results in the cards. The two cards that stand for
- *   footage carry OUR OWN frames, washed back with `plate-wash`; the rest are
- *   drawn from tokens (skeleton bars, a marker row). A genuine screenshot of
- *   somebody else's product is both a licensing question and exactly the fake
- *   product content the truthfulness rules confine to the preview surface.
- * - **No `rounded-full`.** The play mark and the marker row are square. Round
- *   geometry is reserved for the preview phone and the hardware inside it
- *   (§4); everything else on the site is the editorial near-square.
+ * So the pile is suggested rather than enumerated: two blank sheets sit
+ * behind the one you are reading. That is what a pile actually looks like
+ * from the front — you see the top sheet and the edges of the ones under it —
+ * and it costs nothing in legibility, because nothing is written on the
+ * sheets that are covered.
  *
- * ## The scatter is in flow, never absolute
+ * ## Proportion is the point
  *
- * Every card is a normal grid item that is *rotated* and nudged with a
- * transform. Transforms do not affect layout, so the grid keeps its own
- * geometry at every width: nothing can overlap the section beside it, nothing
- * can spill past the container, and the whole thing reflows to two columns on
- * a phone with no positional maths to get wrong. The container carries the
- * padding the nudges need so a rotated corner cannot be clipped.
+ * The sheet is sized to sit beside the preview phone as its equal (owner
+ * direction, 2026-08-14): a document of roughly the phone's height, on the
+ * same baseline, so the two halves of the act balance instead of one
+ * sprawling past the other.
  *
- * Everything here is `aria-hidden` illustration except the cost row, which is
- * a real list. The section's argument is carried in text by the heading and
- * the lede beside it; a screen reader gets the point without being read six
- * card labels and nine question marks.
+ * ## What was dropped from the owner's comp, and why
+ *
+ * - **The product logos.** Reportage, not endorsement: someone else's
+ *   trademark and brand colours do not belong on a page that is otherwise
+ *   three tokens.
+ * - **The card thumbnails.** They made every card a different height and
+ *   turned a document back into a grid of tiles.
+ * - **The four chips.** Folded into the caption line under the sheet — a row
+ *   of small bordered boxes reads as a component library, not as a page.
+ *
+ * Everything on the sheet is `aria-hidden` illustration. The caption under it
+ * is the content, and the heading and lede beside it carry the argument.
  */
 
-interface Source {
-  name: string;
-  note: string;
-  media?: "photo" | "links" | "video" | "dots";
-  /** Our own photography, for the two cards that show footage. */
-  frame?: string;
-  /** Tailwind classes for this card's angle and nudge. */
-  lift: string;
-}
-
-/**
- * Six places, in the order a person tries them. The angles alternate and the
- * nudges never exceed the container's padding, so the pile reads as dropped
- * rather than arranged and still cannot escape its box.
- */
-const SOURCES: Source[] = [
-  {
-    name: "Instagram",
-    note: "Clips, no prices",
-    media: "photo",
-    frame: "/photography/diving-water.webp",
-    lift: "-rotate-3",
-  },
-  {
-    name: "Google",
-    note: "Ten blue links",
-    media: "links",
-    lift: "rotate-2 translate-y-2",
-  },
-  {
-    name: "YouTube",
-    note: "Vlogs from 2019",
-    media: "video",
-    frame: "/photography/local-unexpected.webp",
-    lift: "rotate-2 -translate-y-1",
-  },
-  {
-    name: "Tripadvisor",
-    note: "Verdicts, no video",
-    media: "dots",
-    lift: "-rotate-2 translate-y-1",
-  },
-  { name: "WhatsApp", note: "A number, if you ask", lift: "-rotate-2" },
-  {
-    name: "The hotel desk",
-    note: "Whoever they know",
-    lift: "rotate-3 -translate-y-1",
-  },
+/** Six places, in the order a person actually tries them, and what each returns. */
+const SOURCES = [
+  ["Instagram", "Clips, no prices"],
+  ["Google", "Ten blue links"],
+  ["YouTube", "Vlogs from 2019"],
+  ["Tripadvisor", "Verdicts, no video"],
+  ["WhatsApp", "A number, if you ask"],
+  ["The hotel desk", "Whoever they know"],
 ];
 
 /** The comparison every traveller starts and nobody finishes. */
@@ -113,7 +60,7 @@ const SHORTLIST = {
   rows: ["Nemo Reef", "Lighthouse", "Mangrove Wall"],
 };
 
-/** What the hunt actually leaves you holding. The one real list here. */
+/** What the hunt leaves you holding. The one line here that is real content. */
 const COSTS = [
   "Scattered sources",
   "Uncertain choices",
@@ -121,231 +68,137 @@ const COSTS = [
   "Hours of guesswork",
 ];
 
-/**
- * A card's illustrative content.
- *
- * The two cards that stand for footage carry our OWN photography, washed back
- * so it reads as something glimpsed rather than as the page's own imagery —
- * which is also the honest picture: a clip of the right place, with none of
- * what you need to act on it. A competitor's actual screenshot would be both
- * a licensing question and the fake product content the truthfulness rules
- * keep to the preview surface. Everything else is drawn from tokens.
- */
-function CardMedia({
-  kind,
-  frame,
-}: {
-  kind: NonNullable<Source["media"]>;
-  frame?: string;
-}) {
-  if (kind === "links") {
-    return (
-      <span className="mt-2.5 flex flex-col gap-1.5">
-        {[100, 78, 88].map((width) => (
-          <span
-            key={width}
-            className="bg-forest/12 block h-1.5"
-            style={{ width: `${width}%` }}
-          />
-        ))}
-      </span>
-    );
-  }
-
-  if (kind === "dots") {
-    return (
-      <span className="mt-3 flex items-center gap-1.5">
-        {[0, 1, 2].map((dot) => (
-          <span key={dot} className="bg-forest/20 block size-1.5" />
-        ))}
-      </span>
-    );
-  }
-
-  return (
-    <span className="rounded-edge relative mt-2.5 block h-11 overflow-hidden sm:h-16">
-      {frame && (
-        <Image
-          src={frame}
-          alt=""
-          fill
-          quality={75}
-          // Small by construction: two thumbnails inside a column that is at
-          // most ~200px wide, so the optimiser never needs a large variant.
-          sizes="(min-width: 1024px) 200px, 45vw"
-          /*
-            Desaturated and dimmed on purpose. At full strength these two
-            frames were the most vivid thing in the act — which inverts the
-            argument the section is making, because the "without" half then
-            looks better than the product beside it. Pulled back, they read as
-            glimpses: enough to know it is the right place, not enough to act
-            on, which is the whole point of the card they sit in.
-          */
-          className="object-cover opacity-90 saturate-[0.65]"
-        />
-      )}
-      {/* Seats the frame in the brand field, the same wash the destination
-          plates use, so a borrowed glimpse cannot out-colour the page. */}
-      <span aria-hidden className="plate-wash absolute inset-0" />
-      {kind === "video" && (
-        <span className="absolute inset-0 flex items-center justify-center">
-          <span className="bg-cream/90 rounded-edge flex size-7 items-center justify-center">
-            <svg viewBox="0 0 12 12" className="text-forest size-3">
-              <path d="M4 2.5 9.5 6 4 9.5Z" fill="currentColor" />
-            </svg>
-          </span>
-        </span>
-      )}
-    </span>
-  );
-}
-
 export function ScatteredSources() {
   return (
     <div className="flex flex-col">
       {/*
-        The pile. `px-1 py-2` is not decoration: the cards are rotated and
-        nudged, and a transformed corner reaches outside its grid cell — this
-        is the room it reaches into, so nothing is ever visually clipped.
+        `px-1.5 pb-3` is structural: the sheets underneath are turned, and a
+        turned corner reaches outside the box its layout occupies. This is the
+        room it reaches into, so no corner is clipped and no shadow is halved.
       */}
-      <div aria-hidden className="relative px-1 py-2 select-none">
-        {/* The confusion, as punctuation. Three marks, placed in the grid's
-            own gutters so they never sit on a card's text. Decorative and
-            hidden with the pile. */}
-        <span
-          className="text-terra/30 font-display absolute top-0 -left-1 text-2xl leading-none sm:text-3xl"
-          aria-hidden
-        >
-          ?
-        </span>
-        <span
-          className="text-terra/25 font-display absolute top-1/2 -right-1 text-xl leading-none sm:text-2xl"
-          aria-hidden
-        >
-          ?
-        </span>
+      <div aria-hidden className="relative px-1.5 pb-3 select-none">
+        {/*
+          The pile, suggested. Two blank sheets on the same box as the one in
+          front, turned the other way, so only their edges show. Nothing is
+          written on them, so nothing can be covered — which is the whole
+          reason the readable content lives on exactly one sheet.
+        */}
+        <span className="border-cream-line bg-cream-deep/70 rounded-edge card-lift absolute inset-0 rotate-3 border" />
+        <span className="border-cream-line bg-cream-deep rounded-edge card-lift absolute inset-0 -rotate-2 border" />
 
-        <ul className="grid grid-cols-2 gap-3 sm:gap-4">
-          {SOURCES.map((source) => (
-            <li
-              key={source.name}
-              className={cn(
-                "border-cream-line bg-cream-deep rounded-edge card-lift border p-3 sm:p-3.5",
-                // Transform only: layout is untouched, so the grid geometry
-                // holds at every width and nothing can overlap its neighbour.
-                "transition-transform duration-200",
-                source.lift,
-              )}
-            >
-              <span className="text-forest block truncate text-sm font-bold sm:text-base">
-                {source.name}
-              </span>
-              <span className="text-forest/70 mt-0.5 block text-xs leading-snug sm:text-sm">
-                {source.note}
-              </span>
-              {source.media && (
-                <CardMedia kind={source.media} frame={source.frame} />
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
+        {/*
+          The sheet you are reading. `cream` against the tinted stock behind
+          it — the page's own paper on top of the pile — which separates it
+          without a heavier rule or a third shadow.
+        */}
+        <div className="border-cream-line bg-cream rounded-edge card-lift relative -rotate-1 border px-5 py-4 sm:px-6 sm:py-5">
+          <p className="label text-forest/75 flex items-baseline justify-between gap-3">
+            <span className="min-w-0 truncate">Where people look</span>
+            {/* `terra-deep`, not `terra`. The accent at label size on cream
+                is the exact case design system §1 rules on: `terra` is 3.24:1
+                and clears AA for large text only, so at 12px it is a
+                violation — axe caught this one. `terra-deep` is 5.21:1 and is
+                the rung for accent text at any size on this surface. */}
+            <span aria-hidden className="text-terra-deep flex-none">
+              Six places
+            </span>
+          </p>
 
-      {/*
-        The shortlist. Not a card: a ruled table, drawn the way the rest of the
-        site draws structure. Every cell is a question mark on purpose —
-        inventing depths and levels here would be exactly the fabrication the
-        page bans outside the preview, and the unknowns ARE the point.
-
-        The column widths are measured, not chosen. At 10px with
-        `tracking-label`'s 0.18em, a two-word head like "Worth it" renders 62px
-        and needs a 64px cell — which left the header row one pixel inside the
-        content box at 360px and 15px OUTSIDE it at 320px. So the third column
-        is one word: "Worth" measures ~37px, the cells drop to 56px on a phone,
-        and the row clears the 360px content box by 21px instead of 1.
-
-        `min-w-0 truncate` on the row label is the backstop for the widths this
-        does not anticipate: the label gives way rather than pushing the
-        columns off the edge, which is the failure that is actually visible.
-      */}
-      <div
-        aria-hidden
-        className="border-cream-line mt-6 border-t select-none sm:mt-8"
-      >
-        <div className="text-forest/75 flex items-center justify-between gap-3 pt-3.5 pb-2.5">
-          <span className="label min-w-0 truncate text-[10px]">
-            The shortlist
-          </span>
-          <span className="flex gap-2 sm:gap-3">
-            {SHORTLIST.columns.map((column) => (
-              <span
-                key={column}
-                className="label w-14 text-center text-[10px] sm:w-16"
+          <ul className="divide-cream-line border-cream-line mt-3 divide-y border-t">
+            {SOURCES.map(([place, gives]) => (
+              <li
+                key={place}
+                className="flex items-baseline justify-between gap-3 py-2.5"
               >
-                {column}
-              </span>
+                <span className="text-forest flex-none text-sm font-bold sm:text-base">
+                  {place}
+                </span>
+                <span className="text-forest/70 min-w-0 truncate text-xs sm:text-sm">
+                  {gives}
+                </span>
+              </li>
             ))}
-          </span>
+          </ul>
+
+          {/*
+            The table you tried to build from all of it. Every cell is a
+            question mark on purpose: inventing depths and levels would be the
+            fabrication the page confines to the preview surface, and the
+            unknowns ARE the point.
+
+            The cells are narrow where the column is narrow — on a phone, and
+            again at `lg` where this drops into a 4fr track of roughly the
+            same width — and wide only at the breakpoints where the left
+            column runs the full page. A two-word head needs 64px at 10px with
+            `tracking-label`'s 0.18em, which is what pushed an earlier version
+            past the content box at 320px; one-word heads in 48px cells clear
+            it at every width.
+          */}
+          <div className="mt-5">
+            <div className="text-forest/75 flex items-baseline justify-between gap-3 pb-2">
+              <span className="label min-w-0 truncate text-[10px]">
+                Shortlist
+              </span>
+              <span className="flex gap-2 sm:gap-3">
+                {SHORTLIST.columns.map((column) => (
+                  <span
+                    key={column}
+                    className="label w-12 text-center text-[10px] sm:w-16 lg:w-12"
+                  >
+                    {column}
+                  </span>
+                ))}
+              </span>
+            </div>
+
+            {SHORTLIST.rows.map((row) => (
+              <div
+                key={row}
+                className="border-cream-line flex items-baseline justify-between gap-3 border-t py-2.5"
+              >
+                <span className="text-forest min-w-0 truncate text-sm">
+                  {row}
+                </span>
+                <span className="flex gap-2 sm:gap-3">
+                  {SHORTLIST.columns.map((column) => (
+                    <span
+                      key={column}
+                      className="text-terra-deep w-12 text-center text-sm font-bold sm:w-16 lg:w-12"
+                    >
+                      ?
+                    </span>
+                  ))}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {SHORTLIST.rows.map((row) => (
-          <div
-            key={row}
-            className="border-cream-line flex items-center justify-between gap-3 border-t py-2.5"
-          >
-            <span className="text-forest min-w-0 truncate text-sm">{row}</span>
-            <span className="flex gap-2 sm:gap-3">
-              {SHORTLIST.columns.map((column) => (
-                <span
-                  key={column}
-                  className="text-terra-deep w-14 text-center text-sm font-bold sm:w-16"
-                >
-                  ?
-                </span>
-              ))}
-            </span>
-          </div>
-        ))}
+        {/* One mark, in the corner the turned sheets leave open. The pile is
+            doing the work; a scattering of these would be decoration
+            pretending to be an idea. */}
+        <span className="text-terra/35 font-display absolute -top-2 -left-1 z-10 text-3xl leading-none">
+          ?
+        </span>
       </div>
 
       {/*
-        What it costs, as four quiet chips — and the block's closing line,
-        since the sentence that used to sit above them said the same thing at
-        four times the height. This is the only part exposed to assistive
-        tech: the cards and the table are drawings of a feeling, and this is
-        what they add up to.
+        What it costs. Middots are the brand's own separator (design system
+        §2: never an em dash), so this reads as the caption under a plate,
+        which is exactly what it is.
       */}
-      <ul className="mt-6 flex flex-wrap gap-2 sm:mt-8 sm:gap-2.5">
-        {COSTS.map((cost) => (
-          <li
-            key={cost}
-            className="border-cream-line text-forest/75 rounded-edge inline-flex items-center gap-2 border px-3 py-1.5 text-xs sm:text-sm"
-          >
-            <svg
-              viewBox="0 0 12 12"
-              fill="none"
-              aria-hidden
-              className="text-terra-deep size-3 flex-none"
-            >
-              <path
-                d="M6 3v3.25"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-              />
-              <circle cx="6" cy="8.75" r="0.85" fill="currentColor" />
-              <circle
-                cx="6"
-                cy="6"
-                r="5"
-                stroke="currentColor"
-                strokeWidth="1.1"
-              />
-            </svg>
+      <p className="text-forest/75 mt-4 text-sm leading-relaxed">
+        {COSTS.map((cost, index) => (
+          <span key={cost}>
+            {index > 0 && (
+              <span aria-hidden className="text-terra-deep px-1.5">
+                ·
+              </span>
+            )}
             {cost}
-          </li>
+          </span>
         ))}
-      </ul>
+      </p>
     </div>
   );
 }
