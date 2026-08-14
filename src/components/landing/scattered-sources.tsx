@@ -64,7 +64,19 @@ interface Source {
    * filler under every label reads as a template.
    */
   media?:
-    { kind: "photo"; frame: string } | { kind: "bars" } | { kind: "dots" };
+    | {
+        kind: "photo";
+        frame: string;
+        /**
+         * Lays a play badge over the frame. Set on the card whose shortfall
+         * is that the footage is OLD, not that there is none — the badge says
+         * "this is a video" so the shortfall beside it can say what is wrong
+         * with it (owner direction, 2026-08-15).
+         */
+        play?: boolean;
+      }
+    | { kind: "bars" }
+    | { kind: "dots" };
   /**
    * Placement at `lg`: left, top, width, angle. Ignored below it.
    *
@@ -96,7 +108,11 @@ const SOURCES: Source[] = [
     place: "YouTube",
     gives: "Vlogs from 2019",
     icon: "dated",
-    media: { kind: "photo", frame: "/photography/local-unexpected.webp" },
+    media: {
+      kind: "photo",
+      frame: "/photography/local-unexpected.webp",
+      play: true,
+    },
     at: { "--x": "66%", "--y": "0%", "--w": "34%", "--r": "-2deg" },
   },
   {
@@ -386,6 +402,23 @@ export function ScatteredSources() {
                   className="object-cover opacity-90 saturate-[0.65]"
                 />
                 <span aria-hidden className="plate-wash absolute inset-0" />
+
+                {/* The play badge, in the pause control's clothes: a forest
+                    square at 70% with a cream mark, `rounded-edge` like every
+                    other box in the system. It is deliberately small — this is
+                    a still of a video, not a player, and a badge that fills
+                    the frame turns the card into a thumbnail of itself. */}
+                {source.media.play && (
+                  <span className="bg-forest/70 text-cream rounded-edge absolute top-1/2 left-1/2 flex size-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center backdrop-blur-[1px] lg:size-5">
+                    <svg
+                      viewBox="0 0 16 16"
+                      fill="currentColor"
+                      className="size-2.5 lg:size-2"
+                    >
+                      <path d="M5.2 3.2v9.6L13 8 5.2 3.2z" />
+                    </svg>
+                  </span>
+                )}
               </span>
             )}
 
