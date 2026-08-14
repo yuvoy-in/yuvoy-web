@@ -519,15 +519,15 @@
   .hunt-scatter {
     display: block;
     position: relative;
-    /* The scatter's own canvas. Absolute children have no intrinsic height,
-       so this is what the column reserves for them.
+    /* The scatter's own canvas.
 
-       Sized so the three rows overlap at their EDGES: a card carrying a
-       photograph runs about 39% of this height, and the rows start at 0, 37
-       and 74, so each lands a few percent onto the one above rather than
-       across the middle of its picture. Too short and the row below slices
-       the photograph in half — which is what 34rem did. */
-    height: 41rem;
+       Two rows of three, sized against a budget rather than to taste: the
+       product preview opposite is 615px of intrinsic content, and the left
+       half must not run past it (owner direction, 2026-08-15) or the act
+       reads as lopsided. This canvas plus the shortlist card, the chips and
+       the gaps between them is what has to fit inside that number, which is
+       why the cards here are smaller than a card elsewhere on the site. */
+    height: 17rem;
   }
 
   .hunt-scatter > * {

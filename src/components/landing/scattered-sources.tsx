@@ -1,6 +1,5 @@
 import type { CSSProperties } from "react";
 import Image from "next/image";
-import { cn } from "@/lib/cn";
 
 /**
  * The hunt: six places scattered across the column, the shortlist you tried to
@@ -58,8 +57,14 @@ interface Source {
   place: string;
   gives: string;
   icon: Shortfall;
-  /** Our own photography, for the two cards that stand for footage. */
-  frame?: string;
+  /**
+   * What fills the card under its label, per the owner's comp: a frame of our
+   * photography, the bars of a results page, a row of markers still loading,
+   * or nothing at all. Two of the six carry nothing on purpose — a card with
+   * filler under every label reads as a template.
+   */
+  media?:
+    { kind: "photo"; frame: string } | { kind: "bars" } | { kind: "dots" };
   /**
    * Placement at `lg`: left, top, width, angle. Ignored below it.
    *
@@ -77,39 +82,41 @@ const SOURCES: Source[] = [
     place: "Instagram",
     gives: "Clips, no prices",
     icon: "noPrice",
-    frame: "/photography/diving-water.webp",
-    at: { "--x": "0%", "--y": "0%", "--w": "57%", "--r": "-4deg" },
+    media: { kind: "photo", frame: "/photography/diving-water.webp" },
+    at: { "--x": "0%", "--y": "0%", "--w": "31%", "--r": "-5deg" },
   },
   {
     place: "Google",
     gives: "Ten blue links",
     icon: "links",
-    at: { "--x": "53%", "--y": "2%", "--w": "47%", "--r": "3deg" },
+    media: { kind: "bars" },
+    at: { "--x": "35%", "--y": "6%", "--w": "30%", "--r": "3deg" },
   },
   {
     place: "YouTube",
     gives: "Vlogs from 2019",
     icon: "dated",
-    frame: "/photography/local-unexpected.webp",
-    at: { "--x": "0%", "--y": "37%", "--w": "55%", "--r": "-3deg" },
+    media: { kind: "photo", frame: "/photography/local-unexpected.webp" },
+    at: { "--x": "69%", "--y": "1%", "--w": "31%", "--r": "-2deg" },
   },
   {
     place: "Tripadvisor",
     gives: "Verdicts, no video",
     icon: "noVideo",
-    at: { "--x": "51%", "--y": "39%", "--w": "49%", "--r": "2deg" },
+    media: { kind: "dots" },
+    at: { "--x": "2%", "--y": "58%", "--w": "30%", "--r": "4deg" },
   },
   {
     place: "WhatsApp",
     gives: "A number, if you ask",
     icon: "ask",
-    at: { "--x": "0%", "--y": "74%", "--w": "53%", "--r": "-2deg" },
+    at: { "--x": "36%", "--y": "64%", "--w": "31%", "--r": "-4deg" },
   },
   {
     place: "The hotel site",
     gives: "Whoever may know",
     icon: "unknown",
-    at: { "--x": "49%", "--y": "76%", "--w": "51%", "--r": "3deg" },
+    at: { "--x": "70%", "--y": "56%", "--w": "30%", "--r": "2deg" },
   },
 ];
 
@@ -123,13 +130,21 @@ const SHORTLIST = {
   ],
 };
 
-/** What the hunt leaves you holding. The one real list here. */
-const COSTS = [
-  "Scattered sources",
-  "Uncertain choices",
-  "Hard to compare",
-  "Hours of guesswork",
-];
+/**
+ * What the hunt leaves you holding. The one real list here.
+ *
+ * THREE, not the comp's four. Four phrases totalling 67 characters cannot sit
+ * on one line in this column: measured against the 362px the left column has
+ * at `lg`, they need 463px at 12px, 399px at 10px and 368px even at 9px,
+ * which is past legible before it is past the edge. The owner asked for one
+ * line and left the choice of which to cut here.
+ *
+ * "Scattered sources" is the one that goes, because it is the only one that
+ * is already on the screen: the lede two lines above opens "Scattered
+ * sources. Confusing info." verbatim. The other three each say something the
+ * page has not said yet.
+ */
+const COSTS = ["Uncertain choices", "Hard to compare", "Hours of guesswork"];
 
 /**
  * The shortfall icons — what that place did NOT give you.
@@ -148,7 +163,11 @@ function ShortfallIcon({ kind }: { kind: Shortfall }) {
     fill: "none",
   };
   return (
-    <svg viewBox="0 0 24 24" aria-hidden className="text-terra-deep size-5">
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden
+      className="text-terra-deep size-5 lg:size-4"
+    >
       {kind === "noPrice" && (
         <>
           <path d="M4 12.5 11.5 5H19v7.5L11.5 20 4 12.5Z" {...stroke} />
@@ -203,11 +222,64 @@ export function ScatteredSources() {
         clips and a shadow is cut in half.
       */}
       <div aria-hidden className="hunt-scatter relative pb-2 select-none">
+        {/*
+          The comp's dashed arcs and question marks — the search doubling back
+          on itself between one place and the next.
+
+          `lg` only, and drawn in the scatter's own pixel space rather than in
+          percentages: the left column is a fixed 362px from that breakpoint,
+          so a viewBox in real units scales without distorting the dash
+          pattern, which stretching to a percentage box would. Below `lg` the
+          cards are a grid and there is nothing for an arc to connect.
+
+          Behind everything (`-z-10` against the cards' own stacking) and
+          inert. `terra` at low opacity: this is decoration, and fills are
+          exempt from the contrast floors that govern text.
+        */}
+        <svg
+          viewBox="0 0 362 272"
+          fill="none"
+          className="text-terra pointer-events-none absolute inset-0 hidden h-full w-full lg:block"
+        >
+          <g
+            stroke="currentColor"
+            strokeWidth="1.25"
+            strokeDasharray="5 6"
+            opacity="0.32"
+          >
+            <path d="M26 124C64 100 108 104 132 128" />
+            <path d="M158 132C196 106 248 108 286 130" />
+            <path d="M112 40C126 22 132 78 116 106" />
+            <path d="M248 34C264 20 268 76 250 104" />
+            <path d="M18 150C-4 168 4 200 30 206" />
+            <path d="M344 148C368 166 360 198 334 206" />
+          </g>
+          <g
+            stroke="currentColor"
+            strokeWidth="1.25"
+            strokeDasharray="4 5"
+            opacity="0.38"
+          >
+            <circle cx="176" cy="140" r="11" />
+          </g>
+          <g fill="currentColor" opacity="0.5">
+            <text
+              x="176"
+              y="146"
+              textAnchor="middle"
+              fontSize="14"
+              fontWeight="500"
+            >
+              ?
+            </text>
+          </g>
+        </svg>
+
         {SOURCES.map((source) => (
           <article
             key={source.place}
             style={source.at}
-            className="border-cream-line bg-cream card-lift rounded-lg border p-3.5 sm:p-4"
+            className="border-cream-line bg-cream card-lift rounded-lg border p-3.5 sm:p-4 lg:p-2.5"
           >
             {/*
               The icon sits ABOVE the words wherever the card is narrow, and
@@ -220,38 +292,36 @@ export function ScatteredSources() {
               spare — "A number, if you ask" and "Verdicts, no video" both
               truncated. Stacked, the words get the card's whole width.
             */}
-            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-2.5 lg:flex-col lg:items-start lg:gap-2">
-              <span className="bg-cream-deep rounded-edge flex size-8 flex-none items-center justify-center">
+            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-2.5 lg:flex-col lg:items-start lg:gap-1.5">
+              <span className="bg-cream-deep rounded-edge flex size-8 flex-none items-center justify-center lg:size-6">
                 <ShortfallIcon kind={source.icon} />
               </span>
               <span className="min-w-0">
-                <span className="text-forest block truncate text-sm font-bold sm:text-base">
+                <span className="text-forest block truncate text-sm font-bold sm:text-base lg:text-[0.8125rem]">
                   {source.place}
                 </span>
-                <span className="text-forest/70 block truncate text-xs sm:text-sm">
+                <span className="text-forest/70 block truncate text-xs sm:text-sm lg:text-[0.6875rem]">
                   {source.gives}
                 </span>
               </span>
             </div>
 
             {/*
-              The picture and the filler bars are `sm` and up.
-
-              In the 166px cell a two-column grid leaves at 390px, a
-              photograph is a postage stamp: it adds a third of the card's
-              height and nothing a reader can use, and the phone's problem
-              here is length (owner direction, 2026-08-15). The cards keep
-              their icon, their name and their shortfall, which is the whole
-              argument; the pictures live where they are big enough to read.
+              The fill is `sm` and up. In the 166px cell a two-column grid
+              leaves at 390px a photograph is a postage stamp: it costs a
+              third of the card's height and tells the reader nothing, and
+              the phone's problem here is length (owner direction). The cards
+              keep their icon, their name and their shortfall, which is the
+              whole argument.
             */}
-            {source.frame ? (
-              <span className="rounded-edge relative mt-3 hidden h-20 overflow-hidden sm:block">
+            {source.media?.kind === "photo" && (
+              <span className="rounded-edge relative mt-3 hidden h-20 overflow-hidden sm:block lg:mt-2 lg:h-11">
                 <Image
-                  src={source.frame}
+                  src={source.media.frame}
                   alt=""
                   fill
                   quality={75}
-                  sizes="(min-width: 1024px) 240px, 45vw"
+                  sizes="(min-width: 1024px) 150px, 45vw"
                   /* Dimmed and desaturated: at full strength these were the
                      brightest thing in the act, which inverts the argument —
                      the "without" half cannot look better than the product
@@ -260,15 +330,28 @@ export function ScatteredSources() {
                 />
                 <span aria-hidden className="plate-wash absolute inset-0" />
               </span>
-            ) : (
-              /* The cards with no footage get the comp's own filler: a few
-                 bars of nothing, or a row of markers still loading. */
-              <span className="mt-3 hidden flex-col gap-1.5 sm:flex">
+            )}
+
+            {source.media?.kind === "bars" && (
+              <span className="mt-3 hidden flex-col gap-1.5 sm:flex lg:mt-2 lg:gap-1">
                 {[100, 82, 91].map((width) => (
                   <span
                     key={width}
-                    className="bg-forest/10 block h-1.5"
+                    className="bg-forest/10 block h-1.5 lg:h-1"
                     style={{ width: `${width}%` }}
+                  />
+                ))}
+              </span>
+            )}
+
+            {/* One row of markers, not three bars: a verdict page is a row of
+                scores still loading, and the comp draws it that way. */}
+            {source.media?.kind === "dots" && (
+              <span className="mt-3 hidden items-center gap-1.5 sm:flex lg:mt-2">
+                {[0, 1, 2, 3].map((dot) => (
+                  <span
+                    key={dot}
+                    className="bg-forest/15 block size-2 lg:size-1.5"
                   />
                 ))}
               </span>
@@ -290,7 +373,7 @@ export function ScatteredSources() {
       */}
       <div
         aria-hidden
-        className="border-cream-line bg-cream card-lift mt-6 rounded-lg border px-4 py-4 select-none sm:px-5"
+        className="border-cream-line bg-cream card-lift mt-5 rounded-lg border px-3.5 py-3 select-none sm:px-4 sm:py-3.5 lg:mt-3 lg:px-3 lg:py-2.5"
       >
         <div className="text-forest/75 flex items-baseline justify-between gap-3 pb-2">
           <span className="label min-w-0 truncate text-[10px]">
@@ -300,7 +383,7 @@ export function ScatteredSources() {
             {SHORTLIST.columns.map((column) => (
               <span
                 key={column}
-                className="label w-12 text-center text-[10px] sm:w-16 lg:w-12"
+                className="label w-11 text-center text-[10px] sm:w-16 lg:w-12"
               >
                 {column}
               </span>
@@ -311,10 +394,10 @@ export function ScatteredSources() {
         {SHORTLIST.rows.map((row) => (
           <div
             key={row.name}
-            className="border-cream-line flex items-center justify-between gap-3 border-t py-2.5"
+            className="border-cream-line flex items-center justify-between gap-2.5 border-t py-2 lg:py-1.5"
           >
-            <span className="flex min-w-0 items-center gap-2.5">
-              <span className="rounded-edge relative size-8 flex-none overflow-hidden">
+            <span className="flex min-w-0 items-center gap-2 sm:gap-2.5">
+              <span className="rounded-edge relative hidden size-7 flex-none overflow-hidden sm:block lg:size-6">
                 <Image
                   src={row.frame}
                   alt=""
@@ -333,7 +416,7 @@ export function ScatteredSources() {
               {SHORTLIST.columns.map((column) => (
                 <span
                   key={column}
-                  className="text-terra-deep w-12 text-center text-sm font-bold sm:w-16 lg:w-12"
+                  className="text-terra-deep w-11 text-center text-sm font-bold sm:w-16 lg:w-12"
                 >
                   ?
                 </span>
@@ -345,11 +428,11 @@ export function ScatteredSources() {
         {/* The comp's closing note. It counts what is actually drawn — six
             cards, three shortlisted rows — where the comp said "four"; change
             either list and this number moves with it. */}
-        <p className="text-forest/75 border-cream-line mt-1 flex items-start gap-3 border-t pt-3.5 text-sm leading-relaxed">
+        <p className="text-forest/75 border-cream-line mt-1 flex items-start gap-2.5 border-t pt-3 text-xs leading-relaxed sm:text-sm lg:pt-2.5 lg:text-[0.6875rem]">
           <svg
             viewBox="0 0 24 24"
             aria-hidden
-            className="text-terra-deep mt-0.5 size-4 flex-none"
+            className="text-terra-deep mt-0.5 size-3.5 flex-none"
           >
             <circle
               cx="12"
@@ -375,18 +458,22 @@ export function ScatteredSources() {
       {/* What it costs, as the comp's four chips. The one part of this block
           exposed to assistive tech: the cards and the table are drawings of a
           feeling, and this is what they add up to. */}
-      <ul className="mt-5 flex flex-wrap gap-2">
+      <ul className="mt-5 flex flex-wrap gap-2 lg:mt-3 lg:gap-1.5">
         {COSTS.map((cost) => (
           <li
             key={cost}
-            className={cn(
-              "border-cream-line text-forest/75 inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs sm:text-sm",
-            )}
+            /*
+              Tighter at `lg` than anywhere else, because that is the only
+              breakpoint where the row has to fit a fixed 362px column: 10px
+              type, 6px of side padding, a 12px mark. Measured, the three come
+              to 329px there and clear the column by 33.
+            */
+            className="border-cream-line text-forest/75 inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs sm:text-sm lg:gap-1 lg:px-1.5 lg:py-0.5 lg:text-[0.625rem]"
           >
             <svg
               viewBox="0 0 24 24"
               aria-hidden
-              className="text-terra-deep size-3.5 flex-none"
+              className="text-terra-deep size-3.5 flex-none lg:size-3"
             >
               <circle
                 cx="12"
