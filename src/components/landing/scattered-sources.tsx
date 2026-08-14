@@ -214,7 +214,24 @@ function ShortfallIcon({ kind }: { kind: Shortfall }) {
 
 export function ScatteredSources() {
   return (
-    <div className="flex flex-col">
+    /*
+      `h-full` + `justify-between` from `lg`, and neither below it.
+
+      Side by side, the two halves of the act share a grid row, so the row is
+      as tall as the taller of them — the product preview — and anything the
+      left half does not use is dead space under it. Measured at 1440 that was
+      94px of the 615 (owner report, 2026-08-15).
+
+      Spreading the three blocks to fill it is self-correcting: whatever the
+      preview's height turns out to be, the scatter, the shortlist and the
+      costs distribute themselves across it, so this cannot silently
+      re-open the gap when either side changes.
+
+      Below `lg` the halves are stacked in one column and there is no row to
+      fill — spreading there would just be a long block with holes in it, so
+      the phone keeps the compact rhythm it was tuned to.
+    */
+    <div className="flex flex-col lg:h-full lg:justify-between">
       {/*
         The scatter. `pb-2` at every width and the `lg` canvas height in
         globals.css are the room the angles need: a turned card reaches
