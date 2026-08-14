@@ -1,28 +1,43 @@
 name: Production deployment
 
-# Production deploys only after CI has gone green on the exact commit.
+# Production deploys on push to `main`. The gate in front of it is local.
 #
-# It used to deploy straight off `push: [main]`, which raced CI rather than
-# waiting for it: on the 2026-08-07 release the site was live and serving
-# before the e2e job finished, and that job then failed. Nothing was wrong with
-# the site that time — the failure was a bug in the test harness — but "we
-# found out afterwards" is not a release process, and branch protection does
-# not help here: it gates the *merge*, and a merge commit is not the commit any
-# PR run ever tested.
+# ## This is a deliberate downgrade, and the reasoning it replaces matters
 #
-# `workflow_run` is the only trigger that can express "after CI, on this SHA".
-# Its cost is that the event carries the *default branch's* context, so the
-# commit to deploy has to be passed explicitly — see `ref` below and the note
-# in `_deploy.yml`.
+# Until 2026-08-14 this waited on `workflow_run: [CI]` so it could deploy only
+# after CI went green **on the exact commit**. That existed for a real reason:
+# deploying straight off `push` raced CI, and on the 2026-08-07 release the
+# site was live and serving before the e2e job finished — which then failed.
+# Nothing was actually wrong that time, but "we found out afterwards" is not a
+# release process.
+#
+# The trigger is back to `push` because CI no longer runs automatically at all
+# (see ci.yml: the account hit 90% of its free Actions minutes with no budget
+# to go past it). There is no workflow to wait for, so waiting for one would
+# deadlock the release.
+#
+# **What now stands in its place**, in order of when it catches something:
+#
+# 1. `.husky/pre-push` runs `pnpm verify` — typecheck, lint, format, unit
+#    tests, production build, full e2e — against the exact tree being pushed.
+#    Nothing reaches `dev` without passing it.
+# 2. Staging deploys from `dev` and is looked at before anything is promoted.
+#    A release is a promotion of a tree that has been on staging, not a new
+#    tree, which is the substantive difference from the 08-07 incident: that
+#    deployed a commit nobody had run anything against.
+# 3. `gh workflow run CI --ref main` before promoting, when a release is worth
+#    7 minutes of second opinion on a machine that is not the author's.
+#
+# **The residual risk is honest and worth stating:** a `--no-verify` push, or
+# a merge whose result differs from any tree the hook saw, reaches production
+# with nothing having checked it. Restore the `workflow_run` gate the moment
+# Actions minutes are not the binding constraint.
 on:
   # Manual redeploy. NEXT_PUBLIC_* values are inlined at build time, so
   # changing one in Vercel does nothing until a rebuild — which previously
-  # meant pushing a commit for a config-only change. Also the escape hatch when
-  # a release must go out with CI red on something known and accepted.
+  # meant pushing a commit for a config-only change.
   workflow_dispatch:
-  workflow_run:
-    workflows: [CI]
-    types: [completed]
+  push:
     branches: [main]
 
 concurrency:
@@ -31,16 +46,14 @@ concurrency:
 
 jobs:
   deploy:
-    # A `workflow_run` fires on *completion*, success or not, so the conclusion
-    # has to be checked here or a red CI would deploy exactly as before.
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      github.event.workflow_run.conclusion == 'success'
     uses: ./.github/workflows/_deploy.yml
     with:
-      # Empty on manual dispatch, where checkout's default (the dispatched ref)
-      # is already what we want.
-      ref: ${{ github.event.workflow_run.head_sha || '' }}
+      # Empty: checkout's default is the pushed commit on a `push`, and the
+      # dispatched ref on a manual run. The explicit SHA that used to be
+      # passed here existed only because `workflow_run` reports the default
+      # branch's context rather than the tested commit's — with that trigger
+      # gone, the default is correct for both events.
+      ref: ""
     secrets:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
