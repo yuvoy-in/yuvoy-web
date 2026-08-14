@@ -66,7 +66,7 @@ export function WaitlistChrome() {
   }
 
   return (
-    <header className="bg-forest text-cream">
+    <header className="bg-forest text-cream pt-[env(safe-area-inset-top)]">
       {/*
         Three columns, the outer two equal, so the mark sits at the true centre
         of the page rather than at the midpoint of whatever the back control

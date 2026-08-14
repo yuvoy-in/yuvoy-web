@@ -1,8 +1,10 @@
-import { FaqAccordion } from "@/components/site/faq-accordion";
 import { AUDIENCE_COPY } from "@/lib/site/audiences";
 
 /**
- * The application, narrated. Rendered by LeadForms as the left column of the
+ * The application, narrated. Rendered by LeadForms as the head of the
+ * operator application section — the eyebrow, the heading and the lede. The
+ * questions moved to LeadForms on 2026-08-10 so they can sit below the form
+ * on a phone; see JoinAside for the reasoning. Formerly the left column of the
  * operators page's closing section — the same shape the homepage uses for the
  * waitlist (`JoinAside`).
  *
@@ -39,16 +41,14 @@ export function ApplyAside() {
       <p className="eyebrow text-terra-soft">{copy.eyebrow}</p>
       <h2
         id="apply-heading"
-        className="font-display tracking-display mt-6 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-normal text-balance"
+        className="font-display tracking-display mt-4 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-normal text-balance sm:mt-6"
       >
         {copy.title}{" "}
         <em className="text-terra-soft font-turn italic">{copy.accent}</em>
       </h2>
-      <p className="text-cream/70 mt-6 max-w-md text-lg leading-relaxed">
+      <p className="text-cream/70 mt-5 max-w-md leading-relaxed sm:mt-6 sm:text-lg">
         {copy.lede}
       </p>
-
-      <FaqAccordion items={copy.faqs} tone="ink" className="mt-12" />
     </>
   );
 }

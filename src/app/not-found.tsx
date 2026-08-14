@@ -4,7 +4,7 @@ import { buttonVariants } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center px-6 text-center">
+    <main className="flex min-h-svh flex-col items-center justify-center px-6 text-center">
       <p className="label text-terra-deep">404</p>
       <h1 className="font-display text-forest mt-5 text-4xl">
         This path leads nowhere.

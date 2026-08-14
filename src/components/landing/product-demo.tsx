@@ -283,7 +283,7 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
     // on screen, so "wait for animations to finish" must not include it.
     <div
       data-demo
-      className="flex flex-col items-center gap-8 lg:flex-row lg:gap-7"
+      className="flex flex-col items-center gap-6 sm:gap-8 lg:flex-row lg:gap-7"
     >
       {/*
         Both boxes size to the frame, and the frame sizes to the screen.
@@ -434,17 +434,36 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
               WCAG 2.2.2: the tour moves for far longer than five seconds, so
               a pause mechanism has to exist. It rides the frame like a video
               player's control rather than sitting under it as a labelled
-              button (owner direction: the button was visual noise) — revealed
-              on hover, and on keyboard focus, which is the skip-link pattern
-              and keeps it reachable without a pointer. Under reduced motion
-              nothing auto-plays, so there is nothing to pause.
+              button (owner direction: the button was visual noise). Under
+              reduced motion nothing auto-plays, so there is nothing to pause.
+
+              It was revealed on hover and on keyboard focus alone until
+              2026-08-09, which meant that on a touch device — where there is
+              no hover and no focus ring to chase — the required mechanism was
+              **painted at zero opacity and effectively absent**, on the
+              platform that carries most of this site's traffic. Reveal-on-
+              hover is a pointer affordance being asked to do an accessibility
+              job it cannot do without a pointer.
+
+              `(hover: none)` rather than `pointer-coarse`: the question is not
+              what kind of pointer the device has but whether the hover reveal
+              can ever fire. A touchscreen laptop reports a fine primary
+              pointer and still hovers, so it keeps the quiet version; a phone
+              never hovers and gets the control outright. This is the standard
+              mobile video-player behaviour and it is the only reading of
+              2.2.2 that survives on a phone.
+
+              The button stays quiet where hover works, which is the owner's
+              2026-08-06 call (a labelled button under the frame was visual
+              noise) — that decision is preserved everywhere it was actually
+              made about.
             */}
             {!reduced && (
               <button
                 type="button"
                 onClick={() => setPlaying((now) => !now)}
                 aria-label={playing ? "Pause the preview" : "Play the preview"}
-                className="border-cream/25 bg-forest/70 text-cream rounded-edge focus-visible:ring-terra-soft ease-interaction absolute top-2.5 right-2.5 z-30 flex size-8 items-center justify-center border opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:outline-none"
+                className="border-cream/25 bg-forest/70 text-cream rounded-edge focus-visible:ring-terra-soft ease-interaction absolute top-2.5 right-2.5 z-30 flex size-8 items-center justify-center border opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:outline-none [@media(hover:none)]:opacity-100"
               >
                 {playing ? (
                   <PauseGlyph className="size-3" />
@@ -481,7 +500,7 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
                 type="button"
                 onClick={() => seek(act.id)}
                 aria-current={isActive ? "step" : undefined}
-                className="rounded-edge focus-visible:ring-terra-deep group flex w-full items-start gap-4 py-3.5 text-left focus-visible:ring-2 focus-visible:outline-none"
+                className="rounded-edge focus-visible:ring-terra-deep group flex w-full items-start gap-4 py-2.5 text-left focus-visible:ring-2 focus-visible:outline-none sm:py-3.5"
               >
                 <span
                   aria-hidden

@@ -34,18 +34,18 @@ export function ContactGlance() {
       aria-labelledby="contact-glance-heading"
       className="bg-cream text-forest"
     >
-      <div className="container-page py-16 sm:py-20">
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
+      <div className="container-page py-12 sm:py-20">
+        <div className="flex flex-col gap-6 sm:gap-8 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
           <div className="max-w-xl">
             <p className="eyebrow text-terra-deep">Questions</p>
             <h2
               id="contact-glance-heading"
-              className="font-display tracking-display mt-5 text-[clamp(1.75rem,3.5vw,2.5rem)] leading-tight text-balance"
+              className="font-display tracking-display mt-4 text-[clamp(1.75rem,3.5vw,2.5rem)] leading-tight text-balance sm:mt-5"
             >
               Not sure where to start?{" "}
               <em className="text-terra font-turn italic">Ask us.</em>
             </h2>
-            <p className="text-forest/75 mt-5 leading-relaxed">
+            <p className="text-forest/75 mt-4 leading-relaxed sm:mt-5">
               A person reads every message. Email or WhatsApp reaches us
               directly.
             </p>

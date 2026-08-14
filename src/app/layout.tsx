@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { VIEWPORT_ON_CREAM } from "@/lib/site/theme";
 import type { ReactNode } from "react";
 import { dancingScript, fraunces, satoshi } from "@/lib/fonts";
 import { BrandIntro } from "@/components/brand/brand-intro";
@@ -45,16 +46,13 @@ export const metadata: Metadata = {
 };
 
 /*
-  Without an explicit theme-color, Safari tints its tab and URL chrome by
-  sampling the page's top pixels — which, while the brand veil plays, are
-  forest, so the chrome went green and then disagreed with the cream page
-  underneath (owner report, 2026-08-06). Pinned to the canvas token
-  `cream` (#F4EFE4 in globals.css @theme; a literal here because metadata
-  cannot read CSS variables — the OG frame does the same).
+  The default chrome: cream, matching the canvas. Routes that open on a
+  forest cover export VIEWPORT_ON_FOREST themselves — Safari's top glass
+  follows theme-color, so each route's chrome has to agree with its first
+  surface. The full story, the measured iOS behaviour and the sampling bug
+  this replaces are documented once, in lib/site/theme.ts.
 */
-export const viewport: Viewport = {
-  themeColor: "#f4efe4",
-};
+export const viewport: Viewport = VIEWPORT_ON_CREAM;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -80,7 +78,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <BrandIntro />
         <a
           href="#content"
-          className="focus:bg-forest focus:text-cream label rounded-edge sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-3"
+          className="focus:bg-forest focus:text-cream label rounded-edge sr-only focus:not-sr-only focus:absolute focus:top-[max(1rem,env(safe-area-inset-top))] focus:left-4 focus:z-50 focus:px-4 focus:py-3"
         >
           Skip to content
         </a>
@@ -90,7 +88,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             See navigation-history.tsx. */}
         <NavigationHistory />
         <Providers>
-          <div className="flex min-h-dvh flex-col">
+          <div className="flex min-h-svh flex-col">
             <SiteHeader />
             <div id="content" tabIndex={-1} className="flex-1 outline-none">
               {children}

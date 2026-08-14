@@ -45,9 +45,9 @@ export function OperatorSystem() {
     <section
       id="system"
       aria-labelledby="operator-system-heading"
-      className="bg-cream scroll-mt-16"
+      className="bg-cream scroll-mt-[calc(4rem+env(safe-area-inset-top))]"
     >
-      <div className="container-page py-20 sm:py-28">
+      <div className="container-page py-14 sm:py-28">
         <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-12">
           <div className="lg:col-span-7">
             <SectionHeading

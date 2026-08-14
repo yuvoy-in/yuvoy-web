@@ -29,31 +29,20 @@ import { Wordmark } from "@/components/brand/wordmark";
  */
 
 /**
- * The improvised stack every traveller actually uses, one card each, with
- * what that source leaves you holding. Real product names and no logos: this
- * is reportage, not endorsement, and a card carries the name at a readable
- * size instead of a clipped tab strip. Six of them fill the grid exactly.
+ * The hunt, as it actually goes: six places, in the order a person tries them,
+ * and what each one hands back.
+ *
+ * Reportage, not endorsement — real product names, no logos, and every line
+ * literally true of that source today. It is the section's argument, so it is
+ * real content rather than the `aria-hidden` illustration it used to be.
  */
-const SOURCES = [
-  { name: "Instagram", note: "Clips, no prices" },
-  { name: "Google", note: "Ten blue links" },
-  { name: "YouTube", note: "Vlogs from 2019" },
-  { name: "Tripadvisor", note: "Verdicts, no video" },
-  { name: "WhatsApp", note: "A number, if you ask" },
-  { name: "The hotel desk", note: "Whoever they know" },
-];
-
-/** The comparison every traveller tries to build, and cannot finish. */
-const COMPARE = {
-  columns: ["Depth", "Level", "Worth it"],
-  rows: ["Nemo Reef", "Lighthouse", "Mangrove Wall"],
-};
-
-const COSTS = [
-  "Scattered sources",
-  "Hard to compare",
-  "Uncertain choices",
-  "Hours of guesswork",
+const HUNT = [
+  ["Instagram", "shows you a clip. No price."],
+  ["Google", "returns ten blue links."],
+  ["YouTube", "has a vlog, filmed in 2019."],
+  ["Tripadvisor", "has verdicts, no video."],
+  ["WhatsApp", "gets you a number, if you ask."],
+  ["The hotel desk", "sends whoever they know."],
 ];
 
 export function WhyYuvoy() {
@@ -79,7 +68,7 @@ export function WhyYuvoy() {
         its rail side by side, and an even split leaves the rail about 130px
         wide at the lg breakpoint, where every line of it wraps three ways.
       */}
-      <div className="mt-14 grid grid-cols-1 gap-x-8 gap-y-8 sm:mt-20 lg:grid-cols-[minmax(0,4fr)_auto_minmax(0,6fr)] lg:grid-rows-[auto_1fr] lg:gap-x-10">
+      <div className="mt-10 grid grid-cols-1 gap-x-8 gap-y-6 sm:mt-20 sm:gap-y-8 lg:grid-cols-[minmax(0,4fr)_auto_minmax(0,6fr)] lg:grid-rows-[auto_1fr] lg:gap-x-10">
         {/* ---------------------------------------- without Yuvoy · header */}
         <div className="lg:col-start-1 lg:row-start-1">
           <p className="label text-forest/75">Without Yuvoy</p>
@@ -88,96 +77,60 @@ export function WhyYuvoy() {
           </p>
         </div>
 
-        {/* ----------------------------------------- without Yuvoy · panel */}
-        <div className="border-cream-line divide-cream-line bg-cream-deep rounded-edge flex flex-col divide-y border lg:col-start-1 lg:row-start-2">
-          {/* The open tabs, one card each: the headline's "too many tabs",
-              drawn. Six cards, six cells, so the grid reads as finished
-              rather than clipped (owner report, 2026-08-06). */}
-          <div aria-hidden className="p-5 select-none">
-            <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3">
-              {SOURCES.map((source) => (
-                <li
-                  key={source.name}
-                  className="border-cream-line bg-cream rounded-edge border px-3 py-2.5"
-                >
-                  <span className="text-forest block truncate text-sm">
-                    {source.name}
-                  </span>
-                  <span className="text-forest/70 mt-1 block text-xs">
-                    {source.note}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
+        {/* ------------------------------------------- without Yuvoy · hunt */}
+        {/*
+          The hunt as six sentences, because it is a story and not a dataset.
 
-          {/* The comparison that never resolves. Every cell is a question
-              mark on purpose: inventing depths and levels here would be the
-              same fabrication the page bans, and the unknowns are the point. */}
-          <div aria-hidden className="flex flex-1 flex-col p-5 select-none">
-            <div className="text-forest/75 flex items-center justify-between gap-4 pb-3">
-              <span className="label text-[10px]">The shortlist</span>
-              <span className="flex gap-3">
-                {COMPARE.columns.map((column) => (
-                  <span
-                    key={column}
-                    className="label w-12 text-center text-[10px]"
-                  >
-                    {column}
-                  </span>
-                ))}
-              </span>
-            </div>
+          ## Three versions of this have been rejected, and why
 
-            {COMPARE.rows.map((row) => (
-              <div
-                key={row}
-                className="border-cream-line flex items-center justify-between gap-4 border-t py-3.5"
-              >
-                <span className="text-forest truncate text-sm">{row}</span>
-                <span className="flex gap-3">
-                  {COMPARE.columns.map((column) => (
-                    <span
-                      key={column}
-                      className="text-terra-deep w-12 text-center text-sm font-bold"
-                    >
-                      ?
-                    </span>
-                  ))}
-                </span>
-              </div>
-            ))}
+          1. A bordered, tinted panel of six bordered cards plus a mocked
+             comparison table: a box of boxes, the one structure the design
+             system names and rejects outright (§5).
+          2. A ruled two-column index: no boxes, but a name on the left and a
+             note on the right with a rule between is the shape of every
+             pricing table ever built, and read as generic (owner, 2026-08-10).
+          3. The names as one run of display type: it overflowed its column at
+             `lg`, and a row of brand names separated by middots reads as an
+             "as seen in" logo strip — the opposite of the intended meaning.
 
-            <p className="text-forest/70 border-cream-line mt-auto border-t pt-4 text-sm leading-relaxed">
-              Four sources, three answers, and no way to tell which one was
-              written this season.
-            </p>
-          </div>
+          ## What this is
 
-          {/* The real content of this panel: what the hunt costs. */}
-          <ul className="grid grid-cols-1 gap-x-6 gap-y-3 p-5 sm:grid-cols-2">
-            {COSTS.map((cost) => (
+          Six short sentences, one per place, in the order a person actually
+          tries them, each naming what it hands back. It reads the way the
+          experience feels: you go somewhere, you get a fragment, you go
+          somewhere else. The repetition IS the argument, so no container has
+          to draw it and nothing has to be tabulated.
+
+          The left edge is the composition: every line opens with the place, so
+          the six names stack into a hard vertical rule of proper nouns down
+          the column while the shortfalls trail off to the right in a lighter
+          tone. That contrast — solid names, fading answers — is the whole
+          picture, and it is made of nothing but type.
+
+          Set in the display face at reading size rather than the text face:
+          this is the argument, opposite a phone, and Satoshi at 16px would
+          read as a caption next to it. The closing line is the only thing
+          here at full display scale, because it is the conclusion the six
+          lines have earned.
+        */}
+        <div className="lg:col-start-1 lg:row-start-2">
+          <ul className="space-y-3.5 sm:space-y-4">
+            {HUNT.map(([place, outcome]) => (
               <li
-                key={cost}
-                className="text-forest/75 flex items-center gap-2.5 text-sm"
+                key={place}
+                className="font-display tracking-display text-xl leading-snug font-normal sm:text-[1.375rem]"
               >
-                <svg
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  className="text-terra-deep size-2.5 flex-none"
-                  aria-hidden
-                >
-                  <path
-                    d="M2 2l8 8M10 2l-8 8"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                {cost}
+                <span className="text-forest">{place}</span>{" "}
+                <span className="text-forest/70">{outcome}</span>
               </li>
             ))}
           </ul>
+
+          {/* The conclusion the six lines earn. It counts them: anything added
+              to or removed from HUNT has to move this number. */}
+          <p className="font-display tracking-display text-forest mt-8 text-2xl leading-snug text-balance sm:mt-10 sm:text-3xl">
+            Six places. Still no idea what the day actually looks like.
+          </p>
         </div>
 
         {/* The turn of the story: one arrow, chaos into flow. */}
@@ -252,14 +205,21 @@ export function WhyYuvoy() {
            is therefore one step short of the top (24px against 32px) so the
            two OPTICAL gaps match. Change one and change the other.
       */}
-      <div className="mt-24 flex flex-col items-center text-center sm:mt-32">
-        <Wordmark className="h-16 sm:h-20" />
+      <div className="mt-16 flex flex-col items-center text-center sm:mt-32">
+        <Wordmark className="h-14 sm:h-20" />
 
         <svg
           viewBox="0 0 16 28"
           fill="none"
           aria-hidden
-          className="text-terra mt-8 mb-6 h-7 w-4"
+          /* The 8px asymmetry is the point, at both steps: `leading-tight`
+             leaves ~8px of empty line box above the sentence's cap height
+             that no margin can see, so the bottom margin is one 8px step
+             short of the top and the two OPTICAL gaps match. The mobile pair
+             (24/16) keeps that same 8px difference rather than scaling it —
+             the dead space comes from the font's metrics, not from the
+             margin, so it does not shrink with the viewport. */
+          className="text-terra mt-6 mb-4 h-7 w-4 sm:mt-8 sm:mb-6"
         >
           <path d="M8 0V26" stroke="currentColor" strokeWidth="1.5" />
           <path

@@ -63,7 +63,7 @@ export function OperatorTeaser({ source }: { source: LeadSource }) {
 
       {/* A plain list on a rule, not three bordered cards: boxes inside a
           box is the SaaS grid this rebuild exists to get away from. */}
-      <ul className="border-cream-line mt-14 grid grid-cols-1 gap-x-10 gap-y-10 border-t pt-10 sm:grid-cols-3">
+      <ul className="border-cream-line mt-10 grid grid-cols-1 gap-x-10 gap-y-8 border-t pt-8 sm:mt-14 sm:grid-cols-3 sm:gap-y-10 sm:pt-10">
         {OUTCOMES.map((outcome) => (
           <li key={outcome.title}>
             <h3 className="font-display tracking-display text-2xl leading-snug font-normal">
@@ -76,7 +76,7 @@ export function OperatorTeaser({ source }: { source: LeadSource }) {
         ))}
       </ul>
 
-      <div className="mt-12 flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-8">
+      <div className="mt-10 flex flex-col items-start gap-5 sm:mt-12 sm:flex-row sm:items-center sm:gap-8">
         {/* Both links carry the campaign source. On `/go/ferry` this act is
             rendered by the same page an operator scanned into, so a link that
             dropped it would lose the attribution exactly the way the legacy

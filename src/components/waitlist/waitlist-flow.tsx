@@ -144,10 +144,23 @@ export function WaitlistFlow({
   }, [select]);
 
   return (
-    <main className="bg-forest text-cream">
+    /*
+      `data-dark-hero` here marks the canvas, not the header: /waitlist hides
+      the site header entirely (its masthead is WaitlistChrome), but the
+      body:has() rule in globals.css reads the same attribute to paint the
+      page canvas forest, so the top overscroll and Safari's status strip
+      agree with this page's dark ground exactly as they do on the cover
+      routes. The header hook is unaffected — it never runs a measurement on
+      a route where SiteHeader returns null.
+    */
+    <main data-dark-hero className="bg-forest text-cream">
       {/* The legacy operator anchor. It must exist for the browser to have
           something to scroll to when the hash arrives with the document. */}
-      <span id="providers" className="block scroll-mt-24" aria-hidden />
+      <span
+        id="providers"
+        className="block scroll-mt-[calc(6rem+env(safe-area-inset-top))]"
+        aria-hidden
+      />
 
       <div className="container-page pt-10 pb-20 sm:pt-14 sm:pb-28">
         <AudienceTabs

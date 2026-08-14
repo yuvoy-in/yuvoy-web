@@ -25,9 +25,19 @@ export function ConsentBanner() {
       role="dialog"
       aria-modal="false"
       aria-labelledby={headingId}
-      className="fixed inset-x-0 bottom-0 z-50 px-4 pb-4 sm:px-6 sm:pb-6"
+      className="fixed inset-x-0 bottom-0 z-50 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6 sm:pb-6"
     >
-      <div className="border-cream-line bg-cream rounded-edge mx-auto max-w-3xl border p-6 shadow-lg sm:p-8">
+      {/*
+        `pb-[max(...)]` on the wrapper above and one step off the padding here:
+        on a phone this prompt is the first thing a visitor meets, and at
+        `p-6` with three stacked full-width buttons it stood ~320px tall — well
+        over a third of a 844px screen, covering the content it is asking about
+        (which is also the page whose reported fault is that the content is too
+        far away). The `env()` term resolves to 0 until the viewport ever opts
+        into `viewport-fit=cover`, so it is a no-op today and correct the day
+        it is not.
+      */}
+      <div className="border-cream-line bg-cream rounded-edge mx-auto max-w-3xl border p-5 shadow-lg sm:p-8">
         <h2
           id={headingId}
           className="font-display text-forest tracking-display text-lg font-normal"
@@ -46,7 +56,7 @@ export function ConsentBanner() {
           </Link>
           .
         </p>
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-5 grid grid-cols-2 gap-3 sm:mt-6 sm:flex sm:flex-row">
           <Button type="button" onClick={accept} className="w-full sm:w-auto">
             Allow analytics
           </Button>
@@ -64,7 +74,7 @@ export function ConsentBanner() {
               type="button"
               variant="ghost"
               onClick={closePrompt}
-              className="w-full sm:w-auto"
+              className="col-span-2 w-full sm:col-span-1 sm:w-auto"
             >
               Close
             </Button>
