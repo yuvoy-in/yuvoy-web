@@ -494,6 +494,52 @@
 }
 
 /*
+  The hunt's scatter: one set of cards, two layouts.
+
+  On a phone the cards are a two-column grid — a scatter needs width to read
+  as one, and at 342px an overlapping spread is a pile of collisions. From
+  `lg` they become absolutely placed, each card carrying its own position,
+  width and angle as custom properties set at the call site.
+
+  One DOM either way. The alternative — a mobile block and a desktop block,
+  one of them hidden — duplicates every card, and duplicated illustration is
+  how a screen reader ends up reading the same six things twice.
+
+  Plain CSS rather than an `@utility`: this needs a child selector and a media
+  query around it, which reads better here than nested in a utility. Same
+  reasoning as `.header-slide`.
+*/
+.hunt-scatter {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+}
+
+@media (width >= 64rem) {
+  .hunt-scatter {
+    display: block;
+    position: relative;
+    /* The scatter's own canvas. Absolute children have no intrinsic height,
+       so this is what the column reserves for them.
+
+       Sized so the three rows overlap at their EDGES: a card carrying a
+       photograph runs about 39% of this height, and the rows start at 0, 37
+       and 74, so each lands a few percent onto the one above rather than
+       across the middle of its picture. Too short and the row below slices
+       the photograph in half — which is what 34rem did. */
+    height: 41rem;
+  }
+
+  .hunt-scatter > * {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--w);
+    transform: rotate(var(--r));
+  }
+}
+
+/*
   The why act's deck: six cards cycling through a stack, the front one sliding
   away downward as the one behind it rises into its place (owner direction,
   2026-08-15).

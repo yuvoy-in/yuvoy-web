@@ -119,17 +119,17 @@ test("the three steps are watch, understand and book, and nothing more", async (
     ).toBeVisible();
   }
   /*
-    Five, and every one of them named: the tour's three steps, the tour's
-    pause control, and the source deck's pause control (added 2026-08-15 —
-    the deck auto-plays, so WCAG 2.2.2 requires its own mechanism).
+    Four, and both kinds named: the tour's three steps and the tour's pause
+    control. It was briefly five while the hunt was an auto-playing deck,
+    which needed its own pause control for WCAG 2.2.2; that deck was replaced
+    by a static scatter on 2026-08-15 and the control went with it.
 
-    The number is the point of this assertion, not the ceiling: it exists so
-    the eight-step traveller and operator journeys retired with
-    /how-it-works cannot quietly come back, and so a stray control cannot
-    appear in this act unnoticed. Raise it only alongside a control you can
-    name here.
+    The number is the point of this assertion: it exists so the eight-step
+    traveller and operator journeys retired with /how-it-works cannot quietly
+    come back, and so a stray control cannot appear in this act unnoticed.
+    Change it only alongside a control you can name here.
   */
-  await expect(section.getByRole("button")).toHaveCount(5);
+  await expect(section.getByRole("button")).toHaveCount(4);
 });
 
 test.describe("the consolidated routes", () => {

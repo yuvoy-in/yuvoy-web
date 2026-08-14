@@ -1,122 +1,129 @@
-"use client";
-
-import * as React from "react";
+import type { CSSProperties } from "react";
+import Image from "next/image";
 import { cn } from "@/lib/cn";
 
 /**
- * The hunt, as a deck: six places cycling through a stack, and the shortlist
- * you tried to build from them on its own card underneath.
+ * The hunt: six places scattered across the column, the shortlist you tried to
+ * build from them, and what the whole exercise costs.
  *
- * ## Why a deck
+ * Built from the owner's comp (2026-08-15), with four decisions taken with the
+ * owner rather than for them:
  *
- * The right half of this act is a single clean device. The left has to answer
- * it with a single object — the argument is *one tidy thing against one
- * untidy one*, and it only lands if both sides read as objects rather than as
- * regions of a page. Five earlier versions enumerated the problem instead of
- * depicting it: a panel of cards, a ruled index, a grid over a table over
- * chips, a fan of strips, and a single static sheet.
+ * - **No brand logos.** The comp carries the real Instagram, Google, YouTube,
+ *   Tripadvisor and WhatsApp marks. Dropped by owner direction: each card
+ *   takes a drawn icon of its SHORTFALL instead — a struck-through price tag,
+ *   a stack of links, a rewound clock — which says more than a logo did,
+ *   because the logo said "here is a brand" and the icon says "here is what
+ *   you did not get". One family, one stroke weight, one accent.
+ * - **Our own photography** in the two cards that show footage and in the
+ *   shortlist rows, rather than the comp's stock frames.
+ * - **Six, not four.** The comp's note read "Four sources" above six cards.
+ * - **"The hotel site"**, the comp's wording.
  *
- * A deck says "too many places" the way none of them could, because you watch
- * one give way to the next and it never runs out.
+ * ## The one thing that could not be matched, and why
  *
- * ## The motion is one keyframe, and that is the whole bug-avoidance strategy
+ * The comp draws its left half about 700px wide. In the live layout that
+ * column is **362px at every desktop size** — `max-w-page` is 70rem and the
+ * act splits 4fr / 6fr, because the right side carries the phone AND its rail
+ * side by side and an even split leaves that rail wrapping every line three
+ * ways. So the comp's wide horizontal spread is reproduced as a vertical
+ * one: same overlap, same angles, same character, arranged down the column
+ * instead of across it. Matching the comp's geometry exactly needs the act's
+ * columns rebalanced, which is a decision about the product rail.
  *
- * The obvious build — hold an order in state, reorder on a timer, let each
- * card transition to its new slot — has a wrap bug at its heart: the card
- * leaving the FRONT must become the card at the BACK, and any transition
- * between those animates it backwards through the stack. Every fix is a state
- * machine that can desynchronise.
+ * ## Two layouts, one DOM
  *
- * So there is no order state and no per-tick re-render. Every card runs the
- * identical `yuvoy-deck` keyframe with its start shifted by a sixth of the
- * cycle (`animation-delay`, negative, so the stack is already mid-cycle on
- * first paint rather than assembling itself). The wrap happens where the
- * keyframe loops, which is exactly where the card is invisible. See the
- * keyframe in globals.css.
+ * Each card carries its position, width and angle as custom properties, which
+ * `.hunt-scatter` (globals.css) applies only from `lg`. Below that the same
+ * cards are a two-column grid: a scatter needs width to read as a scatter, and
+ * at 342px an overlapping spread is a pile of collisions.
  *
- * React owns three things only: whether the animation is running, whether the
- * deck is on screen, and the motion preference. None of them is per-frame.
- *
- * ## Two obligations that come with anything that auto-plays
- *
- * 1. **A pause control (WCAG 2.2.2).** Motion that starts on its own and runs
- *    past five seconds needs a mechanism to stop it. Same treatment as the
- *    preview beside it: the control rides the deck, quiet where a pointer can
- *    hover, and always visible where one cannot — on a touch device a
- *    hover-revealed control is a control that does not exist. The button sits
- *    OUTSIDE the `aria-hidden` stack so it is reachable.
- * 2. **A static state that is the default.** The cards' own styles place them
- *    in a fan; the keyframe only moves them. So the global reduced-motion
- *    rule collapses the animation and leaves a perfectly composed static
- *    stack — no component-level motion branch, which is what the design
- *    system asks for. The keyframe deliberately has no `fill-mode`: with
- *    `both`, a neutralised animation would strand every card off-stage.
- *
- * The clock also stops when the deck is off screen, which is the preview's
- * rule too — an animation nobody is looking at should not be costing a phone
- * its battery.
- *
- * ## What was dropped from the owner's comp
- *
- * The product logos: reportage, not endorsement, and someone else's trademark
- * and brand colours do not belong on a page that is otherwise three tokens.
- * Everything on the cards is `aria-hidden` illustration; the caption under
- * the shortlist is the content, and the heading and lede beside it carry the
- * argument.
+ * Everything above the cost row is `aria-hidden` illustration. The costs are
+ * the content, and the heading and lede beside them carry the argument.
  */
+
+type Shortfall = "noPrice" | "links" | "dated" | "noVideo" | "ask" | "unknown";
+
+/**
+ * A card's placement at `lg`, carried as custom properties.
+ *
+ * `CSSProperties` has no index signature for `--*`, so a bare object literal
+ * of them is a type error rather than a widening. Declared here once instead
+ * of cast at each call site — a cast would also silence a genuine typo in a
+ * property name, which is exactly the mistake this shape invites.
+ */
+type Placement = CSSProperties & Record<`--${string}`, string>;
 
 interface Source {
   place: string;
   gives: string;
-  /** The line the comp asked for: what that place actually leaves you with. */
-  detail: string;
+  icon: Shortfall;
+  /** Our own photography, for the two cards that stand for footage. */
+  frame?: string;
+  /**
+   * Placement at `lg`: left, top, width, angle. Ignored below it.
+   *
+   * Every pair overlaps by about six percent of the column — enough to read
+   * as a scatter, little enough that the card in front lands on the card
+   * behind's PICTURE rather than its words. The first cut overlapped by
+   * twelve and clipped "Vlogs from 2019" and "A number, if you ask"; a card
+   * on top of another card's text is not a scatter, it is a bug.
+   */
+  at: Placement;
 }
 
-/**
- * Six places, in the order a person tries them. Reportage: real product
- * names, no invented counts, ratings or prices — the truthfulness rules
- * confine those to the preview surface, and nothing here is inside it.
- */
 const SOURCES: Source[] = [
   {
     place: "Instagram",
     gives: "Clips, no prices",
-    detail: "Beautiful reels. No dates, no cost, no way to book one.",
+    icon: "noPrice",
+    frame: "/photography/diving-water.webp",
+    at: { "--x": "0%", "--y": "0%", "--w": "57%", "--r": "-4deg" },
   },
   {
     place: "Google",
     gives: "Ten blue links",
-    detail: "Aggregators and blog posts, mostly written seasons ago.",
+    icon: "links",
+    at: { "--x": "53%", "--y": "2%", "--w": "47%", "--r": "3deg" },
   },
   {
     place: "YouTube",
     gives: "Vlogs from 2019",
-    detail: "Somebody else's trip, filmed in a different season.",
+    icon: "dated",
+    frame: "/photography/local-unexpected.webp",
+    at: { "--x": "0%", "--y": "37%", "--w": "55%", "--r": "-3deg" },
   },
   {
     place: "Tripadvisor",
     gives: "Verdicts, no video",
-    detail: "Ratings that never show you what the day looks like.",
+    icon: "noVideo",
+    at: { "--x": "51%", "--y": "39%", "--w": "49%", "--r": "2deg" },
   },
   {
     place: "WhatsApp",
     gives: "A number, if you ask",
-    detail: "A chat thread, and no idea what you are agreeing to.",
+    icon: "ask",
+    at: { "--x": "0%", "--y": "74%", "--w": "53%", "--r": "-2deg" },
   },
   {
-    place: "The hotel desk",
-    gives: "Whoever they know",
-    detail: "One recommendation, and nothing to compare it against.",
+    place: "The hotel site",
+    gives: "Whoever may know",
+    icon: "unknown",
+    at: { "--x": "49%", "--y": "76%", "--w": "51%", "--r": "3deg" },
   },
 ];
 
 /** The comparison every traveller starts and nobody finishes. */
 const SHORTLIST = {
   columns: ["Depth", "Level", "Worth"],
-  rows: ["Nemo Reef", "Lighthouse", "Mangrove Wall"],
+  rows: [
+    { name: "Nemo Reef", frame: "/photography/diving-water.webp" },
+    { name: "Lighthouse", frame: "/photography/neil.webp" },
+    { name: "Mangrove Wall", frame: "/photography/havelock.webp" },
+  ],
 };
 
-/** What the hunt leaves you holding. The one line here that is real content. */
+/** What the hunt leaves you holding. The one real list here. */
 const COSTS = [
   "Scattered sources",
   "Uncertain choices",
@@ -124,160 +131,171 @@ const COSTS = [
   "Hours of guesswork",
 ];
 
-/** One full pass of the deck. A card reaches the front every sixth of this. */
-const CYCLE_SECONDS = 21;
-
-/*
-  Drawn here rather than imported from `ProductDemo`, which has its own pair:
-  importing them would pull a 1,200-line client component into this file's
-  graph for twelve lines of SVG. Same spec as that pair — square caps, the
-  same proportions — so the two pause controls on the page are one control.
-*/
-function PlayGlyph({ className }: { className?: string }) {
+/**
+ * The shortfall icons — what that place did NOT give you.
+ *
+ * Authored rather than borrowed, one family: a 24 box, 1.6 stroke, square
+ * caps, drawn on the same grid so six of them read as one set. They replace
+ * the comp's brand marks (owner direction), and they carry more meaning than
+ * the marks did: a logo says which app, and the whole point of the section is
+ * what every app leaves out.
+ */
+function ShortfallIcon({ kind }: { kind: Shortfall }) {
+  const stroke = {
+    stroke: "currentColor",
+    strokeWidth: 1.6,
+    strokeLinecap: "square" as const,
+    fill: "none",
+  };
   return (
-    <svg viewBox="0 0 12 12" aria-hidden className={className}>
-      <path d="M3 1.5 10 6l-7 4.5Z" fill="currentColor" />
-    </svg>
-  );
-}
-
-function PauseGlyph({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 12 12" aria-hidden className={className}>
-      <path d="M3 1.5h2.2v9H3zM6.8 1.5H9v9H6.8z" fill="currentColor" />
+    <svg viewBox="0 0 24 24" aria-hidden className="text-terra-deep size-5">
+      {kind === "noPrice" && (
+        <>
+          <path d="M4 12.5 11.5 5H19v7.5L11.5 20 4 12.5Z" {...stroke} />
+          <circle cx="15" cy="9" r="1.3" fill="currentColor" />
+          <path d="M3 21 21 3" {...stroke} />
+        </>
+      )}
+      {kind === "links" && (
+        <>
+          <path d="M4 6h16M4 11h13M4 16h16M4 21h9" {...stroke} />
+        </>
+      )}
+      {kind === "dated" && (
+        <>
+          <circle cx="12" cy="13" r="8" {...stroke} />
+          <path d="M12 8.5V13l3 2" {...stroke} />
+          <path d="M4 6.5 6.5 4v5H1.5" {...stroke} />
+        </>
+      )}
+      {kind === "noVideo" && (
+        <>
+          <rect x="3" y="6" width="18" height="12" rx="1" {...stroke} />
+          <path d="M10 10.5 14.5 12 10 13.5Z" fill="currentColor" />
+          <path d="M3 21 21 3" {...stroke} />
+        </>
+      )}
+      {kind === "ask" && (
+        <>
+          <path d="M4 5h16v11H12l-5 4v-4H4V5Z" {...stroke} />
+          <path d="M10 8.6a2 2 0 1 1 2 2.4v1" {...stroke} />
+          <circle cx="12" cy="13.8" r="0.9" fill="currentColor" />
+        </>
+      )}
+      {kind === "unknown" && (
+        <>
+          <path d="M4 21V4h9v17M13 21V9h7v12M2 21h20" {...stroke} />
+          <path d="M6.6 8.2a1.7 1.7 0 1 1 1.7 2v.9" {...stroke} />
+          <circle cx="8.3" cy="13.4" r="0.85" fill="currentColor" />
+        </>
+      )}
     </svg>
   );
 }
 
 export function ScatteredSources() {
-  const deckRef = React.useRef<HTMLDivElement>(null);
-  const [playing, setPlaying] = React.useState(true);
-  const [inView, setInView] = React.useState(false);
-  const [reduced, setReduced] = React.useState(false);
-
-  React.useEffect(() => {
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setReduced(query.matches);
-    sync();
-    query.addEventListener("change", sync);
-    return () => query.removeEventListener("change", sync);
-  }, []);
-
-  // The clock only runs while the deck is on screen. An animation nobody is
-  // looking at is a phone's battery being spent on nothing.
-  React.useEffect(() => {
-    const node = deckRef.current;
-    if (!node) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { threshold: 0.2 },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
-
-  const running = playing && inView && !reduced;
-
   return (
     <div className="flex flex-col">
       {/*
-        The deck.
-
-        A fixed height, because the cards are absolutely stacked and a stack
-        has no intrinsic one. `pt-12` is the room the cards behind rise into
-        (the keyframe lifts them up to 2.75rem) and `pb-3` is where the
-        departing card goes; without both, a shadow would be clipped at the
-        moment it matters most.
+        The scatter. `pb-2` at every width and the `lg` canvas height in
+        globals.css are the room the angles need: a turned card reaches
+        outside the box its layout occupies, and without that room a corner
+        clips and a shadow is cut in half.
       */}
-      <div ref={deckRef} className="group/deck relative pt-12 pb-3">
-        <div
-          aria-hidden
-          className="relative h-40 select-none sm:h-36"
-          role="presentation"
-        >
-          {SOURCES.map((source, index) => (
-            <article
-              key={source.place}
-              style={{
-                // Negative, so the deck is already mid-cycle at first paint
-                // instead of assembling itself from nothing.
-                animationDelay: `-${(index * CYCLE_SECONDS) / SOURCES.length}s`,
-                animationPlayState: running ? "running" : "paused",
-                // The STATIC fan, written on the element itself. This is what
-                // shows under reduced motion, and what the keyframe overrides
-                // while it plays — which is why no motion branch is needed.
-                transform: `translateY(-${index * 0.55}rem) scale(${1 - index * 0.025})`,
-                zIndex: SOURCES.length - index,
-              }}
-              className={cn(
-                "border-cream-line bg-cream card-lift rounded-edge absolute inset-x-0 top-0 border px-5 py-4",
-                // Suspended entirely under reduced motion: with the animation
-                // neutralised there is nothing to run, and the static
-                // transform above is the composition.
-                !reduced && "deck-card",
-              )}
-            >
-              <div className="flex items-baseline justify-between gap-3">
-                <h3 className="text-forest flex-none text-base font-bold sm:text-lg">
-                  {source.place}
-                </h3>
-                <p className="text-terra-deep label min-w-0 truncate text-[10px]">
-                  {source.gives}
-                </p>
-              </div>
-              <p className="text-forest/70 mt-2 text-sm leading-relaxed">
-                {source.detail}
-              </p>
-            </article>
-          ))}
-        </div>
-
-        {/*
-          WCAG 2.2.2. Outside the `aria-hidden` stack so it is reachable, and
-          shown outright where the device cannot hover — a hover-revealed
-          control on a touchscreen is a control that does not exist. Under
-          reduced motion nothing auto-plays, so there is nothing to pause and
-          the button is not rendered at all.
-        */}
-        {!reduced && (
-          <button
-            type="button"
-            onClick={() => setPlaying((now) => !now)}
-            aria-label={playing ? "Pause the deck" : "Play the deck"}
-            className="border-cream-line bg-cream/90 text-forest rounded-edge focus-visible:ring-terra-deep ease-interaction absolute top-1 right-0 z-20 flex size-8 items-center justify-center border opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover/deck:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:outline-none [@media(hover:none)]:opacity-100"
+      <div aria-hidden className="hunt-scatter relative pb-2 select-none">
+        {SOURCES.map((source) => (
+          <article
+            key={source.place}
+            style={source.at}
+            className="border-cream-line bg-cream card-lift rounded-lg border p-3.5 sm:p-4"
           >
-            {playing ? (
-              <PauseGlyph className="size-3" />
+            {/*
+              The icon sits ABOVE the words wherever the card is narrow, and
+              beside them only at `sm`-`md` where the left column runs the
+              full page.
+
+              An icon tile plus its gap costs 42px. In the 166px cell a phone
+              grid leaves, and again in the ~175px card the `lg` scatter
+              leaves inside a 362px column, that is more than the words can
+              spare — "A number, if you ask" and "Verdicts, no video" both
+              truncated. Stacked, the words get the card's whole width.
+            */}
+            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-2.5 lg:flex-col lg:items-start lg:gap-2">
+              <span className="bg-cream-deep rounded-edge flex size-8 flex-none items-center justify-center">
+                <ShortfallIcon kind={source.icon} />
+              </span>
+              <span className="min-w-0">
+                <span className="text-forest block truncate text-sm font-bold sm:text-base">
+                  {source.place}
+                </span>
+                <span className="text-forest/70 block truncate text-xs sm:text-sm">
+                  {source.gives}
+                </span>
+              </span>
+            </div>
+
+            {/*
+              The picture and the filler bars are `sm` and up.
+
+              In the 166px cell a two-column grid leaves at 390px, a
+              photograph is a postage stamp: it adds a third of the card's
+              height and nothing a reader can use, and the phone's problem
+              here is length (owner direction, 2026-08-15). The cards keep
+              their icon, their name and their shortfall, which is the whole
+              argument; the pictures live where they are big enough to read.
+            */}
+            {source.frame ? (
+              <span className="rounded-edge relative mt-3 hidden h-20 overflow-hidden sm:block">
+                <Image
+                  src={source.frame}
+                  alt=""
+                  fill
+                  quality={75}
+                  sizes="(min-width: 1024px) 240px, 45vw"
+                  /* Dimmed and desaturated: at full strength these were the
+                     brightest thing in the act, which inverts the argument —
+                     the "without" half cannot look better than the product
+                     beside it. Pulled back they read as glimpses. */
+                  className="object-cover opacity-90 saturate-[0.65]"
+                />
+                <span aria-hidden className="plate-wash absolute inset-0" />
+              </span>
             ) : (
-              <PlayGlyph className="size-3" />
+              /* The cards with no footage get the comp's own filler: a few
+                 bars of nothing, or a row of markers still loading. */
+              <span className="mt-3 hidden flex-col gap-1.5 sm:flex">
+                {[100, 82, 91].map((width) => (
+                  <span
+                    key={width}
+                    className="bg-forest/10 block h-1.5"
+                    style={{ width: `${width}%` }}
+                  />
+                ))}
+              </span>
             )}
-          </button>
-        )}
+          </article>
+        ))}
       </div>
 
       {/*
-        The shortlist, on its own card at the foot (owner direction,
-        2026-08-15). It is the thing you were trying to write while the deck
-        piled up, so it sits apart from the deck rather than inside it.
+        The shortlist, on its own card. Every cell is a question mark on
+        purpose: inventing depths and levels would be the fabrication the page
+        confines to the preview surface, and the unknowns ARE the point.
 
-        Every cell is a question mark on purpose: inventing depths and levels
-        would be the fabrication the page confines to the preview surface, and
-        the unknowns ARE the point.
-
-        The cells are narrow where the column is narrow — on a phone, and
-        again at `lg` where this drops into a 4fr track of roughly the same
-        width — and wide only at the breakpoints where the left column runs
-        the full page. A two-word head needs 64px at 10px with
-        `tracking-label`'s 0.18em, which is what pushed an earlier version
-        past the content box at 320px; one-word heads in 48px cells clear it
-        at every width.
+        Column cells are narrow where the column is narrow — on a phone, and
+        again at `lg` where this sits in a 362px track — and wide only at the
+        breakpoints where the left column runs the full page. A two-word head
+        needs 64px at 10px with `tracking-label`'s 0.18em, which is what
+        pushed an earlier version past the content box at 320px.
       */}
       <div
         aria-hidden
-        className="border-cream-line bg-cream-deep card-lift rounded-edge mt-5 border px-5 py-4 select-none"
+        className="border-cream-line bg-cream card-lift mt-6 rounded-lg border px-4 py-4 select-none sm:px-5"
       >
         <div className="text-forest/75 flex items-baseline justify-between gap-3 pb-2">
-          <span className="label min-w-0 truncate text-[10px]">Shortlist</span>
+          <span className="label min-w-0 truncate text-[10px]">
+            The shortlist
+          </span>
           <span className="flex gap-2 sm:gap-3">
             {SHORTLIST.columns.map((column) => (
               <span
@@ -292,10 +310,25 @@ export function ScatteredSources() {
 
         {SHORTLIST.rows.map((row) => (
           <div
-            key={row}
-            className="border-cream-line flex items-baseline justify-between gap-3 border-t py-2.5"
+            key={row.name}
+            className="border-cream-line flex items-center justify-between gap-3 border-t py-2.5"
           >
-            <span className="text-forest min-w-0 truncate text-sm">{row}</span>
+            <span className="flex min-w-0 items-center gap-2.5">
+              <span className="rounded-edge relative size-8 flex-none overflow-hidden">
+                <Image
+                  src={row.frame}
+                  alt=""
+                  fill
+                  quality={75}
+                  sizes="32px"
+                  className="object-cover saturate-[0.7]"
+                />
+                <span aria-hidden className="plate-wash absolute inset-0" />
+              </span>
+              <span className="text-forest min-w-0 truncate text-sm">
+                {row.name}
+              </span>
+            </span>
             <span className="flex gap-2 sm:gap-3">
               {SHORTLIST.columns.map((column) => (
                 <span
@@ -308,26 +341,73 @@ export function ScatteredSources() {
             </span>
           </div>
         ))}
+
+        {/* The comp's closing note. It counts what is actually drawn — six
+            cards, three shortlisted rows — where the comp said "four"; change
+            either list and this number moves with it. */}
+        <p className="text-forest/75 border-cream-line mt-1 flex items-start gap-3 border-t pt-3.5 text-sm leading-relaxed">
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden
+            className="text-terra-deep mt-0.5 size-4 flex-none"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="9.5"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              fill="none"
+            />
+            <path
+              d="M12 11v6"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="square"
+            />
+            <circle cx="12" cy="7.6" r="1.1" fill="currentColor" />
+          </svg>
+          Six sources, three answers, and no way to tell which one was worth
+          your time.
+        </p>
       </div>
 
-      {/*
-        What it costs. Middots are the brand's own separator (design system
-        §2: never an em dash), and `terra-deep` rather than `terra` because
-        this is text at body size on cream — `terra` is 3.24:1 and clears AA
-        for large text only, which axe caught the one time it was used here.
-      */}
-      <p className="text-forest/75 mt-4 text-sm leading-relaxed">
-        {COSTS.map((cost, index) => (
-          <span key={cost}>
-            {index > 0 && (
-              <span aria-hidden className="text-terra-deep px-1.5">
-                ·
-              </span>
+      {/* What it costs, as the comp's four chips. The one part of this block
+          exposed to assistive tech: the cards and the table are drawings of a
+          feeling, and this is what they add up to. */}
+      <ul className="mt-5 flex flex-wrap gap-2">
+        {COSTS.map((cost) => (
+          <li
+            key={cost}
+            className={cn(
+              "border-cream-line text-forest/75 inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs sm:text-sm",
             )}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden
+              className="text-terra-deep size-3.5 flex-none"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="9.5"
+                stroke="currentColor"
+                strokeWidth="1.7"
+                fill="none"
+              />
+              <path
+                d="M12 7v6"
+                stroke="currentColor"
+                strokeWidth="1.9"
+                strokeLinecap="square"
+              />
+              <circle cx="12" cy="16.6" r="1.15" fill="currentColor" />
+            </svg>
             {cost}
-          </span>
+          </li>
         ))}
-      </p>
+      </ul>
     </div>
   );
 }

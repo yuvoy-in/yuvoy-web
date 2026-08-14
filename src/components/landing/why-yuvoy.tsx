@@ -100,14 +100,10 @@ export function WhyYuvoy() {
       <div className="mt-10 grid grid-cols-1 gap-x-8 gap-y-6 sm:mt-20 sm:gap-y-8 lg:grid-cols-[minmax(0,4fr)_auto_minmax(0,6fr)] lg:grid-rows-[auto_1fr] lg:gap-x-10">
         {/* ---------------------------------------- without Yuvoy · header */}
         <div className="lg:col-start-1 lg:row-start-1">
-          {/* The label runs into a hairline that finishes the line, which is
-              how the comp separates the two halves without a box. `flex-1` on
-              the rule rather than a fixed width, so it always reaches the
-              column's edge. */}
-          <p className="label text-forest/75 flex items-center gap-4">
-            Without Yuvoy
-            <span aria-hidden className="bg-cream-line h-px flex-1" />
-          </p>
+          {/* No trailing rule (owner direction, 2026-08-15). It was drawing a
+              line across the top of the column that read as a divider rather
+              than as part of the label. */}
+          <p className="label text-forest/75">Without Yuvoy</p>
           <p className="font-display tracking-display mt-3 text-2xl leading-snug text-balance">
             Too many places. Too much guesswork.
           </p>
