@@ -494,21 +494,106 @@
 }
 
 /*
-  The scattered source cards' lift (owner direction, 2026-08-14).
+  The why act's deck: six cards cycling through a stack, the front one sliding
+  away downward as the one behind it rises into its place (owner direction,
+  2026-08-15).
+
+  ## Why this is one keyframe and no JavaScript state
+
+  A cycling stack is usually built by reordering an array and letting each
+  card transition to its new slot. That has a wrap bug at its heart: the card
+  leaving the FRONT has to become the card at the BACK, and any transition
+  between those two positions animates it backwards through the whole stack.
+  Every fix for that — disabling the transition for a frame, a `leaving`
+  flag, cloning nodes — is a state machine that can desynchronise.
+
+  One continuous keyframe cannot. Each card runs the identical animation with
+  its start shifted by a sixth of the cycle, so at any instant one is at the
+  front, four are stacked behind it, and one is off-stage. The wrap happens
+  where the keyframe loops, which is exactly where the card is invisible.
+  Nothing to get out of step, and no re-render per tick.
+
+  ## The static state is the base, not a fallback
+
+  Every value here is also written on the card itself, so the fan exists
+  without this animation ever running. That is what makes the global
+  reduced-motion rule correct for this component rather than destructive:
+  it collapses the animation to nothing and the cards stay exactly where
+  their own styles put them. There is deliberately no `fill-mode` — with
+  `both`, a neutralised animation would strand every card on its final
+  frame, which is off-stage and invisible.
+
+  The fade finishes well before the travel does, so the departing card is
+  gone before it can reach the block below it.
+*/
+@keyframes yuvoy-deck {
+  0% {
+    transform: translateY(-2.75rem) scale(0.88);
+    opacity: 0;
+    z-index: 1;
+  }
+
+  7% {
+    transform: translateY(-2.5rem) scale(0.89);
+    opacity: 1;
+    z-index: 1;
+  }
+
+  32% {
+    transform: translateY(-1.75rem) scale(0.925);
+    opacity: 1;
+    z-index: 2;
+  }
+
+  57% {
+    transform: translateY(-0.9rem) scale(0.962);
+    opacity: 1;
+    z-index: 3;
+  }
+
+  74% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    z-index: 6;
+  }
+
+  92% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    z-index: 6;
+  }
+
+  97% {
+    transform: translateY(1.5rem) scale(1);
+    opacity: 0;
+    z-index: 6;
+  }
+
+  100% {
+    transform: translateY(2.5rem) scale(1);
+    opacity: 0;
+    z-index: 6;
+  }
+}
+
+@utility deck-card {
+  animation: yuvoy-deck var(--deck-cycle, 21s) var(--ease-cinematic) infinite;
+}
+
+/*
+  The lift on those cards, and on the sheet the shortlist sits on.
 
   This is the **second** shadow in the system and the only one outside the
   preview frame. §4's rule stands everywhere else — hairlines do the work
-  shadows do elsewhere — and this is a named exception, not a loosening:
-  those cards depict loose paper dropped on a desk, and paper at an angle
-  with no shadow reads as a rotated rectangle rather than as a thing lying
-  on something. The rotation and the shadow are one effect; neither works
-  alone.
+  shadows do elsewhere — and this is a named exception the owner signed off
+  (2026-08-14, restated 2026-08-15): the cards depict paper in a stack, and
+  stacked paper without a shadow reads as flat rectangles printed on the page
+  rather than as sheets lying on each other. The depth IS the idea here.
 
   Built like `device-frame`'s: a tight contact shadow plus a wide ambient one
   with negative spread so it cannot bloom into a halo, and both are `forest`
   rather than black — black greys the cream underneath and is what makes a
-  drop shadow look cheap on a warm ground. Far lighter than the frame's,
-  because these are sheets of paper and that is a machined object.
+  drop shadow look cheap on a warm ground.
 */
 @utility card-lift {
   box-shadow:

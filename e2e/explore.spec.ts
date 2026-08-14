@@ -118,9 +118,18 @@ test("the three steps are watch, understand and book, and nothing more", async (
       section.getByRole("button", { name: new RegExp(`^${step}`) }),
     ).toBeVisible();
   }
-  // Three steps and the tour's pause control. Not eight: the eight-step
-  // traveller and operator journeys were retired with /how-it-works.
-  await expect(section.getByRole("button")).toHaveCount(4);
+  /*
+    Five, and every one of them named: the tour's three steps, the tour's
+    pause control, and the source deck's pause control (added 2026-08-15 —
+    the deck auto-plays, so WCAG 2.2.2 requires its own mechanism).
+
+    The number is the point of this assertion, not the ceiling: it exists so
+    the eight-step traveller and operator journeys retired with
+    /how-it-works cannot quietly come back, and so a stray control cannot
+    appear in this act unnoticed. Raise it only alongside a control you can
+    name here.
+  */
+  await expect(section.getByRole("button")).toHaveCount(5);
 });
 
 test.describe("the consolidated routes", () => {
