@@ -535,7 +535,7 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
                   <span
                     aria-hidden
                     className={cn(
-                      "rounded-edge ease-interaction relative flex size-10 flex-none items-center justify-center border transition-colors duration-200",
+                      "rounded-edge ease-interaction relative flex size-10 flex-none items-center justify-center border-2 transition-colors duration-200 lg:border",
                       isActive
                         ? "border-forest bg-forest text-cream"
                         : "border-cream-line bg-cream-deep text-forest/70 group-hover:text-forest",
@@ -549,41 +549,42 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
                     (5.6:1 on the forest of an active step, and against
                     cream-deep when a completed one keeps its ring).
 
-                    It rides OUTSIDE the tile, clear of it by 2px.
+                    The stroke IS the tile's border: it covers the same 2px
+                    band the tile draws for itself, so the border colours in
+                    as the act runs rather than a second line appearing
+                    anywhere near it.
 
-                    Two earlier attempts read as "inside the box" (owner
-                    report, twice on 2026-08-15). The first genuinely was: an
-                    absolutely positioned child resolves its offsets against
-                    the PADDING box, so `inset-0` covered the 38px inside the
-                    tile's 1px border and traced a square smaller than the
-                    tile. The second sat exactly on the border box — pixel-
-                    probed, terra on rows 0 and 1 with nothing between it and
-                    the page — and STILL read as inside, because a line drawn
-                    on the edge of a filled dark square is inside that
-                    square's silhouette. Being geometrically outermost is not
-                    the same as looking like a border.
+                    That equivalence is the whole design, and it took three
+                    goes to get right (owner reports, 2026-08-15). `inset-0`
+                    traced the 38px INSIDE the border, because an absolutely
+                    positioned child resolves its offsets against the padding
+                    box. `-inset-1` put a separate ring 2px outside the tile,
+                    which read as two misaligned squares — worse. What was
+                    missing from the middle version was not geometry but
+                    WIDTH: the stroke was 2px over a 1px border, so it never
+                    lined up with anything the eye could call the edge.
 
-                    So it is a ring around the tile now, with cream showing
-                    between the two. `-inset-1` gives the box 4px of margin on
-                    every side; the 2px stroke centred on `x=1` lands 4 to 2px
-                    out, leaving a 2px gap. `rx="5"` is `rounded-edge`'s 2px
-                    plus the 3px the stroke's centre line is offset by, which
-                    is what keeps the ring concentric with the corner it
-                    follows — change the inset and this changes with it.
+                    Hence `border-2` on the tile below `lg` and a 2px stroke
+                    centred on `x=1`, which spans 0 to 2 — exactly that band.
+                    `-inset-px` cancels the padding-box offset so the viewBox
+                    maps 1:1 onto the border box, and `rx="1"` is
+                    `rounded-edge`'s 2px measured at the stroke's centre line.
+                    These four numbers are one measurement: change the border
+                    width and the stroke, the inset and the radius all move.
                   */}
                     <svg
-                      viewBox="0 0 48 48"
+                      viewBox="0 0 40 40"
                       fill="none"
                       preserveAspectRatio="none"
-                      className="pointer-events-none absolute -inset-1 lg:hidden"
+                      className="pointer-events-none absolute -inset-px lg:hidden"
                     >
                       <rect
                         key={`${act.id}-${epoch}`}
                         x="1"
                         y="1"
-                        width="46"
-                        height="46"
-                        rx="5"
+                        width="38"
+                        height="38"
+                        rx="1"
                         pathLength="100"
                         strokeWidth="2"
                         className={cn(isActive && "demo-trace")}
