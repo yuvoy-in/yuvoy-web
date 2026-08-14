@@ -1,6 +1,8 @@
 import { Section, SectionHeading } from "@/components/ui/section";
 import { ProductDemo } from "@/components/landing/product-demo";
 import { Wordmark } from "@/components/brand/wordmark";
+import { ScatteredSources } from "@/components/landing/scattered-sources";
+import Image from "next/image";
 
 /**
  * The why act: the problem and the product in one frame, because they are
@@ -16,34 +18,24 @@ import { Wordmark } from "@/components/brand/wordmark";
  * the copy does. Centring the columns against each other was what made the
  * sides read as misaligned (owner report, 2026-08-06).
  *
- * The left panel is reportage, and it is built like the artefact it
- * describes: a strip of open tabs, then the comparison that never resolves.
- * Real product names, no logos, no invented ratings, no colour from outside
- * the palette. Those two parts are illustration and are aria-hidden; the
- * cost list below them is real content and carries the meaning for
- * assistive tech. Nothing here may use the words the homepage truthfulness
- * guard bans outside the preview.
+ * The left half lives in `ScatteredSources` — a scatter of cards, the
+ * shortlist that never resolves, and what the hunt costs. It is reportage:
+ * real product names, **no logos**, no invented ratings, no colour from
+ * outside the palette. The cards and the table are illustration and are
+ * `aria-hidden`; the cost chips are real content and carry the meaning for
+ * assistive tech, together with the heading and lede above them. Nothing
+ * here may use the words the homepage truthfulness guard bans outside the
+ * preview. The reasoning behind every departure from the owner's comp is
+ * documented in that file rather than repeated here.
+ *
+ * The act carries the owner's line drawing as a watermark behind everything
+ * (2026-08-14). It is an alpha stencil with no ground of its own, so it
+ * composites onto the cream with no seam — see
+ * scripts/generate-without-yuvoy-artwork.mjs.
  *
  * The section keeps the id `how`: the cover's "How it works" button lands
  * here, and this is now the section that shows it.
  */
-
-/**
- * The hunt, as it actually goes: six places, in the order a person tries them,
- * and what each one hands back.
- *
- * Reportage, not endorsement — real product names, no logos, and every line
- * literally true of that source today. It is the section's argument, so it is
- * real content rather than the `aria-hidden` illustration it used to be.
- */
-const HUNT = [
-  ["Instagram", "shows you a clip. No price."],
-  ["Google", "returns ten blue links."],
-  ["YouTube", "has a vlog, filmed in 2019."],
-  ["Tripadvisor", "has verdicts, no video."],
-  ["WhatsApp", "gets you a number, if you ask."],
-  ["The hotel desk", "sends whoever they know."],
-];
 
 export function WhyYuvoy() {
   return (
@@ -53,7 +45,44 @@ export function WhyYuvoy() {
       forest, so the tone change does that work and a hairline on top of it
       would just be a line for its own sake.
     */
-    <Section id="how" aria-labelledby="why-heading">
+    <Section
+      id="how"
+      aria-labelledby="why-heading"
+      className="relative isolate"
+    >
+      {/*
+        The owner's line drawing, behind everything.
+
+        Bottom-anchored and full-bleed: the artwork is a wide horizon — headland
+        and palms at the edges, water and a boat along the foot — with an empty
+        sky through the middle, so the foot is the only part worth showing and
+        the middle is what the section's own content sits in.
+
+        It is an alpha stencil in `terra` with no ground of its own (see
+        scripts/generate-without-yuvoy-artwork.mjs), so it composites onto the
+        cream with no seam and no colour shift. At 55% it reads as watermark
+        rather than illustration and leaves the body text's 11.44:1 essentially
+        untouched — it is 8.7% ink at the best of times, and none of it lands
+        under a paragraph.
+
+        `-z-10` with `isolate` on the section: behind the content, and unable
+        to escape into any ancestor's stacking context.
+      */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+      >
+        <Image
+          src="/assets/without-yuvoy-artwork.webp"
+          alt=""
+          width={1672}
+          height={941}
+          quality={75}
+          sizes="100vw"
+          className="absolute inset-x-0 bottom-0 h-auto w-full opacity-55"
+        />
+      </div>
+
       <SectionHeading
         id="why-heading"
         className="mx-auto text-center"
@@ -71,66 +100,25 @@ export function WhyYuvoy() {
       <div className="mt-10 grid grid-cols-1 gap-x-8 gap-y-6 sm:mt-20 sm:gap-y-8 lg:grid-cols-[minmax(0,4fr)_auto_minmax(0,6fr)] lg:grid-rows-[auto_1fr] lg:gap-x-10">
         {/* ---------------------------------------- without Yuvoy · header */}
         <div className="lg:col-start-1 lg:row-start-1">
-          <p className="label text-forest/75">Without Yuvoy</p>
+          {/* The label runs into a hairline that finishes the line, which is
+              how the comp separates the two halves without a box. `flex-1` on
+              the rule rather than a fixed width, so it always reaches the
+              column's edge. */}
+          <p className="label text-forest/75 flex items-center gap-4">
+            Without Yuvoy
+            <span aria-hidden className="bg-cream-line h-px flex-1" />
+          </p>
           <p className="font-display tracking-display mt-3 text-2xl leading-snug text-balance">
             Too many places. Too much guesswork.
           </p>
+          <p className="text-forest/70 mt-4 max-w-sm leading-relaxed">
+            Scattered sources. Confusing info. You spend hours, still not sure.
+          </p>
         </div>
 
-        {/* ------------------------------------------- without Yuvoy · hunt */}
-        {/*
-          The hunt as six sentences, because it is a story and not a dataset.
-
-          ## Three versions of this have been rejected, and why
-
-          1. A bordered, tinted panel of six bordered cards plus a mocked
-             comparison table: a box of boxes, the one structure the design
-             system names and rejects outright (§5).
-          2. A ruled two-column index: no boxes, but a name on the left and a
-             note on the right with a rule between is the shape of every
-             pricing table ever built, and read as generic (owner, 2026-08-10).
-          3. The names as one run of display type: it overflowed its column at
-             `lg`, and a row of brand names separated by middots reads as an
-             "as seen in" logo strip — the opposite of the intended meaning.
-
-          ## What this is
-
-          Six short sentences, one per place, in the order a person actually
-          tries them, each naming what it hands back. It reads the way the
-          experience feels: you go somewhere, you get a fragment, you go
-          somewhere else. The repetition IS the argument, so no container has
-          to draw it and nothing has to be tabulated.
-
-          The left edge is the composition: every line opens with the place, so
-          the six names stack into a hard vertical rule of proper nouns down
-          the column while the shortfalls trail off to the right in a lighter
-          tone. That contrast — solid names, fading answers — is the whole
-          picture, and it is made of nothing but type.
-
-          Set in the display face at reading size rather than the text face:
-          this is the argument, opposite a phone, and Satoshi at 16px would
-          read as a caption next to it. The closing line is the only thing
-          here at full display scale, because it is the conclusion the six
-          lines have earned.
-        */}
+        {/* -------------------------------------- without Yuvoy · the pile */}
         <div className="lg:col-start-1 lg:row-start-2">
-          <ul className="space-y-3.5 sm:space-y-4">
-            {HUNT.map(([place, outcome]) => (
-              <li
-                key={place}
-                className="font-display tracking-display text-xl leading-snug font-normal sm:text-[1.375rem]"
-              >
-                <span className="text-forest">{place}</span>{" "}
-                <span className="text-forest/70">{outcome}</span>
-              </li>
-            ))}
-          </ul>
-
-          {/* The conclusion the six lines earn. It counts them: anything added
-              to or removed from HUNT has to move this number. */}
-          <p className="font-display tracking-display text-forest mt-8 text-2xl leading-snug text-balance sm:mt-10 sm:text-3xl">
-            Six places. Still no idea what the day actually looks like.
-          </p>
+          <ScatteredSources />
         </div>
 
         {/* The turn of the story: one arrow, chaos into flow. */}
