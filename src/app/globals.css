@@ -813,33 +813,49 @@
 }
 
 /*
-  The same meter, drawn round the step's icon instead of under its sentence.
+  The same meter, drawn by the tile's OWN border below `lg`.
 
-  Below `lg` the rail is a row of three across the top of the tour rather than
-  a stacked list beside it (owner direction, 2026-08-15), and a 2px underline
-  under a 40px tile is too small a thing to read as progress at that size. The
-  stroke traces the tile's own square edge instead: same duration, same linear
-  speed, same inline play-state, one obvious moving part.
+  Three SVG-overlay versions failed in a row (owner reports, 2026-08-15): an
+  overlay reproduces the box's geometry from the outside, and CSS borders and
+  SVG strokes rasterise independently — at a fractional layout position or a
+  non-integer zoom they snap to device pixels differently and a hairline of
+  the underlying edge survives beside the drawn one. A border cannot misalign
+  with itself, so the meter IS the border: a conic sweep repaints the border
+  band terra as the act runs, from 12 o'clock, clockwise.
 
-  `pathLength="100"` on the rect is what makes this simple — the dash length
-  is expressed in hundredths of the perimeter, so the keyframes never have to
-  know the tile's real size and changing that size cannot desynchronise them.
+  `@property` registers the stop as a real percentage, which is what lets a
+  gradient animate smoothly instead of flipping at the keyframe midpoint. The
+  `background` shorthand carries the tile's forest fill on its padding-box
+  layer — a shorthand resets background-color, so the fill must ride here.
+  The sweep's rest colour is that same forest: the border vanishes into the
+  fill at 0% and the terra edge grows out of it.
 
-  Under reduced motion the global rule collapses it to a completed ring, which
-  is the correct resting state: nothing auto-plays there, so the ring marks
-  the current step rather than timing it.
+  Duration and play-state ride inline styles from ProductDemo, exactly like
+  `demo-fill` above. Under reduced motion the global rule collapses it to a
+  full border, the right resting state: nothing auto-plays there, so the
+  border marks the current step rather than timing it.
 */
+@property --yuvoy-trace {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
 @keyframes yuvoy-demo-trace {
   from {
-    stroke-dashoffset: 100;
+    --yuvoy-trace: 0%;
   }
   to {
-    stroke-dashoffset: 0;
+    --yuvoy-trace: 100%;
   }
 }
 
 @utility demo-trace {
-  stroke-dasharray: 100;
+  border-color: transparent;
+  background:
+    linear-gradient(var(--color-forest), var(--color-forest)) padding-box,
+    conic-gradient(var(--color-terra) var(--yuvoy-trace), var(--color-forest) 0)
+      border-box;
   animation-name: yuvoy-demo-trace;
   animation-timing-function: linear;
   animation-fill-mode: both;

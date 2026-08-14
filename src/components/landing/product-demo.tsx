@@ -532,107 +532,59 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
                   aria-current={isActive ? "step" : undefined}
                   className="rounded-edge focus-visible:ring-terra-deep group flex w-full flex-col items-center gap-2 py-1 text-center focus-visible:ring-2 focus-visible:outline-none lg:flex-row lg:items-start lg:gap-4 lg:py-3.5 lg:text-left"
                 >
+                  {/*
+                    Below `lg` the act meter is the tile's OWN border: while
+                    the act runs, `demo-trace` (globals.css) repaints the
+                    border band with a conic sweep, so the edge colours in
+                    terra from 12 o'clock, clockwise, over the act's real
+                    duration.
+
+                    It is the border, not a drawing of one. Three SVG
+                    overlays in a row failed here (owner reports, 2026-08-15)
+                    for one structural reason: an overlay reproduces the
+                    box's geometry from the OUTSIDE, and CSS borders and SVG
+                    strokes rasterise independently — these cells are
+                    `flex-1` thirds, so the tile sits at a fractional x at
+                    most widths, the two painters snap to device pixels
+                    differently, and a hairline of the real border survives
+                    beside the drawn one. A border cannot misalign with
+                    itself, so the geometry class of bug is gone rather than
+                    patched.
+
+                    While tracing, `border-transparent` lets the sweep own
+                    the band and the forest fill rides the same declaration.
+                    A finished step keeps a quiet terra border at 40% — full
+                    strength would end the loop with three tiles shouting as
+                    loudly as the one playing. `lg` keeps its 1px border and
+                    the underline meter below carries progress there.
+
+                    The epoch key remounts the tile on every seek and loop
+                    wrap, which is what restarts the CSS animation cleanly.
+                  */}
                   <span
                     aria-hidden
+                    key={`${act.id}-${epoch}`}
                     className={cn(
                       "rounded-edge ease-interaction relative flex size-10 flex-none items-center justify-center border-2 transition-colors duration-200 lg:border",
                       isActive
-                        ? "border-forest bg-forest text-cream"
-                        : "border-cream-line bg-cream-deep text-forest/70 group-hover:text-forest",
+                        ? "bg-forest text-cream max-lg:demo-trace lg:border-forest border-transparent"
+                        : cn(
+                            "bg-cream-deep text-forest/70 group-hover:text-forest",
+                            isDone
+                              ? "border-terra/40 lg:border-cream-line"
+                              : "border-cream-line",
+                          ),
                     )}
+                    style={
+                      isActive
+                        ? {
+                            animationDuration: `${ACT_TOTAL[act.id]}ms`,
+                            animationPlayState: running ? "running" : "paused",
+                          }
+                        : undefined
+                    }
                   >
                     <ActGlyph id={act.id} />
-
-                    {/*
-                    The act meter, traced round the tile — the phone's version
-                    of the bar below. `terra` reads against both tile states
-                    (5.6:1 on the forest of an active step, and against
-                    cream-deep when a completed one keeps its ring).
-
-                    The stroke IS the tile's border: it covers the same 2px
-                    band the tile draws for itself, so the border colours in
-                    as the act runs rather than a second line appearing
-                    anywhere near it.
-
-                    That equivalence is the whole design, and it took three
-                    goes to get right (owner reports, 2026-08-15). `inset-0`
-                    traced the 38px INSIDE the border, because an absolutely
-                    positioned child resolves its offsets against the padding
-                    box. `-inset-1` put a separate ring 2px outside the tile,
-                    which read as two misaligned squares — worse. What was
-                    missing from the middle version was not geometry but
-                    WIDTH: the stroke was 2px over a 1px border, so it never
-                    lined up with anything the eye could call the edge.
-
-                    THE INSET MUST EQUAL THE BORDER WIDTH. That is the rule
-                    the fourth attempt got wrong: an absolutely positioned
-                    child is laid out against the padding box, so pulling it
-                    out by less than the border leaves the outer part of that
-                    border uncovered — with `border-2` and `-inset-px` the
-                    stroke sat 1 to 3 instead of 0 to 2, and a hairline of the
-                    tile's own edge showed all the way round outside the
-                    terra. That thin outline is what read as "not a border".
-
-                    So: `border-2` and `-inset-0.5`, both 2px. The SVG box is
-                    then the border box exactly, the viewBox maps 1:1 onto it,
-                    and a 2px stroke centred on `x=1` spans 0 to 2 — the same
-                    band the tile draws for itself. `rx="1"` is
-                    `rounded-edge`'s 2px measured at that centre line. All
-                    four numbers are one measurement: change the border and
-                    the inset, the stroke and the radius all move with it.
-                  */}
-                    <svg
-                      viewBox="0 0 40 40"
-                      fill="none"
-                      preserveAspectRatio="none"
-                      className="pointer-events-none absolute -inset-0.5 lg:hidden"
-                    >
-                      <rect
-                        key={`${act.id}-${epoch}`}
-                        x="1"
-                        y="1"
-                        width="38"
-                        height="38"
-                        rx="1"
-                        pathLength="100"
-                        strokeWidth="2"
-                        className={cn(isActive && "demo-trace")}
-                        style={
-                          isActive
-                            ? {
-                                stroke: "var(--color-terra)",
-                                animationDuration: `${ACT_TOTAL[act.id]}ms`,
-                                animationPlayState: running
-                                  ? "running"
-                                  : "paused",
-                              }
-                            : {
-                                /*
-                                  A step that has not started draws NO stroke,
-                                  rather than a full-length dash pushed out of
-                                  sight: `stroke-dashoffset: 100` on a closed
-                                  path still rendered a terra nick at the
-                                  corner the path starts from, on every
-                                  pending tile. Transparent has no such edge.
-                                */
-                                stroke: isDone
-                                  ? "var(--color-terra)"
-                                  : "transparent",
-                                /*
-                                  A finished step keeps its ring, quietly.
-                                  At full strength three completed tiles end
-                                  the loop shouting as loudly as the one
-                                  actually playing — the bar at `lg` gets away
-                                  with that because it is 2px of a 320px line,
-                                  where this is the whole edge of the tile.
-                                */
-                                strokeOpacity: 0.4,
-                                strokeDasharray: 100,
-                                strokeDashoffset: 0,
-                              }
-                        }
-                      />
-                    </svg>
                   </span>
 
                   <span className="min-w-0 flex-1 lg:w-full">
