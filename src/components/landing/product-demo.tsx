@@ -283,7 +283,16 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
     // on screen, so "wait for animations to finish" must not include it.
     <div
       data-demo
-      className="flex flex-col items-center gap-6 sm:gap-8 lg:flex-row lg:gap-7"
+      /*
+        `flex-col-reverse` below `lg`: the rail is written after the phone and
+        painted before it (owner direction, 2026-08-15 — the steps come first
+        on a phone). The DOM order is deliberately the one that was already
+        here, so keyboard order on the desktop layout, where the phone really
+        is first, is untouched; below `lg` the only focusable thing inside the
+        phone is its pause control, and reaching the three chapter buttons
+        before it is a sequence that still reads.
+      */
+      className="flex flex-col-reverse items-center gap-6 sm:gap-8 lg:flex-row lg:gap-7"
     >
       {/*
         Both boxes size to the frame, and the frame sizes to the screen.
@@ -488,77 +497,188 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
         </p>
       </div>
 
-      {/* The rail: the same three moves the section promises, highlighted in
-          sync with the phone. Clicking one seeks the tour to that act. */}
-      <ol className="w-full max-w-xs lg:min-w-0 lg:flex-1">
-        {ACTS.map((act, index) => {
-          const isActive = index === activeActIndex;
-          const isDone = index < activeActIndex;
-          return (
-            <li key={act.id}>
-              <button
-                type="button"
-                onClick={() => seek(act.id)}
-                aria-current={isActive ? "step" : undefined}
-                className="rounded-edge focus-visible:ring-terra-deep group flex w-full items-start gap-4 py-2.5 text-left focus-visible:ring-2 focus-visible:outline-none sm:py-3.5"
-              >
-                <span
-                  aria-hidden
-                  className={cn(
-                    "rounded-edge ease-interaction flex size-10 flex-none items-center justify-center border transition-colors duration-200",
-                    isActive
-                      ? "border-forest bg-forest text-cream"
-                      : "border-cream-line bg-cream-deep text-forest/70 group-hover:text-forest",
-                  )}
+      {/*
+        The rail: the same three moves the section promises, highlighted in
+        sync with the phone. Clicking one seeks the tour to that act.
+
+        It reads two ways.
+
+        Beside the phone at `lg`, it is a stacked list: icon, title, sentence,
+        and a meter that fills under each step.
+
+        Below `lg` it is a row of three across the TOP of the tour (owner
+        direction, 2026-08-15) — the steps name what is about to happen, so on
+        a phone they belong above the thing that happens, and three short
+        labels cost about 70px where three stacked rows cost 300. The
+        sentences come out of the rows and appear one at a time under it, and
+        the meter moves onto the icon's own square edge, which is the only
+        element left with room to carry it.
+
+        Each sentence stays in its own step for assistive tech (`sr-only`),
+        so every button still reads "Watch, real videos of the experience"
+        exactly as it does at `lg`; the line under the row is the same text
+        drawn for the eye and is hidden from AT to avoid saying it twice.
+      */}
+      <div className="flex w-full flex-col items-center gap-4 lg:min-w-0 lg:flex-1 lg:items-start lg:gap-0">
+        <ol className="flex w-full max-w-sm gap-2 lg:block lg:max-w-xs">
+          {ACTS.map((act, index) => {
+            const isActive = index === activeActIndex;
+            const isDone = index < activeActIndex;
+            return (
+              <li key={act.id} className="min-w-0 flex-1 lg:flex-none">
+                <button
+                  type="button"
+                  onClick={() => seek(act.id)}
+                  aria-current={isActive ? "step" : undefined}
+                  className="rounded-edge focus-visible:ring-terra-deep group flex w-full flex-col items-center gap-2 py-1 text-center focus-visible:ring-2 focus-visible:outline-none lg:flex-row lg:items-start lg:gap-4 lg:py-3.5 lg:text-left"
                 >
-                  <ActGlyph id={act.id} />
-                </span>
-                <span className="min-w-0 flex-1">
-                  {/* Inactive steps recede by stepping down the measured
-                      opacity ladder, never by dimming the whole row: a
-                      wrapper opacity puts the text below the AA floor. */}
-                  <span
-                    className={cn(
-                      "font-display tracking-display ease-interaction block text-xl leading-snug transition-colors duration-200",
-                      isActive
-                        ? "text-forest"
-                        : "text-forest/75 group-hover:text-forest",
-                    )}
-                  >
-                    {act.title}
-                  </span>
-                  <span className="text-forest/70 mt-0.5 block text-sm leading-relaxed">
-                    {actCopy?.[act.id] ?? act.body}
-                  </span>
-                  {/* The act meter: fills over the act's real duration. */}
                   <span
                     aria-hidden
-                    className="bg-cream-line rounded-edge mt-3 block h-0.5 w-full overflow-hidden"
+                    className={cn(
+                      "rounded-edge ease-interaction relative flex size-10 flex-none items-center justify-center border transition-colors duration-200",
+                      isActive
+                        ? "border-forest bg-forest text-cream"
+                        : "border-cream-line bg-cream-deep text-forest/70 group-hover:text-forest",
+                    )}
                   >
-                    <span
-                      key={`${act.id}-${epoch}`}
-                      className={cn(
-                        "bg-terra block h-full w-full origin-left",
-                        isActive && "demo-fill",
-                      )}
-                      style={
-                        isActive
-                          ? {
-                              animationDuration: `${ACT_TOTAL[act.id]}ms`,
-                              animationPlayState: running
-                                ? "running"
-                                : "paused",
-                            }
-                          : { transform: isDone ? "scaleX(1)" : "scaleX(0)" }
-                      }
-                    />
+                    <ActGlyph id={act.id} />
+
+                    {/*
+                    The act meter, traced round the tile — the phone's version
+                    of the bar below. It sits ON the border rather than beside
+                    it: the rect is inset by half its stroke so the 2px line
+                    lands exactly over the 1px edge it replaces, and `terra`
+                    reads against both tile states (5.6:1 on the forest of an
+                    active step, and against cream-deep when a completed one
+                    keeps its full ring).
+                  */}
+                    <svg
+                      viewBox="0 0 40 40"
+                      fill="none"
+                      preserveAspectRatio="none"
+                      className="pointer-events-none absolute inset-0 size-full lg:hidden"
+                    >
+                      <rect
+                        key={`${act.id}-${epoch}`}
+                        x="1"
+                        y="1"
+                        width="38"
+                        height="38"
+                        rx="1"
+                        pathLength="100"
+                        strokeWidth="2"
+                        className={cn(isActive && "demo-trace")}
+                        style={
+                          isActive
+                            ? {
+                                stroke: "var(--color-terra)",
+                                animationDuration: `${ACT_TOTAL[act.id]}ms`,
+                                animationPlayState: running
+                                  ? "running"
+                                  : "paused",
+                              }
+                            : {
+                                /*
+                                  A step that has not started draws NO stroke,
+                                  rather than a full-length dash pushed out of
+                                  sight: `stroke-dashoffset: 100` on a closed
+                                  path still rendered a terra nick at the
+                                  corner the path starts from, on every
+                                  pending tile. Transparent has no such edge.
+                                */
+                                stroke: isDone
+                                  ? "var(--color-terra)"
+                                  : "transparent",
+                                /*
+                                  A finished step keeps its ring, quietly.
+                                  At full strength three completed tiles end
+                                  the loop shouting as loudly as the one
+                                  actually playing — the bar at `lg` gets away
+                                  with that because it is 2px of a 320px line,
+                                  where this is the whole edge of the tile.
+                                */
+                                strokeOpacity: 0.4,
+                                strokeDasharray: 100,
+                                strokeDashoffset: 0,
+                              }
+                        }
+                      />
+                    </svg>
                   </span>
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ol>
+
+                  <span className="min-w-0 flex-1 lg:w-full">
+                    {/* Inactive steps recede by stepping down the measured
+                      opacity ladder, never by dimming the whole row: a
+                      wrapper opacity puts the text below the AA floor. */}
+                    <span
+                      className={cn(
+                        "font-display tracking-display ease-interaction block text-base leading-snug transition-colors duration-200 sm:text-lg lg:text-xl",
+                        isActive
+                          ? "text-forest"
+                          : "text-forest/75 group-hover:text-forest",
+                      )}
+                    >
+                      {act.title}
+                    </span>
+                    <span className="text-forest/70 sr-only text-sm leading-relaxed lg:not-sr-only lg:mt-0.5 lg:block">
+                      {actCopy?.[act.id] ?? act.body}
+                    </span>
+                    {/* The act meter: fills over the act's real duration. */}
+                    <span
+                      aria-hidden
+                      className="bg-cream-line rounded-edge mt-3 hidden h-0.5 w-full overflow-hidden lg:block"
+                    >
+                      <span
+                        key={`${act.id}-${epoch}`}
+                        className={cn(
+                          "bg-terra block h-full w-full origin-left",
+                          isActive && "demo-fill",
+                        )}
+                        style={
+                          isActive
+                            ? {
+                                animationDuration: `${ACT_TOTAL[act.id]}ms`,
+                                animationPlayState: running
+                                  ? "running"
+                                  : "paused",
+                              }
+                            : { transform: isDone ? "scaleX(1)" : "scaleX(0)" }
+                        }
+                      />
+                    </span>
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+
+        {/*
+        The active step's sentence, under the row of three.
+
+        All three are rendered into ONE grid cell and the inactive two are
+        held at zero opacity, so the block is always as tall as the longest of
+        them and a step change cannot move the phone below it. That matters
+        because the sentences differ per page: `/explore` runs to "Check the
+        duration, price, inclusions, requirements and who runs it", which is
+        two lines where the homepage's is one.
+
+        `aria-hidden`: each sentence is already inside its own step above.
+      */}
+        <p aria-hidden className="grid w-full max-w-sm text-center lg:hidden">
+          {ACTS.map((act, index) => (
+            <span
+              key={act.id}
+              className={cn(
+                "text-forest/70 col-start-1 row-start-1 text-sm leading-relaxed",
+                index === activeActIndex ? "demo-copy" : "invisible",
+              )}
+            >
+              {actCopy?.[act.id] ?? act.body}
+            </span>
+          ))}
+        </p>
+      </div>
     </div>
   );
 }

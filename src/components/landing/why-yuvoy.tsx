@@ -90,8 +90,31 @@ export function WhyYuvoy() {
           width={1672}
           height={941}
           quality={75}
-          sizes="100vw"
-          className="absolute inset-x-0 bottom-0 h-auto w-full opacity-55"
+          sizes="(min-width: 640px) 100vw, 210vw"
+          /*
+            Cropped on a phone, whole from `sm`.
+
+            The drawing is a 16:9 horizon. Fitted to a 390px screen it is
+            219px tall — 9% of a section that runs past 2,400px, which reads
+            as a strip along the bottom rather than as the ground the act
+            stands on (owner report, 2026-08-15). On a 1440px page the same
+            image is 810px, a quarter of the section: the phone was not
+            getting a smaller version of the desktop composition, it was
+            getting a different one.
+
+            So it is scaled past the viewport and cropped instead of fitted —
+            210% wide, which puts it back at ~460px, the same quarter. Anchored
+            RIGHT because that is where the drawing is: measured column ink
+            runs 3% through the middle third and 58-77% in the last sixth, so
+            centring it would crop to open water and lose the palms, the
+            headland and the boat. Right-anchored, the visible half opens on
+            water and closes on the trees, which is the composition the
+            desktop reads left to right in full.
+
+            `max-w-none` because preflight caps images at 100% — without it
+            the width class is silently ignored and this is a no-op.
+          */
+          className="absolute right-0 bottom-0 h-auto w-[210%] max-w-none opacity-55 sm:inset-x-0 sm:w-full"
         />
       </div>
 

@@ -166,7 +166,7 @@ function ShortfallIcon({ kind }: { kind: Shortfall }) {
     <svg
       viewBox="0 0 24 24"
       aria-hidden
-      className="text-terra-deep size-5 lg:size-[1.125rem]"
+      className="text-terra-deep size-4.5 sm:size-5 lg:size-4.5"
     >
       {kind === "noPrice" && (
         <>
@@ -308,25 +308,37 @@ export function ScatteredSources() {
             className="border-cream-line bg-cream card-lift rounded-lg border p-3.5 sm:p-4 lg:p-3"
           >
             {/*
-              The icon sits ABOVE the words wherever the card is narrow, and
-              beside them only at `sm`-`md` where the left column runs the
-              full page.
+              The icon sits BESIDE the words everywhere except `lg`.
 
-              An icon tile plus its gap costs 42px. In the 166px cell a phone
-              grid leaves, and again in the ~175px card the `lg` scatter
-              leaves inside a 362px column, that is more than the words can
-              spare — "A number, if you ask" and "Verdicts, no video" both
-              truncated. Stacked, the words get the card's whole width.
+              It used to stack them on a phone, to give the words the card's
+              whole width: an icon tile plus its gap cost 42px of the 138px a
+              166px cell leaves inside its padding, and "A number, if you ask"
+              truncated. Beside them is shorter — the tallest card goes from
+              104px to about 76 — and shorter is the whole brief on a phone
+              (owner direction, 2026-08-15), so the width is bought back
+              instead: the tile drops to the 28px it already uses at `lg`, the
+              gap to 8, and the words WRAP rather than truncate. A second line
+              costs 16px; the stack cost 36.
+
+              `lg` is the exception because the card is ~175px wide there
+              inside a 362px column and there is no second line to spend —
+              the scatter's height is fixed by the canvas it sits in.
             */}
-            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:gap-2.5 lg:flex-col lg:items-start lg:gap-1.5">
-              <span className="bg-cream-deep rounded-edge flex size-8 flex-none items-center justify-center lg:size-7">
+            {/* `items-start`, not `items-center`: the cards wrap to two lines
+                or three depending on the phrase, and centring puts the icon
+                at a different height on every card — on the three-line ones
+                it lands beside the shortfall instead of beside the name.
+                Top-aligned, all six icons sit at one offset from the card's
+                top and the row reads as a set. */}
+            <div className="flex items-start gap-2 sm:gap-2.5 lg:flex-col lg:gap-1.5">
+              <span className="bg-cream-deep rounded-edge flex size-7 flex-none items-center justify-center sm:size-8 lg:size-7">
                 <ShortfallIcon kind={source.icon} />
               </span>
               <span className="min-w-0 lg:w-full">
-                <span className="text-forest block truncate text-sm font-bold sm:text-base lg:overflow-visible lg:text-sm lg:whitespace-normal">
+                <span className="text-forest block text-sm font-bold sm:text-base lg:text-sm">
                   {source.place}
                 </span>
-                <span className="text-forest/70 block truncate text-xs sm:text-sm lg:overflow-visible lg:text-xs lg:whitespace-normal">
+                <span className="text-forest/70 block text-xs sm:text-sm lg:text-xs">
                   {source.gives}
                 </span>
               </span>
@@ -483,8 +495,15 @@ export function ScatteredSources() {
 
       {/* What it costs, as the comp's four chips. The one part of this block
           exposed to assistive tech: the cards and the table are drawings of a
-          feeling, and this is what they add up to. */}
-      <ul className="mt-5 flex flex-wrap gap-2 lg:mt-3 lg:gap-1.5">
+          feeling, and this is what they add up to.
+
+          `justify-center` matters most where the row WRAPS. Three chips fit
+          one line at `lg` and on a phone they break two-then-one; left-packed,
+          that lone third chip sat against the left edge with all the slack on
+          the right and read as a mistake (owner report, 2026-08-15). Centred,
+          each line is balanced against the column whether it holds one chip or
+          three. */}
+      <ul className="mt-5 flex flex-wrap justify-center gap-2 lg:mt-3 lg:gap-1.5">
         {COSTS.map((cost) => (
           <li
             key={cost}

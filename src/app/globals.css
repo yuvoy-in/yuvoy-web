@@ -813,6 +813,60 @@
 }
 
 /*
+  The same meter, drawn round the step's icon instead of under its sentence.
+
+  Below `lg` the rail is a row of three across the top of the tour rather than
+  a stacked list beside it (owner direction, 2026-08-15), and a 2px underline
+  under a 40px tile is too small a thing to read as progress at that size. The
+  stroke traces the tile's own square edge instead: same duration, same linear
+  speed, same inline play-state, one obvious moving part.
+
+  `pathLength="100"` on the rect is what makes this simple — the dash length
+  is expressed in hundredths of the perimeter, so the keyframes never have to
+  know the tile's real size and changing that size cannot desynchronise them.
+
+  Under reduced motion the global rule collapses it to a completed ring, which
+  is the correct resting state: nothing auto-plays there, so the ring marks
+  the current step rather than timing it.
+*/
+@keyframes yuvoy-demo-trace {
+  from {
+    stroke-dashoffset: 100;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@utility demo-trace {
+  stroke-dasharray: 100;
+  animation-name: yuvoy-demo-trace;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+
+/*
+  The active step's sentence, arriving under that row. Only one is ever shown,
+  so it has to announce the change itself — a swap with no movement reads as a
+  glitch. Short and small: this answers a step change, so it sits inside the
+  250ms interaction budget rather than performing an entrance.
+*/
+@keyframes yuvoy-demo-copy {
+  from {
+    opacity: 0;
+    transform: translateY(0.25rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility demo-copy {
+  animation: yuvoy-demo-copy 250ms var(--ease-interaction) both;
+}
+
+/*
   The header sliding out of the way on the way down the page, and back on the
   way up. HeaderShell sets the data attribute; the movement lives here so every
   motion definition stays in one file.
