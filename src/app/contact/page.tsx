@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { ContactChannels } from "@/components/site/contact-channels";
 import { MessageForm } from "@/components/site/message-form";
+import { VIEWPORT_ON_FOREST } from "@/lib/site/theme";
+
+/** This route opens on a forest cover; Safari's top glass follows
+    theme-color, so the chrome must agree with it (see lib/site/theme). */
+export const viewport = VIEWPORT_ON_FOREST;
 
 export const metadata: Metadata = {
   title: "Contact Yuvoy",
@@ -97,14 +102,17 @@ export default function ContactPage() {
               */}
               <h2
                 id="channels"
-                className="label text-cream/70 mt-14 scroll-mt-24"
+                className="label text-cream/70 mt-14 scroll-mt-[calc(6rem+env(safe-area-inset-top))]"
               >
                 Reach us directly
               </h2>
               <ContactChannels tone="ink" className="mt-6" />
             </div>
 
-            <div id="message" className="scroll-mt-24">
+            <div
+              id="message"
+              className="scroll-mt-[calc(6rem+env(safe-area-inset-top))]"
+            >
               <MessageForm />
             </div>
           </div>

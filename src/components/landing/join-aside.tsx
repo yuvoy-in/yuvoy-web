@@ -1,9 +1,14 @@
-import { FaqAccordion } from "@/components/site/faq-accordion";
 import { AUDIENCE_COPY } from "@/lib/site/audiences";
 
 /**
- * The ask, narrated. Rendered by LeadForms as the left column of the
- * homepage registration section.
+ * The ask, narrated. Rendered by LeadForms as the head of the homepage
+ * registration section — the eyebrow, the heading and the lede, and nothing
+ * else.
+ *
+ * **The questions moved out on 2026-08-10.** LeadForms renders them itself,
+ * from the same `AUDIENCE_COPY[audience].faqs` this file reads, because they
+ * have to be placed independently: on a phone the order is headline, form,
+ * questions, and a FAQ nested in here could only ever follow the headline.
  *
  * Contract: this component owns the section's heading and must render an
  * element with `id="register-heading"` — the LeadForms section points its
@@ -38,16 +43,14 @@ export function JoinAside() {
       <p className="eyebrow text-terra-soft">{copy.eyebrow}</p>
       <h2
         id="register-heading"
-        className="font-display tracking-display mt-6 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-normal text-balance"
+        className="font-display tracking-display mt-4 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-normal text-balance sm:mt-6"
       >
         {copy.title}{" "}
         <em className="text-terra-soft font-turn italic">{copy.accent}</em>
       </h2>
-      <p className="text-cream/70 mt-6 max-w-md text-lg leading-relaxed">
+      <p className="text-cream/70 mt-5 max-w-md leading-relaxed sm:mt-6 sm:text-lg">
         {copy.lede}
       </p>
-
-      <FaqAccordion items={copy.faqs} tone="ink" className="mt-12" />
     </>
   );
 }

@@ -25,13 +25,13 @@ export function FooterCta() {
   if (!showsFooterCta(pathname)) return null;
 
   return (
-    <div className="container-page border-cream/12 border-b py-20 sm:py-24">
+    <div className="container-page border-cream/12 border-b py-14 sm:py-24">
       <p className="eyebrow text-terra-soft">Early access</p>
-      <h2 className="font-display tracking-display mt-6 max-w-3xl text-4xl leading-[1.05] font-normal text-balance sm:text-5xl">
+      <h2 className="font-display tracking-display mt-4 max-w-3xl text-4xl leading-[1.05] font-normal text-balance sm:mt-6 sm:text-5xl">
         Be first to{" "}
         <em className="text-terra-soft font-turn italic">experience Yuvoy.</em>
       </h2>
-      <p className="text-cream/70 mt-6 max-w-xl text-lg leading-relaxed">
+      <p className="text-cream/70 mt-5 max-w-xl leading-relaxed sm:mt-6 sm:text-lg">
         Join the waitlist and we will contact you when the first experiences for
         your destination are ready.
       </p>
@@ -39,7 +39,7 @@ export function FooterCta() {
         href={PRIMARY_CTA.href}
         className={cn(
           buttonVariants({ variant: "paper", size: "lg" }),
-          "mt-10 flex w-full sm:inline-flex sm:w-auto",
+          "mt-8 flex w-full sm:mt-10 sm:inline-flex sm:w-auto",
         )}
       >
         {PRIMARY_CTA.label}

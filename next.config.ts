@@ -17,6 +17,30 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+
+  /**
+   * Hosts allowed to request `/_next/*` from the **dev server**.
+   *
+   * Next 16 blocks cross-origin requests to dev resources by default, and
+   * "cross-origin" means anything that is not the host the server was started
+   * on. Open `http://<lan-ip>:3000` from a phone on the same wifi and the
+   * server-rendered HTML arrives fine while every `/_next/` chunk is refused —
+   * so the page paints and **React never hydrates**.
+   *
+   * That failure is silent and it looks like a pile of unrelated UI bugs
+   * rather than one missing config (owner report, 2026-08-10, testing on an
+   * iPhone against `http://192.168.1.6:3000`): the header keeps whatever tone
+   * the server rendered and never turns cream, it never slides away on scroll,
+   * the menu button does nothing, and the product preview never advances —
+   * because all four are client behaviour and there is no client. The only
+   * visible evidence is one WARN line in `.next/dev/logs/`.
+   *
+   * Private ranges only, and dev only: this has no effect on a production
+   * build, and it can never allow a public host. Wildcards rather than a
+   * literal address because a DHCP lease changes and the failure it causes is
+   * this hard to recognise a second time.
+   */
+  allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "172.16.*.*", "*.local"],
   images: {
     /*
       Next only serves the qualities listed here, so that a URL parameter

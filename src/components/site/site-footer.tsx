@@ -104,7 +104,28 @@ export function SiteFooter() {
             competing for that hint — the right trade for a file this small.
           */
           loading="eager"
-          className="object-cover object-bottom"
+          /*
+            Anchored to the bottom always, and to the turtle on a portrait
+            screen.
+
+            The frame is 1774x887 and its subject is not centred: coral runs
+            along the bottom left, the seabed flattens out through the middle,
+            and the turtle and its school of fish are in the right fifth. A
+            390px phone covering that frame sees a 384px window — 22% of the
+            width — and centred, that window lands on the emptiest part of the
+            picture: flat sand under empty water, with the coral off one edge
+            and the turtle off the other (owner report, 2026-08-10).
+
+            At 90% the window holds the turtle whole, the fish above it and
+            coral in the bottom corner. Past that it starts clipping the
+            turtle's tail against the edge; below about 85% its head is cut.
+
+            The vertical term stays at `100%` in both cases — that is
+            `object-bottom`, and it is load-bearing for the reason documented
+            above: the crop must always be taken from the empty top of the
+            frame, never from the seabed. Only the horizontal anchor moves.
+          */
+          className="object-cover portrait:object-[90%_100%] landscape:object-bottom"
         />
         <div className="plate-wash absolute inset-0" />
         <div className="footer-scrim absolute inset-0" />
@@ -113,13 +134,13 @@ export function SiteFooter() {
 
       <FooterCta />
 
-      <div className="container-page py-16 sm:py-20">
-        <div className="grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:gap-20">
+      <div className="container-page py-12 sm:py-20">
+        <div className="grid grid-cols-1 gap-10 sm:gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)] lg:gap-20">
           {/* Identity. The lockup is the signature; the two lines under it
               say what Yuvoy does and where it is, and nothing else. */}
           <div>
-            <Wordmark tone="onDark" className="h-20" />
-            <p className="text-cream/70 mt-7 max-w-xs leading-relaxed">
+            <Wordmark tone="onDark" className="h-16 sm:h-20" />
+            <p className="text-cream/70 mt-6 max-w-xs leading-relaxed sm:mt-7">
               {FOOTER_DESCRIPTION}
             </p>
             <p className="label text-cream/70 mt-6 flex items-start gap-2.5">
@@ -133,7 +154,7 @@ export function SiteFooter() {
             <nav
               aria-label="Footer"
               className={cn(
-                "grid gap-x-6 gap-y-10 sm:gap-x-8 lg:justify-items-end",
+                "grid gap-x-6 gap-y-8 sm:gap-x-8 sm:gap-y-10 lg:justify-items-end",
                 GROUP_GRID[groups.length] ?? "grid-cols-2 sm:grid-cols-4",
               )}
             >
@@ -143,7 +164,7 @@ export function SiteFooter() {
                       of the page's own sections. As h3 they skipped a level on
                       pages whose main content has no h2 (e.g. /waitlist). */}
                   <h2 className="label text-terra-soft">{group.title}</h2>
-                  <ul className="mt-5 flex flex-col gap-2.5">
+                  <ul className="mt-4 flex flex-col gap-2.5 sm:mt-5">
                     {group.items.map((item) => (
                       <li key={item.href}>
                         {item.href.startsWith("/") ? (
@@ -173,7 +194,7 @@ export function SiteFooter() {
         {/* Legal. No social row: a link to an unmaintained account is a
             promise nobody is keeping, so `CONTACT_CHANNELS` stays empty
             until a real one is confirmed. */}
-        <div className="border-cream/12 mt-16 flex flex-col-reverse items-start gap-4 border-t pt-8 sm:flex-row sm:items-center sm:justify-between">
+        <div className="border-cream/12 mt-12 flex flex-col-reverse items-start gap-4 border-t pt-6 sm:mt-16 sm:flex-row sm:items-center sm:justify-between sm:pt-8">
           <p className="label text-cream/60">
             © {new Date().getFullYear()} Yuvoy · India
           </p>

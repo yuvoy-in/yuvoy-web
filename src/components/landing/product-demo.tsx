@@ -283,7 +283,16 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
     // on screen, so "wait for animations to finish" must not include it.
     <div
       data-demo
-      className="flex flex-col items-center gap-8 lg:flex-row lg:gap-7"
+      /*
+        `flex-col-reverse` below `lg`: the rail is written after the phone and
+        painted before it (owner direction, 2026-08-15 — the steps come first
+        on a phone). The DOM order is deliberately the one that was already
+        here, so keyboard order on the desktop layout, where the phone really
+        is first, is untouched; below `lg` the only focusable thing inside the
+        phone is its pause control, and reaching the three chapter buttons
+        before it is a sequence that still reads.
+      */
+      className="flex flex-col-reverse items-center gap-6 sm:gap-8 lg:flex-row lg:gap-7"
     >
       {/*
         Both boxes size to the frame, and the frame sizes to the screen.
@@ -434,17 +443,36 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
               WCAG 2.2.2: the tour moves for far longer than five seconds, so
               a pause mechanism has to exist. It rides the frame like a video
               player's control rather than sitting under it as a labelled
-              button (owner direction: the button was visual noise) — revealed
-              on hover, and on keyboard focus, which is the skip-link pattern
-              and keeps it reachable without a pointer. Under reduced motion
-              nothing auto-plays, so there is nothing to pause.
+              button (owner direction: the button was visual noise). Under
+              reduced motion nothing auto-plays, so there is nothing to pause.
+
+              It was revealed on hover and on keyboard focus alone until
+              2026-08-09, which meant that on a touch device — where there is
+              no hover and no focus ring to chase — the required mechanism was
+              **painted at zero opacity and effectively absent**, on the
+              platform that carries most of this site's traffic. Reveal-on-
+              hover is a pointer affordance being asked to do an accessibility
+              job it cannot do without a pointer.
+
+              `(hover: none)` rather than `pointer-coarse`: the question is not
+              what kind of pointer the device has but whether the hover reveal
+              can ever fire. A touchscreen laptop reports a fine primary
+              pointer and still hovers, so it keeps the quiet version; a phone
+              never hovers and gets the control outright. This is the standard
+              mobile video-player behaviour and it is the only reading of
+              2.2.2 that survives on a phone.
+
+              The button stays quiet where hover works, which is the owner's
+              2026-08-06 call (a labelled button under the frame was visual
+              noise) — that decision is preserved everywhere it was actually
+              made about.
             */}
             {!reduced && (
               <button
                 type="button"
                 onClick={() => setPlaying((now) => !now)}
                 aria-label={playing ? "Pause the preview" : "Play the preview"}
-                className="border-cream/25 bg-forest/70 text-cream rounded-edge focus-visible:ring-terra-soft ease-interaction absolute top-2.5 right-2.5 z-30 flex size-8 items-center justify-center border opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:outline-none"
+                className="border-cream/25 bg-forest/70 text-cream rounded-edge focus-visible:ring-terra-soft ease-interaction absolute top-2.5 right-2.5 z-30 flex size-8 items-center justify-center border opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:outline-none [@media(hover:none)]:opacity-100"
               >
                 {playing ? (
                   <PauseGlyph className="size-3" />
@@ -469,77 +497,165 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
         </p>
       </div>
 
-      {/* The rail: the same three moves the section promises, highlighted in
-          sync with the phone. Clicking one seeks the tour to that act. */}
-      <ol className="w-full max-w-xs lg:min-w-0 lg:flex-1">
-        {ACTS.map((act, index) => {
-          const isActive = index === activeActIndex;
-          const isDone = index < activeActIndex;
-          return (
-            <li key={act.id}>
-              <button
-                type="button"
-                onClick={() => seek(act.id)}
-                aria-current={isActive ? "step" : undefined}
-                className="rounded-edge focus-visible:ring-terra-deep group flex w-full items-start gap-4 py-3.5 text-left focus-visible:ring-2 focus-visible:outline-none"
-              >
-                <span
-                  aria-hidden
-                  className={cn(
-                    "rounded-edge ease-interaction flex size-10 flex-none items-center justify-center border transition-colors duration-200",
-                    isActive
-                      ? "border-forest bg-forest text-cream"
-                      : "border-cream-line bg-cream-deep text-forest/70 group-hover:text-forest",
-                  )}
+      {/*
+        The rail: the same three moves the section promises, highlighted in
+        sync with the phone. Clicking one seeks the tour to that act.
+
+        It reads two ways.
+
+        Beside the phone at `lg`, it is a stacked list: icon, title, sentence,
+        and a meter that fills under each step.
+
+        Below `lg` it is a row of three across the TOP of the tour (owner
+        direction, 2026-08-15) — the steps name what is about to happen, so on
+        a phone they belong above the thing that happens, and three short
+        labels cost about 70px where three stacked rows cost 300. The
+        sentences come out of the rows and appear one at a time under it, and
+        the meter moves onto the icon's own square edge, which is the only
+        element left with room to carry it.
+
+        Each sentence stays in its own step for assistive tech (`sr-only`),
+        so every button still reads "Watch, real videos of the experience"
+        exactly as it does at `lg`; the line under the row is the same text
+        drawn for the eye and is hidden from AT to avoid saying it twice.
+      */}
+      <div className="flex w-full flex-col items-center gap-4 lg:min-w-0 lg:flex-1 lg:items-start lg:gap-0">
+        <ol className="flex w-full max-w-sm gap-2 lg:block lg:max-w-xs">
+          {ACTS.map((act, index) => {
+            const isActive = index === activeActIndex;
+            const isDone = index < activeActIndex;
+            return (
+              <li key={act.id} className="min-w-0 flex-1 lg:flex-none">
+                <button
+                  type="button"
+                  onClick={() => seek(act.id)}
+                  aria-current={isActive ? "step" : undefined}
+                  className="rounded-edge focus-visible:ring-terra-deep group flex w-full flex-col items-center gap-2 py-1 text-center focus-visible:ring-2 focus-visible:outline-none lg:flex-row lg:items-start lg:gap-4 lg:py-3.5 lg:text-left"
                 >
-                  <ActGlyph id={act.id} />
-                </span>
-                <span className="min-w-0 flex-1">
-                  {/* Inactive steps recede by stepping down the measured
-                      opacity ladder, never by dimming the whole row: a
-                      wrapper opacity puts the text below the AA floor. */}
-                  <span
-                    className={cn(
-                      "font-display tracking-display ease-interaction block text-xl leading-snug transition-colors duration-200",
-                      isActive
-                        ? "text-forest"
-                        : "text-forest/75 group-hover:text-forest",
-                    )}
-                  >
-                    {act.title}
-                  </span>
-                  <span className="text-forest/70 mt-0.5 block text-sm leading-relaxed">
-                    {actCopy?.[act.id] ?? act.body}
-                  </span>
-                  {/* The act meter: fills over the act's real duration. */}
+                  {/*
+                    Below `lg` the act meter is the tile's OWN border: while
+                    the act runs, `demo-trace` (globals.css) repaints the
+                    border band with a conic sweep, so the edge colours in
+                    terra from 12 o'clock, clockwise, over the act's real
+                    duration.
+
+                    It is the border, not a drawing of one. Three SVG
+                    overlays in a row failed here (owner reports, 2026-08-15)
+                    for one structural reason: an overlay reproduces the
+                    box's geometry from the OUTSIDE, and CSS borders and SVG
+                    strokes rasterise independently — these cells are
+                    `flex-1` thirds, so the tile sits at a fractional x at
+                    most widths, the two painters snap to device pixels
+                    differently, and a hairline of the real border survives
+                    beside the drawn one. A border cannot misalign with
+                    itself, so the geometry class of bug is gone rather than
+                    patched.
+
+                    While tracing, `border-transparent` lets the sweep own
+                    the band and the forest fill rides the same declaration.
+                    A finished step drops back to the plain `cream-line`
+                    border (owner direction, 2026-08-15 — a kept ring ended
+                    the loop with three highlighted tiles); only the running
+                    act carries terra. `lg` keeps its 1px border and the
+                    underline meter below carries progress there.
+
+                    The epoch key remounts the tile on every seek and loop
+                    wrap, which is what restarts the CSS animation cleanly.
+                  */}
                   <span
                     aria-hidden
-                    className="bg-cream-line rounded-edge mt-3 block h-0.5 w-full overflow-hidden"
+                    key={`${act.id}-${epoch}`}
+                    className={cn(
+                      "rounded-edge ease-interaction relative flex size-10 flex-none items-center justify-center border-3 transition-colors duration-200 lg:border",
+                      isActive
+                        ? "bg-forest text-cream max-lg:demo-trace lg:border-forest border-transparent"
+                        : "border-cream-line bg-cream-deep text-forest/70 group-hover:text-forest",
+                    )}
+                    style={
+                      isActive
+                        ? {
+                            animationDuration: `${ACT_TOTAL[act.id]}ms`,
+                            animationPlayState: running ? "running" : "paused",
+                          }
+                        : undefined
+                    }
                   >
-                    <span
-                      key={`${act.id}-${epoch}`}
-                      className={cn(
-                        "bg-terra block h-full w-full origin-left",
-                        isActive && "demo-fill",
-                      )}
-                      style={
-                        isActive
-                          ? {
-                              animationDuration: `${ACT_TOTAL[act.id]}ms`,
-                              animationPlayState: running
-                                ? "running"
-                                : "paused",
-                            }
-                          : { transform: isDone ? "scaleX(1)" : "scaleX(0)" }
-                      }
-                    />
+                    <ActGlyph id={act.id} />
                   </span>
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ol>
+
+                  <span className="min-w-0 flex-1 lg:w-full">
+                    {/* Inactive steps recede by stepping down the measured
+                      opacity ladder, never by dimming the whole row: a
+                      wrapper opacity puts the text below the AA floor. */}
+                    <span
+                      className={cn(
+                        "font-display tracking-display ease-interaction block text-base leading-snug transition-colors duration-200 sm:text-lg lg:text-xl",
+                        isActive
+                          ? "text-forest"
+                          : "text-forest/75 group-hover:text-forest",
+                      )}
+                    >
+                      {act.title}
+                    </span>
+                    <span className="text-forest/70 sr-only text-sm leading-relaxed lg:not-sr-only lg:mt-0.5 lg:block">
+                      {actCopy?.[act.id] ?? act.body}
+                    </span>
+                    {/* The act meter: fills over the act's real duration. */}
+                    <span
+                      aria-hidden
+                      className="bg-cream-line rounded-edge mt-3 hidden h-0.5 w-full overflow-hidden lg:block"
+                    >
+                      <span
+                        key={`${act.id}-${epoch}`}
+                        className={cn(
+                          "bg-terra block h-full w-full origin-left",
+                          isActive && "demo-fill",
+                        )}
+                        style={
+                          isActive
+                            ? {
+                                animationDuration: `${ACT_TOTAL[act.id]}ms`,
+                                animationPlayState: running
+                                  ? "running"
+                                  : "paused",
+                              }
+                            : { transform: isDone ? "scaleX(1)" : "scaleX(0)" }
+                        }
+                      />
+                    </span>
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+
+        {/*
+        The active step's sentence, under the row of three.
+
+        All three are rendered into ONE grid cell and the inactive two are
+        held at zero opacity, so the block is always as tall as the longest of
+        them and a step change cannot move the phone below it. That matters
+        because the sentences differ per page: `/explore` runs to "Check the
+        duration, price, inclusions, requirements and who runs it", which is
+        two lines where the homepage's is one.
+
+        `aria-hidden`: each sentence is already inside its own step above.
+      */}
+        <p aria-hidden className="grid w-full max-w-sm text-center lg:hidden">
+          {ACTS.map((act, index) => (
+            <span
+              key={act.id}
+              className={cn(
+                "text-forest/70 col-start-1 row-start-1 text-sm leading-relaxed",
+                index === activeActIndex ? "demo-copy" : "invisible",
+              )}
+            >
+              {actCopy?.[act.id] ?? act.body}
+            </span>
+          ))}
+        </p>
+      </div>
     </div>
   );
 }

@@ -240,7 +240,7 @@ export function MessageForm() {
           <select
             id="m-topic"
             {...register("topic")}
-            className="border-cream/20 bg-cream/5 text-cream focus-visible:border-terra-soft focus-visible:ring-terra-soft/40 rounded-edge h-12 w-full border px-4 text-sm transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
+            className="border-cream/20 bg-cream/5 text-cream focus-visible:border-terra-soft focus-visible:ring-terra-soft/40 rounded-edge h-12 w-full border px-4 text-base transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none pointer-fine:text-sm"
           >
             {CONTACT_TOPICS.map((topic) => (
               <option
@@ -284,7 +284,7 @@ export function MessageForm() {
             rows={5}
             aria-invalid={!!errors.message}
             aria-describedby={errors.message ? "m-message-error" : undefined}
-            className="border-cream/20 bg-cream/5 text-cream placeholder:text-cream/60 focus-visible:border-terra-soft focus-visible:ring-terra-soft/40 rounded-edge w-full resize-y border px-4 py-3 text-sm transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
+            className="border-cream/20 bg-cream/5 text-cream placeholder:text-cream/60 focus-visible:border-terra-soft focus-visible:ring-terra-soft/40 rounded-edge w-full resize-y border px-4 py-3 text-base transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none pointer-fine:text-sm"
           />
           <FieldError id="m-message-error" message={errors.message?.message} />
         </div>

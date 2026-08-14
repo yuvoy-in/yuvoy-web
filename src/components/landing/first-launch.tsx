@@ -48,14 +48,14 @@ export function FirstLaunch() {
 
       {/* The status line, once. Set as a quiet rule-and-label rather than a
           panel: it is context for the headline above it, not a notice. */}
-      <p className="label text-cream/70 border-cream/12 mt-10 border-t pt-5">
+      <p className="label text-cream/70 border-cream/12 mt-8 border-t pt-4 sm:mt-10 sm:pt-5">
         {EXPANSION_STATUS}
       </p>
 
       <DestinationGrid
         destinations={DESTINATIONS}
         tone="ink"
-        className="mt-12 sm:mt-14"
+        className="mt-8 sm:mt-14"
       />
     </Section>
   );

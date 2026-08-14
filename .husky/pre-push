@@ -1,0 +1,20 @@
+# The gate that replaced CI (2026-08-14). Actions runs deployments only now —
+# see .github/workflows/ci.yml for why — so this is the last thing between a
+# mistake and staging.
+#
+# It runs the identical sequence CI ran, on the identical lockfile, against
+# the exact tree being pushed: typecheck, lint, format, unit tests, a
+# production build, and the full e2e suite against that build. About two
+# minutes.
+#
+# `SKIP_VERIFY=1 git push` skips it. That exists for the case where the push
+# is not code — a docs-only branch, a revert of something already known bad —
+# and every use of it is a deliberate decision to ship unverified, because
+# nothing downstream will check afterwards.
+if [ "$SKIP_VERIFY" = "1" ]; then
+  echo "pre-push: SKIP_VERIFY=1 — nothing was checked, and nothing downstream will be"
+  exit 0
+fi
+
+echo "pre-push: running pnpm verify (CI does not run this any more)"
+pnpm verify

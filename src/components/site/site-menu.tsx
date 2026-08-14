@@ -223,7 +223,7 @@ export function SiteMenu({
         >
           {/* Mirrors the header exactly, so the close button sits on the
               same pixel the trigger did. */}
-          <div className="border-cream-line container-page flex h-16 shrink-0 items-center justify-between border-b">
+          <div className="border-cream-line container-page mt-[env(safe-area-inset-top)] flex h-16 shrink-0 items-center justify-between border-b">
             <Wordmark />
             <button
               type="button"
@@ -313,7 +313,7 @@ export function SiteMenu({
             </div>
           </div>
 
-          <div className="border-cream-line bg-cream container-page shrink-0 border-t py-6">
+          <div className="border-cream-line bg-cream container-page shrink-0 border-t pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <Link
                 href={PRIMARY_CTA.href}

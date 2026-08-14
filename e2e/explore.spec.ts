@@ -118,8 +118,17 @@ test("the three steps are watch, understand and book, and nothing more", async (
       section.getByRole("button", { name: new RegExp(`^${step}`) }),
     ).toBeVisible();
   }
-  // Three steps and the tour's pause control. Not eight: the eight-step
-  // traveller and operator journeys were retired with /how-it-works.
+  /*
+    Four, and both kinds named: the tour's three steps and the tour's pause
+    control. It was briefly five while the hunt was an auto-playing deck,
+    which needed its own pause control for WCAG 2.2.2; that deck was replaced
+    by a static scatter on 2026-08-15 and the control went with it.
+
+    The number is the point of this assertion: it exists so the eight-step
+    traveller and operator journeys retired with /how-it-works cannot quietly
+    come back, and so a stray control cannot appear in this act unnoticed.
+    Change it only alongside a control you can name here.
+  */
   await expect(section.getByRole("button")).toHaveCount(4);
 });
 

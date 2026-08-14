@@ -6,10 +6,15 @@ import { ExperienceCategoryGrid } from "@/components/experiences/experience-cate
 import { StatusNotice } from "@/components/site/status-notice";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
+import { VIEWPORT_ON_FOREST } from "@/lib/site/theme";
 import {
   SEASON_CATEGORIES,
   WIDER_CATEGORIES,
 } from "@/lib/site/experience-categories";
+
+/** This route opens on a forest cover; Safari's top glass follows
+    theme-color, so the chrome must agree with it (see lib/site/theme). */
+export const viewport = VIEWPORT_ON_FOREST;
 
 export const metadata: Metadata = {
   title: "Explore experiences and destinations",

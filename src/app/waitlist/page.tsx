@@ -4,6 +4,7 @@ import { WaitlistFlow } from "@/components/waitlist/waitlist-flow";
 import { LandingView } from "@/components/analytics/landing-view";
 import { AUDIENCE_COPY, audienceFromParam } from "@/lib/site/audiences";
 import { DEFAULT_DESTINATION, LAUNCH_MARKET } from "@/lib/leads/registry";
+import { VIEWPORT_ON_FOREST } from "@/lib/site/theme";
 
 /**
  * The route's title follows the tab that is open.
@@ -19,6 +20,11 @@ import { DEFAULT_DESTINATION, LAUNCH_MARKET } from "@/lib/leads/registry";
  * `/operators` — pointing a second canonical at a query string would split the
  * route's signals between them for nothing.
  */
+
+/** This route opens on a forest cover; Safari's top glass follows
+    theme-color, so the chrome must agree with it (see lib/site/theme). */
+export const viewport = VIEWPORT_ON_FOREST;
+
 export async function generateMetadata({
   searchParams,
 }: {
