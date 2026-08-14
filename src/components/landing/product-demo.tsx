@@ -545,26 +545,45 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
 
                     {/*
                     The act meter, traced round the tile — the phone's version
-                    of the bar below. It sits ON the border rather than beside
-                    it: the rect is inset by half its stroke so the 2px line
-                    lands exactly over the 1px edge it replaces, and `terra`
-                    reads against both tile states (5.6:1 on the forest of an
-                    active step, and against cream-deep when a completed one
-                    keeps its full ring).
+                    of the bar below. `terra` reads against both tile states
+                    (5.6:1 on the forest of an active step, and against
+                    cream-deep when a completed one keeps its ring).
+
+                    It rides OUTSIDE the tile, clear of it by 2px.
+
+                    Two earlier attempts read as "inside the box" (owner
+                    report, twice on 2026-08-15). The first genuinely was: an
+                    absolutely positioned child resolves its offsets against
+                    the PADDING box, so `inset-0` covered the 38px inside the
+                    tile's 1px border and traced a square smaller than the
+                    tile. The second sat exactly on the border box — pixel-
+                    probed, terra on rows 0 and 1 with nothing between it and
+                    the page — and STILL read as inside, because a line drawn
+                    on the edge of a filled dark square is inside that
+                    square's silhouette. Being geometrically outermost is not
+                    the same as looking like a border.
+
+                    So it is a ring around the tile now, with cream showing
+                    between the two. `-inset-1` gives the box 4px of margin on
+                    every side; the 2px stroke centred on `x=1` lands 4 to 2px
+                    out, leaving a 2px gap. `rx="5"` is `rounded-edge`'s 2px
+                    plus the 3px the stroke's centre line is offset by, which
+                    is what keeps the ring concentric with the corner it
+                    follows — change the inset and this changes with it.
                   */}
                     <svg
-                      viewBox="0 0 40 40"
+                      viewBox="0 0 48 48"
                       fill="none"
                       preserveAspectRatio="none"
-                      className="pointer-events-none absolute inset-0 size-full lg:hidden"
+                      className="pointer-events-none absolute -inset-1 lg:hidden"
                     >
                       <rect
                         key={`${act.id}-${epoch}`}
                         x="1"
                         y="1"
-                        width="38"
-                        height="38"
-                        rx="1"
+                        width="46"
+                        height="46"
+                        rx="5"
                         pathLength="100"
                         strokeWidth="2"
                         className={cn(isActive && "demo-trace")}

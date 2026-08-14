@@ -133,18 +133,27 @@ const SHORTLIST = {
 /**
  * What the hunt leaves you holding. The one real list here.
  *
- * THREE, not the comp's four. Four phrases totalling 67 characters cannot sit
- * on one line in this column: measured against the 362px the left column has
- * at `lg`, they need 463px at 12px, 399px at 10px and 368px even at 9px,
- * which is past legible before it is past the edge. The owner asked for one
- * line and left the choice of which to cut here.
+ * All FOUR of the comp's phrases, two to a line (owner direction,
+ * 2026-08-15). They ran as three for a day because the brief then was one
+ * line: four phrases totalling 67 characters need 463px at 12px against the
+ * 362px this column has at `lg`, which is past legible before it is past the
+ * edge, so "Scattered sources" was cut as the only one the lede above already
+ * says. Two lines cost 28px and buy the phrase back, which is the better
+ * trade — and they are what let the row grow from 10px type in 6px of padding
+ * to something that reads as a chip rather than a footnote.
  *
- * "Scattered sources" is the one that goes, because it is the only one that
- * is already on the screen: the lede two lines above opens "Scattered
- * sources. Confusing info." verbatim. The other three each say something the
- * page has not said yet.
+ * The two-and-two break is arithmetic, not luck: the widest pair comes to
+ * 292px of the 362 available and any three to 436, so the row cannot wrap
+ * three-and-one at any desktop width. Anything that widens a chip — longer
+ * copy, more padding, a bigger mark — has to be checked against those two
+ * numbers.
  */
-const COSTS = ["Uncertain choices", "Hard to compare", "Hours of guesswork"];
+const COSTS = [
+  "Scattered sources",
+  "Uncertain choices",
+  "Hard to compare",
+  "Hours of guesswork",
+];
 
 /**
  * The shortfall icons — what that place did NOT give you.
@@ -305,7 +314,16 @@ export function ScatteredSources() {
           <article
             key={source.place}
             style={source.at}
-            className="border-cream-line bg-cream card-lift rounded-lg border p-3.5 sm:p-4 lg:p-3"
+            /*
+              `flex-col justify-center` so the content sits in the MIDDLE of
+              the card rather than at the top of it. Grid items stretch, so
+              the shorter of two cards sharing a row is as tall as the taller
+              one; as a plain block its content stayed at the top and all the
+              slack fell to the bottom (owner report, 2026-08-15). At `lg`
+              the cards are absolutely positioned and size to their content,
+              where centring a box inside itself changes nothing.
+            */
+            className="border-cream-line bg-cream card-lift flex flex-col justify-center rounded-lg border p-3.5 sm:p-4 lg:p-3"
           >
             {/*
               The icon sits BESIDE the words everywhere except `lg`.
@@ -324,13 +342,14 @@ export function ScatteredSources() {
               inside a 362px column and there is no second line to spend —
               the scatter's height is fixed by the canvas it sits in.
             */}
-            {/* `items-start`, not `items-center`: the cards wrap to two lines
-                or three depending on the phrase, and centring puts the icon
-                at a different height on every card — on the three-line ones
-                it lands beside the shortfall instead of beside the name.
-                Top-aligned, all six icons sit at one offset from the card's
-                top and the row reads as a set. */}
-            <div className="flex items-start gap-2 sm:gap-2.5 lg:flex-col lg:gap-1.5">
+            {/* `items-center`: the icon takes the same air above it as below
+                (owner report, 2026-08-15 — top-aligned, a 28px tile beside a
+                36px block of words left all 8px of the difference under the
+                icon and none over it). On the cards whose shortfall runs to a
+                second line the icon centres against three lines rather than
+                two, which is the trade: an icon that sits level with its own
+                words beats six icons at one height with air under each. */}
+            <div className="flex items-center gap-2 sm:gap-2.5 lg:flex-col lg:items-start lg:gap-1.5">
               <span className="bg-cream-deep rounded-edge flex size-7 flex-none items-center justify-center sm:size-8 lg:size-7">
                 <ShortfallIcon kind={source.icon} />
               </span>
@@ -497,28 +516,37 @@ export function ScatteredSources() {
           exposed to assistive tech: the cards and the table are drawings of a
           feeling, and this is what they add up to.
 
-          `justify-center` matters most where the row WRAPS. Three chips fit
-          one line at `lg` and on a phone they break two-then-one; left-packed,
-          that lone third chip sat against the left edge with all the slack on
-          the right and read as a mistake (owner report, 2026-08-15). Centred,
-          each line is balanced against the column whether it holds one chip or
-          three. */}
-      <ul className="mt-5 flex flex-wrap justify-center gap-2 lg:mt-3 lg:gap-1.5">
+          A two-column GRID, not a wrapping row. Wrapping put two chips on each
+          line, but each chip took its own text's width, so the four ended up
+          four different sizes and the pairs did not line up under each other
+          (owner report, 2026-08-15). Equal columns fix that by construction:
+          both track to the widest phrase, "Hours of guesswork", and the other
+          three match it rather than trailing it.
+
+          `w-fit` + `mx-auto` is what keeps the block centred without letting
+          it stretch — `fit-content` takes the two columns' width and no more,
+          and it is clamped by the space available, so below the supported
+          360px floor the columns shrink and a phrase wraps instead of
+          overflowing the column. */}
+      <ul className="mx-auto mt-5 grid w-fit grid-cols-2 gap-2 lg:mt-3 lg:gap-1.5">
         {COSTS.map((cost) => (
           <li
             key={cost}
             /*
-              Tighter at `lg` than anywhere else, because that is the only
-              breakpoint where the row has to fit a fixed 362px column: 10px
-              type, 6px of side padding, a 12px mark. Measured, the three come
-              to 329px there and clear the column by 33.
+              `lg` was the tightest of the three sizes while the row had to
+              fit one line in a 362px column — 10px type in 6px of padding,
+              which read as a footnote rather than a chip. Two lines lifted
+              that constraint (owner direction, 2026-08-15), so it steps up to
+              12px type and 10px of padding: measured there, the widest pair
+              is 292px against the 362 available and any three would be 436,
+              so the two-and-two break is guaranteed rather than lucky.
             */
-            className="border-cream-line text-forest/75 inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-xs sm:text-sm lg:gap-1 lg:px-1.5 lg:py-0.5 lg:text-[0.625rem]"
+            className="border-cream-line text-forest/75 flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-center text-xs sm:text-sm lg:gap-1.5 lg:px-2.5 lg:py-1.5 lg:text-xs"
           >
             <svg
               viewBox="0 0 24 24"
               aria-hidden
-              className="text-terra-deep size-3.5 flex-none lg:size-3"
+              className="text-terra-deep size-3.5 flex-none"
             >
               <circle
                 cx="12"
