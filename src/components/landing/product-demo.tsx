@@ -565,7 +565,7 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
                     aria-hidden
                     key={`${act.id}-${epoch}`}
                     className={cn(
-                      "rounded-edge ease-interaction relative flex size-10 flex-none items-center justify-center border-2 transition-colors duration-200 lg:border",
+                      "rounded-edge ease-interaction relative flex size-10 flex-none items-center justify-center border-3 transition-colors duration-200 lg:border",
                       isActive
                         ? "bg-forest text-cream max-lg:demo-trace lg:border-forest border-transparent"
                         : cn(
