@@ -67,110 +67,103 @@ export function WhyYuvoy() {
 
         `-z-10` with `isolate` on the section: behind the content, and unable
         to escape into any ancestor's stacking context.
-      */}
-      {/*
-        The wrapper exists ONLY to set the drawing's foot: it ends where the
-        two halves end, so the artwork ends there too rather than at the foot
-        of the section (owner direction, 2026-08-15). Everything below it —
-        the sign-off and its closing line — sits on plain cream, which is what
-        gives that line the quiet it needs to land.
 
-        Vertically anchored here, horizontally still edge-to-edge: the wrapper
-        sits inside `container-page`, which is 70rem at most and padded, and
-        the drawing shrank to that measure when it moved in (owner report,
-        2026-08-15 — "it should be outside only as same as before"). It breaks
-        back out to the full page width with the usual centre-and-widen pair.
-        `100vw` counts a classic scrollbar, so on a platform that has one the
-        drawing runs a few pixels past each edge and `body`'s `overflow-x:
-        clip` absorbs it — no horizontal scroll, no visible difference.
-      */}
-      <div className="relative">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute bottom-0 left-1/2 -z-10 w-screen -translate-x-1/2 overflow-hidden"
-        >
-          <Image
-            src="/assets/without-yuvoy-artwork.webp"
-            alt=""
-            width={1672}
-            height={941}
-            quality={75}
-            sizes="100vw"
-            className="h-auto w-full opacity-55"
-          />
-        </div>
+        It spans the SECTION, not the act — the foot of the drawing sits at
+        the foot of the section, under the sign-off. Anchoring it to the two
+        halves instead was tried on 2026-08-15 and reverted the same day
+        (owner direction): the horizon wants the full height to sit in.
 
-        <SectionHeading
-          id="why-heading"
-          className="mx-auto text-center"
-          eyebrow="Why Yuvoy"
-          title="From too many tabs to"
-          accent="one simple place."
-          body="See the experience, understand the details, and book in one flow."
+        It must stay a DIRECT child of the section's children, too.
+        `container-page` is static, so this absolutely positioned element
+        resolves against the section and is edge-to-edge for free. Giving any
+        ancestor between here and the section a position takes that away and
+        silently crops the drawing to the 70rem measure — which is exactly
+        what happened while it lived in a wrapper.
+      */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+      >
+        <Image
+          src="/assets/without-yuvoy-artwork.webp"
+          alt=""
+          width={1672}
+          height={941}
+          quality={75}
+          sizes="100vw"
+          className="absolute inset-x-0 bottom-0 h-auto w-full opacity-55"
         />
+      </div>
 
-        {/*
+      <SectionHeading
+        id="why-heading"
+        className="mx-auto text-center"
+        eyebrow="Why Yuvoy"
+        title="From too many tabs to"
+        accent="one simple place."
+        body="See the experience, understand the details, and book in one flow."
+      />
+
+      {/*
         4fr / 6fr, not an even split: the right column carries the phone and
         its rail side by side, and an even split leaves the rail about 130px
         wide at the lg breakpoint, where every line of it wraps three ways.
       */}
-        <div className="mt-10 grid grid-cols-1 gap-x-8 gap-y-6 sm:mt-20 sm:gap-y-8 lg:grid-cols-[minmax(0,4fr)_auto_minmax(0,6fr)] lg:grid-rows-[auto_1fr] lg:gap-x-10">
-          {/* ---------------------------------------- without Yuvoy · header */}
-          <div className="lg:col-start-1 lg:row-start-1">
-            {/* No trailing rule (owner direction, 2026-08-15). It was drawing a
+      <div className="mt-10 grid grid-cols-1 gap-x-8 gap-y-6 sm:mt-20 sm:gap-y-8 lg:grid-cols-[minmax(0,4fr)_auto_minmax(0,6fr)] lg:grid-rows-[auto_1fr] lg:gap-x-10">
+        {/* ---------------------------------------- without Yuvoy · header */}
+        <div className="lg:col-start-1 lg:row-start-1">
+          {/* No trailing rule (owner direction, 2026-08-15). It was drawing a
               line across the top of the column that read as a divider rather
               than as part of the label. */}
-            <p className="label text-forest/75">Without Yuvoy</p>
-            <p className="font-display tracking-display mt-3 text-2xl leading-snug text-balance">
-              Too many places. Too much guesswork.
-            </p>
-            <p className="text-forest/70 mt-4 max-w-sm leading-relaxed">
-              Scattered sources. Confusing info. You spend hours, still not
-              sure.
-            </p>
-          </div>
+          <p className="label text-forest/75">Without Yuvoy</p>
+          <p className="font-display tracking-display mt-3 text-2xl leading-snug text-balance">
+            Too many places. Too much guesswork.
+          </p>
+          <p className="text-forest/70 mt-4 max-w-sm leading-relaxed">
+            Scattered sources. Confusing info. You spend hours, still not sure.
+          </p>
+        </div>
 
-          {/* -------------------------------------- without Yuvoy · the pile */}
-          <div className="lg:col-start-1 lg:row-start-2">
-            <ScatteredSources />
-          </div>
+        {/* -------------------------------------- without Yuvoy · the pile */}
+        <div className="lg:col-start-1 lg:row-start-2">
+          <ScatteredSources />
+        </div>
 
-          {/* The turn of the story: one arrow, chaos into flow. */}
-          <div
-            aria-hidden
-            className="flex justify-center self-center lg:col-start-2 lg:row-start-2"
+        {/* The turn of the story: one arrow, chaos into flow. */}
+        <div
+          aria-hidden
+          className="flex justify-center self-center lg:col-start-2 lg:row-start-2"
+        >
+          <svg
+            viewBox="0 0 56 16"
+            fill="none"
+            className="text-terra w-12 rotate-90 lg:w-14 lg:rotate-0"
           >
-            <svg
-              viewBox="0 0 56 16"
-              fill="none"
-              className="text-terra w-12 rotate-90 lg:w-14 lg:rotate-0"
-            >
-              <path d="M0 8h51" stroke="currentColor" strokeWidth="1.5" />
-              <path
-                d="M46 2.5L52.5 8L46 13.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
+            <path d="M0 8h51" stroke="currentColor" strokeWidth="1.5" />
+            <path
+              d="M46 2.5L52.5 8L46 13.5"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
 
-          {/* ------------------------------------------- with Yuvoy · header */}
-          <div className="lg:col-start-3 lg:row-start-1">
-            <p className="label text-terra-deep">With Yuvoy</p>
-            {/* text-2xl is 24px, which is where `terra` clears AA as large
+        {/* ------------------------------------------- with Yuvoy · header */}
+        <div className="lg:col-start-3 lg:row-start-1">
+          <p className="label text-terra-deep">With Yuvoy</p>
+          {/* text-2xl is 24px, which is where `terra` clears AA as large
               text, and this header sits on `cream`, never on a panel. */}
-            <p className="font-display tracking-display mt-3 text-2xl leading-snug text-balance">
-              Everything you need.{" "}
-              <em className="text-terra font-turn italic">In one flow.</em>
-            </p>
-          </div>
+          <p className="font-display tracking-display mt-3 text-2xl leading-snug text-balance">
+            Everything you need.{" "}
+            <em className="text-terra font-turn italic">In one flow.</em>
+          </p>
+        </div>
 
-          {/* -------------------------------------------- with Yuvoy · panel */}
-          <div className="lg:col-start-3 lg:row-start-2">
-            <ProductDemo />
-          </div>
+        {/* -------------------------------------------- with Yuvoy · panel */}
+        <div className="lg:col-start-3 lg:row-start-2">
+          <ProductDemo />
         </div>
       </div>
 
