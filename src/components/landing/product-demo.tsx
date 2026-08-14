@@ -564,19 +564,28 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
                     WIDTH: the stroke was 2px over a 1px border, so it never
                     lined up with anything the eye could call the edge.
 
-                    Hence `border-2` on the tile below `lg` and a 2px stroke
-                    centred on `x=1`, which spans 0 to 2 — exactly that band.
-                    `-inset-px` cancels the padding-box offset so the viewBox
-                    maps 1:1 onto the border box, and `rx="1"` is
-                    `rounded-edge`'s 2px measured at the stroke's centre line.
-                    These four numbers are one measurement: change the border
-                    width and the stroke, the inset and the radius all move.
+                    THE INSET MUST EQUAL THE BORDER WIDTH. That is the rule
+                    the fourth attempt got wrong: an absolutely positioned
+                    child is laid out against the padding box, so pulling it
+                    out by less than the border leaves the outer part of that
+                    border uncovered — with `border-2` and `-inset-px` the
+                    stroke sat 1 to 3 instead of 0 to 2, and a hairline of the
+                    tile's own edge showed all the way round outside the
+                    terra. That thin outline is what read as "not a border".
+
+                    So: `border-2` and `-inset-0.5`, both 2px. The SVG box is
+                    then the border box exactly, the viewBox maps 1:1 onto it,
+                    and a 2px stroke centred on `x=1` spans 0 to 2 — the same
+                    band the tile draws for itself. `rx="1"` is
+                    `rounded-edge`'s 2px measured at that centre line. All
+                    four numbers are one measurement: change the border and
+                    the inset, the stroke and the radius all move with it.
                   */}
                     <svg
                       viewBox="0 0 40 40"
                       fill="none"
                       preserveAspectRatio="none"
-                      className="pointer-events-none absolute -inset-px lg:hidden"
+                      className="pointer-events-none absolute -inset-0.5 lg:hidden"
                     >
                       <rect
                         key={`${act.id}-${epoch}`}
