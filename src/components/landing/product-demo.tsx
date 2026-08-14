@@ -553,10 +553,11 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
 
                     While tracing, `border-transparent` lets the sweep own
                     the band and the forest fill rides the same declaration.
-                    A finished step keeps a quiet terra border at 40% — full
-                    strength would end the loop with three tiles shouting as
-                    loudly as the one playing. `lg` keeps its 1px border and
-                    the underline meter below carries progress there.
+                    A finished step drops back to the plain `cream-line`
+                    border (owner direction, 2026-08-15 — a kept ring ended
+                    the loop with three highlighted tiles); only the running
+                    act carries terra. `lg` keeps its 1px border and the
+                    underline meter below carries progress there.
 
                     The epoch key remounts the tile on every seek and loop
                     wrap, which is what restarts the CSS animation cleanly.
@@ -568,12 +569,7 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
                       "rounded-edge ease-interaction relative flex size-10 flex-none items-center justify-center border-3 transition-colors duration-200 lg:border",
                       isActive
                         ? "bg-forest text-cream max-lg:demo-trace lg:border-forest border-transparent"
-                        : cn(
-                            "bg-cream-deep text-forest/70 group-hover:text-forest",
-                            isDone
-                              ? "border-terra/40 lg:border-cream-line"
-                              : "border-cream-line",
-                          ),
+                        : "border-cream-line bg-cream-deep text-forest/70 group-hover:text-forest",
                     )}
                     style={
                       isActive
