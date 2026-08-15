@@ -108,21 +108,49 @@ const QUALITY = 78;
 const BACKDROPS = [
   { file: "footer-bg.png", slug: "footer", maxEdge: 2048 },
   /*
-    `/contact`'s field, and the horizon inside its note card — the two frames
-    of the same moody bay the owner delivered for that page (2026-08-11).
-
-    `contact-note` keeps far less resolution than the field does, and that is
-    the rule rather than a saving: it renders inside a card that is at most
-    ~34rem wide, masked, dimmed and sat under a forest wash. Shipping the
-    field's 1653px into a 544px slot would cost a second full-weight
-    photograph on a page that already carries one.
+    `/contact`'s field: the moody bay the owner delivered for that page
+    (2026-08-11). A backdrop like the footer's — it stretches to a section
+    whose height nobody can predict, so its crop stays in CSS.
 
     `moody-tropical-bay-02.png` is delivered and kept as a master but ships
     nothing: it is the alternate frame of the same scene, held so a crop
     decision can be revisited without asking for the artwork again.
   */
   { file: "moody-tropical-bay-01.png", slug: "contact-bay", maxEdge: 2048 },
-  { file: "moody-tropical-bay-03.png", slug: "contact-note", maxEdge: 1100 },
+];
+
+/**
+ * Details: a **named region** of a delivery, cut here rather than in CSS.
+ *
+ * This is the exception to the backdrop rule above, and it earns it by having
+ * the one thing a backdrop never has — a slot whose aspect ratio is known at
+ * build time. `/contact`'s note card holds a fixed band (`h-56 sm:h-64`) at a
+ * card width the page measure decides, so the frame it needs is knowable, and
+ * `object-position` cannot reach it anyway: at that band's ratio the whole
+ * width of the source already fits, so there is no overflow left to pan
+ * across. Cropping in CSS would mean shipping four times the pixels to throw
+ * three of them away.
+ *
+ * Regions are in **source pixels** and are asserted against the delivery's own
+ * dimensions before the cut. A region that has drifted off the edge of a
+ * re-delivered file fails here rather than silently sliding to whatever sharp
+ * clamps it to, which would move the horizon without moving the filename.
+ */
+const DETAILS = [
+  {
+    file: "moody-tropical-bay-03.png",
+    slug: "contact-note",
+    /*
+      The right half of the bay, on the waterline: the island ridge and the
+      one boat (owner direction, 2026-08-12 — the full frame put the empty
+      left-hand water in the card and left the subject off the edge of it).
+      ~1.8, between the band's ratio on a phone (1.53) and on a wide screen
+      (2.1), so `object-cover` trims a little either way and neither end gets
+      a crop it was not drawn for.
+    */
+    region: { left: 870, top: 390, width: 791, height: 439 },
+    maxEdge: 1100,
+  },
 ];
 
 if (!existsSync(SRC_DIR)) {
@@ -191,7 +219,45 @@ for (const { file, slug, maxEdge } of BACKDROPS) {
   console.log(`${file} → photography/${slug}.webp  ${kb(from)} → ${kb(to)}`);
 }
 
+for (const { file, slug, region, maxEdge } of DETAILS) {
+  const src = join(SRC_DIR, file);
+  if (!existsSync(src)) {
+    throw new Error(
+      `missing detail source "${file}" in ${SRC_DIR}. Update DETAILS if it was renamed.`,
+    );
+  }
+
+  // The region has to be inside the delivery. sharp would clamp a region that
+  // hangs off the edge and hand back a differently-framed image under the same
+  // filename, which is the failure nobody would look for.
+  const { width, height } = await sharp(src).metadata();
+  if (
+    region.left + region.width > width ||
+    region.top + region.height > height
+  ) {
+    throw new Error(
+      `${file} is ${width}x${height}, too small for the region ` +
+        `${region.width}x${region.height} at ${region.left},${region.top}. ` +
+        `Re-cut the region in DETAILS against the new delivery.`,
+    );
+  }
+
+  const out = join(OUT_DIR, `${slug}.webp`);
+  await sharp(src)
+    .extract(region)
+    .resize({ width: maxEdge, withoutEnlargement: true })
+    .webp({ quality: QUALITY })
+    .toFile(out);
+
+  const from = statSync(src).size;
+  const to = statSync(out).size;
+  savedFrom += from;
+  savedTo += to;
+  console.log(`${file} → photography/${slug}.webp  ${kb(from)} → ${kb(to)}`);
+}
+
 console.log(
-  `\n${SOURCES.length + BACKDROPS.length} images: ${kb(savedFrom)} → ${kb(savedTo)} ` +
+  `\n${SOURCES.length + BACKDROPS.length + DETAILS.length} images: ` +
+    `${kb(savedFrom)} → ${kb(savedTo)} ` +
     `(${Math.round((1 - savedTo / savedFrom) * 100)}% smaller)`,
 );

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { ContactAssurances } from "@/components/site/contact-assurances";
 import { ContactChannels } from "@/components/site/contact-channels";
-import { HorizonRule } from "@/components/site/contact-icons";
 import { MessageForm } from "@/components/site/message-form";
 import { VIEWPORT_ON_FOREST } from "@/lib/site/theme";
 
@@ -132,17 +131,6 @@ export default function ContactPage() {
               </p>
 
               {/*
-                The turn from the statement into the practical half of the
-                page, drawn as a horizon rather than the straight hairline the
-                rest of the site divides with — a 1px rule here would read as
-                the end of a section rather than as a breath inside one. It is
-                the act's one decorative mark, and it is `terra`, not
-                `terra-soft`: this is decoration, which is the rung `terra` is
-                for, and it sits on the field rather than on a raised surface.
-              */}
-              <HorizonRule className="text-terra/60 mt-10 h-5 max-w-md sm:max-w-lg" />
-
-              {/*
                 `#channels` keeps its id: it was the second entry in the page
                 index this act replaced, and an anchor that has been published
                 is a contract even when the section around it changes shape.
@@ -151,10 +139,15 @@ export default function ContactPage() {
                 window this team will eventually miss costs more trust than one
                 never offered, which is the same rule that keeps launch months
                 off the rest of the site.
+
+                A drawn terracotta horizon sat between the lede and this label
+                until 2026-08-12 (owner direction: taken out). Space does the
+                separating now, which is why the margin here is `mt-16` rather
+                than the `mt-12` it carried while a mark was doing the work.
               */}
               <h2
                 id="channels"
-                className="label text-cream/70 mt-12 scroll-mt-[calc(6rem+env(safe-area-inset-top))]"
+                className="label text-cream/70 mt-16 scroll-mt-[calc(6rem+env(safe-area-inset-top))]"
               >
                 Reach us directly
               </h2>

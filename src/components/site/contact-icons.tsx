@@ -23,8 +23,10 @@ import { cn } from "@/lib/cn";
  * it illustrates and is `aria-hidden`, so nothing is lost when they do not
  * load, do not render, or are read by a screen reader that ignores them.
  *
- * Twenty-unit viewBox for the set, twenty-four for the two ornaments
- * (`PlaneOrnament`, `HorizonRule`), which are drawings rather than glyphs.
+ * Twenty-unit viewBox for the glyph set. The two that are not glyphs carry
+ * their own grid: `PlaneOrnament` is 64x44 because a trail needs room to be a
+ * trail, and `CheckRing` is 24 because it renders at 3x the glyph size, where
+ * a 20-unit grid would put the ring's stroke on a half pixel.
  */
 
 interface IconProps {
@@ -152,42 +154,15 @@ export function PlaneOrnament({ className }: IconProps) {
   );
 }
 
-/**
- * The rule under the lede: a horizon rather than a straight hairline.
- *
- * The site's dividers are all 1px straight lines, and one of those here would
- * read as the end of a section rather than the turn from the statement into
- * the practical half of the page. It stretches to whatever width it is given
- * (`preserveAspectRatio="none"`), so the stroke is pinned with
- * `vectorEffect="non-scaling-stroke"` — without it a wide container would
- * squash a 1px line into a hairline that disappears at some widths and
- * thickens at others.
- */
-export function HorizonRule({ className }: IconProps) {
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 600 22"
-      preserveAspectRatio="none"
-      fill="none"
-      className={cn("w-full", className)}
-    >
-      <path
-        d="M0 14C70 14 96 9 150 9s84 6 140 4c40-1.4 62-8.5 100-8.5s70 8 110 9c40 1 66-2 100-2"
-        stroke="currentColor"
-        strokeWidth="1"
-        vectorEffect="non-scaling-stroke"
-      />
-    </svg>
-  );
-}
+/*
+  A `HorizonRule` lived here until 2026-08-12 — a drawn terracotta wave that
+  divided the lede from "Reach us directly". Removed on owner direction, and
+  deleted rather than kept as an unused export: a component nothing renders is
+  a component nobody maintains, and the next person to find it has no way to
+  tell a deliberate removal from an accidental one. It is in the history.
+*/
 
-/**
- * The success mark: a check inside a ring.
- *
- * Its own viewBox at 24 because it renders at 3x the glyph size, where a
- * 20-unit grid would put the ring's stroke on a half pixel.
- */
+/** The success mark: a check inside a ring. */
 export function CheckRing({ className }: IconProps) {
   return (
     <svg

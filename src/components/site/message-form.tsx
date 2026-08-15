@@ -365,11 +365,16 @@ function NoteCard({ children }: { children: React.ReactNode }) {
           alt=""
           fill
           // 75 is the photography quality the optimiser allows; the source is
-          // already an 1100px derivative and this renders at ~544px, masked
-          // and dimmed, so nothing finer would survive the wash over it.
+          // already cut to this band's region (see `DETAILS` in
+          // `optimise-photography.mjs`) and renders at ~544px, masked and
+          // dimmed, so nothing finer would survive the wash over it.
           quality={75}
           sizes="(min-width: 1024px) 34rem, 100vw"
-          className="note-horizon object-cover object-[62%_60%] opacity-45"
+          // Biased right and low. The band is wider than the region on a
+          // desktop and narrower on a phone, so it trims a different edge at
+          // each end; this keeps the boat in frame on the narrow one and the
+          // horizon off the fields on the wide one.
+          className="note-horizon object-cover object-[68%_58%] opacity-45"
         />
         <div className="note-horizon-wash absolute inset-0" />
       </div>
