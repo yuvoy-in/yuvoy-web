@@ -425,6 +425,85 @@
 }
 
 /*
+  `/contact`'s field, which cannot borrow `hero-scrim`.
+
+  That curve is tuned to a full viewport: its thin band sits at 58% of a
+  screen's height. `/contact` is one act about two thirds that tall, so the
+  same stops would leave the brightest water running straight through the
+  headline. This one seals harder and sooner at the top (the transparent
+  header must meet flat forest, never a photograph), opens across the middle
+  where the bay's own light is, and closes at the foot where the footer
+  begins.
+*/
+@utility contact-scrim {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-forest) 96%, transparent) 0%,
+    color-mix(in oklab, var(--color-forest) 74%, transparent) 20%,
+    color-mix(in oklab, var(--color-forest) 52%, transparent) 52%,
+    color-mix(in oklab, var(--color-forest) 60%, transparent) 78%,
+    color-mix(in oklab, var(--color-forest) 90%, transparent) 100%
+  );
+}
+
+/*
+  The second falloff, and the one the cover never needed: the note card sits
+  on the right half from `lg` up, and glass over a lit photograph is a form
+  nobody can read. So the field deepens toward the side the card lands on,
+  which also puts the bay's palm and its horizon glow on the side the
+  headline reads from.
+
+  It is applied only where that layout exists (`hidden lg:block`). Below
+  `lg` the card stacks under the copy, and a right edge that is darker than
+  its left would be shading nothing.
+*/
+@utility contact-scrim-lateral {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 30%,
+    color-mix(in oklab, var(--color-forest) 42%, transparent) 62%,
+    color-mix(in oklab, var(--color-forest) 70%, transparent) 100%
+  );
+}
+
+/*
+  The horizon inside the note card: the same bay, dimmed and cut off at the
+  waterline, so the card has depth at its foot rather than a photograph in
+  it. Masked with a token rather than a colour literal — a mask reads alpha
+  only, so `forest` here means "opaque" and keeps the no-value-outside-a-token
+  rule intact.
+
+  The top three fifths fade to nothing, which is where the form's fields sit;
+  anything that reached them would be competing with type the visitor has to
+  type into.
+*/
+@utility note-horizon {
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in oklab, var(--color-forest) 55%, transparent) 46%,
+    var(--color-forest) 78%
+  );
+}
+
+/*
+  The wash over that horizon. The photograph is a warm mid-tone and the card
+  is a 5% cream glass, so without this the artwork lifts the card's foot to
+  roughly the brightness of its own text. Forest over it holds the surface at
+  the tone the rest of the card sits on, and the cream/70 body copy keeps the
+  6.45:1 it is measured at.
+*/
+@utility note-horizon-wash {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in oklab, var(--color-forest) 46%, transparent) 55%,
+    color-mix(in oklab, var(--color-forest) 66%, transparent) 100%
+  );
+}
+
+/*
   A hairline that draws itself in from the left. Ends fully drawn, which is
   also what reduced-motion visitors see.
 */

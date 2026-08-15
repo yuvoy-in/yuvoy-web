@@ -1,11 +1,13 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { CheckRing, PlaneOrnament } from "@/components/site/contact-icons";
 import { isPlausibleEmail } from "@/lib/contact/email";
 import { sendMessage, type SendResult } from "@/lib/messages/api";
 import { CONTACT_EMAIL, CONTACT_TOPICS, MESSAGE_MAX } from "@/lib/site/contact";
@@ -141,27 +143,44 @@ export function MessageForm() {
 
   if (result?.kind === "sent") {
     return (
-      <div>
+      <NoteCard>
         <Heading />
         <div
           role="status"
-          className="border-cream/20 rounded-edge mt-8 max-w-xl border p-8"
+          className="border-cream/15 bg-cream/5 rounded-edge mt-8 border p-6 sm:p-7"
         >
-          <p className="eyebrow text-terra-soft">Message received</p>
           {/*
-            No reply-time promise, here or anywhere. The site publishes none
-            (owner direction), and the moment a confirmation invents one it
-            becomes the thing the team is measured against.
+            A plain `label`, not the `eyebrow` utility: the eyebrow's marker is
+            a terracotta square, and the ring beside it is already this block's
+            marker. Two would be one too many, and the page spends its one
+            eyebrow on "Contact" at the top of the act.
           */}
-          <p className="font-display tracking-display mt-6 text-2xl font-normal text-balance">
-            Thanks — a person will read this.
-          </p>
-          <p className="text-cream/70 mt-4 leading-relaxed">
+          <div className="flex items-start gap-5">
+            <CheckRing className="text-terra-soft mt-1 size-10 flex-none" />
+            <div className="min-w-0">
+              <p className="label text-terra-soft">Message received</p>
+              {/*
+                No reply-time promise, here or anywhere. The site publishes
+                none (owner direction), and the moment a confirmation invents
+                one it becomes the thing the team is measured against.
+              */}
+              <p className="font-display tracking-display mt-4 text-2xl font-normal text-balance">
+                Thanks — a person will read this.
+              </p>
+            </div>
+          </div>
+
+          {/* A rule, not a gap: what follows is about the data rather than
+              about the message, and the two should not read as one sentence
+              broken over a paragraph break. */}
+          <hr className="border-cream/12 mt-7" />
+
+          <p className="text-cream/70 mt-6 leading-relaxed">
             We have your note and your email address, and we use them to answer
             you and nothing else.
           </p>
         </div>
-      </div>
+      </NoteCard>
     );
   }
 
@@ -173,13 +192,13 @@ export function MessageForm() {
       : null;
 
   return (
-    <div>
+    <NoteCard>
       <Heading />
 
       <form
         onSubmit={handleSubmit(onSubmit)}
         noValidate
-        className="relative mt-10 flex max-w-xl flex-col gap-5"
+        className="relative mt-8 flex flex-col gap-5"
       >
         {/* Visually hidden honeypot. Real visitors never see or fill it, and a
             bot that does gets the same 202 as everybody else — with no row and
@@ -299,18 +318,107 @@ export function MessageForm() {
           {isSubmitting ? "Sending…" : "Send"}
         </Button>
       </form>
+    </NoteCard>
+  );
+}
+
+/**
+ * The surface the note is written on: glass over the page's own bay.
+ *
+ * ## Why the form gets a card at all
+ *
+ * Everything else in this act is type on a field. A form is not type — it is a
+ * set of targets, and targets need an edge to sit inside or the page reads as
+ * inputs floating on a photograph. The card is what makes the right half a
+ * place rather than a region.
+ *
+ * It is glass rather than a fill (5% cream and a backdrop blur) so the field
+ * still carries through it: a solid panel here would punch a hole in the
+ * photograph the act is built on, and the blur is what keeps the type legible
+ * over whatever part of the bay it lands on. `rounded-edge`, like every other
+ * panel — the reference this was drawn from rounds its card, and the brand is
+ * rectangular (DESIGN_SYSTEM §4); a soft card would be the one rounded object
+ * on a page of square ones.
+ *
+ * ## The horizon at its foot
+ *
+ * The same bay as the field behind it, cropped to its waterline, masked away
+ * before it reaches the fields and held down by a forest wash. It gives the
+ * card depth where nothing is being typed. Two rules govern it and both are in
+ * `globals.css`: it fades out across the top three fifths (`note-horizon`),
+ * and the wash keeps the surface at the tone the `cream/70` body copy is
+ * measured against (`note-horizon-wash`).
+ *
+ * It is `aria-hidden` and inert. It is also **not** `priority` — it is the
+ * page's second photograph and sits below the fold of a phone, so it must
+ * never compete with the field for the first paint.
+ */
+function NoteCard({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="border-cream/15 bg-cream/5 rounded-edge relative overflow-hidden border p-6 backdrop-blur-md sm:p-8">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-56 sm:h-64"
+      >
+        <Image
+          src="/photography/contact-note.webp"
+          alt=""
+          fill
+          // 75 is the photography quality the optimiser allows; the source is
+          // already cut to this band's region (see `DETAILS` in
+          // `optimise-photography.mjs`) and renders at ~544px, masked and
+          // dimmed, so nothing finer would survive the wash over it.
+          quality={75}
+          sizes="(min-width: 1024px) 34rem, 100vw"
+          // Biased right and low. The band is wider than the region on a
+          // desktop and narrower on a phone, so it trims a different edge at
+          // each end; this keeps the boat in frame on the narrow one and the
+          // horizon off the fields on the wide one.
+          className="note-horizon object-cover object-[68%_58%] opacity-60"
+        />
+        <div className="note-horizon-wash absolute inset-0" />
+      </div>
+
+      {/*
+        The ornament, and the only drawing on the page that illustrates
+        nothing: the gesture of sending, where the eye lands after the title.
+        Hidden below `sm`, where the card is the full measure and the title
+        needs the width more than the page needs a flourish.
+      */}
+      <PlaneOrnament className="text-terra-soft/55 pointer-events-none absolute top-7 right-7 hidden w-24 sm:block" />
+
+      {/* The content rides above both decorations; neither is in flow. */}
+      <div className="relative">{children}</div>
     </div>
   );
 }
 
 function Heading() {
   return (
-    <h2
-      id="message-heading"
-      className="font-display tracking-display text-[clamp(1.75rem,3.5vw,2.25rem)] leading-tight font-normal"
-    >
-      Leave a note
-    </h2>
+    /*
+      `sm:pr-28` is the plane's width (96px) plus a gap, applied at exactly the
+      breakpoint the plane appears at. Without it the sub-line runs under the
+      ornament on a tablet — the one width where the card is wide enough to
+      reach it and the type is not yet narrow enough to stop short.
+    */
+    <div className="sm:pr-28">
+      <h2
+        id="message-heading"
+        className="font-display tracking-display text-[clamp(1.75rem,3.5vw,2.25rem)] leading-tight font-normal"
+      >
+        Leave a note
+      </h2>
+      {/*
+        Not "we'll get back to you soon", which the reference says here. Even
+        without a number that is a reply commitment, and this page makes none
+        (see `@/lib/site/contact`). What it can say is where the note goes,
+        which is the thing somebody hovering over a form actually wants to
+        know.
+      */}
+      <p className="text-cream/70 mt-3 text-sm leading-relaxed">
+        It reaches the team directly.
+      </p>
+    </div>
   );
 }
 
