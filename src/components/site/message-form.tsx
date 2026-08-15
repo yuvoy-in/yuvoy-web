@@ -374,7 +374,7 @@ function NoteCard({ children }: { children: React.ReactNode }) {
           // desktop and narrower on a phone, so it trims a different edge at
           // each end; this keeps the boat in frame on the narrow one and the
           // horizon off the fields on the wide one.
-          className="note-horizon object-cover object-[68%_58%] opacity-45"
+          className="note-horizon object-cover object-[68%_58%] opacity-60"
         />
         <div className="note-horizon-wash absolute inset-0" />
       </div>

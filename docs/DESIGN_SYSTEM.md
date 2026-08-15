@@ -264,6 +264,16 @@ fill in.
 table, which does not crop — a backdrop's height is whatever its section turns
 out to be, so the crop belongs in CSS (`object-position`) where it can respond.
 
+Its `DETAILS` table is the one exception, and the test for it is narrow: **the
+slot's aspect ratio must be known before the page renders.** `/contact`'s note
+card holds a fixed band inside a card the page measure decides, so the frame it
+needs is knowable — and `object-position` cannot reach it anyway, because at
+that band's ratio the source's full width already fits and there is no overflow
+left to pan across. Cutting in CSS would mean shipping four times the pixels to
+throw three away. Regions are in source pixels and are asserted against the
+delivery before the cut, so a re-cut source fails loudly instead of quietly
+re-framing itself under the same filename.
+
 ### Glass, and where it is allowed
 
 `/contact`'s note card is 5% cream with a backdrop blur, on `rounded-edge` like

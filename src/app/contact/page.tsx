@@ -50,11 +50,21 @@ export const metadata: Metadata = {
  *
  * ## The surface
  *
- * Forest, and the page's own cover — `data-dark-hero` and the `-mt-16` pull-up
- * that lets the header go transparent over it, exactly as `PageIntro` does for
- * the other interior pages. `/contact` is already in `isCoverRoute`, so the
- * server and the first paint agree; **if this section ever stops being dark,
- * remove it from that list in the same change.**
+ * Forest, and the page's own cover — `data-dark-hero` and the pull-up that
+ * lets the header go transparent over it, exactly as `PageIntro` does for the
+ * other interior pages. `/contact` is already in `isCoverRoute`, so the server
+ * and the first paint agree; **if this section ever stops being dark, remove
+ * it from that list in the same change.**
+ *
+ * The pull-up and the padding that puts the content back are
+ * `calc(4rem + env(safe-area-inset-top))` and its `6rem`/`9rem` counterparts,
+ * matching `Hero` and `PageIntro` (DESIGN_SYSTEM §4). This route was left on
+ * the flat `-mt-16`/`pt-32` when the header moved to 64px plus the inset —
+ * only its `scroll-mt` was carried over — so it was the one cover measuring
+ * the bar differently from the other two. The `env()` reads 0 in Safari today
+ * (`viewport-fit=cover` is banned, and why is in §4); it is here for the same
+ * reason it is on the other two, which is that it costs nothing at zero and
+ * is right the day the site is opened from a home screen.
  *
  * ## The field (owner artwork + direction, 2026-08-11)
  *
@@ -82,7 +92,7 @@ export default function ContactPage() {
         data-dark-hero
         id="contact"
         aria-labelledby="contact-heading"
-        className="bg-forest text-cream relative -mt-16 overflow-hidden"
+        className="bg-forest text-cream relative -mt-[calc(4rem+env(safe-area-inset-top))] overflow-hidden"
       >
         {/* The field, in six layers. All decorative, all inert. */}
         <div aria-hidden className="pointer-events-none absolute inset-0">
@@ -114,7 +124,7 @@ export default function ContactPage() {
           <div className="grain" />
         </div>
 
-        <div className="container-page relative pt-32 pb-20 sm:pt-36 sm:pb-24">
+        <div className="container-page relative pt-[calc(6rem+env(safe-area-inset-top))] pb-20 sm:pt-[calc(9rem+env(safe-area-inset-top))] sm:pb-24">
           <div className="grid grid-cols-1 gap-x-16 gap-y-16 lg:grid-cols-2 lg:gap-x-20">
             <div>
               <p className="eyebrow text-terra-soft">Contact</p>
