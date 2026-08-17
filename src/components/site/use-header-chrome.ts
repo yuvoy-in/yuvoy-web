@@ -21,53 +21,61 @@ import { usePathname } from "next/navigation";
  *   motion preference itself is the bug that silently disabled this whole
  *   behaviour once already.
  *
- * **It wears the cover's colours for exactly as long as the cover is behind
- * it.** On a page whose first section is forest, a cream bar sitting on top of
- * it looks stuck on; the header is transparent instead and its contents turn
- * cream, and it goes solid at the moment the cover's bottom edge passes under
- * it — not a pixel before.
+ * **It wears the cover's colours only where nothing can come between them and
+ * the cover: at the very top of the page, and while the bar itself cannot be
+ * seen.** Any bar the visitor can actually see below the top is solid cream —
+ * owner direction, 2026-08-16, from on-device iOS captures: a bar that came
+ * back transparent partway down the cover sat under the Dynamic Island with
+ * the cover's own type sliding through the lockup. "Going back to the top we
+ * should see the header with cream background till we reach the top point."
  *
- * ## Why it is measured rather than timed (owner report, 2026-08-08)
+ * That narrows the 2026-08-08 rule — the cover's colours for exactly as long
+ * as the cover is behind the bar — to the states where it still holds:
  *
- * It used to go solid 240px into the page, whatever the page was. That number
- * came from a 2026-08-04 decision to release the cover on any scroll rather
- * than track it, and it was wrong in proportion to how tall the cover is:
+ * - **At the top**, the resting bar over the cover: the whole point of the
+ *   transparency, unchanged.
+ * - **While hidden over the cover**, so the slide-away that begins at the top
+ *   leaves in the colours it arrived with instead of flashing cream on its
+ *   way out — and, for reduced-motion visitors, whose bar never actually
+ *   leaves, so the ride DOWN a cover never puts a cream bar on a green field
+ *   (the 2026-08-08 defect). The moment such a bar is asked back below the
+ *   top it returns solid, and the swap lands in the same frame the reveal
+ *   begins — while the bar is still off-screen — so no repaint is ever seen.
  *
- * | route | cover | cream bar begins |
- * |---|---|---|
- * | `/operators` | 744px | 240px — with **504px of forest still to go** |
- * | `/about` | 592px | 240px |
- * | `/explore`, `/contact` | 518px | 240px |
- *
- * So every cover route put a cream bar on a green field partway down, and
- * `/operators` — the tallest cover on the site — wore it for two thirds of the
- * cover. Reported as a bug on `/operators` specifically; it was on all of them,
- * and it is the same defect the transparency exists to prevent.
- *
- * The cover's own bottom edge answers the question exactly, at every height, on
- * every route, with no constant to keep in sync with a design that moves.
- *
- * The comparison is against the header's **resting** height (`offsetHeight`,
- * which no transform touches) rather than its animated position. That is what
- * stops the colour flickering as the bar slides back into view: a hidden bar
- * sitting at `bottom: 0` would otherwise report itself clear of a cover it is
- * about to be drawn on top of again.
- *
- * It also retires a latch and a reduced-motion backstop that both existed to
- * paper over the timed rule — the swap now happens at a boundary that is
- * genuinely there, so there is nothing to hide from the visitor and no case
- * where a transparent bar can end up over cream content.
+ * The cover's bottom edge is still measured, never timed (2026-08-08): a bar
+ * hidden below the cover must already be cream when it is next revealed. The
+ * comparison is against the bar's **resting** height (`offsetHeight`, which
+ * no transform touches) rather than its animated position, so the answer
+ * cannot flicker mid-slide.
  *
  * `hidden` is written straight to the DOM so scrolling never re-renders React.
  * `overCover` is state because the tone genuinely changes the tree — but it
- * flips only when the cover's edge crosses the bar, not per scroll event.
+ * flips at boundaries (the top edge, the cover's edge, a reveal), not per
+ * scroll event.
  */
 
-/** Never hide within this many pixels of the top. */
+/** Never hide within this many pixels of the top, and reveal arriving here. */
 const REVEAL_ABOVE = 8;
 
 /** Total movement in one direction before the header changes its mind. */
 const DIRECTION_DELTA = 8;
+
+/**
+ * How far down the cover's colours reach for a bar that is still visible.
+ *
+ * Descending from the top, the hide cannot fire until `DIRECTION_DELTA` has
+ * accumulated past the reveal zone — so between `REVEAL_ABOVE` and this line
+ * there is a visible bar that is *about* to hide. Releasing the cover's
+ * colours at `REVEAL_ABOVE` painted that bar cream for those few pixels, and
+ * a cream bar seen sliding away over forest is the original glitch this
+ * machinery exists to prevent (owner report, 2026-08-04). The zone ends
+ * exactly where the hide is guaranteed to have fired, because the anchor can
+ * never sit deeper than `REVEAL_ABOVE` while the page is at the top.
+ *
+ * Ascending, the same line simply starts the deliberate cross-fade a few
+ * pixels early, which reads identically to starting it at `REVEAL_ABOVE`.
+ */
+const COVER_ABOVE = REVEAL_ABOVE + DIRECTION_DELTA;
 
 /**
  * Routes whose first section is a dark cover, for the first paint only.
@@ -174,14 +182,6 @@ export function useHeaderChrome() {
     */
     let coverElement = readCover()?.element ?? null;
 
-    // Reveal on focus whatever the preference: a focus ring parked off-screen
-    // is a defect (WCAG 2.4.11), not a motion choice. Closing the menu returns
-    // focus to the trigger, which lives in here.
-    const reveal = () => {
-      header.dataset.hidden = "false";
-    };
-    header.addEventListener("focusin", reveal);
-
     /** Is the cover still drawn behind the bar's resting position? */
     function isOverCover(): boolean {
       if (!header) return false;
@@ -205,11 +205,57 @@ export function useHeaderChrome() {
     }
 
     let anchorY = window.scrollY;
-    let hidden = false;
-    let cover = isOverCover();
+    /*
+      Read from the DOM, not assumed. This component lives in the layout, so a
+      navigation re-runs this effect without remounting the element, and a bar
+      hidden on the previous page (say, by the scroll down to the footer link
+      that navigated) is still hidden here. Seeding `false` desynced the two:
+      the guard below saw nothing to change, the attribute stayed "true", and
+      the new page opened with no header until the visitor scrolled down and
+      back up again.
+    */
+    let hidden = header.dataset.hidden === "true";
+    let cover = false;
     let frame = 0;
 
-    setOverCover(cover);
+    const setHidden = (next: boolean) => {
+      if (next === hidden) return;
+      hidden = next;
+      header.dataset.hidden = next ? "true" : "false";
+    };
+
+    /*
+      The tone, from the states already resolved this frame. The cover's
+      colours belong to the resting bar at the top and to the hidden bar still
+      over the cover — never to a bar the visitor can see anywhere else (owner
+      direction, 2026-08-16). Always called AFTER `hidden` is settled for the
+      frame: a reveal and its repaint to cream must land together, or the bar
+      slides in wearing the state it was hidden with — which is exactly the
+      on-device capture that prompted the rule.
+    */
+    const syncTone = () => {
+      const y = Math.max(0, window.scrollY);
+      const next = (y <= COVER_ABOVE || hidden) && isOverCover();
+      if (next !== cover) {
+        cover = next;
+        setOverCover(next);
+      }
+    };
+
+    /*
+      Reveal on focus whatever the preference: a focus ring parked off-screen
+      is a defect (WCAG 2.4.11), not a motion choice. Closing the menu returns
+      focus to the trigger, which lives in here. A reveal is a state change
+      like any other: it re-anchors direction so the next gesture is measured
+      from here, and it re-syncs the tone so a bar that was hidden over the
+      cover arrives solid — it is below the top, or it would not have hidden.
+    */
+    const reveal = () => {
+      anchorY = Math.max(0, window.scrollY);
+      setHidden(false);
+      syncTone();
+    };
+    header.addEventListener("focusin", reveal);
 
     function update() {
       frame = 0;
@@ -219,45 +265,30 @@ export function useHeaderChrome() {
       // and a negative delta there would read as "scrolling up".
       const y = Math.max(0, window.scrollY);
 
-      /*
-        The colour is a measurement, not a latch (owner report, 2026-08-08).
-
-        It used to be held until the header had physically left the screen,
-        with a 240px backstop for the visitors whose header never leaves —
-        machinery that existed because the release point was a guess and the
-        guess had to be hidden. The cover's own bottom edge is not a guess, so
-        the swap can simply happen where it belongs, and the case that machinery
-        was protecting against (a cream bar seen sliding away over forest) does
-        not arise: inside the cover the bar is transparent, whether it is
-        sliding or sitting still.
-      */
-      const nextCover = isOverCover();
-      if (nextCover !== cover) {
-        cover = nextCover;
-        setOverCover(nextCover);
-      }
-
       if (y <= REVEAL_ABOVE) {
         anchorY = y;
-        if (hidden) {
-          hidden = false;
-          header.dataset.hidden = "false";
+        setHidden(false);
+      } else {
+        const delta = y - anchorY;
+        // Below the threshold the movement is banked rather than discarded,
+        // so `anchorY` deliberately does not move here.
+        if (Math.abs(delta) >= DIRECTION_DELTA) {
+          anchorY = y;
+          setHidden(delta > 0);
         }
-        return;
       }
 
-      const delta = y - anchorY;
-      // Below the threshold the movement is banked rather than discarded, so
-      // `anchorY` deliberately does not move here.
-      if (Math.abs(delta) < DIRECTION_DELTA) return;
-
-      const next = delta > 0;
-      anchorY = y;
-      if (next !== hidden) {
-        hidden = next;
-        header.dataset.hidden = next ? "true" : "false";
-      }
+      syncTone();
     }
+
+    /*
+      The initial paint, through the same rule the frames use: hydration must
+      correct the route-list guess — and a hard load restored mid-page must
+      open cream, not in the cover's colours the server guessed at.
+    */
+    cover =
+      (Math.max(0, window.scrollY) <= COVER_ABOVE || hidden) && isOverCover();
+    setOverCover(cover);
 
     function schedule() {
       if (!frame) frame = requestAnimationFrame(update);

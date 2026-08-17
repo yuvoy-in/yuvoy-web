@@ -400,14 +400,17 @@ test.describe("header on scroll", () => {
   });
 
   /*
-    The bar wears the cover for exactly as long as the cover is behind it, and
-    goes solid when the cover's bottom edge passes under it.
+    The tone contract, in both directions (owner directions 2026-08-08 and
+    2026-08-16 together).
 
-    It used to release on a fixed 240px instead, which put a cream bar on a
-    green field partway down every cover route — 504px early on `/operators`,
-    whose cover is 744px tall (owner report, 2026-08-08). So what is asserted
-    is the *relationship* rather than a scroll position: the boundary is read
-    off the cover element, so this keeps holding as the covers change height.
+    Going DOWN the bar hides, and its latent tone tracks the cover's bottom
+    edge — read off the element, not timed, because a fixed 240px release
+    once put a cream bar on a green field partway down every cover route
+    (504px early on `/operators`, whose cover is 744px tall). Coming back UP
+    anywhere below the top, the visitor sees a SOLID bar: the transparent
+    treatment belongs to the very top alone. On-device captures (2026-08-16)
+    showed why — a bar revealed transparent mid-cover sat under the Dynamic
+    Island with the cover's own type sliding through its lockup.
   */
   /*
     Instant, not the site's own smooth scrolling. What these assert is a
@@ -441,7 +444,7 @@ test.describe("header on scroll", () => {
     });
 
   for (const path of ["/", "/operators", "/explore"]) {
-    test(`${path} wears the cover for the whole cover, then the bar`, async ({
+    test(`${path} wears the cover down it, and the bar back up it`, async ({
       page,
     }) => {
       await page.goto(path);
@@ -451,29 +454,41 @@ test.describe("header on scroll", () => {
       const edge = await coverEdge(page);
       expect(edge, `${path} has no cover to speak of`).toBeGreaterThan(200);
 
-      // Well inside the cover — the old rule had already gone cream here.
+      // Descending, the bar hides — and hidden over the cover it keeps the
+      // cover's colours, so the slide-away that began at the top left in the
+      // colours it arrived with rather than flashing cream on the way out.
       await scrollTo(page, Math.round(edge * 0.6));
+      await expect(header(page)).not.toBeInViewport();
       await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
 
-      // A hair short of the edge: still the cover's colours.
+      // A hair short of the edge: still hidden, still the cover's colours.
       await scrollTo(page, Math.max(0, Math.round(edge) - 8));
       await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
 
-      // Past it: solid, because what is behind the bar is no longer forest.
+      // Past it: cream, swapped where nobody can see it happen.
       await scrollTo(page, Math.round(edge) + 40);
       await expect(header(page)).not.toHaveCSS("background-color", TRANSPARENT);
 
-      // All the way home: it returns to the cover's colours.
+      // Returning up through the cover: the position that was transparent on
+      // the way down now shows a SOLID bar — any bar the visitor can see
+      // below the top is cream (owner direction, 2026-08-16).
+      await scrollTo(page, Math.round(edge * 0.6));
+      await expect(header(page)).toBeInViewport();
+      await expect(header(page)).not.toHaveCSS("background-color", TRANSPARENT);
+
+      // All the way home: the top is the transparent state's whole territory.
       await scrollTo(page, 0);
       await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
     });
   }
 
   /*
-    The reduced-motion case, which the retired 240px constant existed to serve:
-    the bar never hides for these visitors, so the colour is the only thing
-    that can change — and it must still track the cover rather than releasing
-    early over it.
+    The reduced-motion case, where the bar never hides and the colour is the
+    only thing that can change. Descending, it still tracks the cover rather
+    than releasing early over it — a visibly resting bar on a green field must
+    not be cream. Ascending, these visitors get the same contract as everyone
+    else (owner direction, 2026-08-16): a bar coming back up the page is
+    solid, and the cover's colours return at the top.
   */
   test("tracks the cover under prefers-reduced-motion too", async ({
     page,
@@ -490,6 +505,15 @@ test.describe("header on scroll", () => {
     await scrollTo(page, Math.round(edge) + 40);
     await expect(header(page)).toBeInViewport();
     await expect(header(page)).not.toHaveCSS("background-color", TRANSPARENT);
+
+    // Back up into the cover: still solid — the reveal direction wears the
+    // bar, at every motion preference.
+    await scrollTo(page, Math.round(edge * 0.6));
+    await expect(header(page)).toBeInViewport();
+    await expect(header(page)).not.toHaveCSS("background-color", TRANSPARENT);
+
+    await scrollTo(page, 0);
+    await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
   });
 
   // `/safety`, not `/about`: About gained a dark title spread on 2026-08-07,
@@ -595,9 +619,19 @@ test.describe("header on scroll", () => {
     await page.goto("/");
 
     await scrollUntilHidden(page);
+    /*
+      Settled-hidden means it paints NOTHING. A bar translated by its own
+      height is parked exactly in the strip iOS Safari's collapsed chrome
+      shows under the Dynamic Island, and it ghosted there through the system
+      glass (owner captures, 2026-08-16) — so once the slide lands, opacity
+      goes to zero. The element stays focusable: the focus test below depends
+      on that, which is why this is not `visibility`.
+    */
+    await expect(header(page)).toHaveCSS("opacity", "0");
 
     await page.mouse.wheel(0, -120);
     await expect(header(page)).toBeInViewport();
+    await expect(header(page)).toHaveCSS("opacity", "1");
   });
 
   test("comes back when focus enters it", async ({ page }) => {

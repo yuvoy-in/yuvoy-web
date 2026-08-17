@@ -58,6 +58,20 @@ import type { Viewport } from "next";
  * the previous values, so it is inert at zero insets, and it is what makes the
  * layout correct the day the site is opened from the home screen or in an
  * in-app browser that does report insets.
+ *
+ * ## Addendum (owner captures, 2026-08-16)
+ *
+ * Newer Safari builds DO slide the page edge-to-edge under the island while
+ * the top chrome is collapsed, even without `viewport-fit=cover` — the
+ * captures show page type at the physical top edge — while still reporting
+ * zero `env(safe-area-inset-top)` in-browser. Which regime runs is Safari's
+ * choice, so the header no longer depends on it from either side: hidden, it
+ * stops painting entirely once the slide settles (`opacity: 0`,
+ * globals.css), so it cannot ghost in the strip; visible anywhere below the
+ * top, it is solid cream (use-header-chrome.ts, same date), so whatever
+ * Safari draws above it, the bar reads as a bar. The theme-colour system in
+ * this file is unchanged: it is still what keeps Safari's glass agreeing
+ * with each route's first surface.
  */
 export const CHROME = {
   cream: "#f4efe4",

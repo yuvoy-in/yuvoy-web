@@ -990,6 +990,31 @@
 @media (prefers-reduced-motion: no-preference) {
   .header-slide[data-hidden="true"] {
     transform: translateY(-100%);
+    /*
+      Parked above the viewport is not parked off the screen. When iOS
+      Safari's collapsed chrome slides the page edge-to-edge, the strip under
+      the Dynamic Island is exactly the region a bar translated by its own
+      height retreats into, and it ghosted there through the system glass — a
+      faint lockup and hairline over whatever section was behind it (owner
+      captures, 2026-08-16). A settled hidden bar must not paint at all.
+
+      `opacity`, not `visibility`: the bar has to stay focusable while
+      hidden, because focus entering it is what reveals it (WCAG 2.4.11 and
+      the menu's focus-return contract) and `visibility: hidden` would take
+      it out of the tab order entirely.
+
+      The transition list is restated with the opacity flip DELAYED past the
+      slide, so the whole 250ms belongs to the movement and the paint stops
+      in the frame it settles. The reveal path takes the base list above,
+      where opacity is not transitioned, so the bar is paintable again the
+      instant the attribute flips — it fades nothing, it just slides back.
+    */
+    opacity: 0;
+    transition:
+      transform 250ms var(--ease-interaction),
+      background-color 300ms var(--ease-interaction),
+      border-color 300ms var(--ease-interaction),
+      opacity 0s linear 250ms;
   }
 }
 
