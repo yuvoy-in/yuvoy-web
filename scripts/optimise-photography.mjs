@@ -55,11 +55,18 @@ const OUT_DIR = join(root, "public/photography");
 /**
  * Delivered file → shipped slug, with the aspect ratio the layout depends on.
  *
- * The ratios are asserted, not assumed. A destination plate is `3/4` and a
- * category strip is `5/4` in CSS; a source delivered at the wrong ratio would
- * be silently cropped by `object-cover` and nobody would notice until the
- * horizon sat wrong on a phone. Failing here instead makes the delivery the
- * thing that gets fixed.
+ * The ratios are asserted, not assumed: a source delivered at the wrong ratio
+ * would be silently cropped by `object-cover` and nobody would notice until
+ * the horizon sat wrong on a phone. Failing here instead makes the delivery
+ * the thing that gets fixed.
+ *
+ * They are the DELIVERY's ratios, not the layout's, and the two stopped
+ * matching on 2026-08-18: a destination plate is now roughly 0.63 (a square
+ * photograph share plus whatever the caption needs) against a 3/4 delivery,
+ * so `object-cover` trims about 15% of the width. That is a crop these
+ * frames carry easily and it is the right place for it — a plate's ratio
+ * moves with its copy and its column, so baking the layout into the file
+ * would only make the file wrong the next time the caption changed.
  */
 const SOURCES = [
   { file: "Havelock.png", slug: "havelock", ratio: 3 / 4 },
@@ -117,7 +124,94 @@ const BACKDROPS = [
     decision can be revisited without asking for the artwork again.
   */
   { file: "moody-tropical-bay-01.png", slug: "contact-bay", maxEdge: 2048 },
+  /*
+    The first-launch act's night field. Delivered at 1672x941, which is under
+    `maxEdge` — `withoutEnlargement` leaves it there rather than inventing
+    pixels, and it is enough for a field this soft.
+
+    `rolloff` is the whole reason this entry is not a one-liner. See
+    `compressHighlights` below.
+  */
+  {
+    file: "first-launch-bg.png",
+    slug: "first-launch",
+    maxEdge: 2048,
+    rolloff: true,
+  },
 ];
+
+/**
+ * The knee and the ceiling of the highlight rolloff, in WCAG relative
+ * luminance. `forest` sits at 0.0301, and the delivered artwork's brightest
+ * passage — the moon and the sunlit island shoulder — reaches 0.226.
+ *
+ * The ceiling is the number that matters. `terra-soft` is 0.3548, so a
+ * background at luminance L renders the eyebrow at (0.3548 + 0.05) / (L +
+ * 0.05); AA at 4.5:1 needs L <= 0.0400, and a ceiling of 0.0335 leaves the
+ * worst pixel in the frame at 5.82:1 — better than the 5.36:1 of the flat
+ * forest it is painted over.
+ */
+const ROLLOFF = { knee: 0.018, ceiling: 0.0335 };
+
+/**
+ * Pulls a backdrop's highlights down to a luminance any brand text can be
+ * read against, and leaves everything below the knee exactly as delivered.
+ *
+ * ## Why this is baked into the asset rather than layered in CSS
+ *
+ * A backdrop that carries type has to be safe at its BRIGHTEST pixel, not its
+ * average one: `object-cover` moves the crop with the viewport and a section's
+ * height moves with its copy, so there is no fixed place on the page where a
+ * highlight can be assumed not to be.
+ *
+ * The first attempt (2026-08-17) enforced that in CSS, with a 70% `forest`
+ * multiply and a 62%-plus scrim over the whole frame. It measured fine and it
+ * was wrong: a multiply scales every pixel, so buying safety at the top of the
+ * range cost the entire middle of it, where the artwork actually lives. The
+ * palms, the shafts and the boat went to a ghost and the act read as flat
+ * forest with grain on it (owner report, 2026-08-18).
+ *
+ * A knee compressor is the tool the multiply was standing in for. Everything
+ * under `knee` passes through untouched; above it, luminance eases
+ * asymptotically toward `ceiling` and never reaches it, so the specular
+ * passages flatten and the midtones do not move. Channels are scaled by the
+ * ratio of new luminance to old, which holds the hue — the artwork keeps its
+ * colour and only loses the light it could not afford.
+ *
+ * The result is better on both axes at once, which is the tell that the first
+ * version was solving the wrong problem: the worst pixel goes from 5.11:1 to
+ * 5.82:1 against `terra-soft` **and** the field's visible tonal range roughly
+ * triples.
+ *
+ * Working in sRGB bytes on the raw buffer, because that is what the file is;
+ * luminance is WCAG's, so the number here and the number in the design system
+ * are the same number.
+ */
+function compressHighlights({ data, info }) {
+  const channel = (c) => {
+    const v = c / 255;
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  };
+  const { knee, ceiling } = ROLLOFF;
+  const span = ceiling - knee;
+
+  for (let i = 0; i < data.length; i += info.channels) {
+    const luminance =
+      0.2126 * channel(data[i]) +
+      0.7152 * channel(data[i + 1]) +
+      0.0722 * channel(data[i + 2]);
+    if (luminance <= knee) continue;
+
+    const rolled = knee + span * (1 - Math.exp(-(luminance - knee) / span));
+    const scale = rolled / luminance;
+    // Only the colour channels: an alpha channel, if the source has one, is
+    // not light and must not be scaled with it.
+    for (let c = 0; c < 3; c += 1) {
+      data[i + c] = Math.min(255, Math.round(data[i + c] * scale));
+    }
+  }
+  return { data, info };
+}
 
 /**
  * Details: a **named region** of a delivery, cut here rather than in CSS.
@@ -198,7 +292,7 @@ for (const { file, slug, ratio } of SOURCES) {
   console.log(`${file} → photography/${slug}.webp  ${kb(from)} → ${kb(to)}`);
 }
 
-for (const { file, slug, maxEdge } of BACKDROPS) {
+for (const { file, slug, maxEdge, rolloff } of BACKDROPS) {
   const src = join(SRC_DIR, file);
   if (!existsSync(src)) {
     throw new Error(
@@ -207,10 +301,27 @@ for (const { file, slug, maxEdge } of BACKDROPS) {
   }
 
   const out = join(OUT_DIR, `${slug}.webp`);
-  await sharp(src)
-    .resize({ width: maxEdge, withoutEnlargement: true })
-    .webp({ quality: QUALITY })
-    .toFile(out);
+  const resized = sharp(src).resize({
+    width: maxEdge,
+    withoutEnlargement: true,
+  });
+
+  if (rolloff) {
+    // Round-trip through raw so the compressor sees real pixels. It runs
+    // AFTER the resize, so the ceiling is measured on the pixels that ship
+    // rather than on ones the resampler is about to average away.
+    const { data, info } = await resized
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    compressHighlights({ data, info });
+    await sharp(data, {
+      raw: { width: info.width, height: info.height, channels: info.channels },
+    })
+      .webp({ quality: QUALITY })
+      .toFile(out);
+  } else {
+    await resized.webp({ quality: QUALITY }).toFile(out);
+  }
 
   const from = statSync(src).size;
   const to = statSync(out).size;
