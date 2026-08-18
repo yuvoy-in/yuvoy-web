@@ -41,12 +41,30 @@ export function Section({
   tone = "cream",
   id,
   className,
+  backdrop,
   children,
   ...rest
 }: {
   tone?: Tone;
   id?: string;
   className?: string;
+  /**
+   * A full-bleed decorative layer painted behind the section's measure —
+   * artwork, a scrim, grain. It escapes `container-page`, which the children
+   * cannot, and it is why this is a slot rather than just another child.
+   *
+   * The caller owns the layers and is responsible for making them inert:
+   * `aria-hidden`, `pointer-events-none`, and `absolute inset-0` inside it.
+   * `isolate` here plus `-z-10` there is the pairing the footer already uses
+   * — it puts the backdrop behind the content without giving any child its
+   * own stacking context to escape into.
+   *
+   * **A backdrop does not relax the contrast floors.** Text still sits on a
+   * measured pairing, which means the scrim's job is to make the composite
+   * safe at its worst pixel rather than at its average one (see
+   * `launch-field` in globals.css for how that is measured).
+   */
+  backdrop?: ReactNode;
   children: ReactNode;
 } & Omit<React.HTMLAttributes<HTMLElement>, "className" | "id" | "children">) {
   return (
@@ -55,10 +73,12 @@ export function Section({
       className={cn(
         SURFACE[tone],
         "scroll-mt-[calc(4rem+env(safe-area-inset-top))]",
+        backdrop && "relative isolate overflow-hidden",
         className,
       )}
       {...rest}
     >
+      {backdrop}
       {/*
         The section's own rhythm, and the one place the mobile step is set.
 

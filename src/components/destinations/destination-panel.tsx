@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/cn";
-import { LAUNCH_STATUS_LABEL } from "@/lib/site/launch";
 import {
   destinationHref,
   type DestinationContent,
@@ -12,28 +11,32 @@ import {
  *
  * ## Why this is not a card
  *
- * A card is a box with a border, a rounded corner and a button. This is a
- * full-bleed plate with sharp edges, type set on the image, and a single
- * target: the whole plate is the link, so there is one thing to hit rather
- * than a heading and a "read more" pointing at the same page. That is what the
- * triptych is for — three plates read as one composition, and three cards read
- * as a pricing table.
+ * A card is a box with a picture in a slot, a body and a button. This is one
+ * photograph, edge to edge, with the type set *on* it and a single target:
+ * the whole plate is the link, so there is one thing to hit rather than a
+ * heading and a "read more" pointing at the same page. That is what the
+ * triptych is for — three plates read as one composition, and three cards
+ * read as a pricing table.
  *
- * ## The caption always inverts its section
+ * ## The caption is always dark, and it is always on the photograph
  *
- * A forest caption on a cream page, a cream caption on a forest page. This is
- * the rule that keeps a plate an object rather than a stain: the caption is
- * the only part of the plate that is a flat colour, so if that colour matches
- * the section behind it the plate has no bottom edge and the photograph
- * appears to dissolve into the page.
+ * The image fills the plate — behind the caption too — and the caption is a
+ * `forest` block the photograph dissolves into. One treatment on both tones.
  *
- * That is exactly what happened when the first-launch act went dark on
- * 2026-08-07 — the plates had a forest caption, the section became forest,
- * and three photographs bled into the background (owner report). Fixing it by
- * drawing a hairline around each plate would have been a one-pixel promise
- * against a photograph fading to the same green. Inverting the caption is
- * unmissable at every point, and both directions are measured pairings from
- * design system §1 rather than new colours.
+ * It was not always. Until 2026-08-14 the caption **inverted** its section: a
+ * forest caption on a cream page, a cream caption on a forest one. That rule
+ * existed for a real failure — when the first-launch act went dark on
+ * 2026-08-07 the forest captions matched the forest section and three
+ * photographs bled into the background (owner report) — and inverting was the
+ * unmissable fix. It also cost the composition the thing the plate is for:
+ * a cream slab under each image turned the triptych back into three cards.
+ *
+ * A hairline was rejected then as "a one-pixel promise against a photograph
+ * fading to the same green", and on a flat forest section it was. What
+ * changed is that the section is no longer flat: `FirstLaunch` now carries
+ * artwork, so the plate's edge is a crisp 1px line and a flat caption block
+ * against a field with light and grain moving through it. Two signals, not
+ * one, and the darker one no longer has to be the page.
  *
  * ## Image-ready, not image-dependent
  *
@@ -46,14 +49,15 @@ import {
  *
  * The scrim is not optional when an image is present: `cream` type on an
  * unknown photograph is exactly the "text placed over unreadable imagery"
- * failure the accessibility gate bans, so the gradient runs from transparent
- * to near-solid forest under the text block.
+ * failure the accessibility gate bans, so the caption keeps its own solid
+ * block and the gradient only softens the join above it.
  */
 export function DestinationPanel({
   destination,
   /**
-   * The surface the plate sits on. Only the no-photograph fallback cares: a
-   * forest plate on a forest section has no edges of its own.
+   * The surface the plate sits on. It decides the focus ring's offset colour
+   * and how hard the no-photograph fallback has to work for its edges; the
+   * caption is the same on both.
    */
   tone = "cream",
   className,
@@ -71,16 +75,25 @@ export function DestinationPanel({
     <Link
       href={destinationHref(destination)}
       className={cn(
-        "group bg-forest text-cream relative flex flex-col justify-end overflow-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
+        "group bg-forest text-cream rounded-edge relative block aspect-square overflow-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:aspect-3/4",
+        // The plate's own edge, and the reason the caption no longer has to
+        // invert. It is drawn on the Link rather than as an overlay so it
+        // cannot be painted over: `Image fill` resolves `inset-0` against the
+        // padding box, which starts inside this border.
+        //
+        // `cream/15` on both tones. It is the object's edge, not the
+        // surface's, so it does not follow the section — and it disappears
+        // exactly where it is not needed, along the bright top of a
+        // photograph, while holding the line across the dark caption where
+        // the plate would otherwise meet a forest section with nothing
+        // between them.
+        "border-cream/15 border",
         // The ring and its offset both follow the surface. A cream offset on
         // a forest section draws a pale gap around the plate, which reads as
         // a rendering fault rather than as focus.
         onInk
           ? "focus-visible:ring-terra-soft focus-visible:ring-offset-forest"
           : "focus-visible:ring-terra-deep focus-visible:ring-offset-cream",
-        // Sharp edges: the plate is a printed panel, not a UI element. The
-        // one rounded object in the system is the device frame (§4).
-        "aspect-4/3 sm:aspect-3/4",
         className,
       )}
     >
@@ -103,110 +116,109 @@ export function DestinationPanel({
         /*
           No photograph yet. A hairline frame inset from the edge turns the
           plate into a printed panel rather than a flat block of colour, and
-          the wash gives it the same depth the image version has.
+          the diagonal lift gives it the depth the image version gets from
+          the picture.
 
-          On a dark section it needs more than that: the plate is forest, the
-          section is forest, and an inset hairline alone leaves a rectangle
-          that is only visible if you already know it is there. The lift and
-          the outer edge give it back its shape without inventing a second
-          dark — there is only one (design system §1), so definition here has
-          to come from a cream at low opacity rather than from a new surface.
+          The outer edge that used to be drawn here on a dark section is gone
+          — the Link carries it on both tones now. Definition still comes from
+          a cream at low opacity rather than from a new surface: there is one
+          dark (§1), and a plate with no photograph may not invent a second.
         */
         <div aria-hidden className="absolute inset-0">
-          <div
-            className={cn(
-              "absolute inset-0 bg-linear-to-br to-transparent",
-              onInk ? "from-cream/12" : "from-cream/[0.07]",
-            )}
-          />
-          {onInk && <div className="border-cream/15 absolute inset-0 border" />}
+          <div className="from-cream/12 absolute inset-0 bg-linear-to-br to-transparent" />
           <div className="border-cream/12 absolute inset-4 border sm:inset-5" />
         </div>
       )}
 
       {/*
-        The caption, on its own solid block, inverted against the section (see
-        the note at the top of this file). Type sits on a measured pairing
-        either way: `forest` on `cream` and `cream` on `forest` are both
-        11.44:1, whatever the photograph above happens to be doing.
+        The caption, pinned to the foot of a fixed 3:4 plate.
 
-        The dissolve is only drawn for the forest caption, where it fades the
-        photograph into the same colour it is about to meet. A cream caption
-        wants the opposite — a crisp edge, the way a printed caption panel
-        sits on a plate — and a gradient to forest above it would read as a
-        shadow nobody asked for.
+        ## The height is the plate's, not the caption's
 
-        ## The phone rhythm is one step tighter, and that is a photography
-        ## decision rather than a spacing one
+        `sm:aspect-3/4` fixes the plate at the height it has always had (330x440
+        at the measure, 327x436 on a phone) and the photograph fills all of
+        it. The caption is `absolute bottom-0`, so its height constrains
+        nothing: it takes what its content needs and grows UPWARD over the
+        image if a long name, a browser minimum font size or a user's zoom
+        asks for more. Nothing can clip it, and nothing it does moves the
+        plate — which is what lets the height be fixed at all. The version
+        with a fixed ratio and the caption in flow could clip; the version
+        that let the caption push the plate grew it to 522px.
 
-        The plate is an aspect-ratio box and this caption is a solid block
-        pinned to its foot, so on a 342px column the caption was taking 211 of
-        the plate's 256 pixels and leaving a 45px strip of photograph — a
-        full-bleed photographic plate showing almost no photograph. One step
-        off each gap here gives the image back roughly half again as much room
-        without making the plate any taller, which the page cannot afford
-        (owner report, 2026-08-09: mobile scrolls too far).
+        ## The shade
 
-        The caption stays SOLID and never becomes an overlay, at any width.
-        That is load-bearing rather than stylistic: `cream` on `forest` is
-        11.44:1 whatever the photograph underneath is doing, and the gradient
-        version of this was a real bug — on Neil's near-white sand the
-        secondary line measured about 3.2:1, and axe reports text over a
-        gradient as "incomplete" rather than as a violation, so nothing would
-        have caught it.
+        No solid block any more (owner report, 2026-08-18: "too heavy"). The
+        ground is a continuous curve — `plate-shade` for ~190px above,
+        `plate-caption` across the type — meeting at one value with no seam,
+        and the photograph stays legible through the whole upper half of it:
+        about 32% of the picture still shows under the name.
+
+        That is as open as it can be. The measurement and the reason the
+        caption's order is load-bearing are on `plate-shade` in globals.css;
+        the short version is that the terracotta link is the tightest pairing
+        in the palette and it sits at the foot on purpose, where the shade is
+        deepest.
+
+        ## This supersedes the solid-caption ruling of 2026-08-09
+
+        That ruling said, in this file: "The caption stays SOLID and never
+        becomes an overlay, at any width", and it was right on the evidence it
+        had. A gradient caption HAD shipped once and failed — Neil's near-white
+        sand put a secondary line at about 3.2:1, and axe reports text over a
+        gradient as "incomplete" rather than as a violation, so nothing caught
+        it. Solid was the only version anyone had measured.
+
+        It is reversed on owner direction (2026-08-18) and on a measurement
+        rather than on taste. The reason a gradient can be safe now is that the
+        caption's elements are stacked in the order of how much contrast each
+        needs and the gradient deepens in the same direction, so each one is
+        checked where it actually sits — swept over three title sizes, two to
+        four description lines and both leading values, against the brightest
+        pixel under any of the three shipped plates. Worst figure: 4.80:1.
+        The full table is on `plate-shade`.
+
+        **What the 2026-08-09 pass got right is kept**: the phone runs one step
+        tighter than the measure at every gap, and the plate stays squarer than
+        3:4 below `sm` so three of them do not add a screen of scrolling
+        (owner report: mobile scrolls too far).
       */}
-      <div
-        className={cn(
-          "relative p-5 sm:p-7",
-          onInk ? "bg-cream text-forest" : "bg-forest text-cream",
-        )}
-      >
-        {heroMedia && !onInk && (
+      <div className="plate-caption text-cream absolute inset-x-0 bottom-0 p-4 sm:p-5">
+        {heroMedia && (
           <span
             aria-hidden
-            className="plate-dissolve pointer-events-none absolute inset-x-0 bottom-full h-24 sm:h-28"
+            className="plate-shade pointer-events-none absolute inset-x-0 bottom-full h-40 sm:h-48"
           />
         )}
-        <p
-          className={cn("label", onInk ? "text-terra-deep" : "text-terra-soft")}
-        >
-          {LAUNCH_STATUS_LABEL[destination.launchStatus]}
-        </p>
-        <h3 className="font-display tracking-display mt-2 text-3xl leading-none font-normal sm:mt-3 sm:text-4xl">
+        <h3 className="font-display tracking-display text-2xl leading-none font-normal sm:text-3xl">
           {destination.name}
         </h3>
         {/*
-          Reserved to exactly two lines, and this is what makes the row line
-          up. The plates are equal-height boxes and the caption is bottom
-          aligned, so a description that wraps to three lines where its
-          neighbours take two pushes that card's name and status label higher
-          than theirs — the row then reads as misaligned even though every box
-          is identical. Fixing the box was never the fix; fixing the block
-          inside it is.
+          Never truncated (owner direction, 2026-08-18): the sentence is the
+          only thing on the plate that is not repeated in the section around
+          it, so a clamp here loses the one piece of information the plate
+          adds. `min-h` keeps the floor at two lines so a short description
+          cannot make one caption shallower than its neighbours, and there is
+          no ceiling — the three shipped sentences run 65 to 73 characters and
+          wrap to the same count at every breakpoint, so the row stays level,
+          and a longer one would simply grow its caption upward.
 
-          `min-h` sets the floor (2 lines at `text-sm`/`leading-relaxed` is
-          2 × 22.75px) and `line-clamp-2` sets the ceiling, so the block is
-          exactly two lines whatever the copy does. `max-w-xs` is gone: it was
-          narrowing the measure below the plate's own width and causing the
-          third line in the first place.
+          `cream/85`, not the usual `cream/70`: this sits on a gradient rather
+          than on flat forest, and the ladder in §1 is measured against flat
+          forest. The rung is set by the measurement on `plate-shade`.
         */}
-        <p
-          className={cn(
-            "mt-3 line-clamp-2 min-h-11.5 text-sm leading-relaxed sm:mt-4",
-            onInk ? "text-forest/75" : "text-cream/70",
-          )}
-        >
+        <p className="text-cream/85 mt-3 min-h-9.5 text-sm leading-snug sm:mt-3.5">
           {destination.shortDescription}
         </p>
         {/* Not a link: the plate already is one. This is the affordance that
-            says so, and it draws its underline in on hover the way the rest
-            of the site's text links do. */}
-        <span
-          className={cn(
-            "label mt-4 inline-flex items-center gap-2 sm:mt-6",
-            onInk ? "text-terra-deep" : "text-cream",
-          )}
-        >
+            says so, and its arrow eases forward on hover the way the rest of
+            the site's forward actions do.
+
+            **This must stay the last element in the caption.** `terra-soft`
+            is the tightest pairing in the palette (5.36:1 even on flat
+            forest), and it clears AA here only because it sits at the foot
+            where `plate-caption` has closed to 94.5%. Moving it above the
+            description puts it on a lighter ground and it fails. */}
+        <span className="label text-terra-soft mt-4 inline-flex items-center gap-2 sm:mt-5">
           Explore {destination.name}
           <span
             aria-hidden
@@ -235,8 +247,14 @@ export function DestinationPanel({
  * The bigger fault was the breakpoint ladder: `sm:grid-cols-2` put three
  * plates into two columns, so from 640px to 1024px the row was two plates and
  * an orphan sitting alone at half width. A set of three never goes to two
- * columns — it is one column or three, and the jump happens at `md`, where
- * three 3:4 plates still have room to breathe.
+ * columns — it is one column or three, and the jump happens at `md`.
+ *
+ * `md` is the tightest the row gets: three columns of a 688px measure are
+ * ~216px each, against a caption block that is a near-constant ~220px tall.
+ * The plate reads tall and narrow there, and that is the right failure —
+ * before 2026-08-14 the plate held a fixed ratio instead, so the same squeeze
+ * came out of the photograph, which had 66px left by that breakpoint. The
+ * plate grows now; nothing is crowded out of it.
  *
  * Two plates (the related-destinations rail on a destination page) do take two
  * columns, because two into two is a row rather than an orphan.
