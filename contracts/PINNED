@@ -1,0 +1,19 @@
+# The contract this site is generated against.
+#
+# It used to be a hand-vendored fork that had not been touched since 8 August
+# and sat a BREAKING version behind: 0.0.0-proposal against the canonical
+# 1.1.0, with ten paths against twenty-two. `Media`, `Slot` and
+# `ExperienceSummary` had different shapes, and three paths in the copy
+# (`/auth/otp/request`, `/auth/otp/verify`, `/me`) had been deleted upstream
+# entirely. Nothing detected any of it — see yuvoy-web#135.
+#
+# This is now the same mechanism yuvoy-app and yuvoy-operator use, pinned to
+# the same commit, so all three frontends reason about one backend.
+#
+# `pnpm contract:check` fails the build if this copy stops matching the ref.
+# When the contract moves: re-pull, `pnpm codegen`, commit both.
+repo=yuvoy-in/yuvoy-api
+path=contracts/openapi.yaml
+ref=cc8ede61ed6b8823571323a32c42ded739543178
+branch=master
+pinned_on=2026-09-01
