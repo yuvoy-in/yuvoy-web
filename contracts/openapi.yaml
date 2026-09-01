@@ -1,23 +1,48 @@
 openapi: 3.1.0
 info:
   title: Yuvoy API
-  version: 0.0.0-proposal
+  # 1.0.0: the catalog shapes are now implemented rather than proposed. This
+  # release is breaking against 0.0.0-proposal — ratings and review counts are
+  # gone (no real reviews exist, and a number nobody earned is a fabricated
+  # claim), Media became a playback object, and Slot carries local time and
+  # freshness. There are no live consumers of those shapes.
+  version: 1.1.0
   description: >
-    **Proposal — v0.** The Experience Commerce API consumed by yuvoy-web (and,
-    later, the mobile app). This document is the FE/BE contract. Once `yuvoy-api`
-    exists it becomes the source of truth there; this copy lets the frontend
-    generate types and build against mocks in the meantime.
+    The Experience Commerce API consumed by yuvoy-web (and, later, the mobile
+    app). This document is the FE/BE contract and the source of truth: the copy
+    in `yuvoy-api` is canonical, the copy in `yuvoy-web` is a mirror.
 
     Conventions: money is an integer minor unit + currency; timestamps are
     ISO-8601 UTC; lists use cursor pagination; money-mutating requests require an
     `Idempotency-Key`; errors use a single envelope `{ error: { code, message, details, requestId } }`.
+
+    Two rules this API holds to, visible in the shapes below. Nothing is
+    published that is not backed by a record — there are no ratings, no review
+    counts and no placeholder prices, because a number nobody earned is a
+    fabricated claim. And availability is only ever what Yuvoy itself has
+    recorded and recently verified: a `request`-mode slot carries no seat count
+    at all, because Yuvoy holds no inventory on it.
 servers:
   - url: https://api.yuvoy.in/v1
     description: Production
-    # No separate staging API exists — one App Runner service backs both the
-    # production and staging web deployments (differentiated by CORS origin,
-    # not by host). Do not add a staging entry unless a second service exists
-    # to resolve it.
+  - url: https://dev.api.yuvoy.in/v1
+    description: >-
+      Development. A second App Runner service with its own database, seeded
+      fixtures and the FAKE payment provider — so checkout, capture, refunds and
+      cancellation can be exercised end to end without a merchant account and
+      without consuming real seats.
+
+
+      It is called DEV and not staging on purpose. Staging implies a rehearsal
+      of production — same shape, same data, a place you trust a green run. This
+      is not that: the catalog is fixtures, the database is resettable, and it
+      exists to be broken. A green run here means the wiring works, never that a
+      release is safe.
+  - url: http://localhost:8099/v1
+    description: >-
+      Local development. `scripts/dev-stack.sh` brings this up with seeded data,
+      the fake payment provider and OTP codes in the response, so every flow is
+      exercisable without a Razorpay account or an SMS provider.
 tags:
   - name: auth
   - name: experiences
@@ -26,6 +51,10 @@ tags:
   - name: messages
   - name: waitlist
   - name: me
+  - name: operators
+    description: >
+      Supply-side entry points that need no account, because the person using
+      them does not have one yet.
 
 security: []
 
@@ -71,26 +100,21 @@ paths:
       tags: [messages]
       summary: Send a message from the public contact form
       description: >
-        Public, rate-limited free-text contact. Shipped 2026-08-07
-        (yuvoy-in/yuvoy-api#5) and verified against production.
+        Public, rate-limited contact form. Where `/leads` asks a visitor for
+        their details, this lets them say something — the questions a
+        pre-launch product gets and otherwise has nowhere to receive.
 
 
-        **A message is not a lead, and the schema enforces it rather than
-        trusting anyone to remember.** There is no marketing-consent field —
-        its absence is the guarantee, because there is nothing here for a later
-        change to flip to true. Messages are never deduplicated: two questions
-        from one address are two questions. There is no lifecycle status;
-        triage happens in the inbox the alert lands in.
+        Deliberately not a lead: a message carries no marketing opt-in and
+        never joins a marketing list. It is used to answer the sender, and
+        nothing else.
 
 
-        **`202`, never `201`.** It acknowledges receipt and promises nothing
-        about a reply, because the site publishes no reply time and an
-        acknowledgement that implied one would be a commitment nobody made.
-
-
-        Rate limiting has its own bucket, separate from `/leads`: a burst of
-        spam on a public free-text endpoint must not lock a real visitor out of
-        the waitlist, or the reverse.
+        Always `202`, never `201`: the response acknowledges receipt and
+        promises nothing about a reply, because the site publishes no reply
+        time. Notification jobs are written in the same transaction as the
+        message, so a stored message is never lost to an unavailable alert
+        target.
       operationId: createMessage
       requestBody:
         required: true
@@ -99,7 +123,10 @@ paths:
             schema: { $ref: "#/components/schemas/MessageInput" }
       responses:
         "202":
-          description: Message received
+          description: >
+            Message received. Also returned for a submission caught by the
+            honeypot, which is acknowledged normally and then discarded — a
+            bot must not be able to tell that it was detected.
           content:
             application/json:
               schema: { $ref: "#/components/schemas/MessageAcceptance" }
@@ -107,22 +134,260 @@ paths:
         "429": { $ref: "#/components/responses/RateLimited" }
         "503": { $ref: "#/components/responses/ServiceUnavailable" }
 
+  /search:
+    get:
+      tags: [experiences]
+      summary: Find something to do
+      description: >
+        Full-text over the words a traveller would actually type — the title,
+        the destination, the category, the summary.
+
+
+        **Not the operator's name.** Searching by business is a supply-side
+        question, and surfacing it here would be the one place ranking could
+        express a preference between operators, which nothing else in this API
+        can do. Ordering is relevance then recency, with no operator term.
+
+
+        Its own route rather than a `q` on the feed: the feed is ordered by
+        recency and is the browsing surface, search is ordered by relevance and
+        is the finding surface. One endpoint doing both means one of the two
+        orderings is always wrong and the client cannot tell which it got.
+
+
+        An empty `q` returns **nothing**, not everything — "everything" is what
+        the feed is for, and a search box that shows the whole catalog when you
+        clear it looks broken. Not paginated: a traveller who does not find it
+        in twenty results changes the words rather than paging.
+      operationId: searchExperiences
+      parameters:
+        - name: q
+          in: query
+          schema: { type: string, maxLength: 120 }
+        - name: destinationKey
+          in: query
+          schema: { type: string }
+        - name: bookableOn
+          in: query
+          schema: { type: string, format: date }
+          description: Only what can actually be booked that day, in the market's timezone.
+      responses:
+        "200":
+          description: Matches, most relevant first.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ExperiencePage" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "503": { $ref: "#/components/responses/CatalogUnavailable" }
+
+  /operator-applications:
+    post:
+      tags: [operators]
+      summary: Apply to run experiences on Yuvoy
+      description: >
+        A business asking to join. Public and unauthenticated, because there is
+        no account yet — that is the point.
+
+
+        This creates an application, **not an operator**. An application is a
+        claim somebody typed into a form; an operator is a business we have
+        checked, whose credentials we hold and whose departures the catalog
+        joins against. Nothing here can put an experience in front of a
+        traveller.
+
+
+        Deliberately forgiving about everything except the three fields needed
+        to have a conversation — the business, a person, and a number that can
+        be dialled. A form that rejects a boat owner for omitting a destination
+        key loses supply in a market where supply is the constraint.
+
+
+        The response carries no identifier: there is nothing a stranger could do
+        with one, and handing out ids for rows in a review queue is one more
+        authorization boundary to get right later.
+      operationId: submitOperatorApplication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [businessName, contactName, phone]
+              properties:
+                businessName: { type: string, minLength: 2, maxLength: 200 }
+                contactName:  { type: string, minLength: 2, maxLength: 120 }
+                phone:
+                  type: string
+                  description: E.164, with the country code.
+                email:       { type: string }
+                market:      { type: string }
+                destination: { type: string }
+                about:       { type: string, maxLength: 2000 }
+                operations:  { type: string, maxLength: 1000 }
+                source:      { type: string, description: Where they heard about us. }
+      responses:
+        "202":
+          description: Received. Somebody will call.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received: { type: boolean }
+                  next:     { type: string }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+
   /waitlist:
     post:
       tags: [waitlist]
       summary: Join the launch waitlist
       operationId: joinWaitlist
+      deprecated: true
+      description: >-
+        Retired. Superseded by POST /leads, which captures the same intent with
+        audience, attribution and consent. Never implemented; returns 501.
       requestBody:
         required: true
         content:
           application/json:
             schema: { $ref: "#/components/schemas/WaitlistInput" }
       responses:
+        "501":
+          description: >-
+            Not implemented, and deprecated. Declared rather than omitted: this
+            is what the route actually answers, and a contract that promises a
+            201 it never sends is worse than one that admits the stub.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
         "201":
           description: Added (idempotent on email)
           content:
             application/json:
               schema: { $ref: "#/components/schemas/WaitlistEntry" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+
+  /catalog/index:
+    get:
+      tags: [catalog]
+      summary: Everything that has a public page, and when it last changed
+      operationId: getCatalogIndex
+      description: >-
+        The data a sitemap is built from. **Not the sitemap** — the site's URL
+        structure belongs to the site, and returning `/experiences/<slug>` here
+        would mean a URL change needing a backend deploy, in the one repository
+        nobody editing the site opens.
+
+
+        The only catalog response that is genuinely edge-cacheable, because
+        nothing in it moves without a person editing a listing. No seat counts,
+        no prices, no availability beyond a boolean.
+
+
+        `lastModified` is when the CONTENT changed, not when availability did. A
+        crawler told a page changed every time a seat is booked learns to ignore
+        the signal, which costs the pages that genuinely did change.
+
+
+        For a destination or market it is the newest change among the published
+        experiences on it: a destination page whose own row has not been touched
+        since March is not unchanged if three listings appeared last week.
+      responses:
+        "200":
+          description: Every public page. Published experiences only.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [entries]
+                properties:
+                  entries:
+                    type: array
+                    items:
+                      type: object
+                      required: [kind, slug, lastModified, hasBookableDates]
+                      properties:
+                        kind:
+                          type: string
+                          enum: [experience, destination, market]
+                        slug: { type: string }
+                        marketKey: { type: string }
+                        destinationKey: { type: string }
+                        lastModified: { type: string, format: date-time }
+                        hasBookableDates:
+                          type: boolean
+                          description: >-
+                            Whether anything is currently sellable. A page with
+                            nothing bookable is still worth indexing — the
+                            season starts again — but the site may render it
+                            differently, and finding out should not cost a
+                            query per URL.
+        "503": { $ref: "#/components/responses/CatalogUnavailable" }
+
+  /scans:
+    post:
+      tags: [scans]
+      summary: Record a scan of a printed code
+      operationId: recordScan
+      description: >-
+        Somebody pointed a phone at a QR code on a boat, a card in a guesthouse,
+        a sticker on a dive shop's door.
+
+
+        **This endpoint sets no cookie and stores nothing identifying.** No
+        device id, no IP, no user agent — the user agent is used to decide
+        "person or crawler" and is then discarded in the same statement. That is
+        the endpoint, not an omission: counting scans without an identifier is
+        what keeps this an aggregate counter rather than personal data, and it
+        is why there is no consent banner between a traveller and a QR code on a
+        jetty. A client that adds its own identifier to the body defeats the
+        design; there is no field for one.
+
+
+        `target` is always populated, including for a code that resolves to
+        nothing — an unknown or retired code lands on the market feed rather
+        than an error page. Somebody standing on a pier holding a scuffed card
+        did nothing wrong, and a 404 there is a dead end with no staff nearby.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code:
+                  type: string
+                  pattern: "^[A-Za-z0-9-]{3,32}$"
+                  description: >-
+                    The code as printed. Short and human-readable because
+                    somebody reads it aloud over a phone when a QR is scuffed.
+                  example: HAVELOCK-DIVE-01
+      responses:
+        "200":
+          description: >-
+            Counted, and here is where to go. Always 200, including for an
+            unknown code: the response is a destination, and the person holding
+            the card needs one either way.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [target, known]
+                properties:
+                  target:
+                    type: string
+                    description: Path to send the traveller to.
+                    example: /experiences/scuba-discover-havelock
+                  known:
+                    type: boolean
+                    description: >-
+                      Whether the code resolved. `false` still carries a usable
+                      target.
+                  experienceId: { type: string, format: uuid }
+                  marketKey: { type: string, example: andaman }
         "400": { $ref: "#/components/responses/BadRequest" }
         "429": { $ref: "#/components/responses/RateLimited" }
 
@@ -182,56 +447,175 @@ paths:
         - name: from
           in: query
           required: true
+          description: >-
+            Market-local date, inclusive. Interpreted in the experience's market
+            timezone, not the caller's and not UTC — "the 9th" means the 9th
+            where the boat leaves from.
           schema: { type: string, format: date }
         - name: to
           in: query
           required: true
+          description: Market-local date, inclusive.
           schema: { type: string, format: date }
       responses:
         "200":
-          description: Available slots
+          description: >-
+            Slots in the requested local-date range, with the freshness of the
+            answer. Stale slots are counted rather than silently omitted.
           content:
             application/json:
-              schema:
-                type: array
-                items: { $ref: "#/components/schemas/Slot" }
+              schema: { $ref: "#/components/schemas/AvailabilityPage" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "404": { $ref: "#/components/responses/NotFound" }
 
-  /bookings:
+  /reservations:
     post:
       tags: [bookings]
-      summary: Create a booking (holds a slot, initiates payment)
-      operationId: createBooking
-      security: [{ bearerAuth: [] }]
+      summary: Hold seats, or ask the operator for them
+      description: >
+        Checkout. Unauthenticated by design — the traveller is a stranger with a
+        phone, and a login wall here is the largest drop-off available in the
+        flow.
+
+
+        Two behaviours, decided by the slot's `bookingMode`. An `allotment` slot
+        holds seats immediately and returns `state: active` with a
+        `holdExpiresAt`. A `request` slot creates `state: pending_request` with a
+        `requestExpiresAt` and holds no seat at all — Yuvoy has no inventory on
+        it until the operator accepts.
+
+
+        `Idempotency-Key` is required. A retry with the same key returns the
+        original response, unchanged, with `201` and `Idempotent-Replay: true` —
+        the status code is part of the stored response, so a client that retried
+        after a dropped connection cannot tell its request was a repeat. The same
+        key with a *different* body is refused: replaying it would hand back a
+        reservation the caller never asked for.
+
+
+        `statusToken` is returned exactly once, here. Only its hash is stored, so
+        it cannot be recovered afterwards — including by us. It belongs in a URL
+        fragment, never a path or query.
+      operationId: createReservation
       parameters:
         - name: Idempotency-Key
           in: header
           required: true
+          description: Client-generated, 16-128 chars of `A-Za-z0-9_.:-`.
           schema: { type: string }
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: "#/components/schemas/BookingInput" }
+            schema: { $ref: "#/components/schemas/ReservationInput" }
       responses:
         "201":
-          description: Booking created in pending_payment
+          description: Seats held, or the request lodged with the operator.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/Booking" }
+              schema: { $ref: "#/components/schemas/Reservation" }
         "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorized" }
+        "404": { $ref: "#/components/responses/NotFound" }
         "409":
-          description: Slot no longer available (capacity race)
+          description: >
+            Could not proceed, and the code says why: `capacity_unavailable`,
+            `request_quota_exhausted`, `request_window_closed` (carries
+            `opensAt`), `cutoff_passed`, `idempotency_key_reuse`,
+            `idempotency_in_progress`.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "503":
+          description: >
+            Deliberately stopped, not broken — `booking_disabled` or
+            `operator_not_bookable`. Distinct from an outage so the client can
+            say something true.
           content:
             application/json:
               schema: { $ref: "#/components/schemas/Error" }
 
-  /auth/otp/request:
+  /reservations/{id}/release:
     post:
-      tags: [auth]
-      summary: Request an OTP to a phone number
-      operationId: requestOtp
+      tags: [bookings]
+      summary: Give up a held reservation
+      description: Idempotent — releasing an already-released hold is not an error.
+      operationId: releaseReservation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "204": { description: Released, or already was. }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /reservations/{id}/payment-order:
+    post:
+      tags: [bookings]
+      summary: Open checkout for a held reservation
+      description: >
+        Returns the payment order to hand to the provider's checkout.
+
+
+        **No `Idempotency-Key`, and that is not an omission.** One reservation
+        has at most one payment order by construction, so asking twice returns
+        the same order — stronger than a key the client has to remember to send,
+        and it matters more here than anywhere else: two orders for one
+        reservation is a traveller who can pay twice for the same seats.
+
+
+        Only a live hold can be paid for. A lapsed hold, a released reservation
+        and an experience with no contracted price all answer
+        `reservation_not_payable`: they differ to us and not to the traveller,
+        whose next step is the same in every case.
+      operationId: createPaymentOrder
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: >-
+            **Payment is not open yet** (D-021 — no processor chosen). A
+            deliberate product state, not a failure: the hold is real and still
+            running, so keep showing the countdown. Render `message` and do not
+            treat this as an error.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [state, message]
+                properties:
+                  state: { type: string, enum: [coming_soon] }
+                  message: { type: string }
+                  holdStillActive: { type: boolean }
+        "201":
+          description: The order to pay against.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PaymentOrder" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: The hold has ended; this reservation can no longer be paid for.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /bookings/recovery/request:
+    post:
+      tags: [bookings]
+      summary: Ask for a new booking link
+      description: >
+        For a traveller who lost their link. A phone number is not a secret — it
+        is on the operator's manifest, in a WhatsApp group, often on the
+        traveller's own social media — so this endpoint **answers identically
+        whether or not the number has a booking**, including when throttled. An
+        endpoint that differs is a way to find out who booked what.
+
+
+        Clients must not branch on the response: there is exactly one body.
+      operationId: requestBookingRecovery
       requestBody:
         required: true
         content:
@@ -240,16 +624,48 @@ paths:
               type: object
               required: [phone]
               properties:
-                phone: { type: string, description: E.164 }
+                phone: { type: string, description: "E.164, e.g. +919000000000" }
       responses:
-        "202": { description: OTP dispatched }
-        "429": { $ref: "#/components/responses/RateLimited" }
+        "202":
+          description: Always this, for every number.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [sent, message]
+                properties:
+                  devCode:
+                    type: string
+                    description: >-
+                      **Development only.** Present when the service runs
+                      outside production so the flow can be exercised without an
+                      SMS account. Never present in production; a client must
+                      never depend on it. Documented rather than hidden — an
+                      undocumented field that appears in some environments is
+                      one a client accidentally comes to rely on.
+                  sent: { type: boolean }
+                  message:
+                    type: string
+                    description: >-
+                      Hedged on purpose — the honest phrasing and the one that
+                      reveals nothing.
+        "400": { $ref: "#/components/responses/BadRequest" }
 
-  /auth/otp/verify:
+  /bookings/recovery/verify:
     post:
-      tags: [auth]
-      summary: Verify an OTP and issue tokens
-      operationId: verifyOtp
+      tags: [bookings]
+      summary: Exchange a recovery code for a new booking link
+      description: >
+        Returns a **new** status token and revokes the previous one. Token
+        rotation is contractual, not incidental: recovery is most often used
+        because a phone was lost or a message was seen by somebody else, so any
+        link already in circulation must stop working.
+
+
+        Wrong, expired, used and over-attempted codes all answer `401` with one
+        message — telling a caller which it was tells somebody enumerating
+        numbers whether the number exists.
+      operationId: verifyBookingRecovery
       requestBody:
         required: true
         content:
@@ -262,24 +678,357 @@ paths:
                 code: { type: string }
       responses:
         "200":
-          description: Authenticated
+          description: A fresh status token. The previous link no longer works.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/AuthTokens" }
+              schema:
+                type: object
+                required: [statusToken]
+                properties:
+                  statusToken: { type: string }
+                  note: { type: string }
         "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "429": { $ref: "#/components/responses/RateLimited" }
 
-  /me:
-    get:
-      tags: [me]
-      summary: The current user
-      operationId: getMe
-      security: [{ bearerAuth: [] }]
+  /bookings/cancellation:
+    post:
+      tags: [bookings]
+      summary: Cancel a booking
+      operationId: commitCancellation
+      description: >-
+        The other half of the quote, and deliberately narrower than it.
+
+
+        `expectedRefundPaise` is required and must equal what the quote just
+        showed. Not a confirmation checkbox — a checkbox records that somebody
+        tapped, this records **what they were told**. Between reading a quote
+        and pressing the button a traveller can cross a tier boundary; the
+        24-hour line falls in the middle of the night and people do sit on this
+        decision. If the figure has moved, this answers `409 refund_quote_moved`
+        and the client re-quotes, rather than cancelling at a worse number than
+        the traveller agreed to.
+
+
+        **Only full-refund and no-refund tiers are self-service.** A partial
+        refund answers `409 refund_requires_finance` and nothing is destroyed —
+        because cancelling is irreversible and the seat returns to sale
+        immediately, so self-serving a partial refund would take the trip away
+        now and leave the money in an approval queue for days. Routing the
+        traveller to a person BEFORE anything is lost is the kinder order.
+        `selfService` on the quote tells the client whether to show the button
+        at all.
+      security: [{ statusToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [expectedRefundPaise]
+              additionalProperties: false
+              properties:
+                expectedRefundPaise:
+                  type: integer
+                  description: Echo the quote's `refundPaise` back, unchanged.
       responses:
         "200":
-          description: Current user
+          description: Cancelled. The seat is back on sale and the refund is raised.
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/User" }
+              schema:
+                type: object
+                required: [bookingReference, state, refundPaise]
+                properties:
+                  bookingReference: { type: string }
+                  state: { type: string, enum: [cancelled] }
+                  refundPaise: { type: integer }
+                  refundTier: { type: string }
+                  seatsReleased: { type: integer }
+                  refundNote: { type: string }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "409":
+          description: >-
+            `refund_quote_moved` — re-quote and show the new figure.
+            `refund_requires_finance` — a partial refund; route them to support.
+            `conflict` — not in a cancellable state.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "429": { $ref: "#/components/responses/RateLimited" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+
+  /me/bookings:
+    get:
+      tags: [me]
+      summary: Every trip this phone number has booked
+      operationId: listMyBookings
+      description: >-
+        **This is the whole of "traveller accounts".** There is no signup, no
+        password and no new secret: signing in is the same OTP that already
+        recovers a booking, and this is what it unlocks. An account here is a
+        projection over a phone number somebody has proved they control.
+
+
+        A traveller who never signs in loses nothing — none of this appears in
+        the checkout path, and the founding claim is that a stranger pays in
+        about a minute with no account.
+
+
+        The phone comes from the verified token and is never a parameter. A
+        `?phone=` here would let anyone read a stranger's itinerary by typing
+        their number, which on a small island is a disclosure about where
+        somebody will be and when.
+      security: [{ statusToken: [] }]
+      responses:
+        "200":
+          description: >-
+            Trips still to come first, soonest first; then past ones, most
+            recent first. Somebody opening this on the morning of a dive wants
+            the dive, not the thing they did in March.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [bookings]
+                properties:
+                  bookings:
+                    type: array
+                    items:
+                      type: object
+                      required: [reference, experience, operator, localDate, localTime, state, guests]
+                      properties:
+                        reference: { type: string }
+                        experience: { type: string }
+                        operator: { type: string }
+                        localDate: { type: string, format: date }
+                        localTime: { type: string, example: "06:30" }
+                        state: { type: string }
+                        guests: { type: integer }
+                        meetingPoint: { type: string }
+                        statusToken: { type: string }
+                        cancelledAt: { type: [string, "null"], format: date-time }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+
+  /bookings/share:
+    post:
+      tags: [bookings]
+      summary: Make a link for the people coming
+      operationId: shareBooking
+      description: >-
+        A link for a different audience from the person who paid, and therefore
+        a different token.
+
+
+        The status token opens the booking — the payer's name, their number, the
+        amount, the refund position, the cancel button. A trip pasted into a
+        hostel WhatsApp group of six strangers must reveal none of that. This
+        token opens what somebody needs in order to turn up and nothing else,
+        and the response says so in words, because the person about to paste it
+        is the one who needs to know what it reveals.
+
+
+        Only the holder of the status token can mint one: you may share your own
+        trip, not somebody else's.
+      security: [{ statusToken: [] }]
+      responses:
+        "201":
+          description: A shareable link.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [shareUrl, expiresIn]
+                properties:
+                  shareUrl: { type: string }
+                  expiresIn: { type: integer, description: Seconds. }
+                  reveals:
+                    type: string
+                    description: Plain words for what the link exposes.
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+
+  /trips/{token}:
+    get:
+      tags: [bookings]
+      summary: Open a shared trip
+      operationId: getSharedTrip
+      description: >-
+        Unauthenticated by design — the token IS the authorisation, and
+        everybody in the group has it. What it buys is deliberately small.
+
+
+        Note what is absent, and that the absence is the design: no phone
+        number, no email, no name, no amount paid, no refund position and no
+        cancel action. `partySize` is a count, never a guest list — who is
+        coming is theirs to say in the group chat, not ours.
+
+
+        A cancelled trip still resolves. Somebody opening a link for a departure
+        that was called off must be told, not shown a dead page.
+      parameters:
+        - name: token
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: What somebody needs in order to turn up.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [experience, operator, localDate, localTime, meetingPoint, partySize, cancelled]
+                properties:
+                  experience: { type: string }
+                  operator: { type: string }
+                  localDate: { type: string, format: date }
+                  localTime: { type: string }
+                  meetingPoint: { type: string }
+                  landmark: { type: string }
+                  durationMinutes: { type: integer }
+                  bring: { type: array, items: { type: string } }
+                  partySize: { type: integer }
+                  cancelled: { type: boolean }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+
+  /bookings/review:
+    post:
+      tags: [bookings]
+      summary: Say how the trip went
+      operationId: leaveReview
+      description: >-
+        Only from a booking whose trip has actually happened — `completed`, not
+        `confirmed`. A confirmed booking is one that is going to happen, and a
+        review of a trip nobody has taken is exactly the fabricated claim this
+        API is built not to make.
+
+
+        One per booking, enforced by a unique constraint rather than a check: a
+        booking is a trip somebody took, and a second review of it is an edit.
+
+
+        **Nothing written here is published to anybody yet.** The catalog
+        carries no rating and no review count, and that ABSENCE is what enforces
+        the no-fabricated-claims rule — not a promise to be careful. Collecting
+        from day one is what makes the numbers real on the day there is
+        something worth showing.
+      security: [{ statusToken: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [rating]
+              properties:
+                rating: { type: integer, minimum: 1, maximum: 5 }
+                comment:
+                  type: string
+                  maxLength: 2000
+                  description: >-
+                    Optional. Plenty of people tap five stars and nothing else,
+                    and a required comment box turns a two-second act into an
+                    abandoned one.
+      responses:
+        "204": { description: Recorded. }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "409":
+          description: The trip has not happened, or was already reviewed.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "503": { $ref: "#/components/responses/ServiceUnavailable" }
+
+  /bookings/cancellation-quote:
+    get:
+      tags: [bookings]
+      summary: What cancelling would refund
+      description: >
+        A read that changes nothing. A traveller deciding whether to cancel
+        should see the number **first** — showing it only afterwards is how
+        people end up feeling tricked by a policy they did agree to.
+
+
+        Priced from the policy snapshot frozen at checkout, never from the live
+        listing. `selfService` tells the client whether to render a cancel
+        button at all: a partial refund is an amount somebody has to stand
+        behind, and offering a button that then fails is worse than not offering
+        one.
+
+
+        A valid token whose booking does not exist yet answers `200` with
+        `cancellable: false` and a reason — the token's validity and the
+        booking's existence are different questions.
+      operationId: quoteCancellation
+      security:
+        - statusToken: []
+      responses:
+        "200":
+          description: The quote.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [cancellable, selfService]
+                properties:
+                  bookingReference: { type: string }
+                  cancellable: { type: boolean }
+                  selfService:
+                    type: boolean
+                    description: False for partial refunds — those need a person.
+                  capturedPaise: { type: integer }
+                  refundPaise: { type: integer }
+                  refundTier: { type: string }
+                  hoursBeforeStart: { type: integer }
+                  reason: { type: string, description: Present when not cancellable. }
+                  note: { type: string }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+
+  /bookings/status:
+    get:
+      tags: [bookings]
+      summary: What happened to my booking
+      description: >
+        The page a traveller lands on after checkout, and the only way back to a
+        booking made without an account.
+
+
+        The status token from `createReservation` is presented as
+        `Authorization: Bearer <token>` and **never as a query parameter** — this
+        service logs the request URI on every request, and a URL additionally
+        reaches browser history, proxies, referrer headers and page analytics.
+        The web route fronting this sets `Referrer-Policy: no-referrer`.
+
+
+        `state` is computed server-side from the underlying state machines and is
+        never stored as a column. Clients must not derive it: a hold whose
+        deadline has passed reads `expired` here even though the stored row still
+        says `active`, because the seat is genuinely gone the instant the hold
+        lapses — the sweep that rewrites the row is tidiness, not truth.
+
+
+        Poll every 3s with backoff while `final` is `false`. Stop when it is
+        `true`; do not hardcode which states are terminal, or the list goes stale
+        the first time one is added.
+
+
+        An expired token is answered `token_expired` rather than the generic
+        unauthorized code, so the page can offer to send a new link. An unknown
+        token and a revoked one are deliberately indistinguishable.
+      operationId: getBookingStatus
+      security:
+        - statusToken: []
+      responses:
+        "200":
+          description: The booking as the traveller may see it.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/BookingStatus" }
         "401": { $ref: "#/components/responses/Unauthorized" }
 
 components:
@@ -288,6 +1037,14 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    statusToken:
+      type: http
+      scheme: bearer
+      description: >-
+        The opaque token minted by `createReservation`. Not a JWT and carries no
+        claims — it is 256 bits of random with no meaning outside our database,
+        which is what lets it be revoked and lets a stolen one be worthless once
+        it is.
 
   parameters:
     Cursor:
@@ -326,6 +1083,20 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/Error" }
 
+    CatalogUnavailable:
+      description: >
+        The catalog cannot be read. Deliberately NOT an empty `200`: an empty
+        list reads to a traveller as "nothing is on", which is a different and
+        untrue statement about the world.
+
+
+        Referenced from the experience routes since the contract was written and
+        never defined until now — so the document did not resolve, and anything
+        generating a client from it would have failed on this ref.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
   schemas:
     Error:
       type: object
@@ -335,10 +1106,65 @@ components:
           type: object
           required: [code, message]
           properties:
-            code: { type: string, example: invalid_input }
+            code: { $ref: "#/components/schemas/ErrorCode" }
             message: { type: string }
             details: { type: object, additionalProperties: true }
             requestId: { type: string }
+
+    ErrorCode:
+      type: string
+      description: >-
+        A closed set, so a client can branch on the machine-readable code and
+        never on the message. Codes are added by contract change, never invented
+        at the call site.
+      enum:
+        # Transport and shape
+        - invalid_input
+        - unauthorized
+        - not_found
+        - conflict
+        - rate_limited
+        - method_not_allowed
+        - not_implemented
+        - internal_error
+        # Availability and capacity. Each names a different reason a traveller
+        # cannot proceed, because "unavailable" alone leaves them with no next
+        # step — and one of these is not the traveller's fault at all.
+        - capacity_unavailable
+        - request_quota_exhausted
+        - request_window_closed
+        - grant_ceiling_exceeded
+        - cutoff_passed
+        - stale_availability
+        # Deliberately stopped, rather than broken. Truthful copy depends on the
+        # client being able to tell these from an outage.
+        - booking_disabled
+        - operator_not_bookable
+        # Idempotency and checkout, emitted today but previously undeclared —
+        # a client cannot branch on a code the contract does not name.
+        - idempotency_key_malformed
+        - idempotency_key_reuse
+        - idempotency_in_progress
+        # Access to a booking without an account.
+        - token_expired
+        - reservation_not_payable
+        # Refused for saying it wrong rather than for lacking permission. Each
+        # is a different next step for the caller: fix the code, echo the
+        # confirmation back, pick a role that exists.
+        - invalid_reason_code
+        - refund_quote_moved
+        # Safety refusals. Distinct codes because each leaves the traveller with
+        # a different next step, and "talk to us first" is not the same message
+        # as "this trip has a minimum age".
+        - screening_required
+        - screening_needs_a_doctor
+        - under_minimum_age
+        - refund_requires_finance
+        - confirmation_required
+        - invalid_role
+        # Configured-off surfaces. Distinguishable from an outage on purpose.
+        - payments_unavailable
+        - media_unavailable
 
     Money:
       type: object
@@ -389,13 +1215,53 @@ components:
 
     Media:
       type: object
-      required: [id, type, url]
+      # A playback object, not a URL. Video is delivered as adaptive-bitrate
+      # HLS/DASH from the media provider's edge, so there is no single "the
+      # url" — the client picks a rendition. posterUrl always resolves and
+      # renders first; a client on a slow connection may show only that.
+      required: [id, kind, posterUrl]
       properties:
         id: { type: string }
-        type: { type: string, enum: [image, video] }
-        url: { type: string, format: uri }
+        kind: { type: string, enum: [image, video] }
+        playbackId: { type: string }
+        hlsUrl:
+          type: string
+          format: uri
+          description: >-
+            **Not populated before M15.** Render poster-first and treat playback
+            as progressive enhancement: `posterUrl` always resolves, and on a
+            0.5-3 Mbps island connection the poster is what most travellers see
+            first anyway.
+        dashUrl:
+          type: string
+          format: uri
+          description: Not populated before M15. See `hlsUrl`.
         posterUrl: { type: string, format: uri }
+        durationSeconds: { type: number, format: float }
+        aspectRatio:
+          type: string
+          description: "e.g. '9:16'. The feed is vertical; a non-9:16 clip is flagged in review."
+          examples: ["9:16"]
         alt: { type: string }
+
+    OperatorSummary:
+      type: object
+      # What a traveller may know about who is running the experience. There is
+      # no rating: reviews do not exist until real completed bookings produce
+      # them, and a number nobody earned is a fabricated claim.
+      required: [id, name, verified]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        verified:
+          type: boolean
+          description: >-
+            True only when every mandatory credential is on file, verified and
+            unexpired. It is a statement about evidence we hold, not a badge.
+        credentialsSummary:
+          type: array
+          description: Human-readable statements of what was checked, each backed by a record.
+          items: { type: string }
 
     ExperienceSummary:
       type: object
@@ -404,51 +1270,102 @@ components:
           id,
           slug,
           title,
-          location,
+          marketKey,
+          destinationKey,
           category,
-          mode,
+          bookingMode,
           durationMinutes,
-          fromPrice,
-          rating,
-          provider,
+          operator,
         ]
       properties:
         id: { type: string }
         slug: { type: string }
         title: { type: string }
-        location: { type: string }
+        marketKey: { $ref: "#/components/schemas/MarketKey" }
+        destinationKey: { $ref: "#/components/schemas/DestinationKey" }
+        location: { type: string, description: Display name of the destination. }
         category: { $ref: "#/components/schemas/Category" }
-        mode: { $ref: "#/components/schemas/ExperienceMode" }
+        bookingMode:
+          $ref: "#/components/schemas/BookingMode"
         durationMinutes: { type: integer }
+        maxPartySize: { type: integer }
+        # Absent until a real contracted price exists. There is no placeholder
+        # price anywhere in this API.
         fromPrice: { $ref: "#/components/schemas/Money" }
-        rating: { type: number, format: float, minimum: 0, maximum: 5 }
-        reviewCount: { type: integer }
-        hero: { $ref: "#/components/schemas/Media" }
-        provider: { $ref: "#/components/schemas/Provider" }
+        heroMedia: { $ref: "#/components/schemas/Media" }
+        operator: { $ref: "#/components/schemas/OperatorSummary" }
+        nextAvailable:
+          type: string
+          format: date
+          description: >-
+            The next departure a traveller could actually book, as a date in
+            the MARKET's timezone.
+
+
+            **Absent means nothing is bookable in the next 90 days** — not "we
+            did not check". A card that says nothing about availability makes
+            the traveller tap through to find out, and the tap that ends in "no
+            dates" is the one that loses them. Bounded at 90 days on purpose: an
+            experience whose next departure is in March is not usable by
+            somebody with three days on an island, and showing it as available
+            wastes their tap.
+        seatsOnNext:
+          type: integer
+          description: >-
+            Seats left on that departure. Present only alongside
+            `nextAvailable`, and **only for `allotment` mode** — a request-mode
+            departure holds nothing until an operator says yes, so a number here
+            would be a promise we cannot keep, and "3 seats left" that becomes
+            "the operator declined" is worse than saying nothing.
+
+    BookingMode:
+      type: string
+      description: >-
+        How this experience sells. `allotment` means Yuvoy holds contracted
+        seats and a traveller books instantly. `request` means the operator
+        answers first and the traveller pays only after they accept — Yuvoy
+        holds no inventory and makes no availability claim.
+      enum: [allotment, request]
 
     Experience:
       allOf:
         - $ref: "#/components/schemas/ExperienceSummary"
         - type: object
-          required: [summary, description, policyTier, gallery]
+          required: [gallery, meetingPoint]
           properties:
             summary: { type: string }
             description: { type: string }
-            highlights:
-              type: array
-              items: { type: string }
             included:
               type: array
               items: { type: string }
+            # What the day asks of the traveller — fitness, swimming, prior
+            # certification. Shown before anyone commits, not at the jetty.
+            requirements:
+              type: array
+              items: { type: string }
+            safetyNotes: { type: string }
             policyTier: { $ref: "#/components/schemas/PolicyTier" }
-            maxGroupSize: { type: integer }
+            cancellationPolicy:
+              type: string
+              description: The policy as it will be frozen onto a booking at checkout.
+            meetingPoint: { $ref: "#/components/schemas/MeetingPoint" }
             gallery:
               type: array
               items: { $ref: "#/components/schemas/Media" }
+            safety: { $ref: "#/components/schemas/SafetyRequirements" }
+
+    MeetingPoint:
+      type: object
+      required: [text]
+      properties:
+        text: { type: string }
+        landmark: { type: string }
+        lat: { type: number, format: double }
+        lng: { type: number, format: double }
 
     ExperiencePage:
       type: object
-      required: [items, nextCursor]
+      required: [items, nextCursor, complete]
       properties:
         items:
           type: array
@@ -456,16 +1373,446 @@ components:
         nextCursor:
           # OpenAPI 3.1 drops `nullable`; a null union is the 3.1 spelling.
           type: [string, "null"]
+        complete:
+          type: boolean
+          description: >-
+            Whether this is the end. **Told, not inferred.** A client that
+            decides it has reached the end because a page came back short stops
+            early the first time a filter happens to return exactly one page —
+            and an infinite scroll that silently stops looks identical to one
+            with nothing more to show.
 
     Slot:
       type: object
-      required: [id, startsAt, capacity, remaining, price]
+      required:
+        [id, startsAt, endsAt, marketTimezone, localDate, localStartTime, bookingCutoffAt, status, bookingMode]
       properties:
         id: { type: string }
         startsAt: { type: string, format: date-time }
-        capacity: { type: integer }
-        remaining: { type: integer }
+        endsAt: { type: string, format: date-time }
+        marketTimezone:
+          type: string
+          description: IANA zone the local fields are expressed in, e.g. Asia/Kolkata.
+          examples: ["Asia/Kolkata"]
+        localDate: { type: string, format: date }
+        localStartTime: { type: string, examples: ["07:00:00"] }
+        bookingCutoffAt:
+          type: string
+          format: date-time
+          description: After this instant the slot cannot be booked. Shown disabled, never hidden.
+        status: { type: string, enum: [open, closed, cancelled] }
+        bookingMode: { $ref: "#/components/schemas/BookingMode" }
+        maxPartySize: { type: integer }
         price: { $ref: "#/components/schemas/Money" }
+        # Present ONLY for allotment slots that are NOT stale.
+        #
+        # A request-mode slot carries no seat count because Yuvoy holds no
+        # inventory on it — publishing a number there would be claiming
+        # availability we do not have. A stale slot carries none because the
+        # number is the thing that went stale; the departure did not.
+        remainingSeats:
+          type: integer
+          description: >-
+            Seats remaining after holds and bookings — the same arithmetic
+            checkout enforces, not the contracted allotment. Absent for request
+            mode and absent when `availability.stale` is true.
+        remainingDisplay:
+          type: string
+          description: >-
+            What to show the traveller, and the only field a UI should render
+            for availability. Render this string; do not re-derive it from
+            `remainingSeats`, or the two disagree the moment either rule
+            changes.
+
+
+            For allotment: `Full` at zero, an exact count from 1 to 5, and
+            **`Available` at six or more** — a counter that reads 23, then 21,
+            then 22 as holds come and go teaches a traveller the number is
+            noise, so it appears only when it changes what somebody does. A
+            stale slot reads `Available` too, except a full one, which stays
+            `Full`: if our best information says there is no room we do not
+            invite somebody into a checkout that will refuse them.
+
+
+            For request mode: wording that promises an answer, never a seat.
+        availability: { $ref: "#/components/schemas/SlotAvailability" }
+
+    SlotAvailability:
+      type: object
+      required: [asOf, stale]
+      properties:
+        asOf:
+          type: string
+          format: date-time
+          description: When a human last confirmed this seat count with the operator.
+        verifiedVia:
+          type: string
+          enum: [manifest_call, operator_message, operator_portal, ops_correction]
+        stale:
+          type: boolean
+          description: >-
+            True when nobody has confirmed this seat count with the operator in
+            over 24 hours.
+
+
+            **Two thresholds, not one.** Past 24 hours the slot is still offered
+            — the departure is real and the operator is reachable — but
+            `remainingSeats` is withheld and `remainingDisplay` reads
+            `Available`, so a day-old figure is never printed as a current one.
+            Past the slot's suppression window (default 48 h) it is not returned
+            at all and is counted in `staleSlotsSuppressed` instead.
+
+
+            A UI seeing `stale: true` should say when the count was last checked
+            — `asOf` and `verifiedVia` are there for exactly that — rather than
+            silently showing less information.
+
+    AvailabilityPage:
+      type: object
+      required: [slots, availabilityAsOf, marketTimezone, staleSlotsSuppressed]
+      properties:
+        slots:
+          type: array
+          items: { $ref: "#/components/schemas/Slot" }
+        availabilityAsOf: { type: string, format: date-time }
+        marketTimezone: { type: string, examples: ["Asia/Kolkata"] }
+        staleSlotsSuppressed:
+          type: integer
+          description: >-
+            How many slots were withheld as stale. Reported rather than hidden,
+            so an empty day is distinguishable from an unverified one.
+
+    ReservationInput:
+      type: object
+      required: [slotId, guests, contact]
+      additionalProperties: false
+      properties:
+        slotId: { type: string }
+        guests: { type: integer, minimum: 1 }
+        contact: { $ref: "#/components/schemas/ReservationContact" }
+        attribution: { $ref: "#/components/schemas/Attribution" }
+        screening: { $ref: "#/components/schemas/Screening" }
+
+    SafetyRequirements:
+      type: object
+      description: >-
+        What this listing asks before it will take money. Carried here rather
+        than behind a second call, because it decides how the booking form
+        renders and a round trip on that screen costs bookings.
+
+
+        This is what a client needs in order to ASK correctly. It enforces
+        nothing — a client that ignores it gets a refusal from
+        `POST /reservations`.
+      properties:
+        minAge:
+          type: integer
+          description: >-
+            The operator's stated minimum age. Absent means no age rule. When
+            present, collect an age BAND per participant — never a date of
+            birth, which is personal data gathered for a comparison that does
+            not need it.
+        screener:
+          type: object
+          description: The health declaration this listing requires. Absent means none.
+          required: [key, version, questions, affirmation]
+          properties:
+            key: { type: string, example: diving_rstc }
+            version:
+              type: integer
+              description: >-
+                The version a declaration will be recorded against. A screener
+                revised on medical advice does not retroactively restate what
+                somebody was already asked.
+            questions:
+              type: array
+              items: { type: string }
+              description: >-
+                Render from here, in order. Not hardcoded in the client: the
+                list changes on medical advice, and a copy in a frontend build
+                is a copy that goes stale silently.
+            affirmation:
+              type: string
+              description: >-
+                The single statement the lead traveller ticks, covering the
+                whole party — which is what the copy tells them they are doing.
+
+    Screening:
+      type: object
+      additionalProperties: false
+      description: >-
+        The two safety gates, both enforced when the reservation is created
+        rather than checked at the jetty. Read `safety` on the experience detail
+        to know whether this listing asks for either.
+
+
+        **A declared condition takes no money and holds no seat.** The whole
+        transaction rolls back: no hold, no payment order, nothing to refund. A
+        refund afterwards is worse for everybody than a conversation beforehand,
+        and somebody who has already paid is somebody who will argue to be
+        allowed in the water — which puts the operator in the position of
+        refusing a paying customer at the jetty.
+      properties:
+        declaredClear:
+          type: boolean
+          description: >-
+            The lead traveller's answer to the whole screener, on behalf of the
+            party. **Omitted is not `false`** — a listing that asks and receives
+            nothing answers `400 screening_required`, because a default here is
+            an answer nobody gave. `false` answers `409
+            screening_needs_a_doctor` and books nothing.
+
+
+            Only the boolean, the screener version and a timestamp are stored.
+            No conditions, no names, no free text — which is what lets that
+            record be unencrypted. The per-diver medical form is a separate,
+            encrypted thing taken privately before the dive.
+        ageBands:
+          type: array
+          description: >-
+            One band per participant, in party order, required when the listing
+            states a `minAge`. A band rather than a date of birth: a band is
+            enough to enforce a minimum age and is not identifying.
+
+
+            Checked against the FLOOR of the band. Somebody in `12_14` could be
+            12, so a 14+ experience refuses them — comparing the top of the band
+            would admit exactly the person the rule exists to stop.
+          items:
+            type: string
+            enum: [under_10, 10_11, 12_14, 15_17, 18_plus]
+
+    Attribution:
+      type: object
+      additionalProperties: false
+      description: >-
+        Where this checkout came from. Optional, client-claimed, and trusted for
+        nothing — it decides no price, no eligibility and no permission, which is
+        what makes accepting it from an anonymous caller safe. A client that lies
+        here corrupts only its own marketing numbers.
+
+
+        Frozen at checkout alongside the price and the policy, and inherited by
+        the booking at capture rather than re-read. At capture the traveller is
+        arriving back from a payment provider's redirect, so anything read then
+        would attribute every booking to the provider.
+
+
+        Sent as part of the request body, so it is covered by the idempotency
+        fingerprint: a retry that changes it is refused rather than silently
+        re-attributing a booking that already exists.
+      properties:
+        source:
+          type: string
+          enum: [qr, direct, search, social, referral, operator, unknown]
+          description: >-
+            Anything outside this set is stored as `unknown` rather than
+            rejected — a checkout must not fail over a marketing field.
+        placement:
+          type: string
+          maxLength: 120
+          description: Which card, which boat, which door.
+        campaign: { type: string, maxLength: 120 }
+        scanCode:
+          type: string
+          maxLength: 32
+          description: >-
+            The printed code they arrived from, if any. The code, not a scan id:
+            an id the client keeps and sends back is exactly the correlatable
+            token POST /scans refuses to mint.
+        landingPath:
+          type: string
+          maxLength: 256
+          description: >-
+            First page of the visit. The checkout path is not accepted here — we
+            already know it for certain, and asking for a fact we hold is how the
+            two come to disagree.
+
+    ReservationContact:
+      type: object
+      # Name and a WhatsApp number, and nothing else required. Minimal by
+      # design: it is what puts someone on a boat and tells them where to be,
+      # and every extra field costs conversions on the one funnel there is.
+      required: [name, whatsapp]
+      properties:
+        name: { type: string, maxLength: 120 }
+        whatsapp: { type: string, description: E.164, e.g. +919000000000 }
+        email: { type: string, description: Optional. }
+
+    Reservation:
+      type: object
+      required: [reservationId, state, guests]
+      properties:
+        reservationId: { type: string }
+        state:
+          type: string
+          enum: [pending_request, active]
+          description: >-
+            `active` holds seats until `holdExpiresAt`. `pending_request` holds
+            none and waits on the operator until `requestExpiresAt`.
+        guests: { type: integer }
+        holdExpiresAt:
+          type: [string, "null"]
+          format: date-time
+          description: Set for allotment holds only.
+        requestExpiresAt:
+          type: [string, "null"]
+          format: date-time
+          description: Set for operator requests only.
+        statusToken:
+          type: string
+          description: >-
+            Returned exactly once. Only its hash is stored; it cannot be
+            recovered afterwards. Carry it in a URL fragment, never a path or
+            query — this API logs request URIs.
+
+    PaymentOrder:
+      type: object
+      required: [state, orderId, providerOrderId, provider, amountPaise, currency, expiresAt]
+      properties:
+        state:
+          type: string
+          enum: [ready]
+          description: >-
+            Always `ready` on a 201. Present so a client switches on one field
+            across both responses rather than inferring from the status code.
+        orderId: { type: string, description: Ours. }
+        providerOrderId:
+          type: string
+          description: >-
+            The provider's own order id, for their checkout widget.
+        provider: { type: string }
+        amountPaise:
+          type: integer
+          description: >-
+            INR paise. Integer — there are no fractional paise.
+        currency: { type: string }
+        expiresAt:
+          type: string
+          format: date-time
+          description: >-
+            The hold's deadline, not a separate payment clock. Paying after it
+            may still succeed — the capture re-acquires capacity — but the seat
+            is no longer reserved and the booking can be declined with a full
+            automatic refund.
+
+    BookingStatus:
+      type: object
+      required: [reservationId, state, final, guests, experience, slot, price]
+      properties:
+        reservationId: { type: string }
+        state:
+          type: string
+          enum:
+            - holding
+            - awaiting_operator
+            - expired
+            - released
+            - verifying
+            - confirmed
+            - declined
+            - cancelled
+            - completed
+            - no_show
+          description: >-
+            Computed server-side from the reservation, fulfilment, payment and
+            refund machines. Never stored, and never to be derived client-side.
+
+
+            `verifying` means money may have moved and the outcome is not yet
+            settled. **Never render it as failure** — "if money left your
+            account it is safe" is the only honest copy for that window. It is
+            also what the server says when a booking exists but is not yet
+            visible: claiming a confirmed seat we cannot prove is the one thing
+            this endpoint must never do.
+
+
+            `declined` means money was taken and the seat could not be
+            delivered; a full refund is already recorded and `refund` carries
+            where it is.
+        final:
+          type: boolean
+          description: >-
+            `true` when this state cannot change on its own — stop polling.
+        holdExpiresAt:
+          type: [string, "null"]
+          format: date-time
+          description: >-
+            Present only while `state` is `holding`. Absent once the deadline is
+            meaningless, so a countdown is never rendered beside a dead booking.
+        guests: { type: integer }
+        contactName:
+          type: string
+          description: >-
+            The name given at checkout. The phone number and email are
+            deliberately not returned: whoever holds this link is usually the
+            person who supplied them, and "usually" is not an access rule.
+        experience:
+          type: object
+          required: [slug, title, operator]
+          properties:
+            slug: { type: string }
+            title: { type: string }
+            operator: { type: string }
+        slot:
+          type: object
+          required: [startsAt, timezone]
+          properties:
+            startsAt: { type: string, format: date-time }
+            timezone:
+              type: string
+              description: IANA zone of the market, for rendering local time.
+        price:
+          type: object
+          required: [totalPaise, currency]
+          properties:
+            totalPaise:
+              type: integer
+              description: >-
+                From the price snapshot frozen at checkout, not the live
+                listing — an operator editing a price cannot restate what this
+                traveller agreed to.
+            currency: { type: string }
+        bookingReference:
+          type: string
+          description: >-
+            Present once a booking exists. Human-quotable and **not a
+            credential** — it goes on the operator's manifest and is read aloud
+            on a jetty.
+        operatorUpdates:
+          type: array
+          description: >-
+            What the operator has told everybody on this departure — a time
+            change, a meeting point, a weather watch. Absent when there are
+            none; the key is omitted rather than sent empty.
+
+
+            This is where a relay note lands. Free text an operator writes is
+            shown HERE and never sent to a phone, so a traveller who is told
+            "see your booking page" has somewhere to look.
+          items:
+            type: object
+            properties:
+              intent:
+                type: string
+                enum: [time_change, meeting_point_change, weather_watch, bring_item, note]
+              detail: { type: string }
+              note: { type: string }
+              sentAt: { type: string, format: date-time }
+        refund:
+          type: [object, "null"]
+          description: >-
+            Present only when a refund exists, so the happy path carries no
+            alarming vocabulary. Answers the only question a declined or
+            cancelled traveller has: where is my money.
+          properties:
+            amountPaise: { type: integer }
+            state:
+              type: string
+              enum: [requested, pending, failed, processed, reversed, abandoned]
+            message:
+              type: string
+              description: Ready-to-render copy for the current refund state.
 
     BookingInput:
       type: object
@@ -503,24 +1850,6 @@ components:
         id: { type: string }
         email: { type: string }
         createdAt: { type: string, format: date-time }
-
-    AuthTokens:
-      type: object
-      required: [accessToken, refreshToken, user]
-      properties:
-        accessToken: { type: string }
-        refreshToken: { type: string }
-        user: { $ref: "#/components/schemas/User" }
-
-    User:
-      type: object
-      required: [id, role]
-      properties:
-        id: { type: string }
-        name: { type: string }
-        email: { type: string }
-        phone: { type: string }
-        role: { type: string, enum: [seeker, provider, admin] }
 
     # ---- Pre-launch lead capture -------------------------------------------
     # Geography is deliberately generic. `marketKey` names a launch market and
@@ -571,24 +1900,15 @@ components:
       type: object
       required: [audience, contactName, privacyAccepted, marketKey]
       description: >
-        Contact rule, as deployed (yuvoy-in/yuvoy-api#4, live 2026-08-07):
-        **at least one of `whatsapp` or `email`**, for both audiences.
+        Contact rule (enforced server-side): every lead, whichever audience,
+        must supply at least one of `whatsapp` or `email`. Providers were
+        previously required to give `whatsapp`; that requirement is gone,
+        because some operators will not hand a personal mobile number to a
+        pre-launch platform and requiring one loses the application entirely.
+
         Deduplication uses the normalised contact — WhatsApp number when
-        present, else email — so an operator with no phone number deduplicates
-        on their address.
-
-
-        A request carrying neither is rejected on the field name **`contact`**,
-        not `whatsapp`, because a form may legitimately no longer render a
-        WhatsApp input to point an error at.
-
-
-        **The frontend is deliberately stricter than this and requires `email`
-        of everyone** (owner direction, 2026-08-07): it is the channel the
-        launch announcement is actually sent on — free, no messaging-platform
-        template approval, and it reaches every country. That is a product
-        decision enforced in the forms, not a contract constraint; the API
-        accepts either channel and this document describes the API.
+        present, else email — so a provider identified only by email
+        deduplicates on that address.
       properties:
         audience: { $ref: "#/components/schemas/LeadAudience" }
         contactName: { type: string, minLength: 1, maxLength: 120 }
@@ -639,20 +1959,23 @@ components:
       allOf:
         - $ref: "#/components/schemas/LeadInputBase"
         - type: object
-          description: >
-            `coverageDestinationKeys` and `primaryInterest` are optional as of
-            2026-08-07 (yuvoy-in/yuvoy-api#4). Both are still accepted and
-            stored when supplied; the public application form no longer asks
-            for them, because an operator answers both in the onboarding
-            conversation and the destination list could not represent an
-            operator outside the launch market.
           required: [businessName]
+          description: >
+            Only the business name is required beyond the base. Where an
+            operator works and what they offer are collected in the onboarding
+            conversation instead, so the form need not ask: the site now
+            invites operators outside the launch market, who have no truthful
+            option to select from a destination list scoped to it.
+
+            `coverageDestinationKeys` and `primaryInterest` remain accepted and
+            are persisted unchanged when sent — existing clients are not
+            broken, and an internal tool may still supply them. A resubmission
+            that omits them does not erase values an earlier one provided.
           properties:
             audience: { const: provider }
             businessName: { type: string, minLength: 1, maxLength: 160 }
             coverageDestinationKeys:
               type: array
-              minItems: 1
               maxItems: 24
               uniqueItems: true
               items: { $ref: "#/components/schemas/DestinationKey" }
@@ -668,53 +1991,6 @@ components:
           traveller: "#/components/schemas/TravellerLeadInput"
           provider: "#/components/schemas/ProviderLeadInput"
 
-    MessageInput:
-      type: object
-      description: >
-        A message from the public contact form. Deliberately not a lead: no
-        marketing consent, no market or destination, no attribution beyond the
-        campaign `source`.
-      required: [name, email, topic, message]
-      properties:
-        name: { type: string, minLength: 1, maxLength: 120 }
-        email: { type: string, format: email, maxLength: 254 }
-        topic: { $ref: "#/components/schemas/MessageTopic" }
-        message:
-          type: string
-          minLength: 1
-          description: >
-            Capped at 4000 **characters, not bytes** — 4000 multi-byte
-            characters is still 4000 characters, so a message written in Hindi
-            is not silently penalised. 4001 is a 400.
-          maxLength: 4000
-        source: { $ref: "#/components/schemas/LeadSource" }
-        website:
-          type: string
-          maxLength: 255
-          description: >
-            Honeypot. A filled value answers `202` exactly as a real submission
-            does, and writes neither a row nor a notification — a bot must not
-            be able to tell it was caught.
-
-    MessageTopic:
-      type: string
-      description: >
-        What the message is about. Anything outside this list is a 400. There
-        is deliberately no "a trip or experience" option: nothing is bookable
-        yet, so offering it would invite a question nobody can answer.
-      enum: [general, feedback, listing, partnership]
-
-    MessageAcceptance:
-      type: object
-      description: >
-        Acknowledges receipt and nothing else. No reply-time promise, because
-        the site publishes none.
-      required: [id, status, createdAt]
-      properties:
-        id: { type: string, format: uuid }
-        status: { type: string, const: received }
-        createdAt: { type: string, format: date-time }
-
     LeadAcceptance:
       type: object
       description: >
@@ -727,6 +2003,58 @@ components:
         status:
           type: string
           enum: [recorded, updated]
+        createdAt: { type: string, format: date-time }
+
+    MessageTopic:
+      type: string
+      description: >
+        What the message is about. These are stable slugs, not the labels the
+        form shows, so wording can change without splitting a category's
+        history.
+      enum: [general, feedback, listing, partnership]
+
+    MessageInput:
+      type: object
+      description: >
+        A message from the public contact form. It asks for one contact
+        channel — an email address — because that is where a reply goes; it
+        never asks for a phone number.
+
+        There is no marketing opt-in here, by design. A message is used to
+        answer the person who sent it, and nothing else; it never joins a
+        marketing list.
+      required: [name, email, topic, message]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 120 }
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          description: The only contact field. Normalised to lowercase server-side.
+        topic: { $ref: "#/components/schemas/MessageTopic" }
+        message: { type: string, minLength: 1, maxLength: 4000 }
+        source: { $ref: "#/components/schemas/LeadSource" }
+        website:
+          type: string
+          description: >
+            Honeypot, with the same contract and the same server-side handling
+            as `LeadInputBase.website`. Left empty by real visitors; a
+            non-empty value is acknowledged normally and never becomes an
+            actionable message.
+          maxLength: 255
+      additionalProperties: false
+
+    MessageAcceptance:
+      type: object
+      description: >
+        Deliberately minimal. It confirms the message was received and carries
+        no reply-time promise, because the site publishes none.
+      required: [id, status, createdAt]
+      properties:
+        id: { type: string, format: uuid }
+        status:
+          type: string
+          enum: [received]
         createdAt: { type: string, format: date-time }
 
     LeadStatus:
