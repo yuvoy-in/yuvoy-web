@@ -11,6 +11,20 @@
 # is not code — a docs-only branch, a revert of something already known bad —
 # and every use of it is a deliberate decision to ship unverified, because
 # nothing downstream will check afterwards.
+# Use the PERSONAL pnpm, not whatever is first on PATH.
+#
+# On this machine a bare `pnpm` resolves to /opt/uber/bin/pnpm — a work wrapper
+# that tries to fetch an SSH cert before running and dies with
+# `FATAL ussh/main.go:14 error requesting cert` when it cannot reach the CA.
+# That failure is indistinguishable from a failing test: husky reports
+# "pre-push script failed (code 1)" either way, so the gate looks broken rather
+# than absent, and the workaround is to push with SKIP_VERIFY=1 — which is the
+# gate not running at all.
+#
+# Fixed here rather than in the shell profile: a repo should not depend on a
+# machine being configured a particular way.
+export PATH="$HOME/.local/share/pnpm:$PATH"
+
 if [ "$SKIP_VERIFY" = "1" ]; then
   echo "pre-push: SKIP_VERIFY=1 — nothing was checked, and nothing downstream will be"
   exit 0

@@ -1,1 +1,8 @@
+# Same reason as pre-push: a bare `pnpm` here resolves to /opt/uber/bin/pnpm,
+# a work wrapper that dies requesting an SSH cert. When it fails, husky reports
+# "pre-commit script failed (code 1)" and the commit is silently not made —
+# which is worse than the push case, because a following `git push` then
+# succeeds and pushes nothing, and it looks like the work shipped.
+export PATH="$HOME/.local/share/pnpm:$PATH"
+
 pnpm lint-staged
