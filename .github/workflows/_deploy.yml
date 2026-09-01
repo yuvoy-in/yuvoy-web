@@ -50,7 +50,17 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: npm i -g vercel@latest
+      # PINNED, not `@latest`.
+      #
+      # On 1 Sep 2026 `vercel@59.11.0` shipped depending on `@vercel/go@9.0.0`,
+      # which was never published — the registry answers 404 for it. Every
+      # deploy in every repo failed on `npm error notarget`, with nothing wrong
+      # in any of them.
+      #
+      # An unpinned global install in the deploy path is the same class of
+      # problem as an unpinned contract: it makes somebody else's publish able
+      # to break a release we did not change. Bump this deliberately.
+      - run: npm i -g vercel@59.10.0
       - run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
       - run: vercel build --prod --token="$VERCEL_TOKEN"
       - run: vercel deploy --prebuilt --prod --archive=tgz --token="$VERCEL_TOKEN"
