@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import { LegalPage, LegalSection } from "@/components/site/legal-page";
+import {
+  analyticsConfigured,
+  analyticsHostedInEu,
+} from "@/lib/analytics/config";
 
 export const metadata: Metadata = {
   title: "Privacy",
@@ -138,24 +142,11 @@ export default function PrivacyPage() {
       </LegalSection>
 
       <LegalSection heading="Analytics">
+        <AnalyticsDisclosure />
         <p>
-          <strong className="text-forest font-bold">
-            No product analytics are running on this site.
-          </strong>{" "}
-          Nothing tracks what you click or how you move through the pages, and
-          there is no cookie banner, because there is nothing to consent to.
-        </p>
-        <p>
-          The site is built to support privacy-respecting analytics later. If
-          that is switched on, it will be hosted in the EU, it will only run
-          after you explicitly agree, the events it records will carry no name,
-          email, phone number or reference to your registration, and this page
-          will be updated before it goes live.
-        </p>
-        <p>
-          One thing does run: Vercel Speed Insights, which measures how quickly
-          pages load. It records performance timings only. It does not build a
-          profile of you and does not follow you between sites.
+          One thing runs without asking: Vercel Speed Insights, which measures
+          how quickly pages load. It records performance timings only. It does
+          not build a profile of you and does not follow you between sites.
         </p>
       </LegalSection>
 
@@ -186,5 +177,88 @@ export default function PrivacyPage() {
         </p>
       </LegalSection>
     </LegalPage>
+  );
+}
+
+/**
+ * What this page says about analytics, derived from what actually runs.
+ *
+ * The section used to be prose, and prose can be false. It promised, in its
+ * own words, that "this page will be updated before it goes live" — which made
+ * the correct order of operations *edit the page, then set the key*, and left
+ * the page saying analytics were running during the gap. Either ordering
+ * produced a window in which /privacy was untrue. See yuvoy-web#84.
+ *
+ * So it is derived instead. `analyticsConfigured()` is the same predicate that
+ * decides whether the consent banner appears and whether anything is ever
+ * captured, and `analyticsHostedInEu()` reads the host the SDK is actually
+ * pointed at. Setting `NEXT_PUBLIC_POSTHOG_KEY` now updates this page in the
+ * same deploy, because there is nothing separate to remember.
+ *
+ * Every claim below is checked against code, not assumed:
+ *
+ *   "only if you agree first"    consent gates `grant()`; `load()` returns
+ *                                null until then — lib/analytics/client.ts
+ *   "not loaded"                 posthog-js is a dynamic import inside load()
+ *   "hosted in the EU"           derived, not stated — analyticsHostedInEu()
+ *   "no name, email, phone"      every payload is built by a named function in
+ *                                lib/analytics/events.ts, and a unit test
+ *                                asserts none can emit an email-, phone- or
+ *                                UUID-shaped value
+ *   "no way to link ... to you"  `person_profiles: "never"`, and there is
+ *                                deliberately no join key to a lead row
+ *   "we do not record your screen"      `disable_session_recording: true`
+ *   "we do not capture clicks automatically"  `autocapture: false`
+ *   the event list               EVENTS in lib/analytics/events.ts, closed
+ *   "Privacy choices in the footer"     components/analytics/consent-banner
+ */
+function AnalyticsDisclosure() {
+  if (!analyticsConfigured()) {
+    return (
+      <>
+        <p>
+          <strong className="text-forest font-bold">
+            No product analytics are running on this site.
+          </strong>{" "}
+          Nothing tracks what you click or how you move through the pages, and
+          there is no cookie banner, because there is nothing to consent to.
+        </p>
+        <p>
+          The site is built to support privacy-respecting analytics later. If
+          that is switched on,{" "}
+          {analyticsHostedInEu() ? "it will be hosted in the EU, " : ""}it will
+          only run after you explicitly agree, the events it records will carry
+          no name, email, phone number or reference to your registration, and
+          this page will say so.
+        </p>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <p>
+        <strong className="text-forest font-bold">
+          We use PostHog to understand how this site is used — but only if you
+          agree first.
+        </strong>{" "}
+        Until you do, it is not loaded and nothing is recorded. If you never
+        agree, nothing ever is.
+      </p>
+      <p>
+        {analyticsHostedInEu() ? "It is hosted in the EU. The" : "The"} events
+        it records carry no name, email, phone number, or any reference to your
+        registration — there is deliberately no way to link what you clicked to
+        who you are. We record which pages you saw, which destination or
+        audience you chose, whether a preview played, whether a registration was
+        started, failed validation, or completed, and whether you changed this
+        choice. We do not record your screen, and we do not capture clicks
+        automatically.
+      </p>
+      <p>
+        You can change your mind whenever you like: “Privacy choices” in the
+        footer turns it back off.
+      </p>
+    </>
   );
 }
