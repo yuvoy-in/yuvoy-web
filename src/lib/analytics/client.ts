@@ -1,4 +1,16 @@
 import type { AnalyticsEvent } from "@/lib/analytics/events";
+import {
+  analyticsConfigured,
+  apiHost,
+  projectKey,
+} from "@/lib/analytics/config";
+
+/*
+  Re-exported so the existing callers do not have to know the predicate moved.
+  It lives in `config.ts` now because /privacy needs it too, and a server
+  component asking "is analytics on" must not drag the PostHog loader in.
+*/
+export { analyticsConfigured } from "@/lib/analytics/config";
 
 /**
  * The PostHog client, loaded only after explicit consent.
@@ -19,32 +31,10 @@ import type { AnalyticsEvent } from "@/lib/analytics/events";
  * orderings live in `grant()` and `revoke()` so no caller has to remember them.
  */
 
-/** EU-hosted by default: visitor data stays in the EU. */
-const DEFAULT_HOST = "https://eu.i.posthog.com";
-
 type PostHog = typeof import("posthog-js").default;
 
 let client: PostHog | null = null;
 let loading: Promise<PostHog | null> | null = null;
-
-function projectKey(): string {
-  return process.env.NEXT_PUBLIC_POSTHOG_KEY ?? "";
-}
-
-function apiHost(): string {
-  return process.env.NEXT_PUBLIC_POSTHOG_HOST || DEFAULT_HOST;
-}
-
-/**
- * Whether analytics is configured at all.
- *
- * With no project key there is nothing to consent to, so the consent UI is not
- * shown and nothing is captured. Asking a visitor to approve tracking that
- * does not exist would be theatre.
- */
-export function analyticsConfigured(): boolean {
-  return projectKey().length > 0;
-}
 
 async function load(): Promise<PostHog | null> {
   if (client) return client;
