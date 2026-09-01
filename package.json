@@ -18,7 +18,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "prepare": "husky",
-    "verify": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build && CI=1 pnpm test:e2e"
+    "verify": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm contract:check && pnpm build && CI=1 pnpm test:e2e",
+    "contract:check": "node scripts/check-contract-drift.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",

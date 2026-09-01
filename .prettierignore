@@ -1,3 +1,8 @@
+# The contract is a byte-exact MIRROR of yuvoy-api, pinned by SHA. Formatting
+# it makes it differ from the ref it is pinned to — a drift-check failure, and
+# worse, a way to hide a real upstream change behind a formatting diff.
+contracts/
+
 .next
 node_modules
 pnpm-lock.yaml
