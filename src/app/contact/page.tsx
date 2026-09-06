@@ -10,7 +10,13 @@ import { VIEWPORT_ON_FOREST } from "@/lib/site/theme";
 export const viewport = VIEWPORT_ON_FOREST;
 
 export const metadata: Metadata = {
-  title: "Contact Yuvoy",
+  /*
+    Absolute, for the reason `/about` gives: the template appends " · Yuvoy",
+    so a page title that already carries the brand renders "Contact Yuvoy ·
+    Yuvoy" — which is what that page's comment calls "worse", and what this
+    one was doing. `e2e/seo.spec.ts` now fails a title naming the brand twice.
+  */
+  title: { absolute: "Contact Yuvoy" },
   description:
     "Reach Yuvoy by email or WhatsApp. General enquiries, feedback, listing your business, and partnerships.",
   alternates: { canonical: "/contact" },
