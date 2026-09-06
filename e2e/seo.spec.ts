@@ -99,6 +99,24 @@ test.describe("metadata", () => {
           `${path} shares a description with ${other}`,
         ).not.toBe(value);
       }
+      /*
+        The brand once, never twice.
+
+        `layout.tsx` appends " · Yuvoy" to every title through the template, so
+        a page whose own title already carries the brand renders "Contact Yuvoy
+        · Yuvoy". `/about` documents the way round it — an absolute title — and
+        `/contact` had quietly done the thing that page's comment calls "worse".
+        Nothing failed, because a title is not load-bearing, which is exactly
+        why it needs a check rather than a reader.
+
+        Counted rather than pattern-matched: "Yuvoy for Operators" is a
+        legitimate second word on the operator door and is one mention, not two.
+      */
+      const brand = (title.match(/Yuvoy/g) ?? []).length;
+      expect(brand, `${path} names the brand ${brand} times: "${title}"`).toBe(
+        1,
+      );
+
       titles.set(path, title);
       descriptions.set(path, description!);
     }
