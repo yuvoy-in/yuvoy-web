@@ -9,7 +9,12 @@ import { Input } from "@/components/ui/input";
 import { PhoneField } from "@/components/ui/phone-field";
 import { FaqAccordion } from "@/components/site/faq-accordion";
 import { AUDIENCE_COPY } from "@/lib/site/audiences";
-import { submitLead, type SubmitResult } from "@/lib/leads/api";
+import {
+  submitLead,
+  type LeadAcceptance,
+  type SubmitResult,
+} from "@/lib/leads/api";
+import { submitOperatorApplication } from "@/lib/operators/api";
 import { useLeadAnalytics } from "@/lib/analytics/use-lead-analytics";
 import { formatForDisplay, phoneIssue } from "@/lib/contact/phone";
 import { isPlausibleEmail, suggestEmail } from "@/lib/contact/email";
@@ -124,20 +129,41 @@ const travellerSchema = z.object({
  * wrong: the page invites operators outside the Andamans, and offered them
  * only Havelock, Neil and Port Blair to tick.
  *
- * `whatsapp` also stopped being required, for the same reason it is optional
- * for travellers.
- *
  * **All three relaxations shipped on 2026-08-07** (`yuvoy-in/yuvoy-api#4`,
  * verified against production with the exact email-only payload this form
  * sends). Until they did, the deployed API answered 400 to every complete
  * application and this form stood down behind a notice; `unknownFieldErrors`
  * in `ProviderForm` is what made that failure visible rather than silent, and
  * it stays for the next rejection nobody predicted.
+ *
+ * ## `whatsapp` is required again here, and only here (2026-09-07)
+ *
+ * It stopped being required with the other two, when this form only filed a
+ * marketing lead. It now also files an **application**, and
+ * `POST /operator-applications` requires `phone` — "the three fields needed to
+ * have a conversation: the business, a person, and a number that can be
+ * dialled."
+ *
+ * The two endpoints set different bars on purpose and both are right. A lead
+ * needs any way to reach somebody, because "some operators will not hand a
+ * personal mobile number to a pre-launch platform". An application is a row a
+ * human picks up and rings; one with no number is not an application, it is a
+ * note.
+ *
+ * So the number is asked for on the operator form and nowhere else — the
+ * traveller waitlist is untouched. The trade is deliberate: a phone-averse
+ * operator now bounces off the form rather than filing something the
+ * onboarding queue could never act on, which is what happened to two real
+ * businesses for a month (yuvoy-web#144).
  */
 const providerSchema = z.object({
   ...sharedSchema,
   email: requiredEmailSchema,
-  whatsapp: optionalPhoneSchema,
+  whatsapp: z
+    .string()
+    .trim()
+    .min(1, "Enter a number we can call you on.")
+    .superRefine(phoneIssueCheck),
   businessName: z
     .string()
     .trim()
@@ -526,9 +552,20 @@ function ContactFields({
   return (
     <fieldset className="flex flex-col gap-1.5">
       <legend className="label text-cream/70">How can we reach you?</legend>
+      {/*
+        Two audiences, two bars, and the copy says which one it is.
+
+        A traveller joins a mailing list: an email is genuinely all we need. An
+        operator files an application somebody rings — `POST
+        /operator-applications` requires a number, because "the three fields
+        needed to have a conversation" are the business, a person and a number
+        that can be dialled. Saying "optional" there would be a lie the form
+        only reveals after the submit.
+      */}
       <p id={`${prefix}-contact-hint`} className="text-cream/70 mb-1 text-sm">
-        An email address is all we need. Add a WhatsApp number if you would
-        rather we message you there.
+        {audience === "provider"
+          ? "Both, please. We email you the details and call to talk it through — an application we cannot ring is one we cannot start."
+          : "An email address is all we need. Add a WhatsApp number if you would rather we message you there."}
       </p>
 
       <div className="flex flex-col gap-1.5">
@@ -573,7 +610,10 @@ function ContactFields({
 
       <div className="mt-4 flex flex-col gap-1.5">
         <label htmlFor={`${prefix}-whatsapp`} className="label text-cream/70">
-          WhatsApp number <span className="normal-case">(optional)</span>
+          WhatsApp number{" "}
+          {audience === "provider" ? null : (
+            <span className="normal-case">(optional)</span>
+          )}
         </label>
         {/*
           `Controller`, not `register`: the field is a composite (country plus
@@ -781,6 +821,27 @@ function TravellerForm({ context }: { context: LeadContext }) {
 
 /* --------------------------------------------------------------- provider */
 
+/**
+ * A stand-in acceptance for the case the application landed and the lead did
+ * not.
+ *
+ * The applicant IS in the onboarding queue, so the form must say so — but
+ * `SubmitResult`'s success shape carries the lead's own acceptance, and there
+ * is none. The id is empty rather than invented: nothing renders it, and a
+ * fabricated one would be a claim about a row that does not exist.
+ *
+ * `/operator-applications` returns no identifier at all, deliberately — "there
+ * is nothing a stranger could do with one".
+ */
+function recordedAcceptance(): LeadAcceptance {
+  return {
+    id: "",
+    audience: "provider",
+    status: "recorded",
+    createdAt: new Date().toISOString(),
+  };
+}
+
 function ProviderForm({ context }: { context: LeadContext }) {
   const [result, setResult] = React.useState<SubmitResult | null>(null);
   const [submitted, setSubmitted] = React.useState<{
@@ -806,20 +867,67 @@ function ProviderForm({ context }: { context: LeadContext }) {
   });
 
   async function onSubmit(values: ProviderValues) {
-    const res = await submitLead({
-      audience: "provider",
-      contactName: values.contactName,
-      // Already E.164 — PhoneField emits nothing else. Omitted rather than
-      // sent empty: absence is what the contract means by optional.
-      whatsapp: values.whatsapp || undefined,
-      email: values.email,
-      privacyAccepted: true,
-      marketingOptIn: values.marketingOptIn,
-      marketKey: LAUNCH_MARKET.key,
-      source: context.source,
-      website: values.website || undefined,
-      businessName: values.businessName,
-    });
+    /*
+      TWO writes, and only one of them is new.
+
+      This form filed a marketing lead and nothing else, so there was no path
+      from a business filling it in to an operator existing — two real
+      businesses sat in `leads` from 8 and 17 August, unread, because the
+      onboarding queue was never told they were there (yuvoy-web#144).
+
+      They are not alternatives. `/leads` is the only place `privacyAccepted`
+      and `marketingOptIn` are recorded, and it is the launch announcement
+      list; `/operator-applications` is the row a human picks up. Dropping
+      either loses something real, so both go.
+
+      In PARALLEL, and the application is the one whose outcome is reported.
+      Sequentially, a slow lead write would delay the thing that matters; and
+      if only one can land, the applicant needs to know about the one that
+      decides whether anybody calls them. A lead that fails behind a successful
+      application is exactly the state this form was already in for a month —
+      no worse, and no longer silent about the half that counts.
+    */
+    const [application, lead] = await Promise.all([
+      submitOperatorApplication({
+        businessName: values.businessName,
+        contactName: values.contactName,
+        // Already E.164 — PhoneField emits nothing else.
+        phone: values.whatsapp,
+        email: values.email,
+        market: LAUNCH_MARKET.key,
+        source: context.source,
+      }),
+      submitLead({
+        audience: "provider",
+        contactName: values.contactName,
+        whatsapp: values.whatsapp || undefined,
+        email: values.email,
+        privacyAccepted: true,
+        marketingOptIn: values.marketingOptIn,
+        marketKey: LAUNCH_MARKET.key,
+        source: context.source,
+        website: values.website || undefined,
+        businessName: values.businessName,
+      }),
+    ]);
+
+    /*
+      The application decides what the applicant is told. `lead` is read only
+      for the case the application cannot speak to: if the application was
+      received, the submission succeeded whatever the mailing list did.
+    */
+    const res: SubmitResult =
+      application.kind === "received"
+        ? lead.kind === "recorded" || lead.kind === "updated"
+          ? lead
+          : { kind: "recorded", acceptance: recordedAcceptance() }
+        : application.kind === "invalid"
+          ? {
+              kind: "invalid",
+              message: application.message,
+              fields: application.fields,
+            }
+          : { kind: application.kind };
     if (res.kind === "invalid") {
       /*
         Server field errors are mapped back onto the form — but **only the
