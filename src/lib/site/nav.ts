@@ -117,7 +117,7 @@ const FOOTER_ORDER: FooterColumn[] = ["explore", "yuvoy", "trust"];
  * Kept out of `SITE_ROUTES` because that list's contract is "routes that
  * exist", and a fragment is not a route.
  */
-const FOOTER_EXTRAS: Partial<
+export const FOOTER_EXTRAS: Partial<
   Record<FooterColumn, { href: string; label: string }[]>
 > = {
   explore: [{ href: "/#destinations", label: "Andaman Islands" }],
@@ -154,10 +154,23 @@ export const FOOTER_COLUMNS: {
     ({ href, label }) => ({ href, label }),
   );
   const extras = FOOTER_EXTRAS[key] ?? [];
-  // Extras sit after the first route so "Explore" leads its own column and
-  // the market reads as something within it.
+  /*
+    Extras are appended for EVERY column, not only `explore`.
+
+    They used to be dropped silently for any other key, which is how the
+    operator portal link vanished on its first deploy: it was declared under
+    `yuvoy`, the map returned `routes` untouched for that column, and the
+    result was a link nobody could see and no test could miss — the column
+    still rendered, just without it.
+
+    `explore` keeps its own ordering because the market has to read as
+    something WITHIN Explore rather than after it. Everywhere else an extra is
+    a destination alongside the routes, so it goes last.
+  */
   const items =
-    key === "explore" ? [routes[0], ...extras, ...routes.slice(1)] : routes;
+    key === "explore"
+      ? [routes[0], ...extras, ...routes.slice(1)]
+      : [...routes, ...extras];
   return {
     key,
     title: FOOTER_COLUMN_TITLES[key],
