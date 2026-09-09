@@ -678,7 +678,7 @@ test.describe("header", () => {
       ).toBeVisible();
     }
     await expect(
-      header.getByRole("link", { name: /join waitlist/i }),
+      header.getByRole("link", { name: /browse experiences/i }),
     ).toBeVisible();
     // The mark, the three primary routes, the call to action — nothing else.
     // A fourth nav item is a design change, not a routing one, so it should
@@ -783,7 +783,7 @@ test.describe("header on a phone", () => {
       ).toBeVisible();
     }
     await expect(
-      dialog.getByRole("link", { name: /join waitlist/i }),
+      dialog.getByRole("link", { name: /browse experiences/i }),
     ).toBeVisible();
   });
 });
@@ -860,7 +860,7 @@ test.describe("mobile menu", () => {
 
     await page
       .getByRole("dialog")
-      .getByRole("link", { name: /join waitlist/i })
+      .getByRole("link", { name: /browse experiences/i })
       .click();
 
     await expect(page.getByRole("dialog")).toBeHidden();
@@ -880,7 +880,7 @@ test.describe("mobile menu", () => {
 
     const dialog = page.getByRole("dialog", { name: "Site menu" });
     await expect(
-      dialog.getByRole("link", { name: /join waitlist/i }),
+      dialog.getByRole("link", { name: /browse experiences/i }),
     ).toBeInViewport();
     for (const label of ["Privacy", "Terms"]) {
       await expect(dialog.getByRole("link", { name: label })).toBeInViewport();

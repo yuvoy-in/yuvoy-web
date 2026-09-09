@@ -180,9 +180,22 @@ test("/operators is an application, at the right proportions", async ({
 test("audience pages send each audience to the right form", async ({
   page,
 }) => {
-  // Travellers: the homepage's own form, and the dedicated page.
+  /*
+    Travellers: the app is the primary path now (yuvoy-web#154), and the
+    waitlist survives as the secondary one — it is still the only way to hear
+    about a destination the first season does not cover.
+
+    Both are asserted, because the risk in that change is losing the waitlist
+    rather than gaining the app.
+  */
   await page.goto("/explore");
-  await page.getByRole("link", { name: "Join the waitlist" }).first().click();
+  await expect(
+    page.getByRole("link", { name: "Browse experiences" }).first(),
+  ).toHaveAttribute("href", /^https:\/\/app\.yuvoy\.in\/\?/);
+  await page
+    .getByRole("link", { name: "Tell us where you want to go" })
+    .first()
+    .click();
   await expect(page).toHaveURL(/\/waitlist$/);
   await expect(page.getByRole("tab", { name: /travelling/i })).toHaveAttribute(
     "aria-selected",

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
+import { appHref } from "@/lib/site/product-links";
 
 /**
  * The cover: a full-viewport statement on a forest field that carries light
@@ -222,14 +223,23 @@ export function Hero() {
               hashchange event LeadForms listens on. A plain anchor sets
               location.hash natively, which both scrolls and fires it.
             */}
+            {/*
+              The cover now opens the app — yuvoy-web#154. It anchored to
+              `#register`, the waitlist form further down this page, which was
+              right for exactly as long as there was nothing to browse.
+
+              An <a> either way, and for a second reason now: it leaves the
+              origin, so `next/link` would prefetch a route that is not in this
+              app's router.
+            */}
             <a
-              href="#register"
+              href={appHref("hero")}
               className={cn(
                 buttonVariants({ variant: "paper", size: "lg" }),
                 "w-full sm:w-auto",
               )}
             >
-              Join the waitlist
+              Browse experiences
               <ButtonArrow />
             </a>
             <a

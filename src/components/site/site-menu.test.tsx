@@ -50,6 +50,22 @@ describe("SiteMenu", () => {
 
     await user.click(screen.getByRole("button", { name: "Open menu" }));
 
-    expect(screen.getByRole("link", { name: /join waitlist/i })).toBeVisible();
+    /*
+      The primary action opens the APP now — yuvoy-web#154. It was "Join
+      Waitlist" → `/waitlist`, which was right for exactly as long as there was
+      nothing to browse.
+
+      The href is asserted, not just the label: this leaves the origin, and a
+      root-relative path would resolve to this site and 404. `src=web` is what
+      makes the arrival attributable — the app reads exactly four parameters
+      and ignores `utm_*` entirely.
+    */
+    const cta = screen.getByRole("link", { name: /browse experiences/i });
+    expect(cta).toBeVisible();
+    expect(cta).toHaveAttribute(
+      "href",
+      expect.stringContaining("https://app.yuvoy.in/"),
+    );
+    expect(cta.getAttribute("href")).toContain("src=web");
   });
 });
