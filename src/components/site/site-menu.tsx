@@ -9,6 +9,7 @@ import { cn } from "@/lib/cn";
 import { LEGAL_ITEMS, MENU_ITEMS, PRIMARY_CTA } from "@/lib/site/nav";
 import { campaignSourceFromPathname, operatorHref } from "@/lib/leads/registry";
 import { ANNOUNCEMENT } from "@/lib/site/launch";
+import { appHref } from "@/lib/site/product-links";
 
 /**
  * The site navigation panel below `lg`.
@@ -315,8 +316,9 @@ export function SiteMenu({
 
           <div className="border-cream-line bg-cream container-page shrink-0 border-t pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-              <Link
-                href={PRIMARY_CTA.href}
+              {/* An <a>: this leaves the origin (yuvoy-web#154). */}
+              <a
+                href={appHref("menu")}
                 onClick={() => close(false)}
                 className={cn(
                   buttonVariants({ size: "lg" }),
@@ -325,7 +327,7 @@ export function SiteMenu({
               >
                 {PRIMARY_CTA.label}
                 <ButtonArrow />
-              </Link>
+              </a>
 
               {legalLinks.length > 0 && (
                 <ul className="flex flex-wrap gap-x-6 gap-y-2">

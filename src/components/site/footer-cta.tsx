@@ -4,7 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { buttonVariants, ButtonArrow } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
-import { showsFooterCta, PRIMARY_CTA } from "@/lib/site/nav";
+import { showsFooterCta, PRIMARY_CTA, WAITLIST_CTA } from "@/lib/site/nav";
+import { appHref } from "@/lib/site/product-links";
 
 /**
  * The footer's closing call to action.
@@ -32,11 +33,12 @@ export function FooterCta() {
         <em className="text-terra-soft font-turn italic">experience Yuvoy.</em>
       </h2>
       <p className="text-cream/70 mt-5 max-w-xl leading-relaxed sm:mt-6 sm:text-lg">
-        Join the waitlist and we will contact you when the first experiences for
-        your destination are ready.
+        Real experiences from the people who run them, in Havelock, Neil and
+        Port Blair. Booking opens as operators come on.
       </p>
-      <Link
-        href={PRIMARY_CTA.href}
+      {/* An <a>: this leaves the origin (yuvoy-web#154). */}
+      <a
+        href={appHref("footer")}
         className={cn(
           buttonVariants({ variant: "paper", size: "lg" }),
           "mt-8 flex w-full sm:mt-10 sm:inline-flex sm:w-auto",
@@ -44,7 +46,24 @@ export function FooterCta() {
       >
         {PRIMARY_CTA.label}
         <ButtonArrow />
-      </Link>
+      </a>
+
+      {/*
+        The waitlist survives as the secondary path (owner's call, 9 Sep 2026).
+        It is still the only way to hear about a destination the first season
+        does not cover, so it keeps a door here rather than being retired with
+        the leads it would have collected.
+      */}
+      <p className="text-cream/70 mt-6 text-sm">
+        Somewhere else in mind?{" "}
+        <Link
+          href={WAITLIST_CTA.href}
+          className="text-cream underline underline-offset-4"
+        >
+          Tell us where you want to go
+        </Link>
+        .
+      </p>
     </div>
   );
 }

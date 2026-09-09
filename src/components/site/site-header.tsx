@@ -9,6 +9,7 @@ import { SiteMenu } from "@/components/site/site-menu";
 import { useHeaderChrome } from "@/components/site/use-header-chrome";
 import { cn } from "@/lib/cn";
 import { hidesSiteChrome, PRIMARY_CTA } from "@/lib/site/nav";
+import { appHref } from "@/lib/site/product-links";
 
 /**
  * The site header: sticky, compact, present on every route, and out of the
@@ -135,8 +136,13 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2 justify-self-end">
-          <Link
-            href={PRIMARY_CTA.href}
+          {/*
+            An <a>, not next/link — yuvoy-web#154. This leaves the origin for
+            app.yuvoy.in, and `Link` would prefetch a route that does not exist
+            in this app's router.
+          */}
+          <a
+            href={appHref("header")}
             className={cn(
               // Monochrome CTAs swap grounds with the bar: paper over the
               // dark cover, forest on the cream bar.
@@ -149,7 +155,7 @@ export function SiteHeader() {
             )}
           >
             {PRIMARY_CTA.label}
-          </Link>
+          </a>
           <SiteMenu
             tone={overCover ? "onDark" : "onLight"}
             className="lg:hidden"

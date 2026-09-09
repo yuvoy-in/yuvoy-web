@@ -225,15 +225,34 @@ test("the cover's momentum line states only true facts", async ({ page }) => {
   expect(text).not.toMatch(/\b\d+\s+(founding\s+)?operators?\b/i);
 });
 
-test("the cover CTA lands on the registration form without leaving the page", async ({
-  page,
-}) => {
+test("the cover CTA opens the app, carrying attribution", async ({ page }) => {
+  /*
+    It anchored to `#register` — the waitlist form further down this page —
+    which was right for exactly as long as there was nothing to browse. Both
+    product hosts are live now, so the cover sends people to the product
+    (yuvoy-web#154).
+
+    The href is asserted rather than followed: clicking would leave the origin
+    for a different application, and this suite's job is this site.
+  */
   await page.goto("/");
 
   const cover = page.locator("main > section[data-dark-hero]").first();
-  await cover.getByRole("link", { name: "Join the waitlist" }).click();
-  await expect(page).toHaveURL(/#register$/);
-  await expect(registerForm(page)).toBeInViewport();
+  const cta = cover.getByRole("link", { name: "Browse experiences" });
+  const href = await cta.getAttribute("href");
+  const url = new URL(href!);
+
+  expect(url.origin).toBe("https://app.yuvoy.in");
+  /*
+    The app reads exactly four parameters and drops the object entirely when
+    `src` is unrecognised — so a wrong value here records NO attribution, not
+    a fallback to `unknown`. `web` only became a legal value in yuvoy-api#135.
+  */
+  expect(url.searchParams.get("src")).toBe("web");
+  expect(url.searchParams.get("placement")).toBe("hero");
+
+  // And the waitlist is still reachable from this page, one act down.
+  await expect(registerForm(page).getByLabel("Name")).toBeVisible();
 });
 
 /*
