@@ -98,8 +98,21 @@ test.describe("/explore", () => {
       expect(body, `/explore must not claim ${claim}`).not.toMatch(claim);
     }
 
-    // It says plainly that there is nothing to browse.
-    expect(body).toMatch(/no listings on yuvoy yet/i);
+    /*
+      It says plainly that there is nothing to BROWSE HERE — yuvoy-web#154.
+
+      This asserted "no listings on Yuvoy yet", which stopped being true:
+      there are published, sellable listings in production. The check is kept
+      and re-aimed rather than deleted, because the thing it was really
+      guarding — that this page never implies you can browse or buy on it — is
+      still the rule.
+
+      And the retired claim is now asserted ABSENT, so a copy change cannot
+      bring back a statement about the catalogue that nothing on this site can
+      keep true.
+    */
+    expect(body).toMatch(/nothing here is browsable or bookable/i);
+    expect(body).not.toMatch(/no listings on yuvoy/i);
   });
 });
 

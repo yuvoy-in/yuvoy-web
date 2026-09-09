@@ -804,10 +804,23 @@ function DetailScreen({
           <p className="font-display tracking-display mt-0.5 text-[19px] leading-tight">
             {reel.title}
           </p>
-          <p className="text-cream/80 mt-1 flex items-center gap-1 text-[10px]">
-            <StarGlyph className="text-terra-soft size-2.5" />
-            4.9 (132) · 3 hrs · small groups
-          </p>
+          {/*
+            NO RATING — yuvoy-web#151.
+
+            This read "4.9 (132)". A price in a mock booking screen reads as
+            sample data; a review count does not — it is a precise, checkable
+            claim of the kind visitors are trained to read as real, on a site
+            whose own /safety page says no operator has been verified by us.
+
+            The traveller app shows no ratings anywhere for the same reason,
+            and says so in a comment on its detail screen: "a number nobody
+            earned is a fabricated claim". The homepage should not be
+            contradicting the product's own stated position.
+
+            The listing's own facts instead, from the same fixture the card
+            above it reads, so the two cannot disagree.
+          */}
+          <p className="text-cream/80 mt-1 text-[10px]">{reel.meta}</p>
         </div>
       </div>
 
@@ -822,16 +835,22 @@ function DetailScreen({
             transitionTimingFunction: "linear",
           }}
         >
-          <div className="flex flex-wrap gap-1.5">
-            {["Certified crew", "Insured", "Free cancel · 24h"].map((chip) => (
-              <span
-                key={chip}
-                className="border-cream-line bg-cream-deep rounded-edge border px-2 py-1 text-[9px] font-medium"
-              >
-                {chip}
-              </span>
-            ))}
-          </div>
+          {/*
+            The chip row is gone — yuvoy-web#151. It carried "Certified crew",
+            "Insured" and "Free cancel · 24h", and every one of the three was
+            a claim about YUVOY rather than about the mock listing:
+
+              · no operator on Yuvoy has been verified by us
+              · insurance handling is not built
+              · no cancellation or refund policy has been written or approved
+
+            all three quoted from /safety, on the same site. DESIGN_SYSTEM §8
+            lets this surface carry illustrative "prices, seat counts,
+            operator lines"; a platform guarantee is none of those.
+
+            They come back as chips when the policies exist. This is a "not
+            yet", not a "never".
+          */}
 
           <div>
             <p className="text-terra-deep tracking-label text-[9px] font-medium uppercase">
@@ -872,22 +891,36 @@ function DetailScreen({
             </ul>
           </div>
 
+          {/*
+            THE OPERATOR, NOT A GUEST — found while fixing yuvoy-web#151 and
+            not in that issue.
+
+            This block was five filled stars, a quote — "First dive ever and I
+            felt safe the whole time" — and a byline: "Meera · last week". An
+            invented review, with a name and a date, on the homepage.
+
+            The rulebook is explicit and names this exact shape: never add a
+            rating or a review count "in copy, IN MOCK DATA, in structured
+            data, or in an OG image". Being inside the preview wrapper does not
+            reach it — DESIGN_SYSTEM §8 permits illustrative prices, seat
+            counts and operator lines, and a guest review is none of those.
+            Reviews are the one thing this product has publicly said it will
+            not fabricate, because they do not exist until real completed
+            bookings produce them.
+
+            What replaces it is what the real product now renders in that
+            position: the operator's own description of the day
+            (yuvoy-app#21 §1). An operator line is illustrative content §8
+            allows, and it is the honest version of the same band.
+          */}
           <div>
             <p className="text-terra-deep tracking-label text-[9px] font-medium uppercase">
-              What guests say
+              In the operator&rsquo;s words
             </p>
             <div className="border-cream-line bg-cream-deep rounded-edge mt-1.5 border p-2.5">
-              <span className="text-terra flex gap-0.5">
-                {Array.from({ length: 5 }, (_, star) => (
-                  <StarGlyph key={star} className="size-2" />
-                ))}
-              </span>
-              <p className="text-forest/80 mt-1.5 text-[11px] leading-relaxed">
-                &ldquo;First dive ever and I felt safe the whole time. Saw a
-                turtle!&rdquo;
-              </p>
-              <p className="text-forest/70 mt-1.5 text-[9px]">
-                Meera · last week
+              <p className="text-forest/80 text-[11px] leading-relaxed">
+                &ldquo;We take four at a time. You breathe on the surface first
+                until you are ready, and nobody goes down until they are.&rdquo;
               </p>
             </div>
           </div>
@@ -942,9 +975,14 @@ function DetailScreen({
             </ul>
           </div>
 
-          <p className="border-cream-line text-forest/70 border-t pt-2.5 pb-1 text-[10px] leading-relaxed">
-            Free cancellation up to 24 hours before your slot.
-          </p>
+          {/*
+            "Free cancellation up to 24 hours before your slot" was here —
+            yuvoy-web#151. No cancellation or refund policy has been written
+            or approved, which /safety says on this same site. The real screen
+            shows the operator's own `cancellationPolicy`, frozen onto the
+            booking at checkout; there is nothing yet to illustrate it with
+            that would not be inventing the policy.
+          */}
         </div>
       </div>
 
@@ -1161,8 +1199,18 @@ function CheckoutScreen({ payTap }: { payTap: boolean }) {
         </span>
 
         <p className="text-forest/60 flex items-center justify-center gap-1.5 text-[9px]">
+          {/*
+            "· full refund if the operator cancels" was here —
+            yuvoy-web#151. That is a specific policy, and no cancellation or
+            refund policy has been written or approved.
+
+            "Payments secured" stays: it describes the checkout being drawn
+            rather than a policy the business has adopted, and /safety does not
+            list payment handling among the things that are not built. If that
+            reading is wrong the whole line should go, and it is one deletion.
+          */}
           <LockGlyph className="size-2.5" />
-          Payments secured · full refund if the operator cancels
+          Payments secured
         </p>
       </div>
     </>
@@ -1323,19 +1371,6 @@ function CheckGlyph({
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-    </svg>
-  );
-}
-
-function StarGlyph({ className }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      className={className}
-      aria-hidden
-    >
-      <path d="M10 1.8l2.47 5.34 5.53.63-4.1 3.9 1.1 5.55L10 14.5l-4.99 2.72 1.1-5.55-4.1-3.9 5.52-.63L10 1.8z" />
     </svg>
   );
 }

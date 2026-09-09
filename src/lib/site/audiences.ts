@@ -67,7 +67,22 @@ export const AUDIENCE_COPY: Record<LeadAudience, AudienceCopy> = {
     eyebrow: "Applying",
     title: "Apply as a",
     accent: "founding operator.",
-    lede: "Tell us who you are, where you operate and what you offer. A member of the team reads it and comes back to you directly.",
+    /*
+      The second half used to read "A member of the team reads it and comes
+      back to you directly" — the same promise yuvoy-web#150 removed from the
+      success notice, on the form above it.
+
+      Nothing kept it: the two operators who used this form in August 2026
+      were still waiting a month later, and D-031 P10 retires that review
+      queue as work. What replaces it is the thing that is true and useful —
+      an operator does not have to wait for anybody, because
+      `POST /operator/v1/auth/signup` is open right now.
+
+      Kept short and kept here rather than fetched: this is the lede ABOVE the
+      form, before any request has been made, so there is no `next` to render.
+      The API's own sentence is what the success notice shows.
+    */
+    lede: "Tell us who you are, where you operate and what you offer. You do not have to wait for us — you can set your business up at operators.yuvoy.in with the same number.",
     faqs: OPERATOR_FAQS,
     metaTitle: "Apply as a founding operator",
     metaDescription:

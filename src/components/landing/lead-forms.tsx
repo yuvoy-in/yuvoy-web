@@ -344,11 +344,18 @@ function SuccessNotice({
   updated,
   audience,
   contact,
+  next,
 }: {
   updated: boolean;
   audience: LeadAudience;
   /** What was actually recorded, read back so a typo can still be caught. */
   contact: { email?: string; whatsapp?: string };
+  /**
+   * The API's own next-step sentence, from `POST /v1/operator-applications` —
+   * yuvoy-web#150. Rendered verbatim and never rewritten here. Optional: a
+   * successful application does not have to carry one.
+   */
+  next?: string;
 }) {
   const provider = audience === "provider";
   const channels = [
@@ -379,9 +386,39 @@ function SuccessNotice({
             : "You’re on the Yuvoy waitlist"}
       </p>
       {provider ? (
+        /*
+          THE API'S SENTENCE, VERBATIM — yuvoy-web#150.
+
+          This said "The Yuvoy team will review it and contact you directly".
+          Nothing kept that promise: the two operators who used this form in
+          August 2026 were still waiting a month later, and D-031 P10 retires
+          the review queue as work, so nothing was going to start keeping it.
+          The API replaced the promise with the thing an applicant can do
+          without waiting for anybody — sign themselves up at
+          operators.yuvoy.in — and this screen was parsing that answer and
+          dropping it on the floor.
+
+          Rendered rather than copied into this repository ON PURPOSE. The
+          whole value of `next` is that the sentence changes on the API's side
+          when what is true changes, with no marketing-site deploy. It has
+          changed once already for exactly that reason.
+
+          Prose, not markup: the API returns a sentence and linkifying prose
+          from an API is a guess about where the words are. If a real link is
+          wanted, the API returns a structured field and this renders that.
+        */
         <p className="text-cream/70 mt-4 leading-relaxed">
-          The Yuvoy team will review it and contact you directly to talk through
-          what you offer.
+          {next ?? (
+            /*
+              The fallback, for a success that carried no `next`. It promises
+              no call either — that is the whole point of the change — and it
+              names the same door the API's sentence names.
+            */
+            <>
+              We have your application. You do not have to wait for us: you can
+              set your business up at operators.yuvoy.in with this number now.
+            </>
+          )}
         </p>
       ) : (
         <p className="text-cream/70 mt-4 leading-relaxed">
@@ -848,6 +885,18 @@ function ProviderForm({ context }: { context: LeadContext }) {
     email?: string;
     whatsapp?: string;
   }>({});
+  /*
+    What the API told us to tell them — yuvoy-web#150.
+
+    `next` was parsed off the application response and thrown away, so the
+    screen kept promising a phone call the API had stopped promising. Held
+    separately from `result` because the result reported here is the LEAD's,
+    by design: the application decides whether the submission succeeded, and
+    the lead carries the "we already had you" distinction.
+  */
+  const [applicationNext, setApplicationNext] = React.useState<
+    string | undefined
+  >(undefined);
   /** Server-side rejections naming fields this form does not render. */
   const [unknownFieldErrors, setUnknownFieldErrors] = React.useState<string[]>(
     [],
@@ -965,6 +1014,11 @@ function ProviderForm({ context }: { context: LeadContext }) {
     }
     if (res.kind === "recorded" || res.kind === "updated") {
       setSubmitted({ email: values.email, whatsapp: values.whatsapp });
+      // Optional on the response, and absent is a normal answer, not a
+      // failure — `SuccessNotice` has its own sentence for that case.
+      setApplicationNext(
+        application.kind === "received" ? application.next : undefined,
+      );
       track.submitted({
         marketKey: LAUNCH_MARKET.key,
         destinationKeys: [],
@@ -982,6 +1036,7 @@ function ProviderForm({ context }: { context: LeadContext }) {
         updated={result.kind === "updated"}
         audience="provider"
         contact={submitted}
+        next={applicationNext}
       />
     );
   }

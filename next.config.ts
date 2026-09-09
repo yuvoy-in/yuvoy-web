@@ -1,4 +1,6 @@
 import type { NextConfig } from "next";
+import { cspHeaders } from "./src/lib/site/csp";
+import { DEFAULT_HOST } from "./src/lib/analytics/config";
 
 const securityHeaders = [
   {
@@ -7,11 +9,30 @@ const securityHeaders = [
   },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-  { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  /*
+    DENY, matching `frame-ancestors 'none'` in the CSP (yuvoy-web#153).
+    Nothing frames this site, including itself, and two headers saying
+    different things is how one of them ends up being the wrong one. Both are
+    kept: `X-Frame-Options` is still honoured by things that ignore CSP.
+  */
+  { key: "X-Frame-Options", value: "DENY" },
   {
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=()",
   },
+  /*
+    Cross-origin isolation for the browsing context. Nothing here opens a
+    cross-origin popup or depends on `window.opener`, so severing that
+    relationship costs nothing and removes a class of tab-nabbing.
+
+    `Cross-Origin-Resource-Policy` is DELIBERATELY NOT SET, and that is the
+    one to think twice about before adding: this site's images are meant to be
+    fetched by other origins — an OG card rendered by WhatsApp, Slack or a
+    search preview is exactly that request. `same-origin` there would be
+    protecting assets whose whole purpose is to travel, on the domain that
+    carries the brand.
+  */
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
 ];
 
 const nextConfig: NextConfig = {
@@ -52,7 +73,22 @@ const nextConfig: NextConfig = {
     qualities: [75, 100],
   },
   async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders }];
+    /*
+      Two CSP headers, deliberately: a small enforced subset that cannot break
+      a working page, and the full policy in report-only until a real run
+      against production says the enumeration is complete. The directive list
+      and, more importantly, why `script-src` carries no nonce, are in
+      src/lib/site/csp.ts.
+
+      The PostHog host comes from the same accessor `/privacy` derives its
+      "hosted in the EU" claim from, so the policy cannot name a different
+      host from the one the page promises.
+    */
+    const csp = cspHeaders({
+      posthogHost: process.env.NEXT_PUBLIC_POSTHOG_HOST || DEFAULT_HOST,
+      dev: process.env.NODE_ENV !== "production",
+    });
+    return [{ source: "/(.*)", headers: [...securityHeaders, ...csp] }];
   },
 
   /**

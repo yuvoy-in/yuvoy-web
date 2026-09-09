@@ -9,10 +9,15 @@ import { getJournalPosts } from "@/lib/journal/posts";
  * Deliberately excluded, each for its own reason:
  * - `/go/*` — campaign routes, `noindex` by metadata and canonicalised to `/`.
  *   Listing them would put them in competition with the homepage.
- * - `/privacy`, `/terms` — still placeholder copy and still `noindex`. They
- *   join this list in the same change that lands approved legal copy and
- *   removes them from the robots disallow list, never before: an indexed
- *   placeholder is worse than a noindexed one.
+ * - `/privacy`, `/terms` — real copy now, and still `noindex` and still on
+ *   the robots disallow list, because it has not been through legal review.
+ *   This comment used to say the copy was placeholder; it stopped being true
+ *   on 2 August and 8 August respectively, and the next person to read it
+ *   would have believed it (yuvoy-web#152).
+ *
+ *   They join this list in the same change that removes their `noindex` and
+ *   takes them off the robots disallow list, never before — all three
+ *   together, which is the rule stated in full in `robots.ts`.
  * - `/philosophy` and retired `/experiences/<slug>` detail pages — 410 Gone.
  *   A 410 in a sitemap is a contradiction that slows de-indexing.
  * - `/how-it-works`, `/travellers`, `/experiences`, `/destinations` — folded

@@ -194,10 +194,35 @@ test("the registration FAQ is three questions", async ({ page }) => {
 
 test("the cover's momentum line states only true facts", async ({ page }) => {
   await page.goto("/");
-  // The signed-operator count is a real, owner-confirmed number (2026-08-03).
-  // If this fails because reality changed, update BOTH the page and this
-  // assertion to the new true number — never delete the check.
-  await expect(page.getByText("3 founding operators signed")).toBeVisible();
+
+  /*
+    This asserted "3 founding operators signed" was visible, and it was doing
+    its job — it is why the claim was findable at all (yuvoy-web#151). But it
+    was pinning a claim we cannot stand behind: the owner was asked directly
+    on 2026-09-09 and it is not accurate.
+
+    So the check is not deleted, it is inverted. The two facts that ARE true
+    are asserted positively, and the retired one is asserted absent, so it
+    cannot come back without somebody meaning it.
+  */
+  await expect(page.getByText("Waitlist open")).toBeVisible();
+  await expect(page.getByText("No payment required")).toBeVisible();
+  /*
+    The banned thing is a COUNT of operators, not the phrase "founding
+    operator" — which is a legitimate call to action on this page and across
+    the site ("Apply as a founding operator"). A first pass at this check
+    banned the phrase and failed on that CTA, which is the right failure for
+    the wrong assertion.
+
+    So: no number of operators, signed or otherwise, anywhere the reader meets
+    — outside the preview wrapper, which is the owner-approved place for
+    illustrative content (DESIGN_SYSTEM §8). A number here is a checkable
+    claim about the business, and the last one went stale in five weeks
+    without anybody noticing.
+  */
+  await expect(page.getByText(/\d+\s+founding operators/i)).toHaveCount(0);
+  const text = await pageText(page, { excludePreview: true });
+  expect(text).not.toMatch(/\b\d+\s+(founding\s+)?operators?\b/i);
 });
 
 test("the cover CTA lands on the registration form without leaving the page", async ({
