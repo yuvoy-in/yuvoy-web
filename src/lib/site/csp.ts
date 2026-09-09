@@ -39,24 +39,66 @@
  * sending anything anywhere. That is the whole of what the issue asked for,
  * and `'unsafe-inline'` in `script-src` weakens nothing else here.
  *
- * ## Rollout
+ * ## Rollout — now enforced
  *
- * Report-only first, then enforce. A policy written from reading the code is
- * a guess; a policy written from a report is a fact. `ENFORCED` is the subset
- * that cannot break a page that works today.
+ * Shipped report-only on 9 Sep 2026 and enforced the same day, on the owner's
+ * call, against evidence rather than a waiting period.
+ *
+ * The evidence is `pnpm verify` run with this policy ENFORCED: the end-to-end
+ * suite drives the real production build in a real browser across every
+ * indexable route, both lead forms, the product demo's animation and the
+ * consent flow. A directive that blocks anything they touch fails the suite
+ * rather than a visitor.
+ *
+ * **What it does not cover.** The suite never grants analytics consent against
+ * a real key, so no request leaves for `eu.i.posthog.com`; that host is in
+ * `connect-src` from reading the call site rather than from watching one
+ * succeed. The report-only header therefore stays alongside the enforced one
+ * carrying the SAME policy — an enforced-only header blocks silently, while
+ * report-only is what names the directive in the console.
  */
 
-/** An origin, or nothing when the URL is unusable. Never a path. */
+/**
+ * An origin, or nothing when the URL is unusable. Never a path.
+ *
+ * The missing scheme is repaired here as well as in `apiBaseUrl`, and that is
+ * deliberate duplication rather than an oversight. `new URL("api.yuvoy.in")`
+ * throws, so a caller passing the raw environment variable instead of the
+ * repaired one would drop the API from `connect-src` — and the symptom of
+ * that is every form on the site failing silently, with no error the browser
+ * reports and nothing in this file to suggest why.
+ *
+ * A directive whose failure is invisible is worth being defensive about twice.
+ */
 function originOf(url: string | undefined): string | null {
-  if (!url) return null;
+  const raw = url?.trim();
+  if (!raw) return null;
+  const withScheme = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
   try {
-    return new URL(url).origin;
+    return new URL(withScheme).origin;
   } catch {
     return null;
   }
 }
 
 export interface CspEnv {
+  /**
+   * The Go API, which **both lead forms and the contact form post to**.
+   *
+   * This was missing from the first draft of the policy, and enforcing it
+   * without this would have killed every form on the site — the waitlist, the
+   * operator application and `/contact` — which is the entire reason this site
+   * exists. The e2e suite caught it the moment the policy went from
+   * report-only to enforced, and that is exactly the failure report-only mode
+   * cannot show you: a report-only header records a violation and lets the
+   * request through, so the forms would have kept working right up until the
+   * day somebody enforced it.
+   *
+   * Empty in environments where the backend is not deployed, in which case
+   * `submitLead` short-circuits and never issues a request — so an absent
+   * value is correct rather than a hole.
+   */
+  apiBaseUrl?: string;
   /** PostHog's ingestion host. `analyticsHostedInEu` guards where it points. */
   posthogHost?: string;
   /** Development needs HMR's websocket and eval; production must not have them. */
@@ -64,10 +106,14 @@ export interface CspEnv {
 }
 
 export function cspDirectives(env: CspEnv): string[] {
+  const api = originOf(env.apiBaseUrl);
   const posthog = originOf(env.posthogHost);
 
   const connect = [
     "'self'",
+    // The origin, never the path. A path in a source expression does not match
+    // and is not an error the browser reports — every form would simply fail.
+    ...(api ? [api] : []),
     ...(posthog ? [posthog] : []),
     ...(env.dev ? ["ws:", "wss:"] : []),
   ];
@@ -111,20 +157,14 @@ export function cspDirectives(env: CspEnv): string[] {
 }
 
 /**
- * The subset enforced today.
+ * The whole policy is enforced.
  *
- * Nothing on this site uses any of these capabilities — there is no
- * `<object>`, no `<base>`, and nothing frames the site — so each can be
- * turned on without a report. The rest waits for a real report-only run
- * against production, because a policy that breaks the site is worse than no
- * policy: it gets reverted and nobody tries again for six months.
+ * It was a three-directive subset for one day. Kept as its own function rather
+ * than collapsed into `reportOnlyCsp` so that narrowing it again is a one-line
+ * change with somewhere to put the reason.
  */
-const ENFORCED = new Set(["object-src", "base-uri", "frame-ancestors"]);
-
 export function enforcedCsp(env: CspEnv): string {
-  return cspDirectives(env)
-    .filter((d) => ENFORCED.has(d.split(" ")[0]))
-    .join("; ");
+  return cspDirectives(env).join("; ");
 }
 
 export function reportOnlyCsp(env: CspEnv): string {

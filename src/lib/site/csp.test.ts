@@ -1,7 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { cspDirectives, enforcedCsp, reportOnlyCsp } from "./csp";
 
-const PROD = { posthogHost: "https://eu.i.posthog.com", dev: false };
+const PROD = {
+  apiBaseUrl: "https://api.yuvoy.in",
+  posthogHost: "https://eu.i.posthog.com",
+  dev: false,
+};
 
 function directive(policy: string, name: string): string | undefined {
   return policy.split("; ").find((d) => d === name || d.startsWith(`${name} `));
@@ -25,6 +29,32 @@ function sources(policy: string, name: string): string[] {
  * `form-action` are the two directives that close it.
  */
 describe("Content-Security-Policy", () => {
+  it("lets the forms reach the API — the thing this site is for", () => {
+    /*
+      Missing from the first draft, and enforcing without it would have killed
+      the waitlist, the operator application and /contact. The e2e suite caught
+      it the moment the policy went from report-only to enforced, which is the
+      one failure report-only mode cannot show: it records a violation and lets
+      the request through, so the forms keep working until somebody enforces.
+    */
+    const connect = sources(reportOnlyCsp(PROD), "connect-src");
+    expect(connect).toContain("https://api.yuvoy.in");
+    // The ORIGIN, never the path. A path in a source expression silently
+    // matches nothing.
+    expect(connect.every((c) => !c.includes("/v1"))).toBe(true);
+  });
+
+  it("repairs a scheme-less API host rather than emitting a path", () => {
+    // `api.yuvoy.in` with no scheme makes fetch treat it as a RELATIVE path,
+    // which reached production once. The policy reads through the same
+    // accessor the forms do, so both agree about the origin.
+    const connect = sources(
+      reportOnlyCsp({ ...PROD, apiBaseUrl: "api.yuvoy.in" }),
+      "connect-src",
+    );
+    expect(connect).toContain("https://api.yuvoy.in");
+  });
+
   it("leaves a form-jacker nowhere to send what it scrapes", () => {
     const connect = sources(reportOnlyCsp(PROD), "connect-src");
     expect(connect).toContain("'self'");
@@ -68,13 +98,16 @@ describe("Content-Security-Policy", () => {
     ).toContain("unsafe-eval");
   });
 
-  it("enforces only what cannot break a page that works today", () => {
-    const enforced = enforcedCsp(PROD);
-    expect(enforced).toBe(
-      "object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
-    );
-    expect(enforced).not.toContain("script-src");
-    expect(enforced).not.toContain("connect-src");
+  it("enforces the whole policy, and reports the same one", () => {
+    /*
+      Enforced on 9 Sep 2026 against the e2e suite rather than a waiting
+      period. Both headers carry the same policy: an enforced-only header
+      blocks silently, while report-only names the directive in the console.
+      Divergence means somebody narrowed one and not the other.
+    */
+    expect(enforcedCsp(PROD)).toBe(reportOnlyCsp(PROD));
+    expect(enforcedCsp(PROD)).toContain("connect-src");
+    expect(enforcedCsp(PROD)).toContain("form-action 'self'");
   });
 
   it("drops a host it cannot parse rather than emitting a broken source", () => {
