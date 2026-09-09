@@ -58,6 +58,21 @@ export const metadata: Metadata = {
  * No search results, no counts, no prices, no Book buttons, no filter that
  * filters nothing. Until real listings are connected this page describes kinds
  * of day; when they are, the grid takes data and nothing here needs redesign.
+ *
+ * ## The link out, which is not here yet
+ *
+ * Every call to action on this page points at `/waitlist`, and that is
+ * correct today: the owner's position is that we do not go live until
+ * payments are integrated, so sending a traveller to a product they cannot
+ * buy from would be the mistake. At launch these become links to
+ * `app.yuvoy.in` carrying `src`, `code`, `placement` and `campaign` — the
+ * only four parameters the app reads (`src/lib/booking/attribution.ts` in
+ * yuvoy-app; `utm_*` and `ref` are silently dropped).
+ *
+ * `src` must be a value on the app's accepted list, which is the API's
+ * `Attribution.source` enum, and `web` is NOT on it — see yuvoy-web#154 and
+ * the API issue raised from it. Nothing switches on until the owner says the
+ * app is open (yuvoy-web#154).
  */
 const CONTENTS = [
   { href: "#experiences", label: "Experiences" },
@@ -119,11 +134,25 @@ export default function ExplorePage() {
           className="mt-6"
         />
 
+        {/*
+          "There are no listings on Yuvoy yet" was here — yuvoy-web#154. It
+          stopped being true: there are published, sellable listings in
+          production. The second half is still true and is the half that
+          matters, so what this notice says now is the thing about THIS page
+          rather than a claim about the catalogue.
+
+          A factual claim on an indexed page has to track reality, and the way
+          this one went stale is instructive: it was true when written, about
+          something outside this repository, with nothing here able to tell
+          when it changed. So the replacement makes no claim that can go
+          stale — it describes what this page does, which is this page's own
+          business.
+        */}
         <StatusNotice label="Collection preview" className="mt-14">
           <p>
             These are the kinds of day the first collection is being built
-            around. There are no listings on Yuvoy yet, so nothing here is
-            browsable or bookable, and no prices or availability are shown.
+            around. Nothing here is browsable or bookable yet, and no prices or
+            availability are shown.
           </p>
         </StatusNotice>
       </Section>

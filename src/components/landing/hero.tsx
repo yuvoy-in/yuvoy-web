@@ -24,15 +24,23 @@ import { cn } from "@/lib/cn";
  * promise: watch real experiences, make one yours (owner copy, 2026-08-06).
  *
  * The facts row along the bottom is the page's momentum line and every entry
- * on it must be literally true today. "3 founding operators signed" is a real
- * count confirmed by the owner (2026-08-03); update it only to another true
- * number.
+ * on it must be literally true today.
+ *
+ * It was three facts. "3 founding operators signed" came off on 2026-09-09
+ * (yuvoy-web#151): the owner was asked directly and it is not accurate —
+ * there have been conversations, and the expectation is that operators come
+ * on board once the product is live, which is a reasonable thing to expect
+ * and a different thing from having signed. The count's only substantiation
+ * was a confirmation from 2026-08-03, five weeks earlier, recorded in this
+ * comment. A fact that needs re-confirming to stay true is not one this row
+ * can carry.
+ *
+ * So: TWO facts, and that is the owner's decision (2026-09-09), not an
+ * oversight. A third would have to be checkable without asking anybody —
+ * "Andaman first" or "Launching October" are the shape — and two true ones
+ * beat an invented third.
  */
-const FACTS = [
-  "Waitlist open",
-  "No payment required",
-  "3 founding operators signed",
-];
+const FACTS = ["Waitlist open", "No payment required"];
 
 export function Hero() {
   return (
@@ -236,7 +244,7 @@ export function Hero() {
           </div>
         </div>
 
-        {/* The momentum line: three true facts, and the three islands. It
+        {/* The momentum line: the true facts, and the three islands. It
             sits at the foot of the cover — the statement above takes the
             free space (`flex-1`) and centres within it, so this row lands
             on the container's bottom padding rather than floating with the

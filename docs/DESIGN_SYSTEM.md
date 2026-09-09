@@ -310,6 +310,12 @@ The **Season One phone preview** (`ProductDemo`) is the one place illustrative p
    > The caption says "sample", not "not bookable". The page's plain-language statement lives in the registration section's first answer — "Can I book something today? No, and we won't pretend otherwise." — which `home.spec.ts` asserts alongside the caption.
 
 2. Its "footage" is **moving colour built from brand tokens** (`film-*` + `caustics` utilities, `color-mix` only) — unmistakably an illustration, never a fake photograph or a real-looking screenshot.
-3. Claims **outside** the preview stay literally true (e.g. the "3 founding operators signed" count is owner-confirmed and must track reality).
+3. Claims **outside** the preview stay literally true, and the preview is **not** a licence for any claim at all — it covers illustrative _prices, seat counts and operator lines_, which is what §8 says and what it means.
+
+   > A **rating, a review count or a guest testimonial is not on that list**, inside the wrapper or outside it. The rulebook bans them "in copy, **in mock data**, in structured data, or in an OG image", and reviews are the one thing this product has publicly said it will not fabricate — they do not exist until real completed bookings produce them, and the traveller app shows none anywhere for the same reason. On 2026-09-09 the preview was carrying a `4.9 (132)` rating and a five-star testimonial bylined "Meera · last week"; both were removed (yuvoy-web#151).
+   >
+   > Neither is a **platform guarantee**. "Certified crew", "Insured" and "Free cancel · 24h" were chips on the preview's detail screen while `/safety` on the same site said no operator has been verified by us, insurance handling is not built, and no cancellation or refund policy has been written or approved. A guarantee is a claim about Yuvoy, not about the mock listing, and it belongs in the preview only once it is true.
+   >
+   > The "3 founding operators signed" count used to be named here as the worked example of a true claim, owner-confirmed on 2026-08-03. It went stale, and nobody noticed for five weeks — the owner confirmed on 2026-09-09 that it is not accurate. **A fact that needs re-confirming to stay true cannot live on the page**, which is why the momentum line now carries two facts rather than three and why `home.spec.ts` asserts the absence of any operator count rather than pinning a number.
 
 Any pasted export is oversized vs. real scale: calibrate the ratio, snap every value to a token, re-express with flex/grid, mobile-first.

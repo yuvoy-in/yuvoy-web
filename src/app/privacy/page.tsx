@@ -9,10 +9,14 @@ export const metadata: Metadata = {
   title: "Privacy",
   description:
     "What Yuvoy collects when you join the waitlist, why, where it is stored, and how to have it deleted.",
-  // Stays noindexed until the copy has been reviewed. Removing this, taking
-  // /privacy off the robots disallow list, and adding it to the sitemap are
-  // one atomic change — an indexed page nobody has checked is worse than a
-  // hidden one.
+  // Stays noindexed until the copy has been legally reviewed. Removing this,
+  // taking /privacy off the robots disallow list, and adding it to the sitemap
+  // are ONE atomic change — an indexed page nobody has checked is worse than a
+  // hidden one, and the page is reachable from the footer either way.
+  //
+  // The three came apart in early September and were put back together on
+  // 2026-09-09 (yuvoy-web#152, owner's call). The copy is no longer
+  // placeholder; legal review is what is outstanding.
   robots: { index: false, follow: false },
 };
 

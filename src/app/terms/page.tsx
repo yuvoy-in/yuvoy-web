@@ -6,7 +6,9 @@ export const metadata: Metadata = {
   title: "Terms",
   description:
     "The terms that apply to this pre-launch Yuvoy site: what joining the waitlist does, what it does not commit anyone to, and who you are dealing with today.",
-  // See the note on /privacy — indexing flips atomically once reviewed.
+  // See the note on /privacy — indexing flips atomically once reviewed, and
+  // all three halves of that flip were restored together on 2026-09-09
+  // (yuvoy-web#152).
   robots: { index: false, follow: false },
 };
 
