@@ -277,9 +277,23 @@ test.describe("security headers", () => {
   test("every response carries the enforced policy", async ({ request }) => {
     const headers = (await request.get("/")).headers();
 
-    expect(headers["content-security-policy"]).toBe(
-      "object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
-    );
+    /*
+      The WHOLE policy is enforced as of 9 Sep 2026 — yuvoy-web#153. It shipped
+      report-only in the morning and was enforced the same day against this
+      suite rather than a waiting period.
+    */
+    const enforced = headers["content-security-policy"] ?? "";
+    expect(enforced).toContain("default-src 'none'");
+    expect(enforced).toContain("form-action 'self'");
+    /*
+      `'unsafe-eval'` is deliberately NOT asserted here. This suite runs
+      against `next dev` locally and a production build only in CI, and the
+      policy correctly carries eval in development where HMR needs it. A
+      production-only assertion in a spec that mostly runs in dev is a test
+      that fails on the machine writing it and passes on the one that does not
+      — `csp.test.ts` pins the production shape instead, where it holds
+      unconditionally.
+    */
     expect(headers["x-frame-options"]).toBe("DENY");
     expect(headers["cross-origin-opener-policy"]).toBe("same-origin");
     expect(headers["strict-transport-security"]).toContain("max-age=");
@@ -299,20 +313,22 @@ test.describe("security headers", () => {
     // what it scrapes, and where a rewritten form may post it.
     expect(policy).toMatch(/connect-src [^;]*'self'/);
     expect(policy).toContain("form-action 'self'");
-    expect(policy).not.toContain("'unsafe-eval'");
+    // The API origin, without which every form on this site is dead.
+    expect(policy).toMatch(/connect-src [^;]*api\./);
   });
 
-  test("the enforced policy is a strict subset of the reported one", async ({
+  test("the enforced and reported policies are the same", async ({
     request,
   }) => {
-    // Both are built from one directive list. An enforced rule that the
-    // report-only header does not carry is a rule nobody ever saw a report for.
+    /*
+      Both headers carry one directive list. Report-only is kept alongside the
+      enforced copy because an enforced-only header blocks SILENTLY, and the
+      console line naming the directive is the only thing that makes a
+      production violation findable.
+    */
     const headers = (await request.get("/")).headers();
-    const reported = new Set(
-      (headers["content-security-policy-report-only"] ?? "").split("; "),
+    expect(headers["content-security-policy-report-only"]).toBe(
+      headers["content-security-policy"],
     );
-    for (const d of (headers["content-security-policy"] ?? "").split("; ")) {
-      expect(reported, `enforced "${d}" is not in report-only`).toContain(d);
-    }
   });
 });

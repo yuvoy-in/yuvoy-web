@@ -17,6 +17,7 @@ import {
   otherDestinations,
 } from "@/lib/site/destinations";
 import { LAUNCH_STATUS_LABEL } from "@/lib/site/launch";
+import { appHref } from "@/lib/site/product-links";
 
 /** Only the known destinations exist; anything else is a 404. */
 export function generateStaticParams() {
@@ -162,21 +163,22 @@ export default async function DestinationPage({
           id="cta-heading"
           tone="ink"
           eyebrow="Heading here?"
-          title="Tell us you are going to"
+          title="See what is on in"
           accent={`${destination.name}.`}
-          body="Pick this destination when you join and it is where we start when we get in touch."
+          body="Browse what operators are running, and hear about the rest as it opens."
         />
         <div className="mt-12 flex flex-col gap-3 sm:flex-row">
-          <Link
-            href="/waitlist"
+          {/* Opens the app — yuvoy-web#154. An <a>: it leaves the origin. */}
+          <a
+            href={appHref("destination")}
             className={cn(
               buttonVariants({ variant: "paper", size: "lg" }),
               "w-full sm:w-auto",
             )}
           >
-            Join the waitlist
+            Browse experiences
             <ButtonArrow />
-          </Link>
+          </a>
           <Link
             href="/#destinations"
             className={cn(

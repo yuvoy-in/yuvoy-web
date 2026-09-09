@@ -11,6 +11,8 @@ import {
   SEASON_CATEGORIES,
   WIDER_CATEGORIES,
 } from "@/lib/site/experience-categories";
+import { appHref } from "@/lib/site/product-links";
+import { WAITLIST_CTA } from "@/lib/site/nav";
 
 /** This route opens on a forest cover; Safari's top glass follows
     theme-color, so the chrome must agree with it (see lib/site/theme). */
@@ -61,7 +63,7 @@ export const metadata: Metadata = {
  *
  * ## The link out, which is not here yet
  *
- * Every call to action on this page points at `/waitlist`, and that is
+ * Every call to action on this page pointed at `/waitlist`, and that was
  * correct today: the owner's position is that we do not go live until
  * payments are integrated, so sending a traveller to a product they cannot
  * buy from would be the mistake. At launch these become links to
@@ -148,11 +150,20 @@ export default function ExplorePage() {
           stale — it describes what this page does, which is this page's own
           business.
         */}
+        {/*
+          The notice says what THIS page is, not what the catalogue is.
+
+          "Nothing here is browsable or bookable" stays true of this page — it
+          describes kinds of day and shows no prices, counts or Book buttons,
+          which is the rule stated in this file's docblock and unchanged. What
+          it adds now is where somebody goes to do the browsing, because as of
+          9 Sep 2026 there is somewhere.
+        */}
         <StatusNotice label="Collection preview" className="mt-14">
           <p>
             These are the kinds of day the first collection is being built
-            around. Nothing here is browsable or bookable yet, and no prices or
-            availability are shown.
+            around. Nothing here is browsable or bookable — the experiences
+            themselves, with prices and dates, are in the app.
           </p>
         </StatusNotice>
       </Section>
@@ -208,19 +219,35 @@ export default function ExplorePage() {
             <em className="text-terra font-turn italic">Yuvoy.</em>
           </h2>
           <p className="text-forest/75 mt-6 text-lg leading-relaxed">
-            Join the waitlist and we will contact you when the first experiences
-            for your destination are ready.
+            Real experiences from the people who run them, in Havelock, Neil and
+            Port Blair.
           </p>
-          <Link
-            href="/waitlist"
+          {/* Opens the app — yuvoy-web#154. An <a>: it leaves the origin. */}
+          <a
+            href={appHref("explore")}
             className={cn(
               buttonVariants({ size: "lg" }),
               "mt-10 flex w-full sm:inline-flex sm:w-auto",
             )}
           >
-            Join the waitlist
+            Browse experiences
             <ButtonArrow />
-          </Link>
+          </a>
+          {/*
+            The waitlist survives as the secondary path (owner's call, 9 Sep
+            2026): it is still the only way to hear about a destination the
+            first season does not cover.
+          */}
+          <p className="text-forest/70 mt-6 text-sm">
+            Somewhere else in mind?{" "}
+            <Link
+              href={WAITLIST_CTA.href}
+              className="text-terra-deep underline underline-offset-4"
+            >
+              Tell us where you want to go
+            </Link>
+            .
+          </p>
         </div>
       </Section>
     </main>

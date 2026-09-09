@@ -197,7 +197,7 @@ test.describe("/waitlist masthead", () => {
       await expect(banner.getByRole("link", { name: label })).toHaveCount(0);
     }
     await expect(
-      banner.getByRole("link", { name: /join waitlist/i }),
+      banner.getByRole("link", { name: /browse experiences/i }),
     ).toHaveCount(0);
     await expect(banner.getByRole("button", { name: "Open menu" })).toHaveCount(
       0,
@@ -239,8 +239,16 @@ test.describe("/waitlist masthead", () => {
   test("back returns to where the visitor came from", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/explore");
-    await rendered(page.getByRole("banner"))
-      .getByRole("link", { name: /join waitlist/i })
+    /*
+      The header's call to action opens the APP now (yuvoy-web#154), so the
+      route into the waitlist from here is its secondary link. The waitlist
+      survives deliberately — it is still the only way to hear about a
+      destination the first season does not cover — and this asserts it is
+      still reachable as well as that Back works.
+    */
+    await page
+      .getByRole("link", { name: "Tell us where you want to go" })
+      .first()
       .click();
     await expect(page).toHaveURL(/\/waitlist$/);
 

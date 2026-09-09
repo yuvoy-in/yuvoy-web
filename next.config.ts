@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import { cspHeaders } from "./src/lib/site/csp";
 import { DEFAULT_HOST } from "./src/lib/analytics/config";
+import { apiBaseUrl } from "./src/lib/api/base-url";
 
 const securityHeaders = [
   {
@@ -85,6 +86,13 @@ const nextConfig: NextConfig = {
       host from the one the page promises.
     */
     const csp = cspHeaders({
+      /*
+        Read through the same accessor the forms use, so the policy names the
+        exact origin they post to — including its scheme-repair, which turns a
+        bare `api.yuvoy.in` into `https://api.yuvoy.in` rather than a relative
+        path.
+      */
+      apiBaseUrl: apiBaseUrl(),
       posthogHost: process.env.NEXT_PUBLIC_POSTHOG_HOST || DEFAULT_HOST,
       dev: process.env.NODE_ENV !== "production",
     });

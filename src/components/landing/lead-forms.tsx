@@ -9,12 +9,11 @@ import { Input } from "@/components/ui/input";
 import { PhoneField } from "@/components/ui/phone-field";
 import { FaqAccordion } from "@/components/site/faq-accordion";
 import { AUDIENCE_COPY } from "@/lib/site/audiences";
+import { submitLead, type SubmitResult } from "@/lib/leads/api";
 import {
-  submitLead,
-  type LeadAcceptance,
-  type SubmitResult,
-} from "@/lib/leads/api";
-import { submitOperatorApplication } from "@/lib/operators/api";
+  submitOperatorApplication,
+  type ApplicationResult,
+} from "@/lib/operators/api";
 import { useLeadAnalytics } from "@/lib/analytics/use-lead-analytics";
 import { formatForDisplay, phoneIssue } from "@/lib/contact/phone";
 import { isPlausibleEmail, suggestEmail } from "@/lib/contact/email";
@@ -858,29 +857,27 @@ function TravellerForm({ context }: { context: LeadContext }) {
 
 /* --------------------------------------------------------------- provider */
 
-/**
- * A stand-in acceptance for the case the application landed and the lead did
- * not.
- *
- * The applicant IS in the onboarding queue, so the form must say so — but
- * `SubmitResult`'s success shape carries the lead's own acceptance, and there
- * is none. The id is empty rather than invented: nothing renders it, and a
- * fabricated one would be a claim about a row that does not exist.
- *
- * `/operator-applications` returns no identifier at all, deliberately — "there
- * is nothing a stranger could do with one".
- */
-function recordedAcceptance(): LeadAcceptance {
-  return {
-    id: "",
-    audience: "provider",
-    status: "recorded",
-    createdAt: new Date().toISOString(),
-  };
-}
+/*
+  `recordedAcceptance()` was here and is gone — yuvoy-web#157.
+
+  It fabricated a `LeadAcceptance` for the case where the application landed
+  and the lead did not, because `SubmitResult`'s success shape carried the
+  lead's acceptance and there was none. That case cannot happen any more:
+  one call writes both rows in one transaction, so either both exist or
+  neither does, and the form reports the application's own outcome rather than
+  reconciling two.
+*/
 
 function ProviderForm({ context }: { context: LeadContext }) {
-  const [result, setResult] = React.useState<SubmitResult | null>(null);
+  /*
+    The APPLICATION's result, not a lead's — yuvoy-web#157.
+
+    This form made two writes and reconciled them into a `SubmitResult`, which
+    is the lead endpoint's vocabulary. One call now does both transactionally,
+    so the outcome it reports is the application's own and there is nothing
+    left to reconcile.
+  */
+  const [result, setResult] = React.useState<ApplicationResult | null>(null);
   const [submitted, setSubmitted] = React.useState<{
     email?: string;
     whatsapp?: string;
@@ -936,47 +933,27 @@ function ProviderForm({ context }: { context: LeadContext }) {
       application is exactly the state this form was already in for a month —
       no worse, and no longer silent about the half that counts.
     */
-    const [application, lead] = await Promise.all([
-      submitOperatorApplication({
-        businessName: values.businessName,
-        contactName: values.contactName,
-        // Already E.164 — PhoneField emits nothing else.
-        phone: values.whatsapp,
-        email: values.email,
-        market: LAUNCH_MARKET.key,
-        source: context.source,
-      }),
-      submitLead({
-        audience: "provider",
-        contactName: values.contactName,
-        whatsapp: values.whatsapp || undefined,
-        email: values.email,
-        privacyAccepted: true,
-        marketingOptIn: values.marketingOptIn,
-        marketKey: LAUNCH_MARKET.key,
-        source: context.source,
-        website: values.website || undefined,
-        businessName: values.businessName,
-      }),
-    ]);
+    const res = await submitOperatorApplication({
+      businessName: values.businessName,
+      contactName: values.contactName,
+      // Already E.164 — PhoneField emits nothing else.
+      phone: values.whatsapp,
+      email: values.email,
+      market: LAUNCH_MARKET.key,
+      source: context.source,
+      /*
+        The consent, and the switch that makes this one transaction.
 
-    /*
-      The application decides what the applicant is told. `lead` is read only
-      for the case the application cannot speak to: if the application was
-      received, the submission succeeded whatever the mailing list did.
-    */
-    const res: SubmitResult =
-      application.kind === "received"
-        ? lead.kind === "recorded" || lead.kind === "updated"
-          ? lead
-          : { kind: "recorded", acceptance: recordedAcceptance() }
-        : application.kind === "invalid"
-          ? {
-              kind: "invalid",
-              message: application.message,
-              fields: application.fields,
-            }
-          : { kind: application.kind };
+        `true` is the only value this form can ever send. `privacyAccepted` is
+        a TRI-STATE — omitted behaves as the endpoint always did, `true` writes
+        both rows linked, and `false` is refused with `400`, because recording
+        a marketing contact for somebody who declined is the one outcome it
+        must not produce. This form cannot be submitted without the box ticked,
+        so `false` is unreachable and is deliberately not sent as a default.
+      */
+      privacyAccepted: true,
+      marketingOptIn: values.marketingOptIn,
+    });
     if (res.kind === "invalid") {
       /*
         Server field errors are mapped back onto the form — but **only the
@@ -1012,28 +989,46 @@ function ProviderForm({ context }: { context: LeadContext }) {
     } else {
       setUnknownFieldErrors([]);
     }
-    if (res.kind === "recorded" || res.kind === "updated") {
+    if (res.kind === "received") {
       setSubmitted({ email: values.email, whatsapp: values.whatsapp });
-      // Optional on the response, and absent is a normal answer, not a
+      // Optional on the response, and absent is a normal answer rather than a
       // failure — `SuccessNotice` has its own sentence for that case.
-      setApplicationNext(
-        application.kind === "received" ? application.next : undefined,
-      );
+      setApplicationNext(res.next);
       track.submitted({
         marketKey: LAUNCH_MARKET.key,
         destinationKeys: [],
         interests: [],
       });
     } else {
+      /*
+        The three failure kinds are shaped identically in `ApplicationResult`
+        and `SubmitResult` — `rate_limited`, `unavailable`, `offline` — and
+        `invalid` carries the same two fields. Narrowed rather than cast, so
+        that a future divergence between the two unions is a build failure
+        here instead of a silently unreported submission.
+      */
       track.submissionFailed(res);
     }
     setResult(res);
   }
 
-  if (result?.kind === "recorded" || result?.kind === "updated") {
+  if (result?.kind === "received") {
     return (
       <SuccessNotice
-        updated={result.kind === "updated"}
+        /*
+          Always false for an operator now — yuvoy-web#157.
+
+          "We already had you; your details are updated" was the LEAD's
+          distinction, and there is no lead call any more. The application
+          endpoint answers `202` either way and returns no identifier at all,
+          deliberately: "there is nothing a stranger could do with one."
+
+          So a repeat applicant reads "Application received" both times, which
+          is true both times. Less informative than it was; not less honest,
+          and the alternative was inventing a distinction the response does not
+          make.
+        */
+        updated={false}
         audience="provider"
         contact={submitted}
         next={applicationNext}

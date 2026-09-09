@@ -1,3 +1,4 @@
+import { OPERATOR_PORTAL_URL } from "@/lib/site/product-links";
 /**
  * The site's route registry — the single source of truth for navigation.
  *
@@ -120,6 +121,24 @@ const FOOTER_EXTRAS: Partial<
   Record<FooterColumn, { href: string; label: string }[]>
 > = {
   explore: [{ href: "/#destinations", label: "Andaman Islands" }],
+  /*
+    The two product hosts — yuvoy-web#154. Both are live and being shared, and
+    until now `git grep "app.yuvoy.in"` returned nothing across this entire
+    repository: the marketing site linked to neither.
+
+    The footer is the right home for the OPERATOR one specifically. The
+    "Apply as a founding operator" call to action deliberately still points at
+    the on-site form, because that form carries the campaign `source` through
+    to a lead row and the portal reads no attribution at all — sending a
+    `/go/hotel` arrival straight to `operators.yuvoy.in` would lose the
+    attribution silently and permanently, which is the exact failure
+    yuvoy-web#70 was raised for. The applicant is told about the portal by the
+    API's own `next` sentence on the success screen (yuvoy-web#150).
+
+    So this is the door for an operator who already has an account, which the
+    form is not.
+  */
+  yuvoy: [{ href: OPERATOR_PORTAL_URL, label: "Operator sign-in" }],
 };
 
 /**
@@ -148,12 +167,30 @@ export const FOOTER_COLUMNS: {
 
 /**
  * The canonical short-form call to action, repeated in the header, the mobile
- * menu and the footer. The long forms ("Join the waitlist", "Apply as a
- * founding operator") are used where there is room to be specific.
+ * menu and the footer.
+ *
+ * **It points at the app now** — yuvoy-web#154. Both product hosts are live
+ * and being shared, so the marketing site sends travellers to the thing rather
+ * than to a form about the thing. It used to be "Join Waitlist" → `/waitlist`,
+ * which was right for exactly as long as there was nothing to browse.
+ *
+ * The `href` is not here because it carries attribution that depends on where
+ * the tap happened — see `appHref` in `lib/site/product-links.ts`. Only the
+ * label is canonical; the destination is built per placement.
+ *
+ * The waitlist is NOT retired (owner's call, 9 Sep 2026). It is still the only
+ * way to hear about a destination the first season does not cover, so it keeps
+ * its page and its links from the footer and from `/explore` — it simply
+ * stops being the thing every button on the site does.
  */
 export const PRIMARY_CTA = {
+  label: "Browse experiences",
+} as const;
+
+/** The waitlist, now a secondary path rather than the destination. */
+export const WAITLIST_CTA = {
   href: "/waitlist",
-  label: "Join Waitlist",
+  label: "Join the waitlist",
 } as const;
 
 /**

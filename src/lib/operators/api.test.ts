@@ -130,3 +130,84 @@ describe("submitOperatorApplication", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 });
+
+/**
+ * One call, one transaction — yuvoy-web#157.
+ *
+ * The form made two independent writes with no transaction between them, and
+ * the failure that mattered left an application with NO consent record on a
+ * site whose privacy policy says we hold one. Nobody would have noticed until
+ * somebody asked us to prove it.
+ */
+describe("the consent travels with the application", () => {
+  beforeEach(() => vi.stubEnv("NEXT_PUBLIC_API_BASE_URL", "http://api.test"));
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
+
+  it("sends privacyAccepted so one call writes both rows", async () => {
+    let body: Record<string, unknown> = {};
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_url: string, init: RequestInit) => {
+        body = JSON.parse(String(init.body));
+        return jsonResponse(202, { received: true });
+      }),
+    );
+
+    await submitOperatorApplication({
+      ...INPUT,
+      privacyAccepted: true,
+      marketingOptIn: false,
+    });
+
+    expect(body.privacyAccepted).toBe(true);
+    expect(body.marketingOptIn).toBe(false);
+  });
+
+  it("never sends privacyAccepted: false", async () => {
+    /*
+      It is a TRI-STATE server-side and `false` is refused with `400` —
+      recording a marketing contact for somebody who declined is the one
+      outcome it must not produce. The form cannot be submitted without the
+      box ticked, so the only two shapes that can reach the API are `true` and
+      absent, and a default of `false` would have turned a decline into a
+      refused submission the applicant could not explain.
+    */
+    let body: Record<string, unknown> = {};
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_url: string, init: RequestInit) => {
+        body = JSON.parse(String(init.body));
+        return jsonResponse(202, { received: true });
+      }),
+    );
+
+    await submitOperatorApplication(INPUT);
+
+    expect(body.privacyAccepted).toBeUndefined();
+    expect("privacyAccepted" in body).toBe(false);
+  });
+
+  it("still reports a 400 as an invalid submission", async () => {
+    // `false` is the only new way to earn one, and this form cannot send it —
+    // but a server that refuses for any reason must still reach the applicant
+    // as something they can act on rather than as a dead button.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        jsonResponse(400, {
+          error: { message: "Consent is required.", details: {} },
+        }),
+      ),
+    );
+
+    const result = await submitOperatorApplication({
+      ...INPUT,
+      privacyAccepted: true,
+    });
+
+    expect(result.kind).toBe("invalid");
+  });
+});

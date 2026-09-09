@@ -100,7 +100,7 @@ test("an application reaches the onboarding queue, not just the mailing list", a
   await expect(page.getByRole("status")).toBeVisible();
 
   /*
-    The assertion the whole issue is about. Before this, `applications` was
+    The assertion the original issue was about. Before it, `applications` was
     empty and `leads` had the row — and the form said somebody would call.
   */
   expect(seen.applications).toHaveLength(1);
@@ -112,35 +112,72 @@ test("an application reaches the onboarding queue, not just the mailing list", a
   });
 
   /*
-    And the lead still goes. `/leads` is the ONLY place `privacyAccepted` and
-    `marketingOptIn` are recorded, and it is the launch announcement list —
-    moving the form across cleanly would have quietly dropped the consent
-    record for a form that asks somebody to accept a privacy policy.
+    ONE WRITE, and the consent travels on it — yuvoy-web#157.
+
+    This used to assert a SECOND request to `/leads`, because that was the only
+    place `privacyAccepted` was recorded. Two independent writes with no
+    transaction between them meant either could fail alone, and the failure
+    that mattered left an application with no consent record on a site whose
+    privacy policy says we hold one.
+
+    `POST /operator-applications` now takes the consent itself and writes the
+    application, the lead, its consent record and the ops alert in one
+    transaction, linked. So the assertion inverts: the consent is ON the
+    application, and there is no second call to half-fail.
   */
-  expect(seen.leads).toHaveLength(1);
-  expect(seen.leads[0]).toMatchObject({
-    audience: "provider",
+  expect(seen.applications[0]).toMatchObject({
     privacyAccepted: true,
-    businessName: "Nemo Reef Divers",
+    marketingOptIn: false,
   });
+  expect(seen.leads).toHaveLength(0);
 });
 
-test("a failed application is reported, even when the lead was recorded", async ({
-  page,
-}) => {
+test("a decline is never sent as privacyAccepted: false", async ({ page }) => {
   /*
-    The failure mode this change introduces, handled on purpose.
+    `privacyAccepted` is a TRI-STATE server-side: omitted behaves as the
+    endpoint always did, `true` writes both rows, and **`false` is refused with
+    400** — recording a marketing contact for somebody who declined is the one
+    outcome it must not produce.
 
-    "If it starts posting to a second endpoint, the failure mode changes from
-    quietly wrong to visibly broken — which is better, but only if the error
-    handling is real."
-
-    A lead that lands behind a failed application means the applicant is NOT in
-    the queue. Telling them "somebody will call" there is the exact promise
-    that went unkept for a month.
+    This form cannot be submitted without the box ticked, so the only two
+    shapes that can reach the API are `true` and absent. Sending `false` as a
+    default would turn a decline into a refused submission the applicant could
+    not explain.
   */
   await page.goto("/operators");
-  await captureWrites(page, { application: 503, lead: 201 });
+  const seen = await captureWrites(page);
+
+  const form = rendered(
+    page.locator("form").filter({ hasText: /Business name/i }),
+  );
+  await form.getByLabel("Your name").fill("Asha Menon");
+  await form.getByLabel("Business name").fill("Nemo Reef Divers");
+  await form.getByLabel("Email").fill("asha@example.com");
+  await form.getByLabel("WhatsApp number").fill("9000000000");
+  // The box is deliberately NOT ticked.
+  await form
+    .getByRole("button", { name: /Apply|Send|Submit/i })
+    .first()
+    .click();
+
+  expect(seen.applications).toHaveLength(0);
+  expect(seen.leads).toHaveLength(0);
+});
+
+test("a failed application is reported as a failure", async ({ page }) => {
+  /*
+    There is no longer a half-success to disentangle — one call, one
+    transaction, so either everything exists or nothing does (yuvoy-web#157).
+    What has to stay right is the reporting: an applicant who is NOT in the
+    queue must not be told they are, which is the exact promise that went
+    unkept for a month.
+
+    This test used to land a lead behind the failed application to prove the
+    application decided the message. That scenario cannot occur any more, and
+    asserting it would be testing a shape the code no longer has.
+  */
+  await page.goto("/operators");
+  await captureWrites(page, { application: 503 });
 
   const form = await fillApplication(page);
   await form
@@ -162,22 +199,17 @@ test("a failed application is reported, even when the lead was recorded", async 
   await expect(page.getByRole("status")).toHaveCount(0);
 });
 
-test("a recorded application is a success even if the mailing list write fails", async ({
-  page,
-}) => {
-  // The other direction. They ARE in the queue; a failed newsletter write is
-  // not their problem and must not be reported as a failed application.
-  await page.goto("/operators");
-  await captureWrites(page, { application: 202, lead: 503 });
+/*
+  "A recorded application is a success even if the mailing list write fails"
+  was here and is gone — yuvoy-web#157.
 
-  const form = await fillApplication(page);
-  await form
-    .getByRole("button", { name: /Apply|Send|Submit/i })
-    .first()
-    .click();
-
-  await expect(page.getByRole("status")).toBeVisible();
-});
+  It covered the other half of the two-write shape: they ARE in the queue, and
+  a failed newsletter write is not their problem. That half-success is now
+  impossible rather than handled — the lead is written in the same transaction
+  as the application — so the test was asserting a state the system can no
+  longer reach. Deleted rather than left passing vacuously against a request
+  nothing makes.
+*/
 
 test("the operator form asks for a number, because an application needs one", async ({
   page,
