@@ -205,14 +205,114 @@ test.describe("sitemap and robots", () => {
     expect(xml).not.toContain("/go/");
   });
 
-  test("robots disallows only the campaign routes", async ({ request }) => {
+  test("robots disallows the campaign routes", async ({ request }) => {
     const txt = await (await request.get("/robots.txt")).text();
     // Non-production disallows everything; that is correct and not under test.
     if (txt.includes("Disallow: /\n") && !txt.includes("Sitemap:")) return;
 
     expect(txt).toContain("Disallow: /go/");
-    expect(txt).not.toContain("Disallow: /privacy");
-    expect(txt).not.toContain("Disallow: /terms");
     expect(txt).toContain("Sitemap:");
+  });
+
+  /*
+    THE ATOMIC RULE, ASSERTED AS AN INVARIANT — yuvoy-web#152.
+
+    `robots.ts` states it: /privacy and /terms come off the disallow list in
+    the same change that removes their `noindex` and adds them to the sitemap,
+    "all three together, never independently".
+
+    Nothing checked it, so it came apart. Step one shipped alone: the two
+    paths left the disallow list while both pages still answered `noindex` and
+    the sitemap still excluded them with a comment calling their copy
+    placeholder. `robots.txt` was inviting crawlers to two pages that told
+    them to go away, and every half looked deliberate on its own.
+
+    Worse, the test that stood here asserted `not.toContain("Disallow:
+    /privacy")` — it PINNED the broken half in place and would have failed the
+    fix.
+
+    So this does not assert a state. It asserts the three agree with each
+    other, whichever way they are set, and it passes unchanged through the
+    launch flip — which is the only version of this check that cannot go stale.
+  */
+  test("the three halves of /privacy and /terms indexing agree", async ({
+    request,
+  }) => {
+    const txt = await (await request.get("/robots.txt")).text();
+    if (txt.includes("Disallow: /\n") && !txt.includes("Sitemap:")) return;
+    const xml = await (await request.get("/sitemap.xml")).text();
+
+    for (const path of ["/privacy", "/terms"]) {
+      const blocked = txt.includes(`Disallow: ${path}`);
+      const html = await (await request.get(path)).text();
+      const noindex = /<meta[^>]+name="robots"[^>]+content="[^"]*noindex/i.test(
+        html,
+      );
+      const listed = xml.includes(`${path}<`);
+
+      expect(
+        noindex,
+        `robots.txt ${blocked ? "blocks" : "allows"} ${path} but the page ` +
+          `${noindex ? "says" : "does not say"} noindex — two halves of one answer`,
+      ).toBe(blocked);
+      expect(
+        listed,
+        `${path} is ${blocked ? "blocked" : "allowed"} and ` +
+          `${listed ? "IS" : "is not"} in the sitemap — a sitemap entry for a ` +
+          `blocked page is a promise to a crawler we are also refusing`,
+      ).toBe(!blocked);
+    }
+  });
+});
+
+/**
+ * Security headers, asserted against a running origin — yuvoy-web#153.
+ *
+ * `next.config.ts` builds the policy from environment variables, so the only
+ * place the real policy exists is a deployed response. A green unit test on
+ * the builder says the string is right; only this says the string arrived.
+ * Read-only GETs, so it can be pointed at yuvoy.in unchanged.
+ */
+test.describe("security headers", () => {
+  test("every response carries the enforced policy", async ({ request }) => {
+    const headers = (await request.get("/")).headers();
+
+    expect(headers["content-security-policy"]).toBe(
+      "object-src 'none'; base-uri 'none'; frame-ancestors 'none'",
+    );
+    expect(headers["x-frame-options"]).toBe("DENY");
+    expect(headers["cross-origin-opener-policy"]).toBe("same-origin");
+    expect(headers["strict-transport-security"]).toContain("max-age=");
+    expect(headers["x-content-type-options"]).toBe("nosniff");
+  });
+
+  test("the full policy ships in report-only and closes both form-jacking exits", async ({
+    request,
+  }) => {
+    const policy =
+      (await request.get("/")).headers()[
+        "content-security-policy-report-only"
+      ] ?? "";
+
+    expect(policy).toContain("default-src 'none'");
+    // The two that matter on a site with no session: where a script may send
+    // what it scrapes, and where a rewritten form may post it.
+    expect(policy).toMatch(/connect-src [^;]*'self'/);
+    expect(policy).toContain("form-action 'self'");
+    expect(policy).not.toContain("'unsafe-eval'");
+  });
+
+  test("the enforced policy is a strict subset of the reported one", async ({
+    request,
+  }) => {
+    // Both are built from one directive list. An enforced rule that the
+    // report-only header does not carry is a rule nobody ever saw a report for.
+    const headers = (await request.get("/")).headers();
+    const reported = new Set(
+      (headers["content-security-policy-report-only"] ?? "").split("; "),
+    );
+    for (const d of (headers["content-security-policy"] ?? "").split("; ")) {
+      expect(reported, `enforced "${d}" is not in report-only`).toContain(d);
+    }
   });
 });
