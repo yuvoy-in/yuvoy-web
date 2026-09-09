@@ -35,21 +35,43 @@ export type ApplicationResult =
  * "This creates an application, **not an operator**. An application is a claim
  * somebody typed into a form; an operator is a business we have checked."
  *
- * ## Why the form still posts a lead as well
+ * ## One call, one transaction — yuvoy-web#157
  *
- * The two endpoints are not alternatives, and the tempting cleanup — move the
- * form across and drop `/leads` — loses two things that only live there:
+ * This form used to make TWO independent writes, in parallel, with no
+ * transaction between them. Either could fail alone, and the one that mattered
+ * left **an application with no consent record**, on a site whose privacy
+ * policy states what we hold and how to have it removed. Nobody would have
+ * noticed until somebody asked us to prove it. The two rows were never linked
+ * either — `operator_applications.lead_id` has existed since migration 0060
+ * and was `NULL` for every submission this site ever made.
  *
- *  1. **The consent record.** `privacyAccepted` and `marketingOptIn` are
- *     fields on `LeadInput` and on nothing else. A form that asks somebody to
- *     accept a privacy policy and then records the acceptance nowhere is worse
- *     than one that never asked.
- *  2. **The launch announcement list.** Email is "the one contact detail we
+ * `POST /v1/operator-applications` now takes the consent itself, and writes
+ * the application, the lead, its submission history, its consent record and
+ * the ops alert **in a single transaction**, linked. Either everything exists
+ * or nothing does. Shipped in yuvoy-api#136.
+ *
+ * Both of the things the old two-call shape existed to preserve are still
+ * preserved, and now atomically:
+ *
+ *  1. **The consent record**, from `privacyAccepted` / `marketingOptIn`.
+ *  2. **The launch announcement list** — email is "the one contact detail we
  *     ask everybody for … what the launch announcement will actually be sent
- *     on" (owner, 2026-08-07). An applicant should get that too.
+ *     on" (owner, 2026-08-07), and the lead this writes is the same row.
  *
- * So an application is filed **in addition**, and the application is the one
- * whose failure the form reports — because it is the one a human acts on.
+ * ## `privacyAccepted` is a tri-state, and is treated as one
+ *
+ * Omitted, `true` and `false` are three different instructions server-side:
+ * omitted writes the application alone and behaves as this endpoint always
+ * has; `true` writes both; and **`false` is refused with `400`**, because
+ * recording a marketing contact for somebody who declined is the one outcome
+ * it must not produce.
+ *
+ * So this never sends `false`. The field is optional here and the form
+ * requires the box to be ticked before it can be submitted at all, which means
+ * the only two shapes that can reach the API are `true` and absent.
+ *
+ * The traveller waitlist still uses `/leads` and is untouched — it has one
+ * endpoint and one write, and there was never anything wrong with it.
  *
  * Never throws: the form's job is to tell the applicant the truth about what
  * happened, and every failure mode has a state for it. Same contract as

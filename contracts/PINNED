@@ -14,9 +14,32 @@
 # When the contract moves: re-pull, `pnpm codegen`, commit both.
 repo=yuvoy-in/yuvoy-api
 path=contracts/openapi.yaml
-# 3 Sep 2026: master moved (yuvoy-api PRs #57, #58, #61, #65, #77). Only the
-# operator contract changed; contracts/openapi.yaml is byte-identical at both
-# refs. Bumped so all three frontends keep pinning one commit.
-ref=2dc9472adb63b5277112fe25a491979dbc814cd4
+# 9 Sep 2026: forward from 2dc9472adb63, across every deploy since. Additive
+# to everything this site reads.
+#
+# Consumed in this change:
+#   - `POST /operator-applications` gains `privacyAccepted`, `marketingOptIn`
+#     and `utm` (yuvoy-web#157). One call now writes the application, the lead,
+#     its submission history, its consent record and the ops alert in a single
+#     transaction, and links them. This site was making two independent writes
+#     that could half-succeed — and the failure that mattered left an
+#     application with NO consent record, on a site whose privacy policy says
+#     we hold one.
+#
+#     `privacyAccepted` is a TRI-STATE and is treated as one: omitted behaves
+#     as this endpoint always has, `true` writes both, and `false` is refused
+#     with 400 because recording a marketing contact for somebody who declined
+#     is the one outcome it must not produce. This form never sends `false` —
+#     it cannot be submitted without the box ticked.
+#
+# Landed and not consumed here, deliberately:
+#   - `Attribution.source` gains `web` (yuvoy-api#134 → #135). It is the value
+#     the launch-day links into the app carry, and it is read by yuvoy-app
+#     rather than by this site.
+#   - `/search` filters and `Scan.destinationKey` — traveller app surfaces.
+#
+# Checked with `git ls-remote` rather than the REST API, which served a stale
+# SHA twice on 8 Sep and cost a retracted issue.
+ref=d4a09f197ea4f70e4cbaf2dc05d4f002c3cb19f6
 branch=master
-pinned_on=2026-09-03
+pinned_on=2026-09-09

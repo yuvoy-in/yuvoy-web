@@ -65,7 +65,11 @@ export interface paths {
          *
          *     Its own route rather than a `q` on the feed: the feed is ordered by recency and is the browsing surface, search is ordered by relevance and is the finding surface. One endpoint doing both means one of the two orderings is always wrong and the client cannot tell which it got.
          *
-         *     An empty `q` returns **nothing**, not everything — "everything" is what the feed is for, and a search box that shows the whole catalog when you clear it looks broken. Not paginated: a traveller who does not find it in twenty results changes the words rather than paging.
+         *     An empty `q` **with no filters** returns nothing, not everything — "everything" is what the feed is for, and a search box that shows the whole catalog when you clear it looks broken.
+         *
+         *     An empty `q` **with any filter set** returns that filtered set, ordered by recency. A traveller who taps Havelock and types nothing is not asking for everything, they are asking for Havelock, and answering that with a blank screen makes every chip look like a control that does nothing. Text and filters are independent; either alone is a real search, and together they intersect.
+         *
+         *     Not paginated: a traveller who does not find it in twenty results changes the words rather than paging.
          */
         get: operations["searchExperiences"];
         put?: never;
@@ -94,6 +98,8 @@ export interface paths {
          *     Deliberately forgiving about everything except the three fields needed to have a conversation — the business, a person, and a number that can be dialled. A form that rejects a boat owner for omitting a destination key loses supply in a market where supply is the constraint.
          *
          *     The response carries no identifier: there is nothing a stranger could do with one, and handing out ids for rows in a review queue is one more authorization boundary to get right later.
+         *
+         *     `next` points the applicant at self-service signup rather than promising a call. It used to say somebody would ring within two working days, and nothing kept that promise — the operators who submitted this form in August 2026 were still waiting a month later. `POST /operator/v1/auth/signup` is open to them right now, the account it creates is PROSPECT and cannot be booked, and document verification is still the gate — so both halves of the new sentence are things the system actually does.
          */
         post: operations["submitOperatorApplication"];
         delete?: never;
@@ -173,6 +179,34 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/reels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The feed
+         * @description **Every published reel**, not one per listing. A listing may hold twenty clips; before this only its hero was visible without opening it, which made the product read as a catalogue with a picture on each row rather than as a feed.
+         *
+         *     Each item carries the whole listing, so a card can offer the booking without a second request — a spinner over the price is a spinner over the one thing somebody stopped scrolling for.
+         *
+         *     **Ordering interleaves operators.** Reels are numbered within each business and the feed is ordered by that number, so every operator's first reel precedes anybody's second. A business with twenty clips appears across twenty rounds rather than twenty times in a row. The ordering is blind to which operator: it rotates them, and cannot express a preference for one. Stable between requests.
+         *
+         *     **Paged, and it says whether it ended.** Pass `nextCursor` back to continue; its absence, with `complete: true`, is the end. Do not infer the end from a short page — a page that happens to come back exactly full would stop the scroll early, and an infinite scroll that has silently stopped looks identical to one with nothing more to show, so nobody reports it.
+         *
+         *     The cursor resumes inside the rotation rather than at a timestamp, which is why a client must not attempt to page this ordering itself: restart the rotation and one business's second reel arrives before another's first, and the ordering stops being blind to which operator.
+         */
+        get: operations["listReels"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/experiences": {
         parameters: {
             query?: never;
@@ -180,7 +214,14 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List published experiences */
+        /**
+         * List published experiences
+         * @description The browse surface, ordered by recency and cursor-paged. Use `/search` to find something; this is for looking.
+         *
+         *     **`mode` and `q` used to be documented here and were never implemented** — the handler has never read either, so a client sending them got them silently ignored, and one sending `q` got an unfiltered list back believing it had searched. They are removed rather than implemented: relevance ordering belongs on `/search`, and one endpoint doing both means one of the two orderings is always wrong and the client cannot tell which it got.
+         *
+         *     `destinationKey` and `bookableOn` are the reverse — implemented from the beginning and never documented, so a client built from this file could not know they existed. Now written down.
+         */
         get: operations["listExperiences"];
         put?: never;
         post?: never;
@@ -528,7 +569,7 @@ export interface components {
          * @description A closed set, so a client can branch on the machine-readable code and never on the message. Codes are added by contract change, never invented at the call site.
          * @enum {string}
          */
-        ErrorCode: "invalid_input" | "unauthorized" | "not_found" | "conflict" | "rate_limited" | "method_not_allowed" | "not_implemented" | "internal_error" | "capacity_unavailable" | "request_quota_exhausted" | "request_window_closed" | "grant_ceiling_exceeded" | "cutoff_passed" | "stale_availability" | "booking_disabled" | "operator_not_bookable" | "idempotency_key_malformed" | "idempotency_key_reuse" | "idempotency_in_progress" | "token_expired" | "reservation_not_payable" | "invalid_reason_code" | "refund_quote_moved" | "screening_required" | "screening_needs_a_doctor" | "under_minimum_age" | "refund_requires_finance" | "confirmation_required" | "invalid_role" | "payments_unavailable" | "media_unavailable";
+        ErrorCode: "invalid_input" | "unauthorized" | "not_found" | "conflict" | "rate_limited" | "method_not_allowed" | "not_implemented" | "internal_error" | "payload_too_large" | "unclassified_error" | "capacity_unavailable" | "request_quota_exhausted" | "request_window_closed" | "grant_ceiling_exceeded" | "cutoff_passed" | "stale_availability" | "booking_disabled" | "operator_not_bookable" | "idempotency_key_malformed" | "idempotency_key_reuse" | "idempotency_in_progress" | "token_expired" | "reservation_not_payable" | "invalid_reason_code" | "refund_quote_moved" | "screening_required" | "screening_needs_a_doctor" | "under_minimum_age" | "refund_requires_finance" | "confirmation_required" | "invalid_role" | "payments_unavailable" | "media_unavailable" | "unavailable";
         Money: {
             /**
              * @description Amount in the currency's minor unit (paise for INR)
@@ -583,6 +624,12 @@ export interface components {
             name: string;
             /** @description True only when every mandatory credential is on file, verified and unexpired. It is a statement about evidence we hold, not a badge. */
             verified: boolean;
+            /**
+             * @description The operator's own mark. **Absent when they have not set one**, so fall back to your own placeholder rather than rendering a broken image.
+             *
+             *     Show it on a card whose `heroMedia` is absent. A logo is not a substitute for footage — the feed is video — but a card carrying the operator's mark is something a person can recognise and tap, and an empty rectangle is neither.
+             */
+            logoUrl?: string;
             /** @description Human-readable statements of what was checked, each backed by a record. */
             credentialsSummary?: string[];
         };
@@ -595,10 +642,44 @@ export interface components {
             /** @description Display name of the destination. */
             location?: string;
             category: components["schemas"]["Category"];
+            /**
+             * @description What this experience actually is — `scuba`, not `adventure`.
+             *
+             *     `category` is market-agnostic and is what a traveller browses by; it cannot describe the thing, because in the launch market every water sport is `adventure`. **Absent** on listings that predate the vocabulary, so render nothing rather than a placeholder noun.
+             *
+             *     Deliberately **not an enum**, unlike `category`: the set grows by INSERT and an enum would go stale — the same reasoning the operator contract already gives for `destination`. `category` stays a closed enum because it is what a traveller browses by and it is not growing.
+             * @example scuba
+             */
+            activityType?: string;
+            /**
+             * @description `activityType` as the word to print. From the same table the operator picker reads, so the two cannot word the same noun differently. Present exactly when `activityType` is.
+             * @example Scuba diving
+             */
+            activityTypeLabel?: string;
             bookingMode: components["schemas"]["BookingMode"];
             durationMinutes: number;
             maxPartySize?: number;
+            /**
+             * @description **The listing's unit price, in the unit `pricingUnit` names.** Absent until a real contracted price exists; there is no placeholder price anywhere in this API.
+             *
+             *     The name implies a floor across variants and that is not what it is: it is a single number, and for a `per_group` charter "from ₹4,000" is wrong twice — it is not a minimum, and it is not per person. The field is not renamed because three generated clients carry the name. If it is ever renamed, the right name is `price`.
+             */
             fromPrice?: components["schemas"]["Money"];
+            /**
+             * @description How `fromPrice` is charged. `per_person` multiplies by the party; `per_group` is the price of the whole departure whatever the party size. **Present exactly when `fromPrice` is present.**
+             *
+             *     This existed in the schema and at checkout from the beginning and was never selected by any public read path, so both traveller surfaces hard-coded "per person" and a ₹4,000 per-GROUP listing read as ₹4,000 per person until the last screen.
+             * @enum {string}
+             */
+            pricingUnit?: "per_person" | "per_group";
+            /**
+             * @description `pricingUnit` as the phrase to print beside the price. **Render it verbatim; do not build one from `pricingUnit`.**
+             *
+             *     Same rule and the same reason as `seatsOnNextDisplay`: a client deriving its own phrase is a second copy of a rule this API owns, and the copy that drifts is the one that misstates a price to a consumer. Money FORMATTING stays with the client — it already gets rupee grouping right; only the unit phrase is ours.
+             * @example per person
+             * @example for the group
+             */
+            pricingUnitLabel?: string;
             heroMedia?: components["schemas"]["Media"];
             operator: components["schemas"]["OperatorSummary"];
             /**
@@ -610,6 +691,15 @@ export interface components {
             nextAvailable?: string;
             /** @description Seats left on that departure. Present only alongside `nextAvailable`, and **only for `allotment` mode** — a request-mode departure holds nothing until an operator says yes, so a number here would be a promise we cannot keep, and "3 seats left" that becomes "the operator declined" is worse than saying nothing. */
             seatsOnNext?: number;
+            /**
+             * @description That number as a sentence, decided here. **Render it verbatim; do not re-derive one from `seatsOnNext`.**
+             *
+             *     The card was printing "N seats left" below a threshold it kept itself, which is a second copy of a rule the server owns. The moment the threshold moves — or counts start being suppressed — the card and the slot row disagree about the same departure.
+             *
+             *     Absent means say nothing about availability. Same semantics as `Slot.remainingDisplay`, and the same function computes both.
+             * @example 3 seats left
+             */
+            seatsOnNextDisplay?: string;
         };
         /**
          * @description How this experience sells. `allotment` means Yuvoy holds contracted seats and a traveller books instantly. `request` means the operator answers first and the traveller pays only after they accept — Yuvoy holds no inventory and makes no availability claim.
@@ -617,6 +707,14 @@ export interface components {
          */
         BookingMode: "allotment" | "request";
         Experience: components["schemas"]["ExperienceSummary"] & {
+            /**
+             * @description Whether this listing can be sold right now: the operator is selling, the listing is published and priced, no kill switch applies, and every credential its market and activity category require is on file, verified and unexpired today.
+             *
+             *     **`false` is a 200, not a 404.** The card is already absent from every browse surface, so the only way to reach this page is a link somebody was handed — a shared message, a bookmark, a search result — and telling that person the business does not exist is worse than telling them it is not selling. Availability comes back empty for the same listing, and a checkout attempt is refused with `operator_not_bookable`.
+             *
+             *     Deliberately carries **no reason**. Why a business has stopped selling is a supply judgment about them and is not published on a traveller endpoint.
+             */
+            bookable: boolean;
             summary?: string;
             description?: string;
             included?: string[];
@@ -699,6 +797,12 @@ export interface components {
         };
         AvailabilityPage: {
             slots: components["schemas"]["Slot"][];
+            /**
+             * @description The listing-level answer, identical to `Experience.bookable`. When it is `false` the response is still a 200 with an EMPTY `slots` array rather than a 404, so "this is not on sale" and "nothing is on between those dates" stay distinguishable to a client.
+             *
+             *     Note that a slot can also disappear from a range while `bookable` is `true`: a credential lapsing mid-range removes the departures after it and leaves the ones before it. Those are dropped silently and are NOT counted in `staleSlotsSuppressed` — a counter there would publish the date an operator's insurance runs out.
+             */
+            bookable: boolean;
             /** Format: date-time */
             availabilityAsOf: string;
             /** @example Asia/Kolkata */
@@ -762,9 +866,11 @@ export interface components {
         Attribution: {
             /**
              * @description Anything outside this set is stored as `unknown` rather than rejected — a checkout must not fail over a marketing field.
+             *
+             *     `web` is **our own marketing site**, and is deliberately not `referral`, which means somebody else's site, nor `direct`, which means the address was typed. A person who read `yuvoy.in` and tapped through did neither, and filing them under either name makes the funnel unreadable a quarter later.
              * @enum {string}
              */
-            source?: "qr" | "direct" | "search" | "social" | "referral" | "operator" | "unknown";
+            source?: "qr" | "direct" | "search" | "social" | "referral" | "operator" | "web" | "unknown";
             /** @description Which card, which boat, which door. */
             placement?: string;
             campaign?: string;
@@ -779,6 +885,16 @@ export interface components {
             whatsapp: string;
             /** @description Optional. */
             email?: string;
+            /**
+             * @description A separate, unticked question at checkout. **Omit it if you did not ask** — absent and `false` mean different things and both are recorded as such.
+             *
+             *     absent = never asked · `false` = asked and declined · `true` = asked and agreed.
+             *
+             *     Collapsing absent into `false` would make every client that omits the field look like a refusal, and would erase the difference between "we never asked" and "they said no" — which is precisely the question a DPDP request asks of us.
+             *
+             *     The moment it was given is recorded server-side from the database clock, never from anything you send: a consent record whose date the caller chooses is not evidence.
+             */
+            marketingConsent?: boolean;
         };
         Reservation: {
             reservationId: string;
@@ -860,6 +976,20 @@ export interface components {
             };
             /** @description Present once a booking exists. Human-quotable and **not a credential** — it goes on the operator's manifest and is read aloud on a jetty. */
             bookingReference?: string;
+            /** @description Where the day starts. This is the screen a traveller opens on the morning of the trip and it was the one screen without it — both `/trips/{token}` and `/me/bookings` already carried it. */
+            meetingPoint?: {
+                text?: string;
+                landmark?: string;
+            };
+            /** @description Why the trip is off. Present only when it is. The app was hedging with "if the sea called it off", which is a guess dressed as information and the wrong guess for anything cancelled otherwise. */
+            cancellation?: {
+                reasonCode?: string;
+            };
+            /**
+             * Format: date-time
+             * @description When an unanswered request lapses — "answer by". The creation response carried this and the status page could not show it, so a traveller waiting had no idea how long for. Absent once the booking is final.
+             */
+            requestExpiresAt?: string;
             /**
              * @description What the operator has told everybody on this departure — a time change, a meeting point, a weather watch. Absent when there are none; the key is omitted rather than sent empty.
              *
@@ -1181,7 +1311,15 @@ export interface operations {
         parameters: {
             query?: {
                 q?: string;
-                destinationKey?: string;
+                destinationKey?: components["schemas"]["DestinationKey"];
+                /** @description The closed browse vocabulary. **An unknown value is a `400`**, not an empty page — the two are indistinguishable to a client otherwise, and "no results" is the wrong thing to tell somebody whose filter was never going to match: they change the words instead of the spelling. */
+                category?: components["schemas"]["Category"];
+                /**
+                 * @description What the thing actually is — `scuba`, not `adventure`. Matched exactly.
+                 *
+                 *     **An unknown value is an empty page, not a `400`** — the opposite of `category`, and deliberately. This set grows by `INSERT`, so today's unknown value is tomorrow's real one and refusing it would make the API stale between deploys. Read the current set from the operator vocabulary endpoint rather than hardcoding it.
+                 */
+                activityType?: string;
                 /** @description Only what can actually be booked that day, in the market's timezone. */
                 bookableOn?: string;
             };
@@ -1225,11 +1363,23 @@ export interface operations {
                     operations?: string;
                     /** @description Where they heard about us. */
                     source?: string;
+                    /**
+                     * @description Send `true` and this call **also records the marketing lead and its consent, in the same transaction as the application**. One call, one unit of work: either both rows exist and are linked, or neither does.
+                     *
+                     *     **Optional, and absent is not `false`.** Omitting it writes the application alone and behaves exactly as this endpoint always has, so a deployed form does not start failing because we grew a field. Sending `false` is a person declining, and is refused with `400` rather than filed — recording a marketing contact for somebody who declined is the one outcome this must not produce.
+                     *
+                     *     Until yuvoy-web sends this, the site calls `/leads` separately. That works and is what it does today; it is simply two independent writes that can half-succeed, and the failure that matters is an application with no consent row on a site whose privacy policy says we hold one.
+                     */
+                    privacyAccepted?: boolean;
+                    /** @description Only meaningful alongside `privacyAccepted`. Defaults false. */
+                    marketingOptIn?: boolean;
+                    /** @description Campaign attribution for the lead. Ignored unless `privacyAccepted` is sent, because without consent there is no lead to attribute. */
+                    utm?: components["schemas"]["Utm"];
                 };
             };
         };
         responses: {
-            /** @description Received. Somebody will call. */
+            /** @description Recorded. `next` tells them how to start without waiting for us. */
             202: {
                 headers: {
                     [name: string]: unknown;
@@ -1341,7 +1491,7 @@ export interface operations {
                     "application/json": {
                         /**
                          * @description Path to send the traveller to.
-                         * @example /experiences/scuba-discover-havelock
+                         * @example /e/scuba-discover-havelock
                          */
                         target: string;
                         /** @description Whether the code resolved. `false` still carries a usable target. */
@@ -1350,6 +1500,14 @@ export interface operations {
                         experienceId?: string;
                         /** @example andaman */
                         marketKey?: string;
+                        /**
+                         * @description Where the code is, when it is registered against a destination rather than the market as a whole. A jetty card in Havelock carries `andaman/havelock`.
+                         *
+                         *     **Absent when the code names no destination**, and absent for an unknown code. It is not a filter the client has to apply: it is what the client needs in order to open the feed or search on the place the person is standing in, rather than on the whole market.
+                         *
+                         *     This has always been on the `scan_codes` row and has always been written to the analytics table. It was simply not returned, so a jetty card in Havelock and a hotel card in Port Blair sent two travellers to the identical unfiltered feed.
+                         */
+                        destinationKey?: components["schemas"]["DestinationKey"];
                     };
                 };
             };
@@ -1357,15 +1515,49 @@ export interface operations {
             429: components["responses"]["RateLimited"];
         };
     };
+    listReels: {
+        parameters: {
+            query?: {
+                limit?: number;
+                /** @description From a previous response's `nextCursor`. Opaque; do not construct one. */
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reels, each with the listing it sells. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: {
+                            media?: components["schemas"]["Media"];
+                            experience?: components["schemas"]["ExperienceSummary"];
+                        }[];
+                        /** @description Told rather than inferred. `false` with no `nextCursor` means the server stopped, which is a different thing from the feed having ended. */
+                        complete: boolean;
+                        /** @description Absent when there is nothing after this page. */
+                        nextCursor?: string;
+                    };
+                };
+            };
+            400: components["responses"]["BadRequest"];
+        };
+    };
     listExperiences: {
         parameters: {
             query?: {
                 cursor?: components["parameters"]["Cursor"];
                 limit?: components["parameters"]["Limit"];
+                destinationKey?: components["schemas"]["DestinationKey"];
                 category?: components["schemas"]["Category"];
-                mode?: components["schemas"]["ExperienceMode"];
-                /** @description Free-text search */
-                q?: string;
+                /** @description Only what can actually be booked that day, in the market's timezone. */
+                bookableOn?: string;
             };
             header?: never;
             path?: never;
