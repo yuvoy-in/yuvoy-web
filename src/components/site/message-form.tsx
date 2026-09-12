@@ -165,7 +165,7 @@ export function MessageForm() {
                 one it becomes the thing the team is measured against.
               */}
               <p className="font-display tracking-display mt-4 text-2xl font-normal text-balance">
-                Thanks — a person will read this.
+                Thanks. A person will read this.
               </p>
             </div>
           </div>

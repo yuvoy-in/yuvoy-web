@@ -1,5 +1,6 @@
 import type { components } from "@/lib/api/schema";
 import { apiBaseUrl } from "@/lib/api/base-url";
+import { dedash } from "@/lib/format/dedash";
 
 export type LeadInput = components["schemas"]["LeadInput"];
 export type LeadAcceptance = components["schemas"]["LeadAcceptance"];
@@ -71,9 +72,9 @@ export async function submitLead(input: LeadInput): Promise<SubmitResult> {
       const body = (await res.json()) as {
         error?: { message?: string; details?: Record<string, unknown> };
       };
-      if (body.error?.message) message = body.error.message;
+      if (body.error?.message) message = dedash(body.error.message);
       for (const [k, v] of Object.entries(body.error?.details ?? {})) {
-        if (typeof v === "string") fields[k] = v;
+        if (typeof v === "string") fields[k] = dedash(v);
       }
     } catch {
       // fall through with the generic message

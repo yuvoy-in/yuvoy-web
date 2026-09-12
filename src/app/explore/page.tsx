@@ -162,7 +162,7 @@ export default function ExplorePage() {
         <StatusNotice label="Collection preview" className="mt-14">
           <p>
             These are the kinds of day the first collection is being built
-            around. Nothing here is browsable or bookable — the experiences
+            around. Nothing here is browsable or bookable. The experiences
             themselves, with prices and dates, are in the app.
           </p>
         </StatusNotice>

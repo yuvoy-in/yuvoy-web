@@ -45,7 +45,7 @@ export default function PrivacyPage() {
       intro={
         <p>
           Yuvoy is not open yet. The only personal information this site
-          collects is what you type into one of its two forms — the waitlist and
+          collects is what you type into one of its two forms: the waitlist and
           operator application, or the contact form. This page describes exactly
           what that is, what happens to it, and how to get it removed.
         </p>
@@ -79,7 +79,7 @@ export default function PrivacyPage() {
             If you send us a message:
           </strong>{" "}
           your name, your email address, the topic you picked, and whatever you
-          write. Nothing else — a message is not a registration, and it does not
+          write. Nothing else. A message is not a registration, and it does not
           put you on any list.
         </p>
         <p>
@@ -243,7 +243,7 @@ function AnalyticsDisclosure() {
     <>
       <p>
         <strong className="text-forest font-bold">
-          We use PostHog to understand how this site is used — but only if you
+          We use PostHog to understand how this site is used, but only if you
           agree first.
         </strong>{" "}
         Until you do, it is not loaded and nothing is recorded. If you never
@@ -252,7 +252,7 @@ function AnalyticsDisclosure() {
       <p>
         {analyticsHostedInEu() ? "It is hosted in the EU. The" : "The"} events
         it records carry no name, email, phone number, or any reference to your
-        registration — there is deliberately no way to link what you clicked to
+        registration. There is deliberately no way to link what you clicked to
         who you are. We record which pages you saw, which destination or
         audience you chose, whether a preview played, whether a registration was
         started, failed validation, or completed, and whether you changed this
