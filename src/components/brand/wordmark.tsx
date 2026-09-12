@@ -51,7 +51,7 @@ export function Wordmark({
   return (
     <span
       role="img"
-      aria-label="Yuvoy — Experience more."
+      aria-label="Yuvoy · Experience more."
       className={cn("relative inline-flex h-10 sm:h-12", className)}
     >
       {VARIANTS.map(({ src, dark }) => (

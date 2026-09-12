@@ -82,7 +82,7 @@ export const AUDIENCE_COPY: Record<LeadAudience, AudienceCopy> = {
       form, before any request has been made, so there is no `next` to render.
       The API's own sentence is what the success notice shows.
     */
-    lede: "Tell us who you are, where you operate and what you offer. You do not have to wait for us — you can set your business up at operators.yuvoy.in with the same number.",
+    lede: "Tell us who you are, where you operate and what you offer. You do not have to wait for us: you can set your business up at operators.yuvoy.in with the same number.",
     faqs: OPERATOR_FAQS,
     metaTitle: "Apply as a founding operator",
     metaDescription:

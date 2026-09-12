@@ -600,7 +600,7 @@ function ContactFields({
       */}
       <p id={`${prefix}-contact-hint`} className="text-cream/70 mb-1 text-sm">
         {audience === "provider"
-          ? "Both, please. We email you the details and call to talk it through — an application we cannot ring is one we cannot start."
+          ? "Both, please. We email you the details and call to talk it through. An application we cannot ring is one we cannot start."
           : "An email address is all we need. Add a WhatsApp number if you would rather we message you there."}
       </p>
 
