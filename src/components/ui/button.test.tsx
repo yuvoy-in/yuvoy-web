@@ -9,7 +9,7 @@ describe("Button", () => {
   });
 
   it("defaults to the primary variant, filled with forest", () => {
-    // Monochrome CTAs (owner direction 2026-08-05): forest fill on cream
+    // Monochrome CTAs (owner direction 2026-08-05): forest fill on paper
     // surfaces, 11.44:1. If this ever flips to a terra fill, the CTA is
     // back on the retired template accent — and `bg-terra` would fail AA.
     render(<Button>Go</Button>);
@@ -21,7 +21,7 @@ describe("Button", () => {
   it("offers paper as the primary on forest surfaces", () => {
     render(<Button variant="paper">Go</Button>);
     const cls = screen.getByRole("button", { name: "Go" }).className;
-    expect(cls).toContain("bg-cream");
+    expect(cls).toContain("bg-paper");
     // The ring offset must follow the dark surface behind the button.
     expect(cls).toContain("focus-visible:ring-offset-forest");
   });

@@ -153,7 +153,7 @@ export function WaitlistFlow({
       routes. The header hook is unaffected — it never runs a measurement on
       a route where SiteHeader returns null.
     */
-    <main data-dark-hero className="bg-forest text-cream">
+    <main data-dark-hero className="bg-forest text-paper">
       {/* The legacy operator anchor. It must exist for the browser to have
           something to scroll to when the hash arrives with the document. */}
       <span
@@ -192,7 +192,7 @@ export function WaitlistFlow({
                 {copy.accent}
               </em>
             </h1>
-            <p className="text-cream/70 mt-6 max-w-md text-lg leading-relaxed">
+            <p className="text-paper/70 mt-6 max-w-md text-lg leading-relaxed">
               {copy.lede}
             </p>
           </div>

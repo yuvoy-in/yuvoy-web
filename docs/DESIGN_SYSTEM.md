@@ -2,9 +2,9 @@
 
 Single source of truth for visual design. **Every color, font, radius and tracking value used in the app must map to a token here.** Never invent a value that falls between tokens — add a token (with review) instead.
 
-Direction: **editorial, rectangular, confident.** Geometric display type against wide-tracked caps labels; cream editorial surfaces alternating with forest immersive ones; hairline rules doing the work that boxes and shadows do elsewhere. Generous space, fast interactions, slow entrances.
+Direction: **editorial, rectangular, confident.** Geometric display type against wide-tracked caps labels; paper editorial surfaces alternating with forest immersive ones; hairline rules doing the work that boxes and shadows do elsewhere. Generous space, fast interactions, slow entrances.
 
-> **Brand Kit v2** (ratified 2026-08-01) supersedes v1. v1 was Fraunces + pill geometry on a warmer cream; v2 moves to Poppins + IBM Plex Mono and a rectangular geometry, retuning the palette to match. Rationale and the full contrast table are in §1.
+> **Brand Kit v2** (ratified 2026-08-01) supersedes v1. v1 was Fraunces + pill geometry on a warmer off-white; v2 moves to Poppins + IBM Plex Mono and a rectangular geometry, retuning the palette to match. Rationale and the full contrast table are in §1.
 >
 > **v2.1 (2026-08-03)** replaces the two darks, `teal` `#0D3B3E` and `ink` `#22302E`, with a single `forest` `#16362E`. Nothing else changed.
 >
@@ -15,6 +15,14 @@ Direction: **editorial, rectangular, confident.** Geometric display type against
 > **v2.4 (2026-08-05, owner-directed)** swaps the display face only: Cabinet Grotesk → **Poppins** (600 + 700), taken from the original landing prototype kept in `claude-artifacts/`. This is the Brand Kit v2 display face returning — v2 shipped Poppins, v2.2 replaced it for a more premium register, v2.3 replaced that with Cabinet Grotesk. The owner asked to try it again on headlines **only**, so the prototype's Inter and IBM Plex Mono do **not** come back: Satoshi still carries body, UI, labels and the wordmark. Display weight moves from `font-medium` (500) to `font-semibold` (600), since those are the two files that ship. Poppins is also Indian Type Foundry, so both families share a foundry. Four font files total.
 >
 > **v2.5 (2026-08-06, owner-confirmed)** ends the search: display becomes **Fraunces**, the open-license member of the soft-serif family (Canela / Recoleta / GT Super) that premium travel and island-hospitality brands set their identities in — chosen over roughly 350 candidates across seven review rounds. It ships as a **variable font tuned into the site's own cut**: `opsz` 144, `SOFT` 75, `WONK` 0, pinned on the `font-display` utility itself via `--font-display--font-variation-settings`. Display weight is **400** (`font-normal`, owner pick from a six-weight strip); the turn is a **true drawn italic** at `--font-weight-turn` (480) via `italic font-turn` — the signature stops being a synthesized oblique. Display tracking moves to `--tracking-display` (-0.01em). Satoshi unchanged as the text voice. Five files total (two Fraunces variable + three Satoshi); `font-semibold` is banned everywhere again.
+
+> **v2.9 (2026-09-19, owner-directed)** makes the marketing site **white**, and renames the surface trio with the value: `cream` `#F4EFE4` → **`paper` `#FFFFFF`**, `cream-deep` `#ECE5D6` → **`paper-deep` `#F7F5F1`**, `cream-line` `#E5DCC9` → **`paper-line` `#EDEAE4`**. This is the change `yuvoy-app` and `yuvoy-operator` took on 15 September, applied here on the owner's ruling that the white surfaces are global. **It retires D-101's "the marketing site is visually frozen and there is no sync back"** — the three repos share one surface vocabulary again.
+>
+> What is preserved is the **separation, not the hue**: 1.09:1 canvas-to-raised and 1.20:1 canvas-to-hairline, the two steps the cream trio had, so no card, input, panel or divider changes weight on any page. The supports stay warm-neutral rather than grey, because the ink is a green and the accent a terracotta and a neutral panel between them reads as a third hue. The name changed with the value because a token called `cream` that paints `#FFFFFF` is a lie every reader has to re-check against the hex, and `bg-cream` is the first thing the next section would have copied.
+>
+> Only the light end moved, so **every pairing gained contrast** and nothing needed re-cutting — no scrim, tint or opacity rung was re-sized. An opaque light tone on a fixed ground scales by exactly `1.05 / (L_cream + 0.05)` = 1.1467; an alpha rung does not, because its composite depends on the ground, so every figure in §1, in `globals.css` and in the two photographic tables was **re-measured rather than multiplied** (they land within 2% of the multiplier). One rule's premise changed and is restated in §1: `terra` on the raised surface was a hard failure at 2.96:1 and is now 3.41:1, so the restriction survives on headroom rather than on failure. `v2.6`–`v2.8` were app-and-portal only and are not part of this site.
+>
+> Brand marks follow, because a cream mark beside paper text measures 1.15:1 — the "two whites" version of the failure v2.1 fixed when it merged two darks. The vector mark and lockup, the header lockup's dark variant, the favicon, app icon, Apple touch icon and OG mark are all regenerated; `yuvoy-{mark,lockup}-vector-cream.svg` are retired in favour of `-paper`. `generate-header-lockup.mjs` now recolours **both** variants off the `@theme` block and asserts each swap individually — the old whole-file guard passed while the stroke swap silently stopped matching, which shipped a cream mark onto a white bar.
 
 ## 0. Architecture rule
 
@@ -28,12 +36,12 @@ Brand Kit v2. Every ratio below is measured (sRGB relative luminance, WCAG 2.2) 
 
 | Token        | Hex       | Role                                                           |
 | ------------ | --------- | -------------------------------------------------------------- |
-| `cream`      | `#F4EFE4` | Canvas — default page background                               |
-| `cream-deep` | `#ECE5D6` | Raised surfaces — cards, inputs, panels on cream               |
-| `cream-line` | `#E5DCC9` | Hairline borders on cream                                      |
-| `forest`     | `#16362E` | Primary ink **and** every dark surface (11.44:1 on cream)      |
-| `terra`      | `#BE7149` | Accent — decoration and LARGE display text only (3.24:1)       |
-| `terra-deep` | `#985028` | Text-capable accent (5.21:1 on cream); never a CTA fill        |
+| `paper`      | `#FFFFFF` | Canvas — default page background                               |
+| `paper-deep` | `#F7F5F1` | Raised surfaces — cards, inputs, panels on paper               |
+| `paper-line` | `#EDEAE4` | Hairline borders on paper                                      |
+| `forest`     | `#16362E` | Primary ink **and** every dark surface (13.11:1 on paper)      |
+| `terra`      | `#BE7149` | Accent — decoration and LARGE display text only (3.72:1)       |
+| `terra-deep` | `#985028` | Text-capable accent (5.98:1 on paper); never a CTA fill        |
 | `terra-soft` | `#D89772` | Accent text on forest (5.36:1)                                 |
 | `device`     | `#0A100E` | **The preview bezel only** — an object's colour, not a surface |
 
@@ -41,20 +49,27 @@ Brand Kit v2. Every ratio below is measured (sRGB relative luminance, WCAG 2.2) 
 
 | Pairing                      | Ratio   | Verdict                     |
 | ---------------------------- | ------- | --------------------------- |
-| `forest` on `cream`          | 11.44:1 | AA + AAA body               |
-| `terra-deep` on `cream`      | 5.21:1  | AA body                     |
-| `terra-deep` on `cream-deep` | 4.77:1  | AA body                     |
-| `terra` on `cream`           | 3.24:1  | **large text only** (≥24px) |
-| `terra` on `cream-deep`      | 2.96:1  | **fails everything**        |
-| `cream` on `terra-deep`      | 5.21:1  | AA body                     |
-| `cream` on `forest`          | 11.44:1 | AA + AAA body               |
+| `forest` on `paper`          | 13.11:1 | AA + AAA body               |
+| `terra-deep` on `paper`      | 5.98:1  | AA body                     |
+| `terra-deep` on `paper-deep` | 5.49:1  | AA body                     |
+| `terra` on `paper`           | 3.72:1  | **large text only** (≥24px) |
+| `terra` on `paper-deep`      | 3.41:1  | **large text only** (≥24px) |
+| `paper` on `terra-deep`      | 5.98:1  | AA body                     |
+| `paper` on `forest`          | 13.11:1 | AA + AAA body               |
 | `terra-soft` on `forest`     | 5.36:1  | AA body                     |
+| `paper` vs `paper-deep`      | 1.09:1  | the raised-surface step     |
+| `paper` vs `paper-line`      | 1.20:1  | the hairline step           |
+
+The surface steps are in the table because they are the one thing a lighter
+canvas can destroy silently. Every TEXT pairing above improves as the
+supports lighten, so a flattened ramp passes every contrast check while the
+cards and dividers disappear. `palette.test.ts` pins both numbers.
 
 ### There is one dark surface
 
 **`forest` is the only dark background on the site** — sections, the
 registration block, and the footer alike. It is also the colour of all body
-text on cream. `Section`'s `tone` is `"cream" | "ink"`, and `ink` paints
+text on paper. `Section`'s `tone` is `"paper" | "ink"`, and `ink` paints
 `forest`; there is no second dark to choose between.
 
 There used to be. `teal` (`#0D3B3E`) and `ink` (`#22302E`) differed in hue —
@@ -81,38 +96,43 @@ Where the scrim is a gradient, state the floor and show that the range is bounde
 
 ### The terra rule (read before using an accent on text)
 
-`terra` is **decoration and large display text only**. At 3.24:1 it clears AA
+`terra` is **decoration and large display text only**. At 3.72:1 it clears AA
 for large text (≥24px, or ≥18.66px bold) and nothing else. It may never be used
-for body copy, labels, nav, or button text.
+for body copy, labels, nav, or button text — 3.72:1 is still well under the
+4.5 floor, and the white canvas did not change that.
 
-- Accent text at body/label size **on cream** → `terra-deep`.
+- Accent text at body/label size **on paper** → `terra-deep`.
 - Accent text **on forest** → `terra-soft`.
-- **`terra` text may only sit on `cream`, never on `cream-deep`.** Its headroom
-  over the large-text floor is 0.24, so the raised surface alone spends it:
-  3.24:1 becomes 2.96:1 and the same headline that passes on the canvas fails
-  on a panel. A section that paints `cream-deep` and then uses `SectionHeading`
-  gets a failing accent with no warning, which is exactly what happened to the
-  operators section — put the section on `cream` and raise its inner panels to
-  `cream-deep` instead, which is how that section is now built.
+- **`terra` text may only sit on `paper`, never on `paper-deep`.** The reason
+  changed at v2.9 and the rule did not. It used to be a hard failure: headroom
+  over the large-text floor was 0.24, the raised surface spent all of it, and
+  3.24:1 became 2.96:1 — the same headline passing on the canvas and failing on
+  a panel, which is exactly what happened to the operators section. On the
+  white canvas both pass: 3.72:1 and 3.41:1. **The rule stands because the
+  panel still spends nearly half the margin** — 0.72 of headroom on the canvas,
+  0.41 on the raised surface — so `paper-deep` is where any future retune of
+  the terracotta breaks first, and it would break on the surface nobody
+  re-measures. Put the section on `paper` and raise its inner panels to
+  `paper-deep` instead, which is how that section is now built.
 - Accent **fills** are not a thing any more. CTAs are monochrome (§5): forest
-  on cream surfaces, cream on forest ones. A `terra` fill with text on it fails
+  on paper surfaces, paper on forest ones. A `terra` fill with text on it fails
   AA, and the `terra-deep` fill that used to carry the CTA was retired on
   2026-08-05 as a template tell.
 
 ### The opacity ladder (measured, not guessed)
 
-Muted and secondary text comes from **opacity modifiers on `forest` / `cream`**, not new tokens. The rendered composite decides whether it passes, so the safe floors are fixed:
+Muted and secondary text comes from **opacity modifiers on `forest` / `paper`**, not new tokens. The rendered composite decides whether it passes, so the safe floors are fixed:
 
 | Usage                         | Floor            | Composite ratio |
 | ----------------------------- | ---------------- | --------------- |
-| Body/secondary text on cream  | `text-forest/70` | 4.77:1          |
-| Labels + small text on cream  | `text-forest/75` | 5.55:1          |
-| Body text on forest           | `text-cream/60`  | 5.15:1          |
-| Comfortable secondary on dark | `text-cream/70`  | 6.45:1          |
+| Body/secondary text on paper  | `text-forest/70` | 5.14:1          |
+| Labels + small text on paper  | `text-forest/75` | 6.00:1          |
+| Body text on forest           | `text-paper/60`  | 5.78:1          |
+| Comfortable secondary on dark | `text-paper/70`  | 7.26:1          |
 
-**Anything below `forest/70` on cream, or `cream/60` on dark, is decoration only** — never text. Every rung above held when the darks merged: `forest` is deeper than the `teal` it replaced, so each pairing gained margin rather than losing it.
+**Anything below `forest/70` on paper, or `paper/60` on dark, is decoration only** — never text. Every rung above held when the darks merged: `forest` is deeper than the `teal` it replaced, so each pairing gained margin rather than losing it.
 
-Borders and fills are exempt from these floors — `border-forest/20`, `bg-forest/5`, `border-cream/12` are all fine.
+Borders and fills are exempt from these floors — `border-forest/20`, `bg-forest/5`, `border-paper/12` are all fine.
 
 ## 2. Typography
 
@@ -120,15 +140,15 @@ Borders and fills are exempt from these floors — `border-forest/20`, `bg-fores
 - **UI / body — Satoshi** (`font-sans`, the default), weights 400 / 500 / 700. There is no 600, so `font-semibold` must never appear on body text (the browser would synthesise it). Emphasis in running text is `font-bold`.
 - **Label — Satoshi** via the `label` utility: uppercase, `text-xs`, `font-medium`, `tracking-label` (0.18em). Eyebrows, nav, stats, metadata, button labels. The mono was retired in v2.3 — it read as terminal, not magazine.
 - **`eyebrow` utility** — the `label` preceded by a terracotta dot, the same square `size-1` marker the fact rows use (a hairline rule until 2026-08-05, replaced by owner direction). This is the section-opening gesture; **use it once per section**, at the top. Eyebrows are plain phrases: no act numbering (owner direction 2026-08-03). The one exception is the cover: the hero's opening line is a plain `label` with no marker (owner direction 2026-08-05).
-- **Wordmark** — the owner-delivered **horizontal lockup** (2026-08-06): ensō + terra dot, tracked YUVOY caps, handwritten "Experience more." and its underline, one drawing. `<Wordmark />` renders two surface variants generated by `scripts/generate-header-lockup.mjs` (cream/terra-soft on forest; forest/terra-deep on cream — the §1 pairings) and cross-fades them, so the header's colour change never waits on a fetch. Never hand-edit the generated SVGs. `--tracking-wordmark` survives for the veil's place-name line.
+- **Wordmark** — the owner-delivered **horizontal lockup** (2026-08-06): ensō + terra dot, tracked YUVOY caps, handwritten "Experience more." and its underline, one drawing. `<Wordmark />` renders two surface variants generated by `scripts/generate-header-lockup.mjs` (paper/terra-soft on forest; forest/terra-deep on paper — the §1 pairings) and cross-fades them, so the header's colour change never waits on a fetch. Never hand-edit the generated SVGs. `--tracking-wordmark` survives for the veil's place-name line.
 - **Punctuation** — rendered copy never uses an em dash. Prefer a period, a colon, a comma or a parenthetical; ranges and pairings use a middot (owner direction 2026-08-03). Code comments are exempt. Since 2026-09-12 the ban covers every long dash (em U+2014, en U+2013, horizontal bar U+2015) and a range takes a plain hyphen, enforced by `pnpm check:dashes`, which runs first in `pnpm lint` and blanks comments before it looks; text from the API is stripped at the boundary instead, in `src/lib/format/dedash.ts`.
 - **Launch timing** — never name a month. The hero states it plainly ("Opening soon", owner direction 2026-08-05); deeper copy may describe the season evocatively ("when the water clears", "when the sea turns to glass").
 - **The mark** — the official ensō (brush ring + terracotta dot), **cut out, never tiled**. The delivered source (`design/brand-source/yuvoy-logo.png`) is white strokes on an opaque black field, so every display asset is derived by `scripts/generate-brand-assets.py`; never hand-edit them, and re-run it if the source is replaced.
-  - `yuvoy-mark-on-light.png` / `yuvoy-mark-on-dark.png` — transparent cut-outs, forest and cream strokes. **These are what the UI uses.** Two files rather than one recoloured file because a cream ensō is invisible on cream and a forest one is invisible on forest. `WaveMark` renders both and cross-fades on opacity, so the header's colour change never waits on a fetch.
+  - `yuvoy-mark-on-light.png` / `yuvoy-mark-on-dark.png` — transparent cut-outs, forest and paper strokes. **These are what the UI uses.** Two files rather than one recoloured file because a paper ensō is invisible on paper and a forest one is invisible on forest. `WaveMark` renders both and cross-fades on opacity, so the header's colour change never waits on a fetch.
   - **Icons are generated from the vector by `scripts/generate-icons.mjs`** (2026-08-07): `src/app/icon.svg` (the primary favicon), `src/app/icon.png` (512, Android + the `Organization` logo), `src/app/apple-icon.png` (180), `src/app/favicon.ico` (16/32/48 PNG-in-ICO) and `public/brand/yuvoy-mark.png` (the OG card's mark). All carry the forest tile, because a favicon is drawn on a browser tab whose colour we do not control — **a tile must never appear in the page itself**; on a forest section it draws a green box around the mark. They previously came from the raster pipeline, which left a soft rectangular halo around the terracotta dot; the vector has none. Never hand-edit an output; re-run the script.
   - The script resamples by **area averaging, not bilinear**. Bilinear is a magnifying filter; shrinking with it discards most of the source pixels and is what made the mark look coarse and its brush strokes break up. Masks are measured off the source, not guessed.
   - **Delivered masters live in `design/brand-source/` and `design/photography-source/`, never under `public/`** (2026-08-07): anything in `public/` is deployed and publicly fetchable, and 4.6MB of print-weight PNGs were shipping on every deploy for no reason. Scripts read them from there.
-- **Vector assets** are derived from the delivered master `public/yuvoy-logo-vector.svg` by `scripts/generate-vector-brand.mjs`: `public/brand/yuvoy-mark-vector-{cream,forest}.svg`, `public/brand/yuvoy-lockup-vector-{cream,forest}.svg`, and the intro's per-letter module `src/components/brand/yuvoy-letter-paths.ts`. The tagline is stripped from all of them, and the delivered colours are re-expressed as tokens (cream or forest strokes, `terra` dot). Never hand-edit the outputs; re-run the script.
+- **Vector assets** are derived from the delivered master `public/yuvoy-logo-vector.svg` by `scripts/generate-vector-brand.mjs`: `public/brand/yuvoy-mark-vector-{paper,forest}.svg`, `public/brand/yuvoy-lockup-vector-{paper,forest}.svg`, and the intro's per-letter module `src/components/brand/yuvoy-letter-paths.ts`. The tagline is stripped from all of them, and the delivered colours are re-expressed as tokens (paper or forest strokes, `terra` dot). Never hand-edit the outputs; re-run the script.
 
 Scale: Tailwind's type scale. Headlines `font-display`; everything else inherits Satoshi unless it is a label.
 
@@ -145,7 +165,7 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 - CSS entrance: the `emerge` utility, used **only** for the homepage cover's first paint. It moves three properties at once — scale (toward the viewer), translate (settling) and blur (pulling into focus) — so the composition surfaces from depth rather than sliding up, and the blur clears at 65% so the type is sharp while it is still settling. It ships zero JS.
 - **The site menu opens like a shutter**: `menu-shutter` unrolls the panel from its top edge with `clip-path` (420ms, cinematic) and rolls it back up to close (320ms, quicker — waiting on a dismissal you already asked for reads as lag). `SiteMenu` holds the dialog open until the closing shutter has run, and skips that wait under reduced motion, where there is nothing to wait for.
 - **The brand veil (`BrandIntro`) is the site's entrance**, and the one composition allowed above the `emerge` budget: once per tab session, a night-water scene (film-gradient field, the comp's island horizon at the foot, particle swells rolling in from each edge and dying before the centre, grain) on which the mark surfaces, the wordmark's letterforms arrive in the cover's own emerge grammar, "Experience more." is written on in the veil-only handwriting face (`--font-script`, the one sanctioned use), a sloped calligraphic swash underlines it as the word finishes, and the island's name signs the foot of the frame (~3.4s all told, timeline in `globals.css`). The exit is the emerge grammar reversed — the camera pushes through the dissolving veil — and it hands off: the cover's `emerge` entrance is suspended (`animation: none`, fail-open visible) while the veil holds `data-intro-wait`, then re-applies from zero at exit start, so the hero surfaces through the dissolve. Page scroll is locked by the component only while it plays, never by pre-hydration code, so a hydration failure cannot strand a locked page. It is theatre over a live page, never a loading gate: the page renders and settles behind it, CSS alone runs and ends it, an inline script decides **before first paint** that repeat sessions, reduced motion and no-JS visitors never see it, and any keypress dismisses it on the interaction budget. It must never be given work to do — no data fetching, no font waiting, no route gating — and its session key is `yuvoy.intro-played`.
-- **The header wears the cover's colours at the very top** of a route whose first section is dark (`data-dark-hero`, currently `/` and `/go/*`): transparent bar, cream contents. Any scroll away from the top returns the solid bar (owner's choice, 2026-08-04, over tracking the whole cover). The swap is invisible in practice because it happens while the header is hidden — the only cross-fade seen is the deliberate one at the top edge. The cover carries `-mt-14` so it reaches up behind the bar; without that, "transparent" would show the page background rather than the cover.
+- **The header wears the cover's colours at the very top** of a route whose first section is dark (`data-dark-hero`, currently `/` and `/go/*`): transparent bar, paper contents. Any scroll away from the top returns the solid bar (owner's choice, 2026-08-04, over tracking the whole cover). The swap is invisible in practice because it happens while the header is hidden — the only cross-fade seen is the deliberate one at the top edge. The cover carries `-mt-14` so it reaches up behind the bar; without that, "transparent" would show the page background rather than the cover.
 - **The header is the one exception to the no-scroll-motion rule** (owner direction, 2026-08-04): it slides out of the way going down the page and returns going up, via the `header-slide` utility and `HeaderShell`. It answers a gesture rather than decorating an arrival, which is why it sits in the interaction budget (250ms) and not the entrance one. It never hides near the top, always returns on focus, and does not run at all under reduced motion.
 - **No other scroll-triggered motion.** Sections render in place, fully visible, the moment they are reached. The `<Reveal>` component and the operator grid's draw-on-scroll strike were both removed on owner direction (2026-08-03): content that animates itself into view reads as decoration, and on a pitch page it delays the thing the reader came for. Do not reintroduce either without that decision being revisited.
 - JS motion: **none.** `motion/react` has no consumers, and `<MotionConfig>` was removed with its last one. If a genuine need for JS animation returns, restore `<MotionConfig reducedMotion="user">` in `providers.tsx` in the same change — it is what makes Motion honour the OS preference, which CSS-level reduced-motion cannot do for it.
@@ -156,10 +176,10 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 
 - **Radius: `rounded-edge` (2px) — the editorial near-square.** Buttons, inputs, cards and panels all share it. **Pills are not part of the system** (v1 used them; v2 does not).
 - **`--radius-device` (2.25rem) — the one rounded object in the system**: the Season One phone-preview frame. It depicts hardware, not UI; nothing else may use it. (Tiny `rounded-full` dots inside the preview depict hardware/avatars and share this exemption.)
-- **`bg-device` — the bezel's near-black**, on that same frame and nothing else (owner direction, 2026-08-06). `forest` was tried and reads green at 4px of bezel. This is **not a second dark surface**: it is what a phone's frame is made of, and `Section` still offers one dark tone and no choice to make. `palette.test.ts` pins that exactly one element in `src` carries `bg-device`, and that it is darker than `forest` — the moment a section takes it, the site has two darks again. Not pure `#000`, which sits harder than anything else on the page and rims the frame against cream.
+- **`bg-device` — the bezel's near-black**, on that same frame and nothing else (owner direction, 2026-08-06). `forest` was tried and reads green at 4px of bezel. This is **not a second dark surface**: it is what a phone's frame is made of, and `Section` still offers one dark tone and no choice to make. `palette.test.ts` pins that exactly one element in `src` carries `bg-device`, and that it is darker than `forest` — the moment a section takes it, the site has two darks again. Not pure `#000`, which sits harder than anything else on the page and rims the frame against paper.
 - **The bezel's padding and the screen's radius are one measurement.** The screen is `calc(var(--radius-device) - <bezel padding>)`; change the padding without the radius and the two curves stop being concentric, which shows as an uneven bezel at the corners.
-- **`device-frame` — the one gradient and the one shadow in the system**, on that same frame and nothing else (owner direction, 2026-08-06). The frame is an object resting on the page rather than a panel drawn on it, which is the whole reason it may be lit or cast at all. It carries a diagonal rail gradient, a 1px specular edge and a top highlight (so it reads as milled metal rather than a border), then two soft drop shadows — a tight contact one and a wide ambient one with negative spread so it cannot bloom into a halo. Every value is a `color-mix` on a token: the highlights are `cream` lifting `device`, and the shadows are `forest`, never black, which would grey the cream under it. `device-key` draws the volume and wake buttons from the same mix. Everywhere else, hairlines still do the work shadows do elsewhere.
-- **`card-lift` — the one shadow outside the preview frame** (owner direction, 2026-08-14), on the why act's scattered source cards and nothing else. The rule above stands everywhere else: hairlines do the work shadows do elsewhere. This is a named exception because those cards depict loose paper dropped on a desk, and paper at an angle with no shadow reads as a rotated rectangle rather than as a sheet lying on something — the rotation and the shadow are one effect and neither works alone. Built like `device-frame`'s: a tight contact shadow plus a wide ambient one with negative spread so it cannot bloom, both `forest` and never black, which would grey the cream under it. Much lighter than the frame's, because these are sheets of paper and that is a machined object.
+- **`device-frame` — the one gradient and the one shadow in the system**, on that same frame and nothing else (owner direction, 2026-08-06). The frame is an object resting on the page rather than a panel drawn on it, which is the whole reason it may be lit or cast at all. It carries a diagonal rail gradient, a 1px specular edge and a top highlight (so it reads as milled metal rather than a border), then two soft drop shadows — a tight contact one and a wide ambient one with negative spread so it cannot bloom into a halo. Every value is a `color-mix` on a token: the highlights are `paper` lifting `device`, and the shadows are `forest`, never black, which would grey the paper under it. `device-key` draws the volume and wake buttons from the same mix. Everywhere else, hairlines still do the work shadows do elsewhere.
+- **`card-lift` — the one shadow outside the preview frame** (owner direction, 2026-08-14), on the why act's scattered source cards and nothing else. The rule above stands everywhere else: hairlines do the work shadows do elsewhere. This is a named exception because those cards depict loose paper dropped on a desk, and paper at an angle with no shadow reads as a rotated rectangle rather than as a sheet lying on something — the rotation and the shadow are one effect and neither works alone. Built like `device-frame`'s: a tight contact shadow plus a wide ambient one with negative spread so it cannot bloom, both `forest` and never black, which would grey the paper under it. Much lighter than the frame's, because these are sheets of paper and that is a machined object.
 - Spacing: Tailwind v4 dynamic scale (multiples of `0.25rem`). Stay on the scale.
 - Control heights: `sm` 36px (`h-9`), `md` 44px (`h-11`), `lg` 52px (`h-13`). Inputs are 48px (`h-12`).
 - **The header is 64px (`h-16`) plus the top safe-area inset**, and the menu panel's top bar matches it exactly — same height, same `container-page` gutters, same negative margin on the button — so the close button lands on the pixel the trigger occupied. Anything that offsets for the header (`scroll-mt-[calc(4rem+env(safe-area-inset-top))]`, the covers' negative top margins) carries the same `calc`; change them together.
@@ -170,11 +190,11 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 ## 5. Components (current)
 
 - **`Button`** — variants `primary | outline | paper | ghost | outlineOnDark`, sizes `sm | md | lg`. Labels are uppercase bold at `tracking-label`; hover lifts a pixel, press compresses (`active:scale`), and the trailing arrow eases forward — all on `--ease-interaction`.
-  - **CTAs are monochrome** (owner direction 2026-08-05): on cream surfaces the pair is `primary` (solid forest) + `outline`; on forest surfaces it is `paper` (solid cream) + `outlineOnDark`. Both fills are 11.44:1. **Terracotta is never a button fill** — it is the accent for type, dots and marks; the old terra-deep CTA was retired as a template tell.
+  - **CTAs are monochrome** (owner direction 2026-08-05): on paper surfaces the pair is `primary` (solid forest) + `outline`; on forest surfaces it is the `paper` variant (a solid white fill) + `outlineOnDark`. Both fills are 13.11:1. **Terracotta is never a button fill** — it is the accent for type, dots and marks; the old terra-deep CTA was retired as a template tell.
   - `ghost` (text-only) is **situational** — allowed, but justify it in review. The former `ink` variant is gone: `primary` now is the forest fill.
   - Use `buttonVariants()` to style a `<Link>` as a button; `<ButtonArrow />` for the trailing arrow on a forward action.
-- **`Section`** — the page's unit: one tone (`cream | ink`), the `container-page` measure, and the standard vertical rhythm. It takes an optional **`backdrop`** slot: a full-bleed decorative layer painted behind the measure, which is how the first-launch act carries artwork without hand-rolling its own `<section>`. The caller owns the layers and must make them inert (`aria-hidden`, `pointer-events-none`, `absolute inset-0 -z-10`); the section supplies `relative isolate overflow-hidden` when the slot is filled. **A backdrop does not relax the contrast floors** — see the artwork rule in §1.
-- **`Input`** — `rounded-edge` field on `cream-deep`, terra-deep focus ring.
+- **`Section`** — the page's unit: one tone (`paper | ink`), the `container-page` measure, and the standard vertical rhythm. It takes an optional **`backdrop`** slot: a full-bleed decorative layer painted behind the measure, which is how the first-launch act carries artwork without hand-rolling its own `<section>`. The caller owns the layers and must make them inert (`aria-hidden`, `pointer-events-none`, `absolute inset-0 -z-10`); the section supplies `relative isolate overflow-hidden` when the slot is filled. **A backdrop does not relax the contrast floors** — see the artwork rule in §1.
+- **`Input`** — `rounded-edge` field on `paper-deep`, terra-deep focus ring.
 - **`WaveMotif`** — the three-line wave glyph, the island signature. Decorative accent only, at most once per section; tone follows the surface.
 - **`Wordmark`** — the horizontal lockup, self-sized by a height class (`h-9` default; the footer passes `h-10`). `tone` follows the surface. The square cut-out marks still ship in `public/brand/` for the favicon, app icon and OG card; `WaveMark` (the standalone square-mark component) was removed with the lockup switch — nothing rendered it.
 - **`BrandIntro`** — the brand veil (§3), rendered first in the root layout's body. Owns only the pre-paint decision script and the post-play cleanup; every visual decision lives in `globals.css` under the `intro-*` classes.
@@ -285,14 +305,14 @@ re-framing itself under the same filename.
 
 ### Glass, and where it is allowed
 
-`/contact`'s note card is 5% cream with a backdrop blur, on `rounded-edge` like
+`/contact`'s note card is 5% paper with a backdrop blur, on `rounded-edge` like
 every other panel. It is glass rather than a fill because a solid panel would
 punch a hole in the photograph the act is built on, and the blur is what keeps
 its type legible over whatever part of the field it lands on.
 
 **This is not a licence for translucent panels generally.** It is allowed here
 because there is a photograph behind it that the page wants to keep; on a plain
-forest or cream section glass has nothing to be glass over and reads as a panel
+forest or paper section glass has nothing to be glass over and reads as a panel
 somebody forgot to finish. The reference this was drawn from rounds its card;
 ours does not, for the reason in §4 — a soft card would be the one rounded
 object on a page of square ones.

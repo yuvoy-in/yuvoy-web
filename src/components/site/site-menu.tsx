@@ -183,7 +183,7 @@ export function SiteMenu({
         className={cn(
           "rounded-edge -mr-2 inline-flex size-11 items-center justify-center transition-colors duration-300 focus-visible:ring-2 focus-visible:outline-none",
           tone === "onDark"
-            ? "text-cream hover:bg-cream/10 focus-visible:ring-terra-soft"
+            ? "text-paper hover:bg-paper/10 focus-visible:ring-terra-soft"
             : "text-forest hover:bg-forest/5 focus-visible:ring-terra-deep",
           className,
         )}
@@ -220,11 +220,11 @@ export function SiteMenu({
           ref={panelRef}
           tabIndex={-1}
           data-state={closing ? "closing" : "open"}
-          className="menu-shutter bg-cream flex h-full flex-col outline-none"
+          className="menu-shutter bg-paper flex h-full flex-col outline-none"
         >
           {/* Mirrors the header exactly, so the close button sits on the
               same pixel the trigger did. */}
-          <div className="border-cream-line container-page mt-[env(safe-area-inset-top)] flex h-16 shrink-0 items-center justify-between border-b">
+          <div className="border-paper-line container-page mt-[env(safe-area-inset-top)] flex h-16 shrink-0 items-center justify-between border-b">
             <Wordmark />
             <button
               type="button"
@@ -259,13 +259,13 @@ export function SiteMenu({
             <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-16">
               <nav aria-label="Site" className="lg:col-span-7">
                 {MENU_ITEMS.length > 0 && (
-                  <ul className="border-cream-line flex flex-col border-t">
+                  <ul className="border-paper-line flex flex-col border-t">
                     {MENU_ITEMS.map((item) => {
                       const current = pathname === item.href;
                       return (
                         <li
                           key={item.href}
-                          className="border-cream-line border-b last:border-b-0"
+                          className="border-paper-line border-b last:border-b-0"
                         >
                           <Link
                             href={
@@ -314,7 +314,7 @@ export function SiteMenu({
             </div>
           </div>
 
-          <div className="border-cream-line bg-cream container-page shrink-0 border-t pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+          <div className="border-paper-line bg-paper container-page shrink-0 border-t pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
             <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               {/* An <a>: this leaves the origin (yuvoy-web#154). */}
               <a

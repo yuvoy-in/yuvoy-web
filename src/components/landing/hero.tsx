@@ -51,13 +51,13 @@ export function Hero() {
       (site-header.tsx) — and the inner padding puts the content back exactly
       where it was. Without this a transparent header would show the page
       background above the cover, not the cover itself; short by the inset, it
-      would show a cream strip exactly under the Dynamic Island. The two
+      would show a paper strip exactly under the Dynamic Island. The two
       calc() values must move with the header's height together.
       `data-dark-hero` is how the header knows this page has one.
     */
     <section
       data-dark-hero
-      className="bg-forest text-cream relative -mt-[calc(4rem+env(safe-area-inset-top))] overflow-hidden"
+      className="bg-forest text-paper relative -mt-[calc(4rem+env(safe-area-inset-top))] overflow-hidden"
     >
       {/*
         The field, in five layers (owner artwork + direction, 2026-08-06):
@@ -205,7 +205,7 @@ export function Hero() {
               16px it takes five, on a slightly better measure, and matches
               every other paragraph on the site. */}
           <p
-            className="text-cream/75 emerge mt-6 max-w-xl leading-relaxed sm:mt-10 sm:text-lg"
+            className="text-paper/75 emerge mt-6 max-w-xl leading-relaxed sm:mt-10 sm:text-lg"
             style={{ animationDelay: "0.28s" }}
           >
             Every video is filmed by the people who host the experience. Book
@@ -267,17 +267,17 @@ export function Hero() {
         >
           <span
             aria-hidden
-            className="draw-line bg-cream/12 absolute inset-x-0 top-0 h-px"
+            className="draw-line bg-paper/12 absolute inset-x-0 top-0 h-px"
             style={{ animationDelay: "0.72s" }}
           />
           <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-2 sm:justify-start">
             {FACTS.map((fact) => (
               <li
                 key={fact}
-                className="label text-cream/70 flex items-center gap-2.5"
+                className="label text-paper/70 flex items-center gap-2.5"
               >
                 {/* terra-soft, not terra: this marker sits on forest, where
-                    `terra` is the cream-surface rung and goes muddy (3.52:1
+                    `terra` is the paper-surface rung and goes muddy (3.52:1
                     against terra-soft's 5.36:1). §1's pairing, and the
                     brighter one beside the eyebrow above. */}
                 <span aria-hidden className="bg-terra-soft size-1 shrink-0" />
@@ -285,7 +285,7 @@ export function Hero() {
               </li>
             ))}
           </ul>
-          <p className="label text-cream/70">Havelock · Neil · Port Blair</p>
+          <p className="label text-paper/70">Havelock · Neil · Port Blair</p>
         </div>
       </div>
     </section>

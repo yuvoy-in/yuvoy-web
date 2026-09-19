@@ -91,7 +91,7 @@ export function AudienceTabs({
       aria-orientation="horizontal"
       onKeyDown={onKeyDown}
       className={cn(
-        "border-cream/20 rounded-edge mx-auto grid w-full max-w-lg grid-cols-2 gap-1 border p-1",
+        "border-paper/20 rounded-edge mx-auto grid w-full max-w-lg grid-cols-2 gap-1 border p-1",
         className,
       )}
     >
@@ -113,11 +113,11 @@ export function AudienceTabs({
             className={cn(
               "rounded-edge focus-visible:ring-terra-soft ease-interaction flex flex-col items-center justify-center gap-1 px-3 py-3 transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none",
               selected
-                ? // `cream-deep`, not `cream`: against saturated forest, pure
-                  // cream reads as white (design system §5). Same fill as the
+                ? // `paper-deep`, not `paper`: against saturated forest, pure
+                  // paper reads as white (design system §5). Same fill as the
                   // `paper` button, 10.49:1.
-                  "bg-cream-deep text-forest"
-                : "text-cream/70 hover:bg-cream/5 hover:text-cream",
+                  "bg-paper-deep text-forest"
+                : "text-paper/70 hover:bg-paper/5 hover:text-paper",
             )}
           >
             <span className="text-sm leading-snug font-medium">
@@ -131,14 +131,14 @@ export function AudienceTabs({
             */}
             <span
               aria-hidden
-              /* `terra-deep` on the selected fill and `cream/70` on the
+              /* `terra-deep` on the selected fill and `paper/70` on the
                  forest one: the two accent pairings §1 measures for these
                  grounds (5.21:1 and 6.45:1). Nothing quieter — this is 12px
                  type, so anything below AA's 4.5:1 is unreadable rather than
                  subtle. */
               className={cn(
                 "label",
-                selected ? "text-terra-deep" : "text-cream/70",
+                selected ? "text-terra-deep" : "text-paper/70",
               )}
             >
               {copy.tabHint}

@@ -7,8 +7,8 @@
  *
  * ## Why it is not just converted to WebP
  *
- * The delivered file is warm line work on its own near-cream ground
- * (`#f9efe2`), and the page's canvas is `cream` (`#f4efe4`). Those are close
+ * The delivered file is warm line work on its own near-paper ground
+ * (`#f9efe2`), and the page's canvas is `paper` (`#ffffff`). Those are close
  * enough to look like a mistake and far enough apart to show a hard rectangle
  * where the image ends. `mix-blend-multiply` is the usual escape and is wrong
  * here too: multiplying a NON-white ground darkens everything under it, which

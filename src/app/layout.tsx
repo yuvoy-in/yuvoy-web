@@ -46,7 +46,7 @@ export const metadata: Metadata = {
 };
 
 /*
-  The default chrome: cream, matching the canvas. Routes that open on a
+  The default chrome: paper, matching the canvas. Routes that open on a
   forest cover export VIEWPORT_ON_FOREST themselves — Safari's top glass
   follows theme-color, so each route's chrome has to agree with its first
   surface. The full story, the measured iOS behaviour and the sampling bug
@@ -78,7 +78,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <BrandIntro />
         <a
           href="#content"
-          className="focus:bg-forest focus:text-cream label rounded-edge sr-only focus:not-sr-only focus:absolute focus:top-[max(1rem,env(safe-area-inset-top))] focus:left-4 focus:z-50 focus:px-4 focus:py-3"
+          className="focus:bg-forest focus:text-paper label rounded-edge sr-only focus:not-sr-only focus:absolute focus:top-[max(1rem,env(safe-area-inset-top))] focus:left-4 focus:z-50 focus:px-4 focus:py-3"
         >
           Skip to content
         </a>

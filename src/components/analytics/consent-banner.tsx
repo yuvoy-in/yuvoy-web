@@ -37,7 +37,7 @@ export function ConsentBanner() {
         into `viewport-fit=cover`, so it is a no-op today and correct the day
         it is not.
       */}
-      <div className="border-cream-line bg-cream rounded-edge mx-auto max-w-3xl border p-5 shadow-lg sm:p-8">
+      <div className="border-paper-line bg-paper rounded-edge mx-auto max-w-3xl border p-5 shadow-lg sm:p-8">
         <h2
           id={headingId}
           className="font-display text-forest tracking-display text-lg font-normal"
@@ -99,7 +99,7 @@ export function PrivacyChoices() {
     <button
       type="button"
       onClick={openPrompt}
-      className="label tap-target text-cream/70 hover:text-cream text-left transition-colors duration-200"
+      className="label tap-target text-paper/70 hover:text-paper text-left transition-colors duration-200"
     >
       Privacy choices
     </button>

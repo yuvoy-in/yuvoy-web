@@ -23,10 +23,10 @@ import { operatorHref, type LeadSource } from "@/lib/leads/registry";
  *
  * ## The surface (owner direction, 2026-08-07)
  *
- * Cream, having swapped with the first-launch act above it. The page now
- * alternates the whole way down — forest cover, cream why, forest
- * destinations, cream operators, forest form, cream contact, forest footer —
- * instead of running two cream acts and then three dark ones. Every join is a
+ * Paper, having swapped with the first-launch act above it. The page now
+ * alternates the whole way down — forest cover, paper why, forest
+ * destinations, paper operators, forest form, paper contact, forest footer —
+ * instead of running two paper acts and then three dark ones. Every join is a
  * tone change, so not one of them needs a rule drawn across it.
  */
 const OUTCOMES = [
@@ -49,7 +49,7 @@ export function OperatorTeaser({ source }: { source: LeadSource }) {
     /*
       No seam needed. This act was forest and met the forest registration
       block below it, so it had to draw its own hairline or the two read as
-      one enormous dark field. On cream it meets that block at a real tone
+      one enormous dark field. On paper it meets that block at a real tone
       change, which separates them better than any rule could.
     */
     <Section aria-labelledby="operators-heading">
@@ -63,7 +63,7 @@ export function OperatorTeaser({ source }: { source: LeadSource }) {
 
       {/* A plain list on a rule, not three bordered cards: boxes inside a
           box is the SaaS grid this rebuild exists to get away from. */}
-      <ul className="border-cream-line mt-10 grid grid-cols-1 gap-x-10 gap-y-8 border-t pt-8 sm:mt-14 sm:grid-cols-3 sm:gap-y-10 sm:pt-10">
+      <ul className="border-paper-line mt-10 grid grid-cols-1 gap-x-10 gap-y-8 border-t pt-8 sm:mt-14 sm:grid-cols-3 sm:gap-y-10 sm:pt-10">
         {OUTCOMES.map((outcome) => (
           <li key={outcome.title}>
             <h3 className="font-display tracking-display text-2xl leading-snug font-normal">
@@ -86,9 +86,9 @@ export function OperatorTeaser({ source }: { source: LeadSource }) {
           href={operatorHref(source, "#apply")}
           className={cn(
             // `primary`, not `paper`: CTAs are monochrome and swap grounds
-            // with the surface — forest fill on cream, cream fill on forest
-            // (design system §5). Leaving `paper` here would put a cream
-            // button on a cream section.
+            // with the surface — forest fill on paper, paper fill on forest
+            // (design system §5). Leaving `paper` here would put a paper
+            // button on a paper section.
             buttonVariants({ variant: "primary", size: "lg" }),
             "flex w-full sm:w-auto",
           )}

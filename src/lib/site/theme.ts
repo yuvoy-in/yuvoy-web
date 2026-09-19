@@ -4,7 +4,7 @@ import type { Viewport } from "next";
  * The browser-chrome colour, per surface — the one place the palette's hex
  * values may appear outside `globals.css` (metadata cannot read a CSS custom
  * property; the OG frame carries the same literals for the same reason).
- * Mirror of `--color-cream` / `--color-forest`; change them together.
+ * Mirror of `--color-paper` / `--color-forest`; change them together.
  *
  * ## Why this exists (measured on an iPhone, iOS 26.5, 2026-08-11)
  *
@@ -14,18 +14,18 @@ import type { Viewport } from "next";
  * The strip under the island belongs to Safari, which paints it as an
  * adaptive glass **tinted by theme-color**.
  *
- * With one global cream theme-color, that glass rendered a CREAM cap over
- * the FOREST covers — the "sometimes under the island, sometimes a cream
+ * With one global paper theme-color, that glass rendered a PAPER cap over
+ * the FOREST covers — the "sometimes under the island, sometimes a paper
  * band" glitch the owner reported. The routes whose first surface is forest
  * therefore declare a forest theme-color: Safari's glass then agrees with
  * the cover beneath it, the top edge reads as one continuous field (the
  * "under the island" look, delivered by the mechanism Safari actually
- * honours), and over the later cream sections the same route keeps a
+ * honours), and over the later paper sections the same route keeps a
  * consistent, deliberate dark cap instead of flickering between tones.
  *
  * The old sampling bug this system replaces: with NO explicit theme-color,
  * Safari samples the page's top pixels — during the brand veil that meant
- * green chrome over a cream page (owner report, 2026-08-06). Explicit
+ * green chrome over a paper page (owner report, 2026-08-06). Explicit
  * per-route colours keep that fixed: on the forest routes the veil, the
  * cover and the chrome are now all the same forest.
  *
@@ -39,7 +39,7 @@ import type { Viewport } from "next";
  * at `top: 0` therefore rides under the clock and back out again on every
  * change of direction, and its background changes with whatever section
  * happens to be behind it (owner report, 2026-08-11: "header under island and
- * transparent, then under island and cream, then not under the island at
+ * transparent, then under island and paper, then not under the island at
  * all").
  *
  * Nothing in CSS can compensate: `env(safe-area-inset-top)` reads 0 in every
@@ -68,19 +68,19 @@ import type { Viewport } from "next";
  * choice, so the header no longer depends on it from either side: hidden, it
  * stops painting entirely once the slide settles (`opacity: 0`,
  * globals.css), so it cannot ghost in the strip; visible anywhere below the
- * top, it is solid cream (use-header-chrome.ts, same date), so whatever
+ * top, it is solid paper (use-header-chrome.ts, same date), so whatever
  * Safari draws above it, the bar reads as a bar. The theme-colour system in
  * this file is unchanged: it is still what keeps Safari's glass agreeing
  * with each route's first surface.
  */
 export const CHROME = {
-  cream: "#f4efe4",
+  paper: "#ffffff",
   forest: "#16362e",
 } as const;
 
-/** For routes whose first surface is the cream canvas (the default). */
+/** For routes whose first surface is the paper canvas (the default). */
 export const VIEWPORT_ON_CREAM: Viewport = {
-  themeColor: CHROME.cream,
+  themeColor: CHROME.paper,
 };
 
 /**

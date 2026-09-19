@@ -32,12 +32,12 @@ export function ExperienceCategoryGrid({
    * as a single-activity product, but visibly not what this season leads with.
    */
   scale = "feature",
-  tone = "cream",
+  tone = "paper",
   className,
 }: {
   categories: ExperienceCategory[];
   scale?: "feature" | "quiet";
-  tone?: "cream" | "ink";
+  tone?: "paper" | "ink";
   className?: string;
 }) {
   const dark = tone === "ink";
@@ -56,7 +56,7 @@ export function ExperienceCategoryGrid({
           key={category.key}
           className={cn(
             "border-t pt-6",
-            dark ? "border-cream/12" : "border-cream-line",
+            dark ? "border-paper/12" : "border-paper-line",
             quiet ? "sm:pr-6" : "sm:pr-8",
           )}
         >
@@ -75,7 +75,7 @@ export function ExperienceCategoryGrid({
 
           {!quiet && (
             <span
-              className={cn("label", dark ? "text-cream/70" : "text-forest/75")}
+              className={cn("label", dark ? "text-paper/70" : "text-forest/75")}
             >
               {String(i + 1).padStart(2, "0")}
             </span>
@@ -86,7 +86,7 @@ export function ExperienceCategoryGrid({
               "font-display tracking-display font-normal",
               !quiet && "mt-4",
               quiet ? "text-lg" : "text-xl sm:text-2xl",
-              dark ? "text-cream" : "text-forest",
+              dark ? "text-paper" : "text-forest",
             )}
           >
             {category.label}
@@ -95,7 +95,7 @@ export function ExperienceCategoryGrid({
             className={cn(
               "mt-3 leading-relaxed",
               quiet ? "text-sm" : "",
-              dark ? "text-cream/70" : "text-forest/75",
+              dark ? "text-paper/70" : "text-forest/75",
             )}
           >
             {category.description}

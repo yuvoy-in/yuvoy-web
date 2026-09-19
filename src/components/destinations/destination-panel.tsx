@@ -24,12 +24,12 @@ import {
  * `forest` block the photograph dissolves into. One treatment on both tones.
  *
  * It was not always. Until 2026-08-14 the caption **inverted** its section: a
- * forest caption on a cream page, a cream caption on a forest one. That rule
+ * forest caption on a paper page, a paper caption on a forest one. That rule
  * existed for a real failure — when the first-launch act went dark on
  * 2026-08-07 the forest captions matched the forest section and three
  * photographs bled into the background (owner report) — and inverting was the
  * unmissable fix. It also cost the composition the thing the plate is for:
- * a cream slab under each image turned the triptych back into three cards.
+ * a paper slab under each image turned the triptych back into three cards.
  *
  * A hairline was rejected then as "a one-pixel promise against a photograph
  * fading to the same green", and on a flat forest section it was. What
@@ -47,7 +47,7 @@ import {
  * type at the measured contrast. **Adding photography is a data change**, and
  * nothing here needs redesigning when it lands.
  *
- * The scrim is not optional when an image is present: `cream` type on an
+ * The scrim is not optional when an image is present: `paper` type on an
  * unknown photograph is exactly the "text placed over unreadable imagery"
  * failure the accessibility gate bans, so the caption keeps its own solid
  * block and the gradient only softens the join above it.
@@ -59,12 +59,12 @@ export function DestinationPanel({
    * and how hard the no-photograph fallback has to work for its edges; the
    * caption is the same on both.
    */
-  tone = "cream",
+  tone = "paper",
   className,
   priority = false,
 }: {
   destination: DestinationContent;
-  tone?: "cream" | "ink";
+  tone?: "paper" | "ink";
   className?: string;
   priority?: boolean;
 }) {
@@ -75,25 +75,25 @@ export function DestinationPanel({
     <Link
       href={destinationHref(destination)}
       className={cn(
-        "group bg-forest text-cream rounded-edge relative block aspect-square overflow-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:aspect-3/4",
+        "group bg-forest text-paper rounded-edge relative block aspect-square overflow-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none sm:aspect-3/4",
         // The plate's own edge, and the reason the caption no longer has to
         // invert. It is drawn on the Link rather than as an overlay so it
         // cannot be painted over: `Image fill` resolves `inset-0` against the
         // padding box, which starts inside this border.
         //
-        // `cream/15` on both tones. It is the object's edge, not the
+        // `paper/15` on both tones. It is the object's edge, not the
         // surface's, so it does not follow the section — and it disappears
         // exactly where it is not needed, along the bright top of a
         // photograph, while holding the line across the dark caption where
         // the plate would otherwise meet a forest section with nothing
         // between them.
-        "border-cream/15 border",
-        // The ring and its offset both follow the surface. A cream offset on
+        "border-paper/15 border",
+        // The ring and its offset both follow the surface. A paper offset on
         // a forest section draws a pale gap around the plate, which reads as
         // a rendering fault rather than as focus.
         onInk
           ? "focus-visible:ring-terra-soft focus-visible:ring-offset-forest"
-          : "focus-visible:ring-terra-deep focus-visible:ring-offset-cream",
+          : "focus-visible:ring-terra-deep focus-visible:ring-offset-paper",
         className,
       )}
     >
@@ -121,12 +121,12 @@ export function DestinationPanel({
 
           The outer edge that used to be drawn here on a dark section is gone
           — the Link carries it on both tones now. Definition still comes from
-          a cream at low opacity rather than from a new surface: there is one
+          a paper at low opacity rather than from a new surface: there is one
           dark (§1), and a plate with no photograph may not invent a second.
         */
         <div aria-hidden className="absolute inset-0">
-          <div className="from-cream/12 absolute inset-0 bg-linear-to-br to-transparent" />
-          <div className="border-cream/12 absolute inset-4 border sm:inset-5" />
+          <div className="from-paper/12 absolute inset-0 bg-linear-to-br to-transparent" />
+          <div className="border-paper/12 absolute inset-4 border sm:inset-5" />
         </div>
       )}
 
@@ -182,7 +182,7 @@ export function DestinationPanel({
         3:4 below `sm` so three of them do not add a screen of scrolling
         (owner report: mobile scrolls too far).
       */}
-      <div className="plate-caption text-cream absolute inset-x-0 bottom-0 p-4 sm:p-5">
+      <div className="plate-caption text-paper absolute inset-x-0 bottom-0 p-4 sm:p-5">
         {heroMedia && (
           <span
             aria-hidden
@@ -202,11 +202,11 @@ export function DestinationPanel({
           wrap to the same count at every breakpoint, so the row stays level,
           and a longer one would simply grow its caption upward.
 
-          `cream/85`, not the usual `cream/70`: this sits on a gradient rather
+          `paper/85`, not the usual `paper/70`: this sits on a gradient rather
           than on flat forest, and the ladder in §1 is measured against flat
           forest. The rung is set by the measurement on `plate-shade`.
         */}
-        <p className="text-cream/85 mt-3 min-h-9.5 text-sm leading-snug sm:mt-3.5">
+        <p className="text-paper/85 mt-3 min-h-9.5 text-sm leading-snug sm:mt-3.5">
           {destination.shortDescription}
         </p>
         {/* Not a link: the plate already is one. This is the affordance that
@@ -265,11 +265,11 @@ export function DestinationPanel({
  */
 export function DestinationGrid({
   destinations,
-  tone = "cream",
+  tone = "paper",
   className,
 }: {
   destinations: DestinationContent[];
-  tone?: "cream" | "ink";
+  tone?: "paper" | "ink";
   className?: string;
 }) {
   return (

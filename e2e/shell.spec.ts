@@ -405,7 +405,7 @@ test.describe("header on scroll", () => {
 
     Going DOWN the bar hides, and its latent tone tracks the cover's bottom
     edge — read off the element, not timed, because a fixed 240px release
-    once put a cream bar on a green field partway down every cover route
+    once put a paper bar on a green field partway down every cover route
     (504px early on `/operators`, whose cover is 744px tall). Coming back UP
     anywhere below the top, the visitor sees a SOLID bar: the transparent
     treatment belongs to the very top alone. On-device captures (2026-08-16)
@@ -456,7 +456,7 @@ test.describe("header on scroll", () => {
 
       // Descending, the bar hides — and hidden over the cover it keeps the
       // cover's colours, so the slide-away that began at the top left in the
-      // colours it arrived with rather than flashing cream on the way out.
+      // colours it arrived with rather than flashing paper on the way out.
       await scrollTo(page, Math.round(edge * 0.6));
       await expect(header(page)).not.toBeInViewport();
       await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
@@ -465,13 +465,13 @@ test.describe("header on scroll", () => {
       await scrollTo(page, Math.max(0, Math.round(edge) - 8));
       await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
 
-      // Past it: cream, swapped where nobody can see it happen.
+      // Past it: paper, swapped where nobody can see it happen.
       await scrollTo(page, Math.round(edge) + 40);
       await expect(header(page)).not.toHaveCSS("background-color", TRANSPARENT);
 
       // Returning up through the cover: the position that was transparent on
       // the way down now shows a SOLID bar — any bar the visitor can see
-      // below the top is cream (owner direction, 2026-08-16).
+      // below the top is paper (owner direction, 2026-08-16).
       await scrollTo(page, Math.round(edge * 0.6));
       await expect(header(page)).toBeInViewport();
       await expect(header(page)).not.toHaveCSS("background-color", TRANSPARENT);
@@ -486,7 +486,7 @@ test.describe("header on scroll", () => {
     The reduced-motion case, where the bar never hides and the colour is the
     only thing that can change. Descending, it still tracks the cover rather
     than releasing early over it — a visibly resting bar on a green field must
-    not be cream. Ascending, these visitors get the same contract as everyone
+    not be paper. Ascending, these visitors get the same contract as everyone
     else (owner direction, 2026-08-16): a bar coming back up the page is
     solid, and the cover's colours return at the top.
   */
@@ -518,14 +518,14 @@ test.describe("header on scroll", () => {
 
   // `/safety`, not `/about`: About gained a dark title spread on 2026-08-07,
   // so it is a cover route now. This assertion needs a page that genuinely
-  // opens on cream, and the legal and safety pages are the ones that do.
+  // opens on paper, and the legal and safety pages are the ones that do.
   /*
     The server and the first paint must agree about whether a route opens on
     a dark cover.
 
     `useHeaderChrome` seeds itself from a hardcoded route list and then
     re-derives the truth from the DOM. If a page gains a `data-dark-hero`
-    section and nobody adds it to that list, the server renders a cream bar,
+    section and nobody adds it to that list, the server renders a paper bar,
     hydration flips it to transparent, and the header flashes on every single
     load — a defect that is invisible in any test that runs after hydration,
     which is every other test in this file.
@@ -589,9 +589,9 @@ test.describe("header on scroll", () => {
     on the server and puts the cover in the DOM before the header ever asks
     about it. A *client-side* navigation to a route that suspends does not:
     `loading.tsx` renders first, and the header asked its question against that
-    — got "no cover", correctly, for a cream loading screen — and never asked
+    — got "no cover", correctly, for a paper loading screen — and never asked
     again, because the pathname does not change a second time. The bar then sat
-    cream on top of a forest cover for the whole visit (owner report,
+    paper on top of a forest cover for the whole visit (owner report,
     2026-08-08).
 
     `/operators` is the case that showed it. It reads `searchParams`, so it is

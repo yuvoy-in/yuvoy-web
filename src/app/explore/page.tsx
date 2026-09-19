@@ -182,13 +182,13 @@ export default function ExplorePage() {
           accent="before you go."
         />
 
-        <ul className="border-cream/12 mt-14 grid grid-cols-1 gap-x-10 gap-y-10 border-t pt-10 sm:mt-16 sm:grid-cols-3">
+        <ul className="border-paper/12 mt-14 grid grid-cols-1 gap-x-10 gap-y-10 border-t pt-10 sm:mt-16 sm:grid-cols-3">
           {EXPECTATIONS.map((item) => (
             <li key={item.title}>
               <h3 className="font-display tracking-display text-2xl leading-snug font-normal">
                 {item.title}
               </h3>
-              <p className="text-cream/70 mt-3 max-w-xs leading-relaxed">
+              <p className="text-paper/70 mt-3 max-w-xs leading-relaxed">
                 {item.body}
               </p>
             </li>

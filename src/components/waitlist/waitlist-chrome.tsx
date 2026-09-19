@@ -66,7 +66,7 @@ export function WaitlistChrome() {
   }
 
   return (
-    <header className="bg-forest text-cream pt-[env(safe-area-inset-top)]">
+    <header className="bg-forest text-paper pt-[env(safe-area-inset-top)]">
       {/*
         Three columns, the outer two equal, so the mark sits at the true centre
         of the page rather than at the midpoint of whatever the back control
@@ -77,7 +77,7 @@ export function WaitlistChrome() {
         <button
           type="button"
           onClick={goBack}
-          className="label text-cream/70 hover:text-cream focus-visible:ring-terra-soft rounded-edge ease-interaction inline-flex h-9 items-center gap-2 justify-self-start px-1 transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
+          className="label text-paper/70 hover:text-paper focus-visible:ring-terra-soft rounded-edge ease-interaction inline-flex h-9 items-center gap-2 justify-self-start px-1 transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
         >
           {/* Decorative: the label carries the meaning. Drawn to the same
               spec as `ButtonArrow` — 1.75 stroke, square caps — so the two

@@ -6,8 +6,8 @@
  *   node scripts/generate-vector-brand.mjs
  *
  * Outputs:
- * - public/brand/yuvoy-mark-vector-{cream,forest}.svg   — the ensō alone
- * - public/brand/yuvoy-lockup-vector-{cream,forest}.svg — ensō + YUVOY
+ * - public/brand/yuvoy-mark-vector-{paper,forest}.svg   — the ensō alone
+ * - public/brand/yuvoy-lockup-vector-{paper,forest}.svg — ensō + YUVOY
  * - src/components/brand/yuvoy-letter-paths.ts          — per-letter outline
  *   data for the intro veil, which animates the letters individually and
  *   colours them with brand tokens (no baked colour)
@@ -17,7 +17,7 @@
  * Colours are re-expressed as brand tokens: the delivered green `#20372F`
  * becomes `forest` `#16362E`, the delivered terracotta `#BD6133` becomes
  * `terra` `#BE7149` (both within a hair of the source values), and the
- * on-dark strokes are `cream` `#F4EFE4`.
+ * on-dark strokes are `paper` `#FFFFFF`.
  */
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -27,7 +27,7 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const master = readFileSync(join(root, "public/yuvoy-logo-vector.svg"), "utf8");
 
-const CREAM = "#F4EFE4";
+const PAPER = "#FFFFFF";
 const FOREST = "#16362E";
 const TERRA = "#BE7149";
 const PAD = 16;
@@ -128,16 +128,16 @@ function svg({ box, stroke, withLetters }) {
 
 const outputs = [
   [
-    "public/brand/yuvoy-mark-vector-cream.svg",
-    { box: markBox, stroke: CREAM, withLetters: false },
+    "public/brand/yuvoy-mark-vector-paper.svg",
+    { box: markBox, stroke: PAPER, withLetters: false },
   ],
   [
     "public/brand/yuvoy-mark-vector-forest.svg",
     { box: markBox, stroke: FOREST, withLetters: false },
   ],
   [
-    "public/brand/yuvoy-lockup-vector-cream.svg",
-    { box: lockupBox, stroke: CREAM, withLetters: true },
+    "public/brand/yuvoy-lockup-vector-paper.svg",
+    { box: lockupBox, stroke: PAPER, withLetters: true },
   ],
   [
     "public/brand/yuvoy-lockup-vector-forest.svg",

@@ -143,7 +143,7 @@ export default async function OperatorsPage({
                 restriction to three islands: operators elsewhere are being
                 spoken to, and a page that says otherwise turns them away at
                 the door. */}
-            <p className="label text-cream/70 mt-8 flex items-start gap-2.5">
+            <p className="label text-paper/70 mt-8 flex items-start gap-2.5">
               <span
                 aria-hidden
                 className="bg-terra-soft mt-1.5 size-1 shrink-0"
@@ -199,7 +199,7 @@ export default async function OperatorsPage({
           `sm`, where the items are columns and a horizontal rule between them
           would be drawing across the grid.
         */}
-        <ol className="divide-cream/12 border-cream/12 mt-10 grid grid-cols-1 divide-y border-t sm:mt-14 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-10 sm:divide-y-0 lg:grid-cols-4">
+        <ol className="divide-paper/12 border-paper/12 mt-10 grid grid-cols-1 divide-y border-t sm:mt-14 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-10 sm:divide-y-0 lg:grid-cols-4">
           {STEPS.map((step, i) => (
             <li key={step.title} className="py-4 sm:py-0 sm:pt-8 sm:pr-6">
               <span className="label text-terra-soft">
@@ -208,7 +208,7 @@ export default async function OperatorsPage({
               <h3 className="font-display tracking-display mt-2 text-xl leading-snug font-normal sm:mt-4">
                 {step.title}
               </h3>
-              <p className="text-cream/70 mt-2 leading-relaxed sm:mt-3">
+              <p className="text-paper/70 mt-2 leading-relaxed sm:mt-3">
                 {step.body}
               </p>
             </li>
@@ -223,7 +223,7 @@ export default async function OperatorsPage({
           title="Built with the"
           accent="first operators."
         />
-        <ul className="border-cream-line mt-14 grid grid-cols-1 gap-x-10 gap-y-10 border-t pt-10 sm:grid-cols-2">
+        <ul className="border-paper-line mt-14 grid grid-cols-1 gap-x-10 gap-y-10 border-t pt-10 sm:grid-cols-2">
           {BENEFITS.map((benefit) => (
             <li key={benefit.title}>
               <h3 className="font-display text-forest tracking-display text-xl leading-snug font-normal">

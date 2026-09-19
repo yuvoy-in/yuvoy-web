@@ -30,7 +30,7 @@ import Image from "next/image";
  *
  * The act carries the owner's line drawing as a watermark behind everything
  * (2026-08-14). It is an alpha stencil with no ground of its own, so it
- * composites onto the cream with no seam — see
+ * composites onto the paper with no seam — see
  * scripts/generate-without-yuvoy-artwork.mjs.
  *
  * The section keeps the id `how`: the cover's "How it works" button lands
@@ -40,7 +40,7 @@ import Image from "next/image";
 export function WhyYuvoy() {
   return (
     /*
-      No bottom rule any more. It existed because two cream sections met
+      No bottom rule any more. It existed because two paper sections met
       here and the join needed drawing; since 2026-08-07 the act below is
       forest, so the tone change does that work and a hairline on top of it
       would just be a line for its own sake.
@@ -60,7 +60,7 @@ export function WhyYuvoy() {
 
         It is an alpha stencil in `terra` with no ground of its own (see
         scripts/generate-without-yuvoy-artwork.mjs), so it composites onto the
-        cream with no seam and no colour shift. At 55% it reads as watermark
+        paper with no seam and no colour shift. At 55% it reads as watermark
         rather than illustration and leaves the body text's 11.44:1 essentially
         untouched — it is 8.7% ink at the best of times, and none of it lands
         under a paragraph.
@@ -177,7 +177,7 @@ export function WhyYuvoy() {
         <div className="lg:col-start-3 lg:row-start-1">
           <p className="label text-terra-deep">With Yuvoy</p>
           {/* text-2xl is 24px, which is where `terra` clears AA as large
-              text, and this header sits on `cream`, never on a panel. */}
+              text, and this header sits on `paper`, never on a panel. */}
           <p className="font-display tracking-display mt-3 text-2xl leading-snug text-balance">
             Everything you need.{" "}
             <em className="text-terra font-turn italic">In one flow.</em>
