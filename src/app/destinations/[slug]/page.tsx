@@ -138,7 +138,7 @@ export default async function DestinationPage({
           title="The kinds of day"
           accent={`${destination.name} is known for.`}
         />
-        <ul className="border-cream-line mt-14 grid grid-cols-1 gap-x-8 gap-y-8 border-t sm:grid-cols-2 lg:grid-cols-4">
+        <ul className="border-paper-line mt-14 grid grid-cols-1 gap-x-8 gap-y-8 border-t sm:grid-cols-2 lg:grid-cols-4">
           {destination.categories.map((category, i) => (
             <li key={category} className="pt-8 sm:pr-6">
               <span className="label text-forest/75">

@@ -147,7 +147,7 @@ export function MessageForm() {
         <Heading />
         <div
           role="status"
-          className="border-cream/15 bg-cream/5 rounded-edge mt-8 border p-6 sm:p-7"
+          className="border-paper/15 bg-paper/5 rounded-edge mt-8 border p-6 sm:p-7"
         >
           {/*
             A plain `label`, not the `eyebrow` utility: the eyebrow's marker is
@@ -173,9 +173,9 @@ export function MessageForm() {
           {/* A rule, not a gap: what follows is about the data rather than
               about the message, and the two should not read as one sentence
               broken over a paragraph break. */}
-          <hr className="border-cream/12 mt-7" />
+          <hr className="border-paper/12 mt-7" />
 
-          <p className="text-cream/70 mt-6 leading-relaxed">
+          <p className="text-paper/70 mt-6 leading-relaxed">
             We have your note and your email address, and we use them to answer
             you and nothing else.
           </p>
@@ -221,7 +221,7 @@ export function MessageForm() {
         {failure && <FailureNotice result={failure} />}
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="m-name" className="label text-cream/70">
+          <label htmlFor="m-name" className="label text-paper/70">
             Name
           </label>
           <Input
@@ -236,7 +236,7 @@ export function MessageForm() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="m-email" className="label text-cream/70">
+          <label htmlFor="m-email" className="label text-paper/70">
             Email
           </label>
           <Input
@@ -253,19 +253,19 @@ export function MessageForm() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="m-topic" className="label text-cream/70">
+          <label htmlFor="m-topic" className="label text-paper/70">
             I&rsquo;m contacting about
           </label>
           <select
             id="m-topic"
             {...register("topic")}
-            className="border-cream/20 bg-cream/5 text-cream focus-visible:border-terra-soft focus-visible:ring-terra-soft/40 rounded-edge h-12 w-full border px-4 text-base transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none pointer-fine:text-sm"
+            className="border-paper/20 bg-paper/5 text-paper focus-visible:border-terra-soft focus-visible:ring-terra-soft/40 rounded-edge h-12 w-full border px-4 text-base transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none pointer-fine:text-sm"
           >
             {CONTACT_TOPICS.map((topic) => (
               <option
                 key={topic.value}
                 value={topic.value}
-                className="bg-cream text-forest"
+                className="bg-paper text-forest"
               >
                 {topic.label}
               </option>
@@ -275,7 +275,7 @@ export function MessageForm() {
 
         <div className="flex flex-col gap-1.5">
           <div className="flex items-baseline justify-between gap-4">
-            <label htmlFor="m-message" className="label text-cream/70">
+            <label htmlFor="m-message" className="label text-paper/70">
               Message
             </label>
             {/*
@@ -290,7 +290,7 @@ export function MessageForm() {
                 className={
                   typed.length > MESSAGE_MAX
                     ? "label text-terra-soft"
-                    : "label text-cream/70"
+                    : "label text-paper/70"
                 }
               >
                 {typed.length.toLocaleString()} / {MESSAGE_MAX.toLocaleString()}
@@ -303,7 +303,7 @@ export function MessageForm() {
             rows={5}
             aria-invalid={!!errors.message}
             aria-describedby={errors.message ? "m-message-error" : undefined}
-            className="border-cream/20 bg-cream/5 text-cream placeholder:text-cream/60 focus-visible:border-terra-soft focus-visible:ring-terra-soft/40 rounded-edge w-full resize-y border px-4 py-3 text-base transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none pointer-fine:text-sm"
+            className="border-paper/20 bg-paper/5 text-paper placeholder:text-paper/60 focus-visible:border-terra-soft focus-visible:ring-terra-soft/40 rounded-edge w-full resize-y border px-4 py-3 text-base transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none pointer-fine:text-sm"
           />
           <FieldError id="m-message-error" message={errors.message?.message} />
         </div>
@@ -332,7 +332,7 @@ export function MessageForm() {
  * inputs floating on a photograph. The card is what makes the right half a
  * place rather than a region.
  *
- * It is glass rather than a fill (5% cream and a backdrop blur) so the field
+ * It is glass rather than a fill (5% paper and a backdrop blur) so the field
  * still carries through it: a solid panel here would punch a hole in the
  * photograph the act is built on, and the blur is what keeps the type legible
  * over whatever part of the bay it lands on. `rounded-edge`, like every other
@@ -346,7 +346,7 @@ export function MessageForm() {
  * before it reaches the fields and held down by a forest wash. It gives the
  * card depth where nothing is being typed. Two rules govern it and both are in
  * `globals.css`: it fades out across the top three fifths (`note-horizon`),
- * and the wash keeps the surface at the tone the `cream/70` body copy is
+ * and the wash keeps the surface at the tone the `paper/70` body copy is
  * measured against (`note-horizon-wash`).
  *
  * It is `aria-hidden` and inert. It is also **not** `priority` — it is the
@@ -355,7 +355,7 @@ export function MessageForm() {
  */
 function NoteCard({ children }: { children: React.ReactNode }) {
   return (
-    <div className="border-cream/15 bg-cream/5 rounded-edge relative overflow-hidden border p-6 backdrop-blur-md sm:p-8">
+    <div className="border-paper/15 bg-paper/5 rounded-edge relative overflow-hidden border p-6 backdrop-blur-md sm:p-8">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 bottom-0 h-56 sm:h-64"
@@ -415,7 +415,7 @@ function Heading() {
         which is the thing somebody hovering over a form actually wants to
         know.
       */}
-      <p className="text-cream/70 mt-3 text-sm leading-relaxed">
+      <p className="text-paper/70 mt-3 text-sm leading-relaxed">
         It reaches the team directly.
       </p>
     </div>
@@ -467,12 +467,12 @@ function FailureNotice({
       <p className="font-display tracking-display text-xl font-normal">
         {copy.title}
       </p>
-      <p className="text-cream/70 mt-2 text-sm">{copy.body}</p>
-      <p className="text-cream/70 mt-3 text-sm">
+      <p className="text-paper/70 mt-2 text-sm">{copy.body}</p>
+      <p className="text-paper/70 mt-3 text-sm">
         Or email us at{" "}
         <a
           href={`mailto:${CONTACT_EMAIL}`}
-          className="text-cream underline underline-offset-2"
+          className="text-paper underline underline-offset-2"
         >
           {CONTACT_EMAIL}
         </a>

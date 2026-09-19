@@ -31,7 +31,7 @@ import { ANNOUNCEMENT } from "@/lib/site/launch";
  * `-mt-16` pulls the cover up behind the header's 64px of flow so that
  * transparency shows the cover rather than the page background. The inner top
  * padding puts the content back. **A route that renders this must also appear
- * in `isCoverRoute`** or the bar renders cream on the server and flips to
+ * in `isCoverRoute`** or the bar renders paper on the server and flips to
  * transparent after hydration, which flashes on every load.
  */
 export function PageIntro({
@@ -55,7 +55,7 @@ export function PageIntro({
   return (
     <section
       data-dark-hero
-      className="bg-forest text-cream relative -mt-[calc(4rem+env(safe-area-inset-top))] overflow-hidden"
+      className="bg-forest text-paper relative -mt-[calc(4rem+env(safe-area-inset-top))] overflow-hidden"
     >
       {/* The field: the same breathing lagoon light and filmic grain the
           homepage cover uses, without its photography. Decorative, inert. */}
@@ -77,17 +77,17 @@ export function PageIntro({
                 </>
               )}
             </h1>
-            <div className="text-cream/75 mt-6 max-w-xl leading-relaxed sm:mt-8 sm:text-lg">
+            <div className="text-paper/75 mt-6 max-w-xl leading-relaxed sm:mt-8 sm:text-lg">
               {lede}
             </div>
             {children && <div className="mt-8 sm:mt-10">{children}</div>}
           </div>
 
           <nav aria-label="On this page" className="lg:pt-3">
-            <p className="label text-cream/70">On this page</p>
-            <ol className="border-cream/12 mt-4 border-t sm:mt-5">
+            <p className="label text-paper/70">On this page</p>
+            <ol className="border-paper/12 mt-4 border-t sm:mt-5">
               {contents.map((item, i) => (
-                <li key={item.href} className="border-cream/12 border-b">
+                <li key={item.href} className="border-paper/12 border-b">
                   {/*
                     Native anchors, not next/link: a hash-only href pushed
                     through the router uses history.pushState, which moves the
@@ -96,9 +96,9 @@ export function PageIntro({
                   */}
                   <a
                     href={item.href}
-                    className="group text-cream hover:text-terra-soft focus-visible:ring-terra-soft flex items-baseline gap-5 py-4 transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
+                    className="group text-paper hover:text-terra-soft focus-visible:ring-terra-soft flex items-baseline gap-5 py-4 transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                   >
-                    <span className="label text-cream/70 flex-none">
+                    <span className="label text-paper/70 flex-none">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <span className="font-display tracking-display flex-1 text-xl leading-snug font-normal">
@@ -116,7 +116,7 @@ export function PageIntro({
             </ol>
             {/* The launch position, once per page, where it is context rather
                 than an announcement. */}
-            <p className="label text-cream/70 mt-6">{ANNOUNCEMENT.short}</p>
+            <p className="label text-paper/70 mt-6">{ANNOUNCEMENT.short}</p>
           </nav>
         </div>
       </div>

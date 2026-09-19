@@ -46,7 +46,7 @@ export function ApplyAside() {
         {copy.title}{" "}
         <em className="text-terra-soft font-turn italic">{copy.accent}</em>
       </h2>
-      <p className="text-cream/70 mt-5 max-w-md leading-relaxed sm:mt-6 sm:text-lg">
+      <p className="text-paper/70 mt-5 max-w-md leading-relaxed sm:mt-6 sm:text-lg">
         {copy.lede}
       </p>
     </>

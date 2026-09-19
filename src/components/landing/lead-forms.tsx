@@ -237,7 +237,7 @@ export function LeadForms({
   return (
     <section
       id={sectionId}
-      className="bg-forest text-cream scroll-mt-[calc(4rem+env(safe-area-inset-top))]"
+      className="bg-forest text-paper scroll-mt-[calc(4rem+env(safe-area-inset-top))]"
       aria-labelledby={`${sectionId}-heading`}
     >
       {/* The legacy operator anchor, wherever a provider form actually lives,
@@ -325,7 +325,7 @@ function OutcomeNotice({
       <p className="font-display tracking-display text-xl font-normal">
         {copy.title}
       </p>
-      <p className="text-cream/70 mt-2 text-sm">{copy.body}</p>
+      <p className="text-paper/70 mt-2 text-sm">{copy.body}</p>
       <Button
         type="button"
         variant="outlineOnDark"
@@ -363,7 +363,7 @@ function SuccessNotice({
   ].filter(Boolean) as string[];
 
   return (
-    <div role="status" className="border-cream/20 rounded-edge border p-8">
+    <div role="status" className="border-paper/20 rounded-edge border p-8">
       <p className="eyebrow text-terra-soft">
         {updated
           ? "Details updated"
@@ -406,7 +406,7 @@ function SuccessNotice({
           from an API is a guess about where the words are. If a real link is
           wanted, the API returns a structured field and this renders that.
         */
-        <p className="text-cream/70 mt-4 leading-relaxed">
+        <p className="text-paper/70 mt-4 leading-relaxed">
           {next ?? (
             /*
               The fallback, for a success that carried no `next`. It promises
@@ -420,7 +420,7 @@ function SuccessNotice({
           )}
         </p>
       ) : (
-        <p className="text-cream/70 mt-4 leading-relaxed">
+        <p className="text-paper/70 mt-4 leading-relaxed">
           We will get in touch when experiences for your destination are ready.
           No spam, and no payment required.
         </p>
@@ -441,13 +441,13 @@ function SuccessNotice({
         form is the honest way to do that, and the reload link says so.
       */}
       {channels.length > 0 && (
-        <div className="border-cream/20 mt-6 border-t pt-6">
-          <p className="text-cream/70 text-sm leading-relaxed">
+        <div className="border-paper/20 mt-6 border-t pt-6">
+          <p className="text-paper/70 text-sm leading-relaxed">
             We will use{" "}
             {channels.map((channel, i) => (
               <React.Fragment key={channel}>
                 {i > 0 && " and "}
-                <strong className="text-cream font-bold">{channel}</strong>
+                <strong className="text-paper font-bold">{channel}</strong>
               </React.Fragment>
             ))}
             .
@@ -456,12 +456,12 @@ function SuccessNotice({
               would differ between the server pass and the client one, which
               is a hydration mismatch waiting for the day this notice renders
               anywhere other than after a click. */}
-          <p className="text-cream/70 mt-2 text-sm leading-relaxed">
+          <p className="text-paper/70 mt-2 text-sm leading-relaxed">
             Not right?{" "}
             <button
               type="button"
               onClick={() => window.location.reload()}
-              className="text-cream focus-visible:ring-terra-soft rounded-edge underline underline-offset-2 focus-visible:ring-2 focus-visible:outline-none"
+              className="text-paper focus-visible:ring-terra-soft rounded-edge underline underline-offset-2 focus-visible:ring-2 focus-visible:outline-none"
             >
               Send it again
             </button>{" "}
@@ -494,7 +494,7 @@ function ConsentFields({
   return (
     <fieldset className="flex flex-col gap-3">
       <legend className="sr-only">Consent</legend>
-      <label className="text-cream/70 flex items-start gap-3 text-sm">
+      <label className="text-paper/70 flex items-start gap-3 text-sm">
         <input
           type="checkbox"
           {...registerPrivacy}
@@ -505,19 +505,19 @@ function ConsentFields({
           I agree to the{" "}
           <a
             href="/privacy"
-            className="text-cream underline underline-offset-2"
+            className="text-paper underline underline-offset-2"
           >
             Privacy Policy
           </a>{" "}
           and{" "}
-          <a href="/terms" className="text-cream underline underline-offset-2">
+          <a href="/terms" className="text-paper underline underline-offset-2">
             Terms
           </a>
           , and to Yuvoy contacting me about my registration.
         </span>
       </label>
       <FieldError id="privacy-error" message={privacyError} />
-      <label className="text-cream/70 flex items-start gap-3 text-sm">
+      <label className="text-paper/70 flex items-start gap-3 text-sm">
         <input
           type="checkbox"
           {...registerMarketing}
@@ -587,7 +587,7 @@ function ContactFields({
 
   return (
     <fieldset className="flex flex-col gap-1.5">
-      <legend className="label text-cream/70">How can we reach you?</legend>
+      <legend className="label text-paper/70">How can we reach you?</legend>
       {/*
         Two audiences, two bars, and the copy says which one it is.
 
@@ -598,14 +598,14 @@ function ContactFields({
         that can be dialled. Saying "optional" there would be a lie the form
         only reveals after the submit.
       */}
-      <p id={`${prefix}-contact-hint`} className="text-cream/70 mb-1 text-sm">
+      <p id={`${prefix}-contact-hint`} className="text-paper/70 mb-1 text-sm">
         {audience === "provider"
           ? "Both, please. We email you the details and call to talk it through. An application we cannot ring is one we cannot start."
           : "An email address is all we need. Add a WhatsApp number if you would rather we message you there."}
       </p>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor={`${prefix}-email`} className="label text-cream/70">
+        <label htmlFor={`${prefix}-email`} className="label text-paper/70">
           Email
         </label>
         <Input
@@ -630,12 +630,12 @@ function ContactFields({
             worse than letting them reach it in reading order. `aria-live` is
             deliberately absent for the same reason.
           */
-          <p className="text-cream/70 text-sm">
+          <p className="text-paper/70 text-sm">
             Did you mean{" "}
             <button
               type="button"
               onClick={() => setValue(suggestion)}
-              className="text-cream focus-visible:ring-terra-soft rounded-edge underline underline-offset-2 focus-visible:ring-2 focus-visible:outline-none"
+              className="text-paper focus-visible:ring-terra-soft rounded-edge underline underline-offset-2 focus-visible:ring-2 focus-visible:outline-none"
             >
               {suggestion}
             </button>
@@ -645,7 +645,7 @@ function ContactFields({
       </div>
 
       <div className="mt-4 flex flex-col gap-1.5">
-        <label htmlFor={`${prefix}-whatsapp`} className="label text-cream/70">
+        <label htmlFor={`${prefix}-whatsapp`} className="label text-paper/70">
           WhatsApp number{" "}
           {audience === "provider" ? null : (
             <span className="normal-case">(optional)</span>
@@ -817,7 +817,7 @@ function TravellerForm({ context }: { context: LeadContext }) {
       )}
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="t-name" className="label text-cream/70">
+        <label htmlFor="t-name" className="label text-paper/70">
           Name
         </label>
         <Input
@@ -1054,7 +1054,7 @@ function ProviderForm({ context }: { context: LeadContext }) {
       )}
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="p-name" className="label text-cream/70">
+        <label htmlFor="p-name" className="label text-paper/70">
           Your name
         </label>
         <Input
@@ -1068,7 +1068,7 @@ function ProviderForm({ context }: { context: LeadContext }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="p-business" className="label text-cream/70">
+        <label htmlFor="p-business" className="label text-paper/70">
           Business name
         </label>
         <Input
@@ -1111,12 +1111,12 @@ function ProviderForm({ context }: { context: LeadContext }) {
           <p className="font-display tracking-display text-xl font-normal">
             We couldn&rsquo;t save that.
           </p>
-          <ul className="text-cream/70 mt-2 flex flex-col gap-1 text-sm">
+          <ul className="text-paper/70 mt-2 flex flex-col gap-1 text-sm">
             {unknownFieldErrors.map((message) => (
               <li key={message}>{message}</li>
             ))}
           </ul>
-          <p className="text-cream/70 mt-3 text-sm">
+          <p className="text-paper/70 mt-3 text-sm">
             Nothing was recorded. Please try again shortly.
           </p>
         </div>
@@ -1137,7 +1137,7 @@ function ProviderForm({ context }: { context: LeadContext }) {
         {isSubmitting ? "Sending…" : "Apply as a founding operator"}
       </Button>
 
-      <p className="text-cream/70 text-xs">
+      <p className="text-paper/70 text-xs">
         Pricing, capacity and listings come later, in conversation. This just
         opens the door.
       </p>

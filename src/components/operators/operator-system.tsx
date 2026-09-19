@@ -45,7 +45,7 @@ export function OperatorSystem() {
     <section
       id="system"
       aria-labelledby="operator-system-heading"
-      className="bg-cream scroll-mt-[calc(4rem+env(safe-area-inset-top))]"
+      className="bg-paper scroll-mt-[calc(4rem+env(safe-area-inset-top))]"
     >
       <div className="container-page py-14 sm:py-28">
         <div className="grid grid-cols-1 items-end gap-10 lg:grid-cols-12">
@@ -66,7 +66,7 @@ export function OperatorSystem() {
 
         {/* The transformation: today's juggling act becomes one system. */}
         <div className="mt-14 grid grid-cols-1 items-stretch gap-5 lg:grid-cols-[1fr_auto_1fr]">
-          <div className="border-cream-line bg-cream-deep rounded-edge flex w-full flex-col border p-7">
+          <div className="border-paper-line bg-paper-deep rounded-edge flex w-full flex-col border p-7">
             <p className="label text-forest/75">Today</p>
             <div className="mt-6">
               <AppStack />
@@ -81,25 +81,25 @@ export function OperatorSystem() {
             aria-hidden
             className="flex items-center justify-center gap-3 px-2 lg:flex-col"
           >
-            <span className="bg-cream-line h-px w-10 lg:h-10 lg:w-px" />
+            <span className="bg-paper-line h-px w-10 lg:h-10 lg:w-px" />
             <span className="label text-terra-deep">becomes</span>
-            <span className="bg-cream-line h-px w-10 lg:h-10 lg:w-px" />
+            <span className="bg-paper-line h-px w-10 lg:h-10 lg:w-px" />
           </div>
 
-          <div className="bg-forest text-cream rounded-edge relative w-full overflow-hidden p-7">
+          <div className="bg-forest text-paper rounded-edge relative w-full overflow-hidden p-7">
             <div aria-hidden className="grain" />
             <div className="relative flex h-full flex-col">
               <p className="label text-terra-soft">With Yuvoy</p>
               <h3 className="font-display tracking-display mt-5 text-3xl leading-tight font-normal text-balance">
                 One place to show, sell and manage it.
               </h3>
-              <ul className="border-cream/12 divide-cream/12 mt-7 flex flex-col divide-y border-t">
+              <ul className="border-paper/12 divide-paper/12 mt-7 flex flex-col divide-y border-t">
                 {OUTCOMES.map((outcome) => (
                   <li key={outcome.title} className="py-4">
                     <p className="font-display tracking-display text-xl leading-snug font-normal">
                       {outcome.title}
                     </p>
-                    <p className="text-cream/70 mt-1.5 text-sm leading-relaxed">
+                    <p className="text-paper/70 mt-1.5 text-sm leading-relaxed">
                       {outcome.body}
                     </p>
                   </li>
@@ -112,7 +112,7 @@ export function OperatorSystem() {
                   chasing rather than explaining. */}
               {/* The product name, once, as a footnote. Nothing above needs
                   it to make sense — that is the condition for it appearing. */}
-              <p className="label text-cream/60 mt-8">
+              <p className="label text-paper/60 mt-8">
                 Yuvoy Experience OS · in development
               </p>
             </div>

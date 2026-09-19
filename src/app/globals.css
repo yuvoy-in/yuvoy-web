@@ -5,7 +5,7 @@
   No hex, font, or tracking value may exist outside this @theme block.
 
   Palette: Brand Kit v2.1 (dark green unified 2026-08-03) — Forest,
-  Terracotta, Cream. Type: Brand Kit v2.3 (2026-08-05) — grotesque display at
+  Terracotta, Paper. Type: Brand Kit v2.3 (2026-08-05) — grotesque display at
   medium weight, one sans text voice, no mono, no italics. Every pairing
   below is measured against WCAG 2.2 AA; the
   ratios and the terra / terra-deep / terra-soft usage rule live in
@@ -16,22 +16,75 @@
   in hue (184° vs 171°) and in saturation (65% vs 17%), so one read as a cyan
   and the other as a grey, and every page that used both looked like one of
   them was a mistake. There is one dark now, and no judgement to make.
+
+  ── Brand Kit v2.9 (2026-09-19, owner-directed) ──────────────────────────
+  THE MARKETING SITE IS WHITE TOO. `cream` is renamed `paper` and the surface
+  trio is re-cut on a pure-white canvas, matching what `yuvoy-app` and
+  `yuvoy-operator` took on 15 September:
+
+    cream      #F4EFE4  ->  paper       #FFFFFF   canvas
+    cream-deep #ECE5D6  ->  paper-deep  #F7F5F1   raised surface
+    cream-line #E5DCC9  ->  paper-line  #EDEAE4   hairline
+
+  This retires D-101's "the marketing site is visually frozen, and there is no
+  sync back". The owner's ruling was that the white surfaces apply GLOBALLY,
+  so the three repos share one surface vocabulary again rather than two.
+
+  What was preserved is the SEPARATION, not the hue: 1.09:1 canvas-to-raised
+  and 1.20:1 canvas-to-hairline, the same two steps the cream trio had. No
+  card, input, panel or divider changes weight on any page — they are the same
+  surfaces, on a white ground.
+
+  The supporting pair stays warm-neutral rather than going grey. The ink is a
+  green and the accent a terracotta; a neutral-grey panel between them reads
+  as a third hue rather than as an absence of one.
+
+  The NAME changed with the value on purpose. A token called `cream` that
+  paints #FFFFFF is a lie every future reader has to re-check against the hex,
+  and `bg-cream` would be the first thing the next section copied. `paper`
+  already meant this surface here: it is the name of the `Button` variant that
+  paints the light fill on a forest section.
+
+  Every pairing GAINED contrast, because only the light end moved. Against a
+  fixed ground an OPAQUE light tone scales by exactly 1.05 / (L_cream + 0.05)
+  = 1.1467; an alpha rung does not, because its composite depends on the
+  ground, so every figure in this file was re-measured rather than multiplied
+  through. They land within 2% of the multiplier and all of them went up.
+
+  Re-measured, computed not estimated (sRGB relative luminance, WCAG 2.2):
+
+    forest      on paper        13.11:1   was 11.44:1
+    terra-deep  on paper         5.98:1   was  5.21:1
+    terra       on paper         3.72:1   was  3.24:1   still large-only
+    forest/70   on paper         5.14:1   was  4.77:1
+    forest/75   on paper         6.00:1   was  5.55:1
+    paper       on forest       13.11:1   was 11.44:1
+    paper/70    on forest        7.26:1   was  6.45:1
+    paper/60    on forest        5.78:1   was  5.15:1
+    terra-soft  on forest        5.36:1   unmoved — both ends are dark
+
+  Nothing needed re-cutting: no scrim, tint or opacity rung moved, and the
+  floors that were tight are the same floors with more room. The ONE rule this
+  changes is recorded in DESIGN_SYSTEM §1: `terra` on the raised surface was
+  2.96:1 and failed everything, and is now 3.41:1, so the specific trap of "a
+  headline that passes on the canvas fails on a card" is closed. `terra` stays
+  off body text everywhere, because 3.72:1 is still under the 4.5 floor.
 */
 @theme {
   /* ---------------------------------------------------------------- color */
-  --color-cream: #f4efe4; /* canvas — editorial surfaces */
-  --color-cream-deep: #ece5d6; /* raised surface on cream — cards, inputs */
-  --color-cream-line: #e5dcc9; /* hairline borders on cream */
-  --color-forest: #16362e; /* primary ink AND every dark surface (11.44:1) */
-  --color-terra: #be7149; /* accent — decoration + LARGE display text (3.24:1) */
-  --color-terra-deep: #985028; /* text-capable accent (5.21:1); never a CTA fill */
+  --color-paper: #ffffff; /* canvas — editorial surfaces */
+  --color-paper-deep: #f7f5f1; /* raised surface on paper — cards, inputs (1.09:1 off the canvas) */
+  --color-paper-line: #edeae4; /* hairline borders on paper (1.20:1 off the canvas) */
+  --color-forest: #16362e; /* primary ink AND every dark surface (13.11:1) */
+  --color-terra: #be7149; /* accent — decoration + LARGE display text (3.72:1) */
+  --color-terra-deep: #985028; /* text-capable accent (5.98:1); never a CTA fill */
   --color-terra-soft: #d89772; /* accent text on forest (5.36:1) */
 
   /* The preview device's bezel, and nothing else — an OBJECT's colour, not
      a surface, which is why it does not break the one-dark-surface rule.
      `forest` was tried here and reads green at bezel scale (owner report,
      2026-08-06). Near-black rather than #000: pure black is harder than
-     anything else on the page and rims the frame against cream. This keeps
+     anything else on the page and rims the frame against paper. This keeps
      forest's hue at a fraction of its lightness, so the phone still belongs
      to the family it sits in. Never use it for a section, text or fill. */
   --color-device: #0a100e;
@@ -84,7 +137,7 @@
   }
 
   body {
-    @apply bg-cream text-forest font-sans antialiased;
+    @apply bg-paper text-forest font-sans antialiased;
     text-rendering: optimizeLegibility;
     overflow-x: clip; /* guard against accidental horizontal scroll on mobile */
   }
@@ -96,7 +149,7 @@
     shows in two places a phone visitor meets constantly: the rubber-band
     overscroll above the page on every bounce, and iOS Safari's own status
     strip, which takes the page's background into account when its chrome is
-    expanded. With a cream canvas under every route, both flashed CREAM above
+    expanded. With a paper canvas under every route, both flashed PAPER above
     the FOREST covers — a pale band capping a dark page, which is most of what
     read as "the top edge glitches" on the iPhone (owner reports, 2026-08-10
     and 2026-08-11; the on-device probe at /debug/safe-area ruled out the
@@ -107,10 +160,10 @@
     already uses to go transparent, so a route's canvas and its chrome always
     agree by construction — a new dark-cover route gets both behaviours from
     the one attribute, and none of the seven pages carries a second flag.
-    Browsers without :has() keep the cream canvas, which is exactly today's
+    Browsers without :has() keep the paper canvas, which is exactly today's
     behaviour.
 
-    The bottom rubber band on CREAM-topped routes still flashes cream under
+    The bottom rubber band on PAPER-topped routes still flashes paper under
     the forest footer. That is the one edge a single canvas colour cannot
     serve — the top follows the first surface, the foot would want the
     footer's — and the top is the edge every report has been about.
@@ -123,7 +176,7 @@
     The touch highlight, in the brand's own colour.
 
     WebKit and Blink paint a translucent BLACK-BLUE rectangle over any tapped
-    link or button by default, sized to the element's box. On a cream editorial
+    link or button by default, sized to the element's box. On a paper editorial
     page that flash is the one colour on the site that belongs to no palette,
     and it fires on every single tap on the platform that carries most of the
     traffic — which is a large part of why a carefully built page can still
@@ -147,7 +200,7 @@
   }
 
   ::selection {
-    @apply bg-terra-deep text-cream;
+    @apply bg-terra-deep text-paper;
   }
 
   /* Visible keyboard focus for links (buttons carry their own ring). */
@@ -198,9 +251,9 @@
 /**
  * Wide-tracked uppercase label — the brand's editorial voice, set in the
  * text face (the mono was retired with Brand Kit v2.3: it read as terminal,
- * not magazine). On cream use `text-terra-deep` or `text-forest/75`; on
- * forest use `text-terra-soft` or `text-cream/70`. Never `text-terra` (fails
- * AA at this size), and never below `text-forest/70` on cream.
+ * not magazine). On paper use `text-terra-deep` or `text-forest/75`; on
+ * forest use `text-terra-soft` or `text-paper/70`. Never `text-terra` (fails
+ * AA at this size), and never below `text-forest/70` on paper.
  */
 @utility label {
   @apply font-sans text-xs font-medium uppercase;
@@ -330,7 +383,7 @@
 /*
   The cover's atmosphere (owner direction, 2026-08-05: "more dramatic"):
   lagoon light, built from tokens the same way the preview's film is. Two
-  layers breathe on slow, offset cycles — a cream glow high in the water and
+  layers breathe on slow, offset cycles — a paper glow high in the water and
   terra warmth low at the horizon — so the field reads as a place with light
   moving through it rather than a flat panel. Fills are exempt from the
   contrast floors, and the global reduced-motion rule collapses the breathing
@@ -360,7 +413,7 @@
   }
 
   /* terra-soft, not terra (owner report, 2026-08-06: the accent read dull).
-     `terra` is the rung tuned for cream; over forest it loses its light and
+     `terra` is the rung tuned for paper; over forest it loses its light and
      the horizon glow turns brown rather than warm. terra-soft is the dark
      surface's accent everywhere else in the cover, so the field and the
      type now carry the same terracotta. The 22% is unchanged: the fix was
@@ -489,10 +542,10 @@
 
 /*
   The wash over that horizon. The photograph is a warm mid-tone and the card
-  is a 5% cream glass, so without this the artwork lifts the card's foot to
+  is a 5% paper glass, so without this the artwork lifts the card's foot to
   roughly the brightness of its own text. Forest over it holds the surface at
-  the tone the rest of the card sits on, and the cream/70 body copy keeps the
-  6.45:1 it is measured at.
+  the tone the rest of the card sits on, and the paper/70 body copy keeps the
+  7.26:1 it is measured at (6.45:1 before v2.9).
 */
 @utility note-horizon-wash {
   background: linear-gradient(
@@ -550,24 +603,31 @@
   background-color, and `bg-device` is what actually paints the bezel — the
   gradient only carries the light over it.
 
-  Every value is a color-mix on a palette token. There is no grey in this
-  palette and none is introduced here; the rail's highlights are `cream`
-  lifting the bezel's near-black, which is why the metal reads warm rather
-  than silver and belongs to the brand it frames.
+  Every value is a color-mix on a palette token: no grey literal is
+  introduced here, and the rail's highlights are `paper` lifting the bezel's
+  near-black.
+
+  This comment used to claim the mix read "warm rather than silver". Measured
+  at v2.9, it never did by much and does not now: 45% `cream` over `device`
+  resolves to #73746E — a 2.7%-saturated grey — and 45% `paper` resolves to
+  #787C7A at 1.4%. Both are a neutral rail to any eye, and the 1.3 points
+  between them is not a reason to give this one object its own light tone.
+  What makes the frame belong to the brand is that it is built from the
+  palette's own tokens and lit by the canvas, whatever the canvas is.
 */
 @utility device-frame {
   background-image: linear-gradient(
     152deg,
-    color-mix(in oklab, var(--color-device) 55%, var(--color-cream)) 0%,
-    color-mix(in oklab, var(--color-device) 90%, var(--color-cream)) 17%,
+    color-mix(in oklab, var(--color-device) 55%, var(--color-paper)) 0%,
+    color-mix(in oklab, var(--color-device) 90%, var(--color-paper)) 17%,
     var(--color-device) 44%,
     var(--color-device) 68%,
-    color-mix(in oklab, var(--color-device) 86%, var(--color-cream)) 88%,
-    color-mix(in oklab, var(--color-device) 60%, var(--color-cream)) 100%
+    color-mix(in oklab, var(--color-device) 86%, var(--color-paper)) 88%,
+    color-mix(in oklab, var(--color-device) 60%, var(--color-paper)) 100%
   );
   box-shadow:
-    inset 0 0 0 1px color-mix(in srgb, var(--color-cream) 15%, transparent),
-    inset 0 1px 2px color-mix(in srgb, var(--color-cream) 20%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--color-paper) 15%, transparent),
+    inset 0 1px 2px color-mix(in srgb, var(--color-paper) 20%, transparent),
     0 3px 10px color-mix(in oklab, var(--color-forest) 10%, transparent),
     0 30px 64px -18px color-mix(in oklab, var(--color-forest) 32%, transparent);
 }
@@ -717,7 +777,7 @@
 
   Built like `device-frame`'s: a tight contact shadow plus a wide ambient one
   with negative spread so it cannot bloom into a halo, and both are `forest`
-  rather than black — black greys the cream underneath and is what makes a
+  rather than black — black greys the paper underneath and is what makes a
   drop shadow look cheap on a warm ground.
 */
 @utility card-lift {
@@ -739,8 +799,8 @@
   border-radius: 1px;
   background-image: linear-gradient(
     180deg,
-    color-mix(in oklab, var(--color-device) 58%, var(--color-cream)),
-    color-mix(in oklab, var(--color-device) 90%, var(--color-cream))
+    color-mix(in oklab, var(--color-device) 58%, var(--color-paper)),
+    color-mix(in oklab, var(--color-device) 90%, var(--color-paper))
   );
 }
 
@@ -793,8 +853,8 @@
   /* Dawn dive — light water giving way to depth. */
   background: linear-gradient(
     165deg,
-    color-mix(in oklab, var(--color-forest) 45%, var(--color-cream)) 0%,
-    color-mix(in oklab, var(--color-forest) 76%, var(--color-cream)) 48%,
+    color-mix(in oklab, var(--color-forest) 45%, var(--color-paper)) 0%,
+    color-mix(in oklab, var(--color-forest) 76%, var(--color-paper)) 48%,
     var(--color-forest) 100%
   );
 }
@@ -803,9 +863,9 @@
   /* Shallows — the reef walk, sunlit from above. */
   background: linear-gradient(
     170deg,
-    color-mix(in oklab, var(--color-forest) 28%, var(--color-cream)) 0%,
-    color-mix(in oklab, var(--color-forest) 58%, var(--color-cream)) 55%,
-    color-mix(in oklab, var(--color-forest) 88%, var(--color-cream)) 100%
+    color-mix(in oklab, var(--color-forest) 28%, var(--color-paper)) 0%,
+    color-mix(in oklab, var(--color-forest) 58%, var(--color-paper)) 55%,
+    color-mix(in oklab, var(--color-forest) 88%, var(--color-paper)) 100%
   );
 }
 
@@ -813,7 +873,7 @@
   /* Night water — near-dark, an ember of warmth at the horizon. */
   background: linear-gradient(
     160deg,
-    color-mix(in oklab, var(--color-forest) 90%, var(--color-cream)) 0%,
+    color-mix(in oklab, var(--color-forest) 90%, var(--color-paper)) 0%,
     var(--color-forest) 55%,
     color-mix(in oklab, var(--color-forest) 78%, var(--color-terra)) 100%
   );
@@ -841,12 +901,12 @@
     background:
       radial-gradient(
         50% 38% at 22% 24%,
-        color-mix(in srgb, var(--color-cream) 16%, transparent),
+        color-mix(in srgb, var(--color-paper) 16%, transparent),
         transparent 65%
       ),
       radial-gradient(
         44% 34% at 78% 68%,
-        color-mix(in srgb, var(--color-cream) 10%, transparent),
+        color-mix(in srgb, var(--color-paper) 10%, transparent),
         transparent 65%
       );
     animation: yuvoy-film-drift 11s ease-in-out infinite alternate;
@@ -858,7 +918,7 @@
     inset: -30%;
     background: repeating-linear-gradient(
       115deg,
-      color-mix(in srgb, var(--color-cream) 7%, transparent) 0 2px,
+      color-mix(in srgb, var(--color-paper) 7%, transparent) 0 2px,
       transparent 2px 26px
     );
     animation: yuvoy-film-sweep 8s ease-in-out infinite alternate;
@@ -1071,7 +1131,7 @@
   scene from the brand's world: night water (the film-c gradient language,
   an ember of terracotta warmth at the bottom edge), the owner's island
   horizon along the foot (silhouettes and a moonlit glint, per the comp in
-  design/brand-source/intro.png), crossed by sparse particle swells — tiny cream
+  design/brand-source/intro.png), crossed by sparse particle swells — tiny paper
   dots that roll in from either edge on slow, decorrelated periods and die
   away before the centre, so the water moves while the lockup keeps a pool
   of still dark — under filmic grain. On it the mark surfaces from depth,
@@ -1142,19 +1202,19 @@
   /* Slightly more space below centre than above: the optical centre of the
      lockup sits a touch high, which is where a still frame wants it. */
   padding-bottom: 3rem;
-  /* Night water: a faint cream lift where the surface would be, forest
+  /* Night water: a faint paper lift where the surface would be, forest
      depths, and an ember of terracotta warmth at the bottom edge — all
      color-mix on brand tokens, the film utilities' rule, so no second dark
      ever exists. */
   background:
     radial-gradient(
       100% 80% at 50% 36%,
-      color-mix(in oklab, var(--color-forest) 94%, var(--color-cream)),
+      color-mix(in oklab, var(--color-forest) 94%, var(--color-paper)),
       transparent 62%
     ),
     linear-gradient(
       175deg,
-      color-mix(in oklab, var(--color-forest) 90%, var(--color-cream)) 0%,
+      color-mix(in oklab, var(--color-forest) 90%, var(--color-paper)) 0%,
       var(--color-forest) 52%,
       color-mix(in oklab, var(--color-forest) 84%, var(--color-terra)) 100%
     );
@@ -1234,7 +1294,7 @@
 .intro-swell-1 {
   --ox: 2.2%;
   --oy: 1.4%;
-  background-color: color-mix(in srgb, var(--color-cream) 30%, transparent);
+  background-color: color-mix(in srgb, var(--color-paper) 30%, transparent);
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cg fill='white'%3E%3Ccircle cx='18' cy='52' r='1.5'/%3E%3Ccircle cx='66' cy='34' r='1.3'/%3E%3Ccircle cx='114' cy='30' r='1.6'/%3E%3Ccircle cx='162' cy='44' r='1.4'/%3E%3Ccircle cx='40' cy='138' r='1.4'/%3E%3Ccircle cx='120' cy='158' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
   mask-size: 200px 200px;
   animation-duration: 9s;
@@ -1244,7 +1304,7 @@
 .intro-swell-2 {
   --ox: 1.6%;
   --oy: 2.2%;
-  background-color: color-mix(in srgb, var(--color-cream) 22%, transparent);
+  background-color: color-mix(in srgb, var(--color-paper) 22%, transparent);
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cg fill='white'%3E%3Ccircle cx='30' cy='80' r='1.4'/%3E%3Ccircle cx='92' cy='60' r='1.2'/%3E%3Ccircle cx='150' cy='52' r='1.5'/%3E%3Ccircle cx='210' cy='66' r='1.3'/%3E%3Ccircle cx='60' cy='190' r='1.5'/%3E%3Ccircle cx='170' cy='206' r='1.2'/%3E%3C/g%3E%3C/svg%3E");
   mask-size: 240px 240px;
   animation-duration: 13s;
@@ -1255,7 +1315,7 @@
 .intro-swell-3 {
   --ox: 2.8%;
   --oy: 1.8%;
-  background-color: color-mix(in srgb, var(--color-cream) 26%, transparent);
+  background-color: color-mix(in srgb, var(--color-paper) 26%, transparent);
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cg fill='white'%3E%3Ccircle cx='36' cy='96' r='1.7'/%3E%3Ccircle cx='120' cy='70' r='1.5'/%3E%3Ccircle cx='200' cy='62' r='1.8'/%3E%3Ccircle cx='262' cy='84' r='1.5'/%3E%3Ccircle cx='80' cy='220' r='1.8'/%3E%3Ccircle cx='190' cy='240' r='1.6'/%3E%3C/g%3E%3C/svg%3E");
   mask-size: 280px 280px;
   animation-duration: 16s;
@@ -1265,7 +1325,7 @@
 .intro-swell-4 {
   --ox: 2%;
   --oy: 2.6%;
-  background-color: color-mix(in srgb, var(--color-cream) 20%, transparent);
+  background-color: color-mix(in srgb, var(--color-paper) 20%, transparent);
   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='340' height='340'%3E%3Cg fill='white'%3E%3Ccircle cx='60' cy='110' r='2.4'/%3E%3Ccircle cx='200' cy='80' r='2.2'/%3E%3Ccircle cx='290' cy='180' r='2.6'/%3E%3C/g%3E%3C/svg%3E");
   mask-size: 340px 340px;
   animation-duration: 21s;
@@ -1517,16 +1577,21 @@ body:has(#yuvoy-intro[data-intro-wait]) .emerge {
 
   What makes a gradient safe here is that the caption's elements stack in
   order of how much contrast they need, and the gradient deepens in the same
-  direction: the name (`cream`, the most forgiving) sits highest, the
-  description (`cream/85`) in the middle, and the terracotta link (`terra-soft`,
+  direction: the name (`paper`, the most forgiving) sits highest, the
+  description (`paper/85`) in the middle, and the terracotta link (`terra-soft`,
   the tightest pairing in the palette) sits at the foot where the shade is
   almost closed.
 
   | Element                 | Depth | Contrast | Picture still visible |
   | ----------------------- | ----- | -------- | --------------------- |
-  | Name, `cream`           | 68%   | 5.3:1    | 32%                   |
-  | Description, `cream/85` | 84%   | 6.2:1    | 16%                   |
+  | Name, `paper`           | 68%   | 6.1:1    | 32%                   |
+  | Description, `paper/85` | 84%   | 7.1:1    | 16%                   |
   | Link, `terra-soft`      | 95%   | 4.8:1    | 5%                    |
+
+  The first two rows gained at v2.9 (they were 5.3:1 and 6.2:1 on `cream`);
+  the link did not move, because `terra-soft` is unchanged and so is the
+  ground. The ground under each row was recovered from its own measured
+  figure and both ends re-measured against it, rather than scaled.
 
   **The stops are percentages of the caption box, not of the plate**, which is
   what makes that table hold rather than describe one lucky layout. The box
@@ -1534,7 +1599,9 @@ body:has(#yuvoy-intro[data-intro-wait]) .emerge {
   browser minimum font size or a user's zoom moves every element and every
   stop together. Swept across title sizes 24/30/36px, descriptions of two to
   four lines and both leading values, the worst figure any element reaches is
-  **4.80:1** — above the 4.5 floor in all eighteen combinations.
+  **4.80:1** — above the 4.5 floor in all eighteen combinations. That worst
+  case is the `terra-soft` link, which v2.9 did not move; the two `paper` rows
+  above it rose with the canvas.
 
   Opening the caption's internal spacing (owner report, 2026-08-18: the lines
   "are looking too close") moved every element **deeper**, not shallower: the
@@ -1630,7 +1697,7 @@ body:has(#yuvoy-intro[data-intro-wait]) .emerge {
   | Pairing on the field   | worst pixel | flat `forest` |
   | ---------------------- | ----------- | ------------- |
   | `terra-soft` (eyebrow) | 5.82:1      | 5.36:1        |
-  | `cream/60`             | 5.45:1      | 5.16:1        |
+  | `paper/60`             | 6.08:1      | 5.78:1        |
 
   **The field is safer than the flat surface it replaces**, at every pixel,
   before this gradient adds anything. So this file is free to be what its name
@@ -1638,7 +1705,7 @@ body:has(#yuvoy-intro[data-intro-wait]) .emerge {
 
   ## The shaping
 
-  Deep at the crown so the seam with the cream act above lands on brand ink
+  Deep at the crown so the seam with the paper act above lands on brand ink
   rather than mid-photograph, barely there through the middle where the light
   shafts and the far shoreline live, and settling again under the plates so
   three photographs sit on a quiet ground.
@@ -1661,8 +1728,8 @@ body:has(#yuvoy-intro[data-intro-wait]) .emerge {
     90deg,
     color-mix(in oklab, var(--color-terra-soft) 90%, transparent) 0%,
     color-mix(in oklab, var(--color-terra-soft) 34%, transparent) 6%,
-    color-mix(in oklab, var(--color-cream) 20%, transparent) 22%,
-    color-mix(in oklab, var(--color-cream) 12%, transparent) 58%,
+    color-mix(in oklab, var(--color-paper) 20%, transparent) 22%,
+    color-mix(in oklab, var(--color-paper) 12%, transparent) 58%,
     transparent 92%
   );
 }
@@ -1692,8 +1759,8 @@ body:has(#yuvoy-intro[data-intro-wait]) .emerge {
   breakpoint, and whether the closing call to action is shown.
 
   This scrim's job is the SEAM, not contrast. Measured on the delivered file:
-  every eighth of the frame sits between 12.3:1 and 15.4:1 against `cream`,
-  which is *better* than the 11.44:1 of the flat forest it replaces — the
+  every eighth of the frame sits between 14.2:1 and 17.6:1 against `paper`,
+  which is *better* than the 13.11:1 of the flat forest it replaces — the
   artwork is genuinely darker than the brand green. So there is no heavy
   darkening here; there is a solid forest band at the top that dissolves
   downward, so the footer begins as the same forest as the section above it

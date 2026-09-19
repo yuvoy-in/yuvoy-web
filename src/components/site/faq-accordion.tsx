@@ -21,11 +21,11 @@ import type { Faq } from "@/lib/site/faqs";
  */
 export function FaqAccordion({
   items,
-  tone = "cream",
+  tone = "paper",
   className,
 }: {
   items: Faq[];
-  tone?: "cream" | "ink";
+  tone?: "paper" | "ink";
   className?: string;
 }) {
   const dark = tone === "ink";
@@ -34,7 +34,7 @@ export function FaqAccordion({
     <div
       className={cn(
         "border-t",
-        dark ? "border-cream/12" : "border-cream-line",
+        dark ? "border-paper/12" : "border-paper-line",
         className,
       )}
     >
@@ -43,7 +43,7 @@ export function FaqAccordion({
           key={item.question}
           className={cn(
             "group border-b",
-            dark ? "border-cream/12" : "border-cream-line",
+            dark ? "border-paper/12" : "border-paper-line",
           )}
         >
           <summary
@@ -52,7 +52,7 @@ export function FaqAccordion({
               // pseudo-element rule in globals.css covers WebKit's own marker.
               "faq-summary flex cursor-pointer items-start justify-between gap-6 py-6 transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none",
               dark
-                ? "focus-visible:ring-terra-soft hover:text-cream"
+                ? "focus-visible:ring-terra-soft hover:text-paper"
                 : "focus-visible:ring-terra-deep hover:text-terra-deep",
             )}
           >
@@ -76,7 +76,7 @@ export function FaqAccordion({
           <p
             className={cn(
               "max-w-prose pb-6 leading-relaxed",
-              dark ? "text-cream/70" : "text-forest/75",
+              dark ? "text-paper/70" : "text-forest/75",
             )}
           >
             {item.answer}

@@ -12,8 +12,8 @@ import { campaignSourceFromPathname, operatorHref } from "@/lib/leads/registry";
  * renders nothing there. Client-side only so the current route can carry
  * `aria-current="page"`; the header itself stays as it is.
  *
- * `tone` follows the header surface — cream text over a dark cover, forest on
- * the cream bar — the same contract as the operator link that replaces this
+ * `tone` follows the header surface — paper text over a dark cover, forest on
+ * the paper bar — the same contract as the operator link that replaces this
  * nav below `lg`.
  */
 export function NavLinks({
@@ -52,8 +52,8 @@ export function NavLinks({
               "label tap-target transition-colors duration-300",
               tone === "onDark"
                 ? current
-                  ? "text-cream"
-                  : "text-cream/75 hover:text-cream"
+                  ? "text-paper"
+                  : "text-paper/75 hover:text-paper"
                 : current
                   ? "text-terra-deep"
                   : "text-forest/75 hover:text-forest",

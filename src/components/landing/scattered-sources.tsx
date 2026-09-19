@@ -339,7 +339,7 @@ export function ScatteredSources() {
               the cards are absolutely positioned and size to their content,
               where centring a box inside itself changes nothing.
             */
-            className="border-cream-line bg-cream card-lift flex flex-col justify-center rounded-lg border p-3.5 sm:p-4 lg:p-3"
+            className="border-paper-line bg-paper card-lift flex flex-col justify-center rounded-lg border p-3.5 sm:p-4 lg:p-3"
           >
             {/*
               The icon sits BESIDE the words everywhere except `lg`.
@@ -366,7 +366,7 @@ export function ScatteredSources() {
                 two, which is the trade: an icon that sits level with its own
                 words beats six icons at one height with air under each. */}
             <div className="flex items-center gap-2 sm:gap-2.5 lg:flex-col lg:items-start lg:gap-1.5">
-              <span className="bg-cream-deep rounded-edge flex size-7 flex-none items-center justify-center sm:size-8 lg:size-7">
+              <span className="bg-paper-deep rounded-edge flex size-7 flex-none items-center justify-center sm:size-8 lg:size-7">
                 <ShortfallIcon kind={source.icon} />
               </span>
               <span className="min-w-0 lg:w-full">
@@ -404,12 +404,12 @@ export function ScatteredSources() {
                 <span aria-hidden className="plate-wash absolute inset-0" />
 
                 {/* The play badge, in the pause control's clothes: a forest
-                    square at 70% with a cream mark, `rounded-edge` like every
+                    square at 70% with a paper mark, `rounded-edge` like every
                     other box in the system. It is deliberately small — this is
                     a still of a video, not a player, and a badge that fills
                     the frame turns the card into a thumbnail of itself. */}
                 {source.media.play && (
-                  <span className="bg-forest/70 text-cream rounded-edge absolute top-1/2 left-1/2 flex size-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center backdrop-blur-[1px] lg:size-5">
+                  <span className="bg-forest/70 text-paper rounded-edge absolute top-1/2 left-1/2 flex size-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center backdrop-blur-[1px] lg:size-5">
                     <svg
                       viewBox="0 0 16 16"
                       fill="currentColor"
@@ -463,7 +463,7 @@ export function ScatteredSources() {
       */}
       <div
         aria-hidden
-        className="border-cream-line bg-cream card-lift mt-5 rounded-lg border px-3.5 py-3 select-none sm:px-4 sm:py-3.5 lg:mt-3 lg:px-3 lg:py-2.5"
+        className="border-paper-line bg-paper card-lift mt-5 rounded-lg border px-3.5 py-3 select-none sm:px-4 sm:py-3.5 lg:mt-3 lg:px-3 lg:py-2.5"
       >
         <div className="text-forest/75 flex items-baseline justify-between gap-3 pb-2">
           <span className="label min-w-0 truncate text-[10px]">
@@ -484,7 +484,7 @@ export function ScatteredSources() {
         {SHORTLIST.rows.map((row) => (
           <div
             key={row.name}
-            className="border-cream-line flex items-center justify-between gap-2.5 border-t py-2 lg:py-1.5"
+            className="border-paper-line flex items-center justify-between gap-2.5 border-t py-2 lg:py-1.5"
           >
             <span className="flex min-w-0 items-center gap-2 sm:gap-2.5">
               <span className="rounded-edge relative hidden size-7 flex-none overflow-hidden sm:block lg:size-6">
@@ -518,7 +518,7 @@ export function ScatteredSources() {
         {/* The comp's closing note. It counts what is actually drawn — six
             cards, three shortlisted rows — where the comp said "four"; change
             either list and this number moves with it. */}
-        <p className="text-forest/75 border-cream-line mt-1 flex items-start gap-2.5 border-t pt-3 text-xs leading-relaxed sm:text-sm lg:pt-2.5 lg:text-[0.6875rem]">
+        <p className="text-forest/75 border-paper-line mt-1 flex items-start gap-2.5 border-t pt-3 text-xs leading-relaxed sm:text-sm lg:pt-2.5 lg:text-[0.6875rem]">
           <svg
             viewBox="0 0 24 24"
             aria-hidden
@@ -574,7 +574,7 @@ export function ScatteredSources() {
               is 292px against the 362 available and any three would be 436,
               so the two-and-two break is guaranteed rather than lucky.
             */
-            className="border-cream-line text-forest/75 flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-center text-xs sm:text-sm lg:gap-1.5 lg:px-2.5 lg:py-1.5 lg:text-xs"
+            className="border-paper-line text-forest/75 flex items-center justify-center gap-2 rounded-lg border px-3 py-2 text-center text-xs sm:text-sm lg:gap-1.5 lg:px-2.5 lg:py-1.5 lg:text-xs"
           >
             <svg
               viewBox="0 0 24 24"

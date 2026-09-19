@@ -87,7 +87,7 @@ export default function AboutPage() {
           assistive tech, so the relationship reads as three things rather
           than as punctuation.
         */}
-        <div className="border-cream-line mt-14 grid grid-cols-1 items-center gap-6 border-t pt-10 sm:grid-cols-[1fr_auto_1fr_auto_1fr] sm:gap-4">
+        <div className="border-paper-line mt-14 grid grid-cols-1 items-center gap-6 border-t pt-10 sm:grid-cols-[1fr_auto_1fr_auto_1fr] sm:gap-4">
           <div>
             <p className="label text-forest/75">Traveller</p>
             <p className="text-forest/75 mt-3 leading-relaxed">
@@ -96,7 +96,7 @@ export default function AboutPage() {
           </div>
           <span
             aria-hidden
-            className="bg-cream-line h-px w-10 justify-self-center sm:w-full sm:min-w-8"
+            className="bg-paper-line h-px w-10 justify-self-center sm:w-full sm:min-w-8"
           />
           {/* The lockup itself, not the name set in display type. This is the
               one place on the site where Yuvoy is named *as a party* between
@@ -108,7 +108,7 @@ export default function AboutPage() {
           </div>
           <span
             aria-hidden
-            className="bg-cream-line h-px w-10 justify-self-center sm:w-full sm:min-w-8"
+            className="bg-paper-line h-px w-10 justify-self-center sm:w-full sm:min-w-8"
           />
           <div className="sm:text-right">
             <p className="label text-forest/75">Operator</p>
@@ -127,12 +127,12 @@ export default function AboutPage() {
           title="The experience is real."
           accent="Finding it is the hard part."
         />
-        <div className="border-cream/12 mt-14 grid grid-cols-1 gap-x-16 gap-y-10 border-t pt-10 sm:grid-cols-2">
+        <div className="border-paper/12 mt-14 grid grid-cols-1 gap-x-16 gap-y-10 border-t pt-10 sm:grid-cols-2">
           <div>
             <h3 className="font-display tracking-display text-xl leading-snug font-normal">
               For travellers
             </h3>
-            <p className="text-cream/70 mt-3 leading-relaxed">
+            <p className="text-paper/70 mt-3 leading-relaxed">
               Good experiences are scattered across social media, messages,
               local counters and booking sites.
             </p>
@@ -141,7 +141,7 @@ export default function AboutPage() {
             <h3 className="font-display tracking-display text-xl leading-snug font-normal">
               For operators
             </h3>
-            <p className="text-cream/70 mt-3 leading-relaxed">
+            <p className="text-paper/70 mt-3 leading-relaxed">
               The people running them manage marketing, enquiries, schedules and
               payments across disconnected tools.
             </p>
@@ -180,7 +180,7 @@ export default function AboutPage() {
           }
         />
 
-        <div className="border-cream-line mt-16 border-t pt-10">
+        <div className="border-paper-line mt-16 border-t pt-10">
           <p className="label text-forest/75">Principles</p>
           <ul className="mt-8 grid grid-cols-1 gap-x-10 gap-y-10 sm:grid-cols-3">
             {PRINCIPLES.map((principle) => (

@@ -72,7 +72,7 @@ export function ContactAssurances({ className }: { className?: string }) {
     */
     <ul
       className={cn(
-        "border-cream/12 rounded-edge grid grid-cols-1 gap-x-8 gap-y-7 border px-6 py-7 sm:grid-cols-2 sm:px-8 lg:grid-cols-4 lg:gap-x-0",
+        "border-paper/12 rounded-edge grid grid-cols-1 gap-x-8 gap-y-7 border px-6 py-7 sm:grid-cols-2 sm:px-8 lg:grid-cols-4 lg:gap-x-0",
         className,
       )}
     >
@@ -81,7 +81,7 @@ export function ContactAssurances({ className }: { className?: string }) {
           key={key}
           className={cn(
             "flex items-center gap-4",
-            index > 0 && "lg:border-cream/12 lg:border-l lg:pl-7",
+            index > 0 && "lg:border-paper/12 lg:border-l lg:pl-7",
             index < ASSURANCES.length - 1 && "lg:pr-7",
           )}
         >
@@ -92,7 +92,7 @@ export function ContactAssurances({ className }: { className?: string }) {
             would read as a paragraph cut into pieces — and it holds at every
             width because it is a block, not a `<br>` waiting on a measure.
           */}
-          <p className="text-cream/70 text-sm leading-snug">
+          <p className="text-paper/70 text-sm leading-snug">
             <span className="block">{lead}</span>
             <span className="block">{rest}</span>
           </p>

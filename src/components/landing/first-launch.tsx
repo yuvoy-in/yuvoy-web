@@ -22,13 +22,13 @@ import { EXPANSION_STATUS } from "@/lib/site/launch";
  * ## Why this act is dark (owner direction, 2026-08-07)
  *
  * It swapped surfaces with the operator act, and the page is better for it:
- * forest → cream → forest → cream → forest → cream → forest, alternating the
- * whole way down instead of running two cream acts and then three dark ones.
+ * forest → paper → forest → paper → forest → paper → forest, alternating the
+ * whole way down instead of running two paper acts and then three dark ones.
  *
  * ## Why it carries artwork (owner direction, 2026-08-14)
  *
  * A flat forest field left the plates nothing to sit against. The fix at the
- * time was to invert each caption — a cream slab under every photograph —
+ * time was to invert each caption — a paper slab under every photograph —
  * which gave the plates their edges back and turned the triptych into three
  * cards doing it. The artwork solves the same problem the other way: the
  * section becomes a place with light and depth in it, and a flat plate with a
@@ -154,7 +154,7 @@ export function FirstLaunch() {
           rule replaced a `border-t`, not the rhythm around it. */}
       <div className="mt-8 sm:mt-10">
         <span aria-hidden className="launch-rule block h-px w-full" />
-        <p className="label text-cream/70 mt-4 sm:mt-5">{EXPANSION_STATUS}</p>
+        <p className="label text-paper/70 mt-4 sm:mt-5">{EXPANSION_STATUS}</p>
       </div>
 
       <DestinationGrid

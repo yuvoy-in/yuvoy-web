@@ -214,8 +214,8 @@ export function PhoneField({
       className={cn(
         "rounded-edge flex h-12 w-full overflow-hidden border transition-colors duration-200",
         dark
-          ? "border-cream/20 bg-cream/5 focus-within:border-terra-soft focus-within:ring-terra-soft/40"
-          : "border-forest/20 bg-cream-deep focus-within:border-terra-deep focus-within:ring-terra-deep/30",
+          ? "border-paper/20 bg-paper/5 focus-within:border-terra-soft focus-within:ring-terra-soft/40"
+          : "border-forest/20 bg-paper-deep focus-within:border-terra-deep focus-within:ring-terra-deep/30",
         "focus-within:ring-2",
         invalid && (dark ? "border-terra-soft" : "border-terra-deep"),
       )}
@@ -236,8 +236,8 @@ export function PhoneField({
               value={option.iso2}
               // Options inherit the page's colours on some platforms and the
               // system's on others; forcing both keeps a dark-surface select
-              // from rendering cream-on-cream when opened.
-              className="bg-cream text-forest"
+              // from rendering paper-on-paper when opened.
+              className="bg-paper text-forest"
             >
               {option.dial ? `${option.name} +${option.dial}` : option.name}
             </option>
@@ -248,7 +248,7 @@ export function PhoneField({
           aria-hidden
           className={cn(
             "pointer-events-none flex h-full items-center gap-1.5 pr-3 pl-4 text-base pointer-fine:text-sm",
-            dark ? "text-cream" : "text-forest",
+            dark ? "text-paper" : "text-forest",
           )}
         >
           <span className="flex-1 truncate">
@@ -259,7 +259,7 @@ export function PhoneField({
             fill="none"
             className={cn(
               "size-3 flex-none",
-              dark ? "text-cream/60" : "text-forest/70",
+              dark ? "text-paper/60" : "text-forest/70",
             )}
           >
             <path
@@ -278,7 +278,7 @@ export function PhoneField({
         aria-hidden
         className={cn(
           "w-px self-stretch",
-          dark ? "bg-cream/20" : "bg-forest/20",
+          dark ? "bg-paper/20" : "bg-forest/20",
         )}
       />
 
@@ -300,7 +300,7 @@ export function PhoneField({
         className={cn(
           "h-full min-w-0 flex-1 border-0 bg-transparent px-4 text-base focus:outline-none pointer-fine:text-sm",
           dark
-            ? "text-cream placeholder:text-cream/60"
+            ? "text-paper placeholder:text-paper/60"
             : "text-forest placeholder:text-forest/70",
         )}
       />

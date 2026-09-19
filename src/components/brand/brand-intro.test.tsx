@@ -51,9 +51,9 @@ describe("IntroVeil", () => {
 
     const mark = container.querySelector("img");
     expect(mark).not.toBeNull();
-    // The generated cream vector variant: cream strokes for the dark
+    // The generated paper vector variant: paper strokes for the dark
     // surface, tagline stripped (scripts/generate-vector-brand.mjs).
-    expect(mark?.getAttribute("src")).toContain("yuvoy-mark-vector-cream");
+    expect(mark?.getAttribute("src")).toContain("yuvoy-mark-vector-paper");
 
     // Five drawn letterforms inside the word block, which emerges as one
     // unit in the cover headline's motion.

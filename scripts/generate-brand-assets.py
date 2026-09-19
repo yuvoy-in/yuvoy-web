@@ -16,6 +16,15 @@ Outputs (all committed):
   src/app/icon.png             the same 512 (Next.js app-icon convention)
   src/app/favicon.ico          256 PNG-in-ICO fallback
 
+SUPERSEDED for the shared outputs, and deliberately not re-run (v2.9).
+`scripts/generate-icons.mjs` now derives yuvoy-mark.png, src/app/icon.png,
+src/app/icon.svg, src/app/apple-icon.png and src/app/favicon.ico from the
+vector mark, which is the pipeline the icons are actually built by. Running
+this file would overwrite three of those with the older raster pipeline's
+output and nothing would fail. It is kept because it is the only producer of
+the two cut-out marks below, and its colours are kept current so that a future
+run cannot quietly reintroduce the retired cream.
+
 Pure standard library on purpose — the repo toolchain is Node, and this
 machine's Python package installers are off limits (work-registry wiring), so
 the script depends on nothing. Re-run after replacing the source logo:
@@ -39,7 +48,9 @@ APP_ICON = ROOT / "src" / "app" / "icon.png"
 FAVICON = ROOT / "src" / "app" / "favicon.ico"
 
 FOREST = (0x16, 0x36, 0x2E)
-CREAM = (0xF4, 0xEF, 0xE4)
+# `--color-paper`. #FFFFFF since Brand Kit v2.9 (was cream #F4EFE4); the rename
+# is why this constant is called PAPER.
+PAPER = (0xFF, 0xFF, 0xFF)
 
 # The cut-out marks are cropped tight: with no tile around them, padding just
 # makes the ensō smaller in its box for no reason.
@@ -463,8 +474,8 @@ def main() -> None:
     tmp.unlink()
 
     # The cut-outs the UI uses: one per surface, because a white ensō is
-    # invisible on cream and a forest one is invisible on forest.
-    write_cut_out(MARK_ON_DARK, rgb, width, height, CREAM)
+    # invisible on paper and a forest one is invisible on forest.
+    write_cut_out(MARK_ON_DARK, rgb, width, height, PAPER)
     write_cut_out(MARK_ON_LIGHT, rgb, width, height, FOREST)
 
     print(f"crop: {window}px window at ({x0},{y0}) of {width}×{height}")

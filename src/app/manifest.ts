@@ -30,8 +30,8 @@ export default function manifest(): MetadataRoute.Manifest {
     // Both are the canvas token from globals.css. A literal because a
     // manifest cannot read a CSS custom property — the same reason the
     // viewport's themeColor and the OG card carry literals.
-    background_color: "#f4efe4",
-    theme_color: "#f4efe4",
+    background_color: "#ffffff",
+    theme_color: "#ffffff",
     icons: [
       {
         src: "/icon.svg",

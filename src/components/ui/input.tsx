@@ -30,9 +30,9 @@ const input = cva(
     variants: {
       tone: {
         onLight:
-          "border-forest/20 bg-cream-deep text-forest placeholder:text-forest/70 focus-visible:border-terra-deep focus-visible:ring-terra-deep/30",
+          "border-forest/20 bg-paper-deep text-forest placeholder:text-forest/70 focus-visible:border-terra-deep focus-visible:ring-terra-deep/30",
         onDark:
-          "border-cream/20 bg-cream/5 text-cream placeholder:text-cream/60 focus-visible:border-terra-soft focus-visible:ring-terra-soft/40",
+          "border-paper/20 bg-paper/5 text-paper placeholder:text-paper/60 focus-visible:border-terra-soft focus-visible:ring-terra-soft/40",
       },
     },
     defaultVariants: { tone: "onLight" },

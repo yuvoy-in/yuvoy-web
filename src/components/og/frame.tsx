@@ -24,7 +24,7 @@ const MARK_DATA_URI = `data:image/png;base64,${readFileSync(
  * v2 verbatim and must be updated with the tokens in globals.css.
  */
 const OG = {
-  cream: "#F4EFE4",
+  paper: "#FFFFFF",
   forest: "#16362E",
   terraDeep: "#985028",
   muted: "rgba(22,54,46,0.68)",
@@ -46,7 +46,7 @@ export function renderOg({
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        background: OG.cream,
+        background: OG.paper,
         padding: "72px 80px",
         fontFamily: "sans-serif",
       }}

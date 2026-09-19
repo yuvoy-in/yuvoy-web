@@ -75,7 +75,7 @@ export default function SafetyPage() {
           title="Four things every experience"
           accent="is being built to meet."
         />
-        <ul className="border-cream-line mt-14 grid grid-cols-1 gap-x-10 gap-y-10 border-t pt-10 sm:grid-cols-2">
+        <ul className="border-paper-line mt-14 grid grid-cols-1 gap-x-10 gap-y-10 border-t pt-10 sm:grid-cols-2">
           {STANDARDS.map((item) => (
             <li key={item.title}>
               <h3 className="font-display text-forest tracking-display text-xl leading-snug font-normal">
@@ -132,7 +132,7 @@ export default function SafetyPage() {
 
         <Link
           href="/explore#how-it-works"
-          className="label tap-target text-terra-soft hover:text-cream mt-12 inline-block underline underline-offset-4 transition-colors duration-200"
+          className="label tap-target text-terra-soft hover:text-paper mt-12 inline-block underline underline-offset-4 transition-colors duration-200"
         >
           See how Yuvoy works
         </Link>

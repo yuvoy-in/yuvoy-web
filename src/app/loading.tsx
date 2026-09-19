@@ -11,7 +11,7 @@ export default function Loading() {
   return (
     <div
       role="status"
-      className="bg-cream flex min-h-svh flex-col items-center justify-center gap-4"
+      className="bg-paper flex min-h-svh flex-col items-center justify-center gap-4"
     >
       <span className="label text-forest/75">Loading Yuvoy</span>
       <span
