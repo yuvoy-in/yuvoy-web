@@ -21,7 +21,7 @@ export function PageHeader({
   children?: ReactNode;
 }) {
   return (
-    <header className="border-cream-line border-b">
+    <header className="border-paper-line border-b">
       <div className="container-page py-14 sm:py-28">
         <p className="eyebrow text-terra-deep">{eyebrow}</p>
         <h1 className="font-display tracking-display mt-4 max-w-4xl text-[clamp(2.5rem,6.5vw,4.25rem)] leading-[1.01] font-normal text-balance sm:mt-6">

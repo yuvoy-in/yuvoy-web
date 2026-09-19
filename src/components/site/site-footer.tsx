@@ -61,7 +61,7 @@ export function SiteFooter() {
   // route that ends in one (the registration form, a closing section) the
   // footer would otherwise run straight on from it with no seam at all.
   return (
-    <footer className="bg-forest text-cream border-cream/12 relative isolate border-t">
+    <footer className="bg-forest text-paper border-paper/12 relative isolate border-t">
       {/*
         The owner-supplied underwater scene, merged into the field rather than
         pasted onto it — the same construction as the homepage cover.
@@ -78,7 +78,7 @@ export function SiteFooter() {
         into. Every layer is inert and hidden from assistive tech.
 
         Contrast is not this stack's job — the artwork measures 12.3:1 to
-        15.4:1 against `cream` across the frame, better than the flat forest
+        15.4:1 against `paper` across the frame, better than the flat forest
         it replaces. See `footer-scrim` in globals.css for the measurements.
       */}
       <div aria-hidden className="absolute inset-0 -z-10 overflow-hidden">
@@ -140,10 +140,10 @@ export function SiteFooter() {
               say what Yuvoy does and where it is, and nothing else. */}
           <div>
             <Wordmark tone="onDark" className="h-16 sm:h-20" />
-            <p className="text-cream/70 mt-6 max-w-xs leading-relaxed sm:mt-7">
+            <p className="text-paper/70 mt-6 max-w-xs leading-relaxed sm:mt-7">
               {FOOTER_DESCRIPTION}
             </p>
-            <p className="label text-cream/70 mt-6 flex items-start gap-2.5">
+            <p className="label text-paper/70 mt-6 flex items-start gap-2.5">
               <span aria-hidden className="bg-terra mt-1.5 size-1 shrink-0" />
               {FOOTER_STATUS}
             </p>
@@ -170,14 +170,14 @@ export function SiteFooter() {
                         {item.href.startsWith("/") ? (
                           <Link
                             href={item.href}
-                            className="tap-target text-cream/70 hover:text-cream focus-visible:ring-terra-soft rounded-edge text-sm leading-snug transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
+                            className="tap-target text-paper/70 hover:text-paper focus-visible:ring-terra-soft rounded-edge text-sm leading-snug transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                           >
                             {item.label}
                           </Link>
                         ) : (
                           <a
                             href={item.href}
-                            className="tap-target text-cream/70 hover:text-cream focus-visible:ring-terra-soft rounded-edge text-sm leading-snug transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
+                            className="tap-target text-paper/70 hover:text-paper focus-visible:ring-terra-soft rounded-edge text-sm leading-snug transition-colors duration-200 focus-visible:ring-2 focus-visible:outline-none"
                           >
                             {item.label}
                           </a>
@@ -194,8 +194,8 @@ export function SiteFooter() {
         {/* Legal. No social row: a link to an unmaintained account is a
             promise nobody is keeping, so `CONTACT_CHANNELS` stays empty
             until a real one is confirmed. */}
-        <div className="border-cream/12 mt-12 flex flex-col-reverse items-start gap-4 border-t pt-6 sm:mt-16 sm:flex-row sm:items-center sm:justify-between sm:pt-8">
-          <p className="label text-cream/60">
+        <div className="border-paper/12 mt-12 flex flex-col-reverse items-start gap-4 border-t pt-6 sm:mt-16 sm:flex-row sm:items-center sm:justify-between sm:pt-8">
+          <p className="label text-paper/60">
             © {new Date().getFullYear()} Yuvoy · India
           </p>
           {/* Consent must be as easy to withdraw as it was to give. */}

@@ -51,9 +51,9 @@ export default async function JournalPage() {
         <JournalCard post={lead} variant="featured" />
 
         {rest.length > 0 && (
-          <ul className="border-cream-line mt-16 border-t">
+          <ul className="border-paper-line mt-16 border-t">
             {rest.map((post) => (
-              <li key={post.slug} className="border-cream-line border-b">
+              <li key={post.slug} className="border-paper-line border-b">
                 <JournalCard post={post} />
               </li>
             ))}

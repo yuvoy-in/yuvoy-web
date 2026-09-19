@@ -52,7 +52,7 @@ const nextConfig: NextConfig = {
    * That failure is silent and it looks like a pile of unrelated UI bugs
    * rather than one missing config (owner report, 2026-08-10, testing on an
    * iPhone against `http://192.168.1.6:3000`): the header keeps whatever tone
-   * the server rendered and never turns cream, it never slides away on scroll,
+   * the server rendered and never turns paper, it never slides away on scroll,
    * the menu button does nothing, and the product preview never advances —
    * because all four are client behaviour and there is no client. The only
    * visible evidence is one WARN line in `.next/dev/logs/`.

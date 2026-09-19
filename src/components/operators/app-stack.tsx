@@ -27,7 +27,7 @@ export function AppStack() {
       {STACK.map((app) => (
         <li
           key={app.tool}
-          className="border-cream-line bg-cream rounded-edge after:bg-terra relative border px-3 py-4 text-center after:absolute after:top-[42%] after:right-[12%] after:left-[12%] after:h-px"
+          className="border-paper-line bg-paper rounded-edge after:bg-terra relative border px-3 py-4 text-center after:absolute after:top-[42%] after:right-[12%] after:left-[12%] after:h-px"
         >
           <p className="text-forest truncate text-sm font-medium">{app.tool}</p>
           <p className="label text-forest/75 mt-1.5 text-[9px]">{app.job}</p>

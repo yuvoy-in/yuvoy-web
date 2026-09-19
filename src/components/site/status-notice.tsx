@@ -21,13 +21,13 @@ import { cn } from "@/lib/cn";
 export function StatusNotice({
   label,
   children,
-  tone = "cream",
+  tone = "paper",
   className,
 }: {
   /** Optional short prefix, e.g. "Pre-launch". Omit where context is obvious. */
   label?: string;
   children: ReactNode;
-  tone?: "cream" | "ink";
+  tone?: "paper" | "ink";
   className?: string;
 }) {
   const dark = tone === "ink";
@@ -36,7 +36,7 @@ export function StatusNotice({
     <div
       className={cn(
         "rounded-edge max-w-2xl border p-6 sm:p-7",
-        dark ? "border-cream/20 bg-cream/5" : "border-cream-line bg-cream-deep",
+        dark ? "border-paper/20 bg-paper/5" : "border-paper-line bg-paper-deep",
         className,
       )}
     >
@@ -53,7 +53,7 @@ export function StatusNotice({
       <div
         className={cn(
           "flex gap-4 text-sm leading-relaxed",
-          dark ? "text-cream/70" : "text-forest/75",
+          dark ? "text-paper/70" : "text-forest/75",
         )}
       >
         {!label && (

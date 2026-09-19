@@ -269,7 +269,7 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
    * Whether the top of the frame is currently dark, which is what the
    * lockup's tone and its scrim follow. The feed and the detail hero are
    * footage, the confirmation is a forest field, and the processing overlay
-   * covers whatever is under it; the booking and checkout screens are cream.
+   * covers whatever is under it; the booking and checkout screens are paper.
    */
   const onDarkSurface =
     step.paying ||
@@ -315,14 +315,14 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
             radius are one measurement: `--radius-device` minus the padding
             keeps the two curves concentric, so changing one without the
             other leaves the screen's corners fighting the frame's. The
-            cream ring that used to sit outside is gone — the rail's own
+            paper ring that used to sit outside is gone — the rail's own
             specular edge does that job now, and two edges read as two
             frames. */}
         <div className="rounded-device bg-device device-frame relative w-fit p-1">
           {/* Camera dot — hardware depiction, the one rounded object on the site. */}
           <span
             aria-hidden
-            className="bg-cream/20 absolute top-3.5 left-1/2 z-10 size-1.5 -translate-x-1/2 rounded-full"
+            className="bg-paper/20 absolute top-3.5 left-1/2 z-10 size-1.5 -translate-x-1/2 rounded-full"
           />
 
           {/* Side keys: the volume pair on the left, the wake button lower
@@ -357,7 +357,7 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
               <ScreenShell
                 order={1}
                 active={activeScreen}
-                className="bg-cream text-forest flex flex-col"
+                className="bg-paper text-forest flex flex-col"
               >
                 <DetailScreen
                   bookTap={step.bookTap}
@@ -376,7 +376,7 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
               <ScreenShell
                 order={2}
                 active={activeScreen}
-                className="bg-cream text-forest flex flex-col"
+                className="bg-paper text-forest flex flex-col"
               >
                 <BookingScreen stage={step.bookingStage} />
               </ScreenShell>
@@ -384,7 +384,7 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
               <ScreenShell
                 order={3}
                 active={activeScreen}
-                className="bg-cream text-forest flex flex-col"
+                className="bg-paper text-forest flex flex-col"
               >
                 <CheckoutScreen payTap={step.payTap} />
               </ScreenShell>
@@ -393,7 +393,7 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
                 order={4}
                 active={activeScreen}
                 rise
-                className="bg-forest text-cream"
+                className="bg-forest text-paper"
               >
                 <ConfirmedScreen />
               </ScreenShell>
@@ -401,15 +401,15 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
               {/* Payment processing, over whichever screen is showing. */}
               <div
                 className={cn(
-                  "bg-forest/90 text-cream ease-interaction absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 backdrop-blur-[2px] transition-opacity duration-200",
+                  "bg-forest/90 text-paper ease-interaction absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 backdrop-blur-[2px] transition-opacity duration-200",
                   step.paying ? "opacity-100" : "opacity-0",
                 )}
               >
-                <span className="border-cream/20 border-t-terra-soft size-9 animate-spin rounded-full border-2" />
+                <span className="border-paper/20 border-t-terra-soft size-9 animate-spin rounded-full border-2" />
                 <span className="text-[11px] font-medium">
                   Confirming your payment
                 </span>
-                <span className="text-cream/60 -mt-2 text-[9px]">
+                <span className="text-paper/60 -mt-2 text-[9px]">
                   Just a moment
                 </span>
               </div>
@@ -419,8 +419,8 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
               The product's own top bar: content runs edge to edge and the
               lockup sits over it (owner direction, 2026-08-06, replacing the
               browser address strip). The mark takes the surface's tone, and
-              a scrim rides in only over the dark screens, where cream type
-              needs ground under it; the cream screens reserve the band with
+              a scrim rides in only over the dark screens, where paper type
+              needs ground under it; the paper screens reserve the band with
               their own top padding instead.
             */}
             <div
@@ -472,7 +472,7 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
                 type="button"
                 onClick={() => setPlaying((now) => !now)}
                 aria-label={playing ? "Pause the preview" : "Play the preview"}
-                className="border-cream/25 bg-forest/70 text-cream rounded-edge focus-visible:ring-terra-soft ease-interaction absolute top-2.5 right-2.5 z-30 flex size-8 items-center justify-center border opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:outline-none [@media(hover:none)]:opacity-100"
+                className="border-paper/25 bg-forest/70 text-paper rounded-edge focus-visible:ring-terra-soft ease-interaction absolute top-2.5 right-2.5 z-30 flex size-8 items-center justify-center border opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:outline-none [@media(hover:none)]:opacity-100"
               >
                 {playing ? (
                   <PauseGlyph className="size-3" />
@@ -553,7 +553,7 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
 
                     While tracing, `border-transparent` lets the sweep own
                     the band and the forest fill rides the same declaration.
-                    A finished step drops back to the plain `cream-line`
+                    A finished step drops back to the plain `paper-line`
                     border (owner direction, 2026-08-15 — a kept ring ended
                     the loop with three highlighted tiles); only the running
                     act carries terra. `lg` keeps its 1px border and the
@@ -568,8 +568,8 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
                     className={cn(
                       "rounded-edge ease-interaction relative flex size-10 flex-none items-center justify-center border-3 transition-colors duration-200 lg:border",
                       isActive
-                        ? "bg-forest text-cream max-lg:demo-trace lg:border-forest border-transparent"
-                        : "border-cream-line bg-cream-deep text-forest/70 group-hover:text-forest",
+                        ? "bg-forest text-paper max-lg:demo-trace lg:border-forest border-transparent"
+                        : "border-paper-line bg-paper-deep text-forest/70 group-hover:text-forest",
                     )}
                     style={
                       isActive
@@ -603,7 +603,7 @@ export function ProductDemo({ actCopy }: { actCopy?: ActCopy } = {}) {
                     {/* The act meter: fills over the act's real duration. */}
                     <span
                       aria-hidden
-                      className="bg-cream-line rounded-edge mt-3 hidden h-0.5 w-full overflow-hidden lg:block"
+                      className="bg-paper-line rounded-edge mt-3 hidden h-0.5 w-full overflow-hidden lg:block"
                     >
                       <span
                         key={`${act.id}-${epoch}`}
@@ -714,31 +714,31 @@ function FeedScreen({ feedIndex }: { feedIndex: number }) {
             <div className="to-forest/95 via-forest/40 absolute inset-0 bg-linear-to-b from-transparent from-35%" />
 
             {/* Clears the lockup band that now rides over the footage. */}
-            <p className="bg-forest/55 text-cream rounded-edge tracking-label absolute top-14 left-3 inline-flex items-center gap-1.5 px-2 py-1 text-[9px] font-medium uppercase backdrop-blur-sm">
+            <p className="bg-forest/55 text-paper rounded-edge tracking-label absolute top-14 left-3 inline-flex items-center gap-1.5 px-2 py-1 text-[9px] font-medium uppercase backdrop-blur-sm">
               <span className="bg-terra-soft inline-block size-1 animate-pulse rounded-full" />
               {reel.live}
             </p>
 
             <div className="absolute inset-x-3 bottom-3">
-              <p className="text-cream/75 flex items-center gap-1.5 text-[10px]">
+              <p className="text-paper/75 flex items-center gap-1.5 text-[10px]">
                 <span
                   aria-hidden
                   className="bg-terra-soft inline-block size-3 rounded-full"
                 />
                 {reel.filmedBy}
               </p>
-              <p className="font-display text-cream tracking-display mt-1 text-[21px] leading-[1.08]">
+              <p className="font-display text-paper tracking-display mt-1 text-[21px] leading-[1.08]">
                 {reel.title}
               </p>
-              <p className="text-cream/70 mt-1 text-[10px]">{reel.meta}</p>
+              <p className="text-paper/70 mt-1 text-[10px]">{reel.meta}</p>
               <div className="mt-2.5 flex items-center justify-between gap-3">
-                <p className="text-cream text-[17px] font-bold">
+                <p className="text-paper text-[17px] font-bold">
                   {reel.price}
-                  <span className="text-cream/60 ml-1 text-[9px] font-normal">
+                  <span className="text-paper/60 ml-1 text-[9px] font-normal">
                     / person
                   </span>
                 </p>
-                <span className="bg-cream text-forest rounded-edge tracking-label px-3.5 py-2 text-[9px] font-bold uppercase">
+                <span className="bg-paper text-forest rounded-edge tracking-label px-3.5 py-2 text-[9px] font-bold uppercase">
                   Book
                 </span>
               </div>
@@ -754,7 +754,7 @@ function FeedScreen({ feedIndex }: { feedIndex: number }) {
             key={reel.title}
             className={cn(
               "rounded-edge ease-interaction w-0.5 transition-all duration-300",
-              index === feedIndex ? "bg-terra-soft h-5" : "bg-cream/25 h-3",
+              index === feedIndex ? "bg-terra-soft h-5" : "bg-paper/25 h-3",
             )}
           />
         ))}
@@ -794,10 +794,10 @@ function DetailScreen({
         <div className="caustics" />
         <div className="to-forest/90 absolute inset-0 bg-linear-to-b from-transparent from-40%" />
         {/* Sits in the lockup band, where a real app puts its back control. */}
-        <span className="bg-forest/40 text-cream rounded-edge absolute top-3.5 left-2.5 flex size-6 items-center justify-center backdrop-blur-sm">
+        <span className="bg-forest/40 text-paper rounded-edge absolute top-3.5 left-2.5 flex size-6 items-center justify-center backdrop-blur-sm">
           <ChevronGlyph className="size-3" />
         </span>
-        <div className="text-cream absolute inset-x-3 bottom-2.5">
+        <div className="text-paper absolute inset-x-3 bottom-2.5">
           <p className="text-terra-soft tracking-label text-[9px] font-medium uppercase">
             {reel.cat}
           </p>
@@ -820,7 +820,7 @@ function DetailScreen({
             The listing's own facts instead, from the same fixture the card
             above it reads, so the two cannot disagree.
           */}
-          <p className="text-cream/80 mt-1 text-[10px]">{reel.meta}</p>
+          <p className="text-paper/80 mt-1 text-[10px]">{reel.meta}</p>
         </div>
       </div>
 
@@ -856,8 +856,8 @@ function DetailScreen({
             <p className="text-terra-deep tracking-label text-[9px] font-medium uppercase">
               Your operator
             </p>
-            <div className="border-cream-line bg-cream-deep rounded-edge mt-1.5 flex items-center gap-2.5 border p-2.5">
-              <span className="bg-forest text-cream rounded-edge flex size-8 flex-none items-center justify-center text-[10px] font-bold">
+            <div className="border-paper-line bg-paper-deep rounded-edge mt-1.5 flex items-center gap-2.5 border p-2.5">
+              <span className="bg-forest text-paper rounded-edge flex size-8 flex-none items-center justify-center text-[10px] font-bold">
                 BS
               </span>
               <span className="min-w-0">
@@ -917,7 +917,7 @@ function DetailScreen({
             <p className="text-terra-deep tracking-label text-[9px] font-medium uppercase">
               In the operator&rsquo;s words
             </p>
-            <div className="border-cream-line bg-cream-deep rounded-edge mt-1.5 border p-2.5">
+            <div className="border-paper-line bg-paper-deep rounded-edge mt-1.5 border p-2.5">
               <p className="text-forest/80 text-[11px] leading-relaxed">
                 &ldquo;We take four at a time. You breathe on the surface first
                 until you are ready, and nobody goes down until they are.&rdquo;
@@ -929,7 +929,7 @@ function DetailScreen({
             <p className="text-terra-deep tracking-label text-[9px] font-medium uppercase">
               How the day runs
             </p>
-            <ol className="border-cream-line mt-1.5 border-l pl-3">
+            <ol className="border-paper-line mt-1.5 border-l pl-3">
               {TIMELINE.map((entry) => (
                 <li key={entry.at} className="pb-2.5 last:pb-0">
                   <span className="text-forest/70 block text-[9px] font-medium">
@@ -947,7 +947,7 @@ function DetailScreen({
             <p className="text-terra-deep tracking-label text-[9px] font-medium uppercase">
               Where you meet
             </p>
-            <div className="border-cream-line bg-cream-deep rounded-edge mt-1.5 border p-2.5">
+            <div className="border-paper-line bg-paper-deep rounded-edge mt-1.5 border p-2.5">
               <p className="text-[11px] font-bold">Beach No. 5 kiosk</p>
               <p className="text-forest/70 mt-0.5 text-[10px] leading-relaxed">
                 Ten minutes from the jetty. Pin sent the evening before.
@@ -986,7 +986,7 @@ function DetailScreen({
         </div>
       </div>
 
-      <div className="border-cream-line flex flex-none items-center gap-3 border-t px-3 py-2.5">
+      <div className="border-paper-line flex flex-none items-center gap-3 border-t px-3 py-2.5">
         <span>
           <span className="block text-[15px] leading-tight font-bold">
             ₹4,500
@@ -995,7 +995,7 @@ function DetailScreen({
         </span>
         <span
           className={cn(
-            "bg-forest text-cream rounded-edge tracking-label ease-interaction flex-1 py-2.5 text-center text-[10px] font-bold uppercase transition-transform duration-150",
+            "bg-forest text-paper rounded-edge tracking-label ease-interaction flex-1 py-2.5 text-center text-[10px] font-bold uppercase transition-transform duration-150",
             bookTap && "scale-[0.96] opacity-90",
           )}
         >
@@ -1009,10 +1009,10 @@ function DetailScreen({
 function BookingScreen({ stage }: { stage: number }) {
   return (
     <>
-      {/* pt-11 reserves the lockup band: these screens are cream, so the
+      {/* pt-11 reserves the lockup band: these screens are paper, so the
           band is empty surface above them rather than a scrim over footage. */}
-      <div className="border-cream-line flex flex-none items-center gap-2.5 border-b px-3 pt-11 pb-2.5">
-        <span className="border-cream-line rounded-edge flex size-6 flex-none items-center justify-center border">
+      <div className="border-paper-line flex flex-none items-center gap-2.5 border-b px-3 pt-11 pb-2.5">
+        <span className="border-paper-line rounded-edge flex size-6 flex-none items-center justify-center border">
           <ChevronGlyph className="size-3" />
         </span>
         <span className="min-w-0">
@@ -1039,14 +1039,14 @@ function BookingScreen({ stage }: { stage: number }) {
                   className={cn(
                     "rounded-edge ease-interaction flex-1 border py-2 text-center transition-colors duration-200",
                     on
-                      ? "border-forest bg-forest text-cream"
-                      : "border-cream-line bg-cream",
+                      ? "border-forest bg-forest text-paper"
+                      : "border-paper-line bg-paper",
                   )}
                 >
                   <span
                     className={cn(
                       "tracking-label block text-[8px] font-medium uppercase",
-                      on ? "text-cream/75" : "text-forest/60",
+                      on ? "text-paper/75" : "text-forest/60",
                     )}
                   >
                     {date.day}
@@ -1072,7 +1072,7 @@ function BookingScreen({ stage }: { stage: number }) {
                   key={slot.time}
                   className={cn(
                     "rounded-edge ease-interaction relative border px-2.5 py-2 transition-colors duration-200",
-                    on ? "border-forest bg-forest/5" : "border-cream-line",
+                    on ? "border-forest bg-forest/5" : "border-paper-line",
                     slot.state === "full" && "opacity-45",
                   )}
                 >
@@ -1099,7 +1099,7 @@ function BookingScreen({ stage }: { stage: number }) {
         </div>
       </div>
 
-      <div className="border-cream-line flex flex-none items-center gap-3 border-t px-3 py-2.5">
+      <div className="border-paper-line flex flex-none items-center gap-3 border-t px-3 py-2.5">
         <span>
           <span className="block text-[15px] leading-tight font-bold">
             ₹4,500
@@ -1112,8 +1112,8 @@ function BookingScreen({ stage }: { stage: number }) {
           className={cn(
             "rounded-edge tracking-label ease-interaction flex-1 py-2.5 text-center text-[10px] font-bold uppercase transition-colors duration-200",
             stage >= 2
-              ? "bg-forest text-cream"
-              : "bg-cream-deep text-forest/40",
+              ? "bg-forest text-paper"
+              : "bg-paper-deep text-forest/40",
           )}
         >
           Continue
@@ -1126,10 +1126,10 @@ function BookingScreen({ stage }: { stage: number }) {
 function CheckoutScreen({ payTap }: { payTap: boolean }) {
   return (
     <>
-      {/* pt-11 reserves the lockup band: these screens are cream, so the
+      {/* pt-11 reserves the lockup band: these screens are paper, so the
           band is empty surface above them rather than a scrim over footage. */}
-      <div className="border-cream-line flex flex-none items-center gap-2.5 border-b px-3 pt-11 pb-2.5">
-        <span className="border-cream-line rounded-edge flex size-6 flex-none items-center justify-center border">
+      <div className="border-paper-line flex flex-none items-center gap-2.5 border-b px-3 pt-11 pb-2.5">
+        <span className="border-paper-line rounded-edge flex size-6 flex-none items-center justify-center border">
           <ChevronGlyph className="size-3" />
         </span>
         <span>
@@ -1143,18 +1143,18 @@ function CheckoutScreen({ payTap }: { payTap: boolean }) {
       </div>
 
       <div className="min-h-0 flex-1 space-y-3 overflow-hidden px-3 pt-3">
-        <div className="bg-forest text-cream rounded-edge p-3">
+        <div className="bg-forest text-paper rounded-edge p-3">
           <p className="font-display tracking-display text-[15px] leading-snug">
             Your first breath underwater
           </p>
-          <p className="text-cream/70 mt-0.5 text-[10px]">
+          <p className="text-paper/70 mt-0.5 text-[10px]">
             Tmrw · 9:00 AM · Havelock
           </p>
-          <div className="border-cream/15 mt-2.5 flex items-baseline justify-between border-t pt-2">
+          <div className="border-paper/15 mt-2.5 flex items-baseline justify-between border-t pt-2">
             <span className="text-[11px]">Total · 1 guest</span>
             <span className="text-[13px] font-bold">₹4,500</span>
           </div>
-          <p className="text-cream/60 mt-0.5 text-[9px]">No hidden fees</p>
+          <p className="text-paper/60 mt-0.5 text-[9px]">No hidden fees</p>
         </div>
 
         <div>
@@ -1175,7 +1175,7 @@ function CheckoutScreen({ payTap }: { payTap: boolean }) {
                 <span className="bg-forest size-1.5" />
               </span>
             </span>
-            <span className="border-cream-line rounded-edge flex items-center gap-2.5 border px-2.5 py-2">
+            <span className="border-paper-line rounded-edge flex items-center gap-2.5 border px-2.5 py-2">
               <span className="min-w-0">
                 <span className="block text-[11px] leading-tight font-bold">
                   Card
@@ -1184,14 +1184,14 @@ function CheckoutScreen({ payTap }: { payTap: boolean }) {
                   Credit or debit
                 </span>
               </span>
-              <span className="border-cream-line rounded-edge ml-auto size-3.5 flex-none border-[1.5px]" />
+              <span className="border-paper-line rounded-edge ml-auto size-3.5 flex-none border-[1.5px]" />
             </span>
           </div>
         </div>
 
         <span
           className={cn(
-            "bg-forest text-cream rounded-edge tracking-label ease-interaction block w-full py-2.5 text-center text-[10px] font-bold uppercase transition-transform duration-150",
+            "bg-forest text-paper rounded-edge tracking-label ease-interaction block w-full py-2.5 text-center text-[10px] font-bold uppercase transition-transform duration-150",
             payTap && "scale-[0.96] opacity-90",
           )}
         >
@@ -1222,18 +1222,18 @@ function ConfirmedScreen() {
     <div className="relative flex h-full flex-col items-center justify-center px-5 text-center">
       <div className="caustics opacity-40" />
       <span className="bg-terra-deep flex size-11 items-center justify-center rounded-full">
-        <CheckGlyph className="text-cream size-5" strokeWidth={2.2} />
+        <CheckGlyph className="text-paper size-5" strokeWidth={2.2} />
       </span>
       <p className="font-display tracking-display mt-4 text-[22px] leading-tight">
         You&rsquo;re booked.
       </p>
-      <p className="text-cream/70 mt-1 text-[10px]">
+      <p className="text-paper/70 mt-1 text-[10px]">
         Tmrw · 9:00 AM · Havelock Island
       </p>
-      <p className="border-cream/30 bg-cream/10 rounded-edge tracking-label mt-3.5 border border-dashed px-3 py-1.5 text-[10px] font-bold uppercase">
+      <p className="border-paper/30 bg-paper/10 rounded-edge tracking-label mt-3.5 border border-dashed px-3 py-1.5 text-[10px] font-bold uppercase">
         Ref · YV-4127
       </p>
-      <p className="text-cream/60 mt-3.5 text-[9px]">
+      <p className="text-paper/60 mt-3.5 text-[9px]">
         Ticket sent to your WhatsApp
       </p>
     </div>

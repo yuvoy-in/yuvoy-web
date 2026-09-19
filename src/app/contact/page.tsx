@@ -34,7 +34,7 @@ export const metadata: Metadata = {
  *
  * ## One act, not three (owner direction, 2026-08-08)
  *
- * It used to run as a title spread, then "Reach us directly" on cream, then
+ * It used to run as a title spread, then "Reach us directly" on paper, then
  * "Leave a note" on forest — three full-height sections for a page that says
  * one thing. Each was correctly built and the page still read as empty,
  * because the content was spread thin across a scroll that kept promising
@@ -98,7 +98,7 @@ export default function ContactPage() {
         data-dark-hero
         id="contact"
         aria-labelledby="contact-heading"
-        className="bg-forest text-cream relative -mt-[calc(4rem+env(safe-area-inset-top))] overflow-hidden"
+        className="bg-forest text-paper relative -mt-[calc(4rem+env(safe-area-inset-top))] overflow-hidden"
       >
         {/* The field, in six layers. All decorative, all inert. */}
         <div aria-hidden className="pointer-events-none absolute inset-0">
@@ -141,7 +141,7 @@ export default function ContactPage() {
                 Not sure where to start?{" "}
                 <em className="text-terra-soft font-turn italic">Here.</em>
               </h1>
-              <p className="text-cream/75 mt-8 max-w-md text-lg leading-relaxed">
+              <p className="text-paper/75 mt-8 max-w-md text-lg leading-relaxed">
                 Ask us anything about Yuvoy, tell us what you think, or start a
                 conversation about listing what you run.
               </p>
@@ -163,7 +163,7 @@ export default function ContactPage() {
               */}
               <h2
                 id="channels"
-                className="label text-cream/70 mt-16 scroll-mt-[calc(6rem+env(safe-area-inset-top))]"
+                className="label text-paper/70 mt-16 scroll-mt-[calc(6rem+env(safe-area-inset-top))]"
               >
                 Reach us directly
               </h2>

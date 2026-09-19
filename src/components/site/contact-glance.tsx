@@ -25,14 +25,14 @@ import { CONTACT_CHANNEL_LIST } from "@/lib/site/contact";
  * number exist in one place and cannot drift between here, `/contact` and the
  * footer.
  *
- * No top rule: this cream band sits between the forest registration block and
+ * No top rule: this paper band sits between the forest registration block and
  * the forest footer, so both of its joins are already tone changes.
  */
 export function ContactGlance() {
   return (
     <section
       aria-labelledby="contact-glance-heading"
-      className="bg-cream text-forest"
+      className="bg-paper text-forest"
     >
       <div className="container-page py-12 sm:py-20">
         <div className="flex flex-col gap-6 sm:gap-8 lg:flex-row lg:items-end lg:justify-between lg:gap-16">

@@ -46,12 +46,12 @@ import { LAUNCH_MARKET } from "@/lib/leads/registry";
  * still no operator form here, no audience picker, and nothing a traveller has
  * to read past.
  *
- * Surface rhythm (owner direction, 2026-08-07): forest cover → cream why →
- * forest destinations → cream operators → forest form → cream contact →
+ * Surface rhythm (owner direction, 2026-08-07): forest cover → paper why →
+ * forest destinations → paper operators → forest form → paper contact →
  * forest footer. **It alternates the whole way down**, which is what the
  * design system asks for and what the page did not do until the
  * destination and operator acts swapped surfaces: before that it ran two
- * cream acts and then three dark ones, and the operator act had to draw its
+ * paper acts and then three dark ones, and the operator act had to draw its
  * own hairline to stop merging into the form beneath it.
  *
  * Every join is now a tone change, so no join needs a rule across it — three
@@ -82,7 +82,7 @@ export function Landing({ context }: { context: LeadContext }) {
       <LeadForms context={context} audience="traveller" aside={<JoinAside />} />
       {/* After the ask, not before it: a visitor who has just been asked to
           join and did not is exactly the visitor with a question. It is also
-          the cream breath between the form and the footer, both forest. */}
+          the paper breath between the form and the footer, both forest. */}
       <ContactGlance />
     </main>
   );

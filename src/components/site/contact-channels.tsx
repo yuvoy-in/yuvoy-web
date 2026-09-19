@@ -39,14 +39,14 @@ const CHANNEL_ICONS: Record<string, ComponentType<{ className?: string }>> = {
 };
 
 export function ContactChannels({
-  tone = "cream",
+  tone = "paper",
   className,
 }: {
-  tone?: "cream" | "ink";
+  tone?: "paper" | "ink";
   className?: string;
 }) {
   const dark = tone === "ink";
-  const rule = dark ? "border-cream/12" : "border-cream-line";
+  const rule = dark ? "border-paper/12" : "border-paper-line";
 
   return (
     <ul
@@ -121,7 +121,7 @@ export function ContactChannels({
                   className={cn(
                     "font-display tracking-display mt-1 block text-xl leading-snug font-normal wrap-break-word underline-offset-4 transition-colors duration-200 group-hover:underline sm:text-2xl lg:text-xl",
                     dark
-                      ? "text-cream group-hover:text-terra-soft"
+                      ? "text-paper group-hover:text-terra-soft"
                       : "text-forest group-hover:text-terra-deep",
                   )}
                 >
@@ -135,7 +135,7 @@ export function ContactChannels({
                 // `ml-15` is the plate (44px) plus its gap (16px), so the note
                 // hangs off the address rather than the icon.
                 "mt-3 max-w-sm text-sm leading-relaxed sm:ml-15",
-                dark ? "text-cream/70" : "text-forest/75",
+                dark ? "text-paper/70" : "text-forest/75",
               )}
             >
               {channel.note}

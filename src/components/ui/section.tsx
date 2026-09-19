@@ -7,38 +7,38 @@ import { cn } from "@/lib/cn";
  * one was read as a mistake wherever it appeared, so there is exactly one, and
  * no third option to reach for.
  */
-type Tone = "cream" | "ink";
+type Tone = "paper" | "ink";
 
 const SURFACE: Record<Tone, string> = {
-  cream: "bg-cream text-forest",
-  ink: "bg-forest text-cream",
+  paper: "bg-paper text-forest",
+  ink: "bg-forest text-paper",
 };
 
 /** Accent colour that clears AA against each surface. */
 const ACCENT: Record<Tone, string> = {
-  cream: "text-terra",
+  paper: "text-terra",
   ink: "text-terra-soft",
 };
 
 const EYEBROW: Record<Tone, string> = {
-  cream: "text-terra-deep",
+  paper: "text-terra-deep",
   ink: "text-terra-soft",
 };
 
 const BODY: Record<Tone, string> = {
-  cream: "text-forest/75",
-  ink: "text-cream/70",
+  paper: "text-forest/75",
+  ink: "text-paper/70",
 };
 
 /**
- * A full-width page section, on cream or on forest.
+ * A full-width page section, on paper or on forest.
  *
  * Sections alternate light and dark down a page — that rhythm is what makes
  * long editorial pages readable, so prefer alternating over stacking two of
  * the same tone.
  */
 export function Section({
-  tone = "cream",
+  tone = "paper",
   id,
   className,
   backdrop,
@@ -115,7 +115,7 @@ export function SectionHeading({
   title,
   accent,
   body,
-  tone = "cream",
+  tone = "paper",
   level = 2,
   id,
   className,

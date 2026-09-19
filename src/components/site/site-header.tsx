@@ -32,8 +32,8 @@ import { appHref } from "@/lib/site/product-links";
  * Two behaviours, both owned by `useHeaderChrome`: it slides up as you scroll
  * down and returns as you scroll back, and at the very top of a page whose
  * first section is a dark cover it goes transparent and turns its contents
- * cream, so the top of that page reads as one uninterrupted field rather than
- * a cream bar stuck on a green wall.
+ * paper, so the top of that page reads as one uninterrupted field rather than
+ * a paper bar stuck on a green wall.
  *
  * The layout is a three-column grid rather than a flex row with
  * `justify-between`, because the centre cell — the nav on desktop — has to sit
@@ -64,16 +64,16 @@ export function SiteHeader() {
       /*
         The bar is SOLID below `lg`, and frosted only where frosting works.
 
-        `bg-cream/85` + `backdrop-blur-md` is a translucent bar that relies on
-        `backdrop-filter` to read as cream. On the phone it does not: WebKit
+        `bg-paper/85` + `backdrop-blur-md` is a translucent bar that relies on
+        `backdrop-filter` to read as paper. On the phone it does not: WebKit
         will not sample a backdrop through an element that is itself
         transformed, and this element is — `.header-slide` puts a
         `translateY` on it to slide it out of the way. The blur is dropped and
-        the 85% is not, so the bar renders as plain 15%-transparent cream with
+        the 85% is not, so the bar renders as plain 15%-transparent paper with
         the forest sections showing through and tinting it green, while the
-        same markup on desktop looks like solid cream (owner report,
+        same markup on desktop looks like solid paper (owner report,
         2026-08-10: "on mobile the header bg is kind of transparent, it's not
-        always cream the same way we had for desktop").
+        always paper the same way we had for desktop").
 
         Making it opaque is the fix rather than moving the blur to an inner
         layer: at 64px of bar there is nothing for a blur to do that a solid
@@ -100,7 +100,7 @@ export function SiteHeader() {
         "header-slide sticky top-0 z-40 border-b pt-[env(safe-area-inset-top)]",
         overCover
           ? "border-transparent bg-transparent"
-          : "border-cream-line bg-cream lg:bg-cream/85 lg:backdrop-blur-md",
+          : "border-paper-line bg-paper lg:bg-paper/85 lg:backdrop-blur-md",
       )}
     >
       <div className="container-page grid h-16 grid-cols-[1fr_auto_1fr] items-center gap-4">
@@ -145,7 +145,7 @@ export function SiteHeader() {
             href={appHref("header")}
             className={cn(
               // Monochrome CTAs swap grounds with the bar: paper over the
-              // dark cover, forest on the cream bar.
+              // dark cover, forest on the paper bar.
               buttonVariants({
                 variant: overCover ? "paper" : "primary",
                 size: "sm",

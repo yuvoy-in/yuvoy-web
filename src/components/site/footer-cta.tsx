@@ -26,13 +26,13 @@ export function FooterCta() {
   if (!showsFooterCta(pathname)) return null;
 
   return (
-    <div className="container-page border-cream/12 border-b py-14 sm:py-24">
+    <div className="container-page border-paper/12 border-b py-14 sm:py-24">
       <p className="eyebrow text-terra-soft">Early access</p>
       <h2 className="font-display tracking-display mt-4 max-w-3xl text-4xl leading-[1.05] font-normal text-balance sm:mt-6 sm:text-5xl">
         Be first to{" "}
         <em className="text-terra-soft font-turn italic">experience Yuvoy.</em>
       </h2>
-      <p className="text-cream/70 mt-5 max-w-xl leading-relaxed sm:mt-6 sm:text-lg">
+      <p className="text-paper/70 mt-5 max-w-xl leading-relaxed sm:mt-6 sm:text-lg">
         Real experiences from the people who run them, in Havelock, Neil and
         Port Blair. Booking opens as operators come on.
       </p>
@@ -54,11 +54,11 @@ export function FooterCta() {
         does not cover, so it keeps a door here rather than being retired with
         the leads it would have collected.
       */}
-      <p className="text-cream/70 mt-6 text-sm">
+      <p className="text-paper/70 mt-6 text-sm">
         Somewhere else in mind?{" "}
         <Link
           href={WAITLIST_CTA.href}
-          className="text-cream underline underline-offset-4"
+          className="text-paper underline underline-offset-4"
         >
           Tell us where you want to go
         </Link>
