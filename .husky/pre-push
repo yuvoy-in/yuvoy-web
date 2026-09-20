@@ -30,5 +30,44 @@ if [ "$SKIP_VERIFY" = "1" ]; then
   exit 0
 fi
 
+# The toolchain has to BE here for the gate to mean anything.
+#
+# `core.hooksPath` points at `.husky/_`, a directory husky GENERATES during
+# `pnpm install`. A worktree that was created but never installed in therefore
+# has no hook directory at all: git finds nothing to run and the push succeeds
+# **silently**. No output, no failure, no verification, and it looks exactly
+# like a clean gated push.
+#
+# That is not hypothetical. PR #74 reached `dev` that way on 20 Sep carrying an
+# unformatted file. `format:check` is repo-wide, so the next person to push
+# anything was blocked by a file they had never touched until somebody fixed
+# it. One ungated commit stopped everybody else landing.
+#
+# This check cannot catch that worst case: if `.husky/_` is absent nothing here
+# runs at all, by construction. What it catches is the other half, a hook
+# directory that exists while the dependencies it needs do not, which is what a
+# pruned store or an interrupted install leaves behind. There `pnpm verify`
+# would die with `tsc: not found` and read as a broken change rather than a
+# broken setup, so this says which it is.
+#
+# A fresh worktree needs TWO things before its first push and neither is
+# obvious: `pnpm install`, and a copy of `.env.local`. Without the env file the
+# e2e suite fails around 46 times in a way that looks exactly like a broken
+# change.
+if [ ! -d node_modules ]; then
+  echo ""
+  echo "pre-push: REFUSING. node_modules is missing, so nothing can be verified."
+  echo ""
+  echo "  This is almost certainly a fresh worktree. In THIS directory run:"
+  echo ""
+  echo "      pnpm install"
+  echo "      cp <the main checkout>/.env.local .env.local"
+  echo ""
+  echo "  Then push again. Do not reach for SKIP_VERIFY=1 to get past this."
+  echo "  It would push code that has never been built, tested or type-checked."
+  echo ""
+  exit 1
+fi
+
 echo "pre-push: running pnpm verify (CI does not run this any more)"
 pnpm verify
