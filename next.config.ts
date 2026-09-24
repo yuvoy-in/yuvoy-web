@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import { cspHeaders } from "./src/lib/site/csp";
 import { DEFAULT_HOST } from "./src/lib/analytics/config";
 import { apiBaseUrl } from "./src/lib/api/base-url";
+import { APP_URL } from "./src/lib/site/product-links";
 
 const securityHeaders = [
   {
@@ -147,6 +148,23 @@ const nextConfig: NextConfig = {
       {
         source: "/experiences",
         destination: "/explore#experiences",
+        permanent: false,
+      },
+      /*
+        A listing lives on the app, not here. yuvoy-api has been sending
+        travellers `https://yuvoy.in/e/<slug>` ("book this again" in the
+        hold-expiry and decline messages) since the root-domain move was
+        deferred, and this site answers it with a 404 (yuvoy-api#234). The API
+        is fixing the link; this makes the ones already sent work meanwhile.
+        The path and any query go across as they are.
+
+        Temporary, and it must go when the app takes yuvoy.in (D-102,
+        yuvoy-app#12): then `/e/*` IS the app, and this would send it round
+        in a circle.
+      */
+      {
+        source: "/e/:path*",
+        destination: `${APP_URL}/e/:path*`,
         permanent: false,
       },
     ];
