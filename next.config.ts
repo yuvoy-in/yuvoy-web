@@ -3,6 +3,14 @@ import { cspHeaders } from "./src/lib/site/csp";
 import { DEFAULT_HOST } from "./src/lib/analytics/config";
 import { apiBaseUrl } from "./src/lib/api/base-url";
 import { APP_URL } from "./src/lib/site/product-links";
+import { assertNoSecretPublicVars } from "./src/lib/site/public-env";
+
+/*
+  Before anything is built: a public variable stored in Vercel as a Secret
+  arrives here as "[SENSITIVE]" and would be inlined as that. Stop the build
+  and name it instead. See src/lib/site/public-env.ts.
+*/
+assertNoSecretPublicVars();
 
 const securityHeaders = [
   {
