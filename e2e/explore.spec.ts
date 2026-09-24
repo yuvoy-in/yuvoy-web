@@ -189,6 +189,24 @@ test.describe("the consolidated routes", () => {
   });
 
   /*
+    yuvoy-api#234: the API sends travellers `yuvoy.in/e/<slug>`, where listings
+    have never lived. Until its link is fixed, this site forwards them to the
+    app, path and query intact, and temporarily: the redirect has to go when
+    the app takes the root domain (yuvoy-app#12).
+  */
+  test("a listing link sent to this domain goes on to the app", async ({
+    request,
+  }) => {
+    const res = await request.get("/e/sky-diving-at-key-west?date=2026-10-01", {
+      maxRedirects: 0,
+    });
+    expect(res.status()).toBe(307);
+    expect(res.headers()["location"]).toBe(
+      "https://app.yuvoy.in/e/sky-diving-at-key-west?date=2026-10-01",
+    );
+  });
+
+  /*
     A redirect that lands on a missing anchor drops the reader at the top of a
     long page with no sign anything happened, which is worse than not
     redirecting at all. Each target is checked on the page that now owns it.
