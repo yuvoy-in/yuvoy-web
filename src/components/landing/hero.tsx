@@ -40,8 +40,13 @@ import { appHref } from "@/lib/site/product-links";
  * oversight. A third would have to be checkable without asking anybody —
  * "Andaman first" or "Launching October" are the shape — and two true ones
  * beat an invented third.
+ *
+ * The two changed with yuvoy-web#170. "Waitlist open" and "No payment
+ * required" described a site with nothing to book, standing under a button
+ * into an app that was taking bookings. Both now are checkable in the app
+ * itself, and stay true when the app starts asking for an invite.
  */
-const FACTS = ["Waitlist open", "No payment required"];
+const FACTS = ["Open in Havelock", "Pay at the counter on the day"];
 
 export function Hero() {
   return (
@@ -159,7 +164,7 @@ export function Hero() {
             className="label text-terra-soft emerge"
             style={{ animationDelay: "0.05s" }}
           >
-            Andaman Islands · Opening soon
+            Andaman Islands · Now open
           </p>
 
           {/*

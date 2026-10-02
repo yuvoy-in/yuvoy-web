@@ -231,7 +231,9 @@ test("/about does not ask for the waitlist", async ({ page }) => {
   await page.goto("/about");
 
   await expect(
-    page.getByRole("heading", { name: /be first to experience yuvoy/i }),
+    page.getByRole("heading", {
+      name: /real experiences, from the people who run them/i,
+    }),
   ).toHaveCount(0);
   await expect(
     page.getByRole("main").getByRole("link", { name: /join the waitlist/i }),
@@ -313,9 +315,9 @@ test.describe("the footer's closing call to action", () => {
     test(`${path} closes with it`, async ({ page }) => {
       await page.goto(path);
       await expect(
-        page
-          .getByRole("contentinfo")
-          .getByRole("heading", { name: /be first to experience yuvoy/i }),
+        page.getByRole("contentinfo").getByRole("heading", {
+          name: /real experiences, from the people who run them/i,
+        }),
       ).toBeVisible();
     });
   }
@@ -324,9 +326,9 @@ test.describe("the footer's closing call to action", () => {
     test(`${path} does not`, async ({ page }) => {
       await page.goto(path);
       await expect(
-        page
-          .getByRole("contentinfo")
-          .getByRole("heading", { name: /be first to experience yuvoy/i }),
+        page.getByRole("contentinfo").getByRole("heading", {
+          name: /real experiences, from the people who run them/i,
+        }),
       ).toHaveCount(0);
     });
   }

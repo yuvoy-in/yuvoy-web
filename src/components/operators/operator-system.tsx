@@ -113,7 +113,7 @@ export function OperatorSystem() {
               {/* The product name, once, as a footnote. Nothing above needs
                   it to make sense — that is the condition for it appearing. */}
               <p className="label text-paper/60 mt-8">
-                Yuvoy Experience OS · in development
+                Yuvoy Experience OS · operators.yuvoy.in
               </p>
             </div>
           </div>

@@ -99,19 +99,22 @@ test.describe("/explore", () => {
     }
 
     /*
-      It says plainly that there is nothing to BROWSE HERE — yuvoy-web#154.
+      It says where the experiences are: in the app (yuvoy-web#170).
 
-      This asserted "no listings on Yuvoy yet", which stopped being true:
-      there are published, sellable listings in production. The check is kept
-      and re-aimed rather than deleted, because the thing it was really
-      guarding — that this page never implies you can browse or buy on it — is
-      still the rule.
+      This asserted "Nothing here is browsable or bookable", which was meant
+      of this page and read as a statement about Yuvoy while the app took
+      bookings. Before that it asserted "no listings on Yuvoy yet"
+      (yuvoy-web#154). The rule both guarded is unchanged, and the FABRICATED
+      and assurance checks above still hold it: this page shows no prices,
+      counts or Book buttons of its own.
 
-      And the retired claim is now asserted ABSENT, so a copy change cannot
-      bring back a statement about the catalogue that nothing on this site can
-      keep true.
+      Both retired claims are asserted ABSENT, so a copy change cannot bring
+      back a statement about the catalogue that the site cannot keep true.
     */
-    expect(body).toMatch(/nothing here is browsable or bookable/i);
+    expect(body).toMatch(
+      /what operators are running now, with prices and dates, is in the yuvoy app/i,
+    );
+    expect(body).not.toMatch(/nothing here is browsable or bookable/i);
     expect(body).not.toMatch(/no listings on yuvoy/i);
   });
 });
@@ -248,13 +251,38 @@ test.describe("destination pages", () => {
     });
   }
 
-  test("a destination page states the pre-launch position exactly once", async ({
+  test("a destination page states where it stands exactly once", async ({
     page,
   }) => {
+    /*
+      yuvoy-web#170. Every destination said "currently onboarding ... join the
+      waitlist", Havelock's included, while Havelock took bookings. Havelock is
+      open; Neil and Port Blair have nothing on Yuvoy yet and say so, naming
+      the place that is open rather than implying all three are.
+    */
     await page.goto("/destinations/havelock");
+    expect(
+      await countInPage(page, /experiences in havelock are open for booking/i),
+    ).toBe(1);
     expect(await countInPage(page, /currently onboarding experiences/i)).toBe(
-      1,
+      0,
     );
+
+    await page.goto("/destinations/neil-island");
+    expect(await countInPage(page, /nothing in neil is on yuvoy yet/i)).toBe(1);
+    expect(await countInPage(page, /havelock is open now/i)).toBe(1);
+  });
+
+  test("a destination that is not open does not invite a look at it", async ({
+    page,
+  }) => {
+    // "See what is on in Neil" would send a traveller looking for nothing.
+    await page.goto("/destinations/port-blair");
+    expect(await countInPage(page, /see what is on in/i)).toBe(0);
+    expect(await countInPage(page, /nothing on yuvoy in/i)).toBe(1);
+
+    await page.goto("/destinations/havelock");
+    expect(await countInPage(page, /see what is on in/i)).toBe(1);
   });
 
   test("an unknown destination is a 404, not a blank page", async ({

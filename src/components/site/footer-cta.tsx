@@ -27,14 +27,22 @@ export function FooterCta() {
 
   return (
     <div className="container-page border-paper/12 border-b py-14 sm:py-24">
-      <p className="eyebrow text-terra-soft">Early access</p>
+      {/*
+        yuvoy-web#170. This read "Early access / Be first to experience Yuvoy
+        / Booking opens as operators come on" while the app took bookings. It
+        shows on Neil's and Port Blair's pages too, so it names the one place
+        that is open rather than implying all three are.
+      */}
+      <p className="eyebrow text-terra-soft">Now open</p>
       <h2 className="font-display tracking-display mt-4 max-w-3xl text-4xl leading-[1.05] font-normal text-balance sm:mt-6 sm:text-5xl">
-        Be first to{" "}
-        <em className="text-terra-soft font-turn italic">experience Yuvoy.</em>
+        Real experiences, from{" "}
+        <em className="text-terra-soft font-turn italic">
+          the people who run them.
+        </em>
       </h2>
       <p className="text-paper/70 mt-5 max-w-xl leading-relaxed sm:mt-6 sm:text-lg">
-        Real experiences from the people who run them, in Havelock, Neil and
-        Port Blair. Booking opens as operators come on.
+        Yuvoy is open in Havelock, in the Andaman Islands. See what operators
+        are running, and pay at the counter on the day.
       </p>
       {/* An <a>: this leaves the origin (yuvoy-web#154). */}
       <a

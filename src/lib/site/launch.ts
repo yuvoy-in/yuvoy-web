@@ -1,58 +1,60 @@
 /**
  * Where Yuvoy actually is, stated once.
  *
- * The pre-launch position used to be re-typed into every page, which is how a
+ * The launch position used to be re-typed into every page, which is how a
  * site ends up apologising for itself in six different wordings. It lives here
- * instead: one status line, one plain sentence about booking, and one label
- * for the phase. Everything that needs to say it imports it.
+ * instead: one status line and one label per destination. Everything that
+ * needs to say it imports it.
  *
- * **Rule: a page states the pre-launch position at most once**, and only where
- * it changes what the visitor should do. It is not a disclaimer to be stapled
+ * **Rule: a page states the position at most once**, and only where it
+ * changes what the visitor should do. It is not a disclaimer to be stapled
  * under every section.
+ *
+ * ## Open, and true on both sides of the invite gate (yuvoy-web#170)
+ *
+ * Until this change the site said booking was not live, while the app took
+ * bookings. It now says what is true: Yuvoy is open in Havelock. The app is
+ * due to ask for an invite to book (yuvoy-api#195), so nothing here says
+ * anyone can book right now, and nothing says you cannot (owner's call, 25
+ * Sep 2026). What is running, and how to book it, is the app's to say.
  */
 
 /**
- * How far along a destination is. Andaman is the first launch, not the shape
- * of the platform — the later statuses exist so a second market is a data
- * entry rather than a redesign.
+ * How far along a destination is. Andaman is the first market, not the shape
+ * of the platform, and the statuses exist so a second market is a data entry
+ * rather than a redesign.
+ *
+ * `not-open` replaced `first-launch` (yuvoy-web#170): with Havelock open,
+ * "First launch" on Neil's page read as "Neil is open too", and nothing in
+ * Neil is on Yuvoy yet.
  */
-export type LaunchStatus =
-  "first-launch" | "opening-soon" | "onboarding" | "live";
+export type LaunchStatus = "not-open" | "opening-soon" | "onboarding" | "live";
 
 export const LAUNCH_STATUS_LABEL: Record<LaunchStatus, string> = {
-  "first-launch": "First launch",
+  "not-open": "Not open yet",
   "opening-soon": "Opening soon",
   onboarding: "Onboarding",
-  live: "Live",
+  live: "Open now",
 };
 
 /**
- * The one-line launch position, in three lengths.
+ * The one-line position, in two lengths.
  *
  * `full` carries the phase; `short` is what a phone shows, where the middot
- * chain would wrap into a paragraph. They must agree — if the launch market
+ * chain would wrap into a paragraph. They must agree: if what is open
  * changes, both change together.
  */
 export const ANNOUNCEMENT = {
-  full: "Season One · Opening first in the Andaman Islands · Waitlist open",
-  short: "Opening first in the Andaman Islands",
+  full: "Season One · Open in Havelock, Andaman Islands",
+  short: "Open in Havelock, in the Andaman Islands",
 } as const;
 
-/**
- * The site-wide truth about booking, in one sentence.
- *
- * Used by the cover and by the pages where it materially affects what a
- * visitor can do. Never repeat it inside a page that already carries it.
- */
-export const BOOKING_STATUS =
-  "Booking is not live yet. Join the waitlist for first access.";
-
 /** The footer's standing status line. Facts only: no dates, no counts. */
-export const FOOTER_STATUS = "Opening first in the Andaman Islands.";
+export const FOOTER_STATUS = "Open in Havelock, in the Andaman Islands.";
 
-/** What the first-launch section says about what comes after Andaman. */
+/** What the destinations section says about what comes after Havelock. */
 export const EXPANSION_STATUS =
-  "First launch now being prepared · More destinations joining later";
+  "Open in Havelock · More destinations joining later";
 
 /*
   `OPERATOR_FORM_LIVE` used to live here, false, because the deployed API still

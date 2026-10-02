@@ -51,7 +51,7 @@ export function organizationSchema(): JsonLd {
     name: "Yuvoy",
     url: SITE_URL,
     description:
-      "Yuvoy is building an experience commerce platform, opening first in the Andaman Islands.",
+      "Yuvoy is an experience commerce platform, open in Havelock in the Andaman Islands.",
     slogan: "Experience more.",
     /*
       A square mark on its own ground, not the Open Graph card. Google wants

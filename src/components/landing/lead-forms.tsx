@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { PhoneField } from "@/components/ui/phone-field";
 import { FaqAccordion } from "@/components/site/faq-accordion";
 import { AUDIENCE_COPY } from "@/lib/site/audiences";
+import { appHref } from "@/lib/site/product-links";
 import { submitLead, type SubmitResult } from "@/lib/leads/api";
 import {
   submitOperatorApplication,
@@ -420,9 +421,23 @@ function SuccessNotice({
           )}
         </p>
       ) : (
+        /*
+          yuvoy-web#170. This promised "we will get in touch when experiences
+          for your destination are ready", which stopped being a thing to wait
+          for once Havelock opened. Like the operator's line above, it now
+          names what a traveller can do without waiting for anybody.
+        */
         <p className="text-paper/70 mt-4 leading-relaxed">
-          We will get in touch when experiences for your destination are ready.
-          No spam, and no payment required.
+          You do not have to wait: Yuvoy is open in Havelock now, and what
+          operators are running is{" "}
+          {/* An <a>: this leaves the origin (yuvoy-web#154). */}
+          <a
+            href={appHref("waitlist")}
+            className="text-paper underline underline-offset-4"
+          >
+            in the Yuvoy app
+          </a>
+          . No spam from us.
         </p>
       )}
 

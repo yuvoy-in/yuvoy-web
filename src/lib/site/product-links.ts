@@ -50,7 +50,14 @@ export const OPERATOR_PORTAL_URL = "https://operators.yuvoy.in";
  * "header" are two rows in a report nobody can read.
  */
 export type Placement =
-  "header" | "hero" | "explore" | "destination" | "footer" | "menu";
+  | "header"
+  | "hero"
+  | "explore"
+  | "destination"
+  | "footer"
+  | "menu"
+  /** The traveller waitlist's thank-you, which points at the app (yuvoy-web#170). */
+  | "waitlist";
 
 /**
  * A link into the traveller app, carrying attribution it will actually read.

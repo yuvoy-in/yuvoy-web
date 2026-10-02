@@ -31,9 +31,9 @@ test("landing tells its story in headlines", async ({ page }) => {
   );
   for (const heading of [
     /from too many tabs to one simple place/i,
-    /opening in the andaman islands/i,
+    /open in the andaman islands/i,
     /you run the experience/i,
-    /be first to experience yuvoy/i,
+    /hear when new places open/i,
     /not sure where to start/i,
   ]) {
     await expect(page.getByRole("heading", { name: heading })).toBeVisible();
@@ -159,26 +159,36 @@ test("the demo rail seeks the flow and reports its position", async ({
 });
 
 /*
-  The page shows a full booking flow, right down to a payment, so it has to
-  say plainly that none of it is live yet. Three things carry that, and none
-  may quietly go: the frame's caption (DESIGN_SYSTEM §8), its accessible
-  name, and the registration section's flat "no". The long-form caveat that
-  used to close the why act was dropped on owner direction, 2026-08-06.
+  The phone tour is illustrative, so it carries its caption (DESIGN_SYSTEM §8)
+  and an accessible name that says so.
 */
-test("the page states that nothing is bookable yet", async ({ page }) => {
+test("the preview says it is a sample", async ({ page }) => {
   await page.goto("/");
 
   await expect(page.getByText("Sample preview")).toBeVisible();
   await expect(
     page.getByRole("group", { name: /nothing is bookable yet/i }),
   ).toBeVisible();
-  // The registration FAQ's first answer, in the DOM whether or not the
-  // disclosure is open.
+});
+
+/*
+  yuvoy-web#170. The registration FAQ answered "Can I book today?" with "Not
+  yet", beside a button into an app that was taking bookings. It now says
+  where Yuvoy is open, and makes no promise either way about who can book,
+  because the app is due to ask for an invite (yuvoy-api#195).
+*/
+test("the registration FAQ says where Yuvoy is open", async ({ page }) => {
+  await page.goto("/");
+  // In the DOM whether or not the disclosure is open.
+  await expect(
+    page.getByText("In Havelock, in the Andaman Islands.", { exact: false }),
+  ).toBeAttached();
   await expect(
     page.getByText("Yuvoy is currently preparing its first collection", {
       exact: false,
     }),
-  ).toBeAttached();
+  ).toHaveCount(0);
+  await expect(page.getByText("Can I book today?")).toHaveCount(0);
 });
 
 /*
@@ -205,8 +215,19 @@ test("the cover's momentum line states only true facts", async ({ page }) => {
     are asserted positively, and the retired one is asserted absent, so it
     cannot come back without somebody meaning it.
   */
-  await expect(page.getByText("Waitlist open")).toBeVisible();
-  await expect(page.getByText("No payment required")).toBeVisible();
+  /*
+    The two facts changed with yuvoy-web#170: "Waitlist open" and "No payment
+    required" described a site with nothing to book. Both new ones can be
+    checked in the app, and the old ones are asserted absent.
+  */
+  await expect(
+    page.getByText("Open in Havelock", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Pay at the counter on the day", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Waitlist open")).toHaveCount(0);
+  await expect(page.getByText("No payment required")).toHaveCount(0);
   /*
     The banned thing is a COUNT of operators, not the phrase "founding
     operator" — which is a legitimate call to action on this page and across
@@ -345,12 +366,20 @@ test("traveller form success state (API stubbed)", async ({ page }) => {
   await expect(form.getByRole("status")).toContainText(
     /You[’']re on the Yuvoy waitlist/,
   );
-  // A future promise, never "check your inbox" — there is no autoresponder.
-  // Expressed per destination rather than per market, so it does not have to
-  // be rewritten the day a second one opens.
-  await expect(form.getByRole("status")).toContainText(
-    /We will get in touch when experiences for your destination are ready\./,
+  /*
+    yuvoy-web#170. This promised "We will get in touch when experiences for
+    your destination are ready", after they were. It now names what the
+    traveller can do without waiting, with the way into the app, and never
+    "check your inbox": there is no autoresponder.
+  */
+  const status = form.getByRole("status");
+  await expect(status).toContainText(
+    /You do not have to wait: Yuvoy is open in Havelock now/,
   );
+  await expect(status).not.toContainText(/get in touch when experiences/);
+  const app = status.getByRole("link", { name: "in the Yuvoy app" });
+  await expect(app).toHaveAttribute("href", /app\.yuvoy\.in\/\?/);
+  await expect(app).toHaveAttribute("href", /placement=waitlist/);
 });
 
 /*

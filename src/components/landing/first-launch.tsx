@@ -138,10 +138,10 @@ export function FirstLaunch() {
       <SectionHeading
         id="first-launch-heading"
         tone="ink"
-        eyebrow="First launch"
-        title="Opening in the"
+        eyebrow="Where we are"
+        title="Open in the"
         accent="Andaman Islands."
-        body="We are starting with Havelock, Neil and Port Blair while onboarding more destinations for what comes next."
+        body="Havelock is open now. Neil and Port Blair are not open yet, and more destinations are joining later."
       />
 
       {/* The status line, once. Set as a quiet rule-and-label rather than a

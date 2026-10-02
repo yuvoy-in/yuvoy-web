@@ -61,8 +61,11 @@ export async function generateMetadata({
  * What is left is what only this page can say: what the place is like, what
  * kinds of day it offers, where it sits in the launch, and one way in.
  *
- * The pre-launch position appears exactly once, in the status notice, and is
- * derived from the destination's own `launchStatus` rather than typed.
+ * Where the place stands appears exactly once, in the status notice, and is
+ * derived from the destination's own `launchStatus` rather than typed. The
+ * call to action follows the same status (yuvoy-web#170): "See what is on in
+ * Neil" on a page for a place with nothing on Yuvoy would send a traveller to
+ * look for something that is not there.
  *
  * Content is geography and character only. **No operator names, no prices, no
  * counts of anything** — "the widest range of days on the water" describes a
@@ -151,7 +154,7 @@ export default async function DestinationPage({
           ))}
         </ul>
 
-        {/* The only pre-launch statement on this page, derived from the
+        {/* The only statement of where this place stands, derived from the
             destination's own status rather than typed into it. */}
         <StatusNotice className="mt-14">
           <p>{availabilityMessage(destination)}</p>
@@ -159,14 +162,25 @@ export default async function DestinationPage({
       </Section>
 
       <Section tone="ink" aria-labelledby="cta-heading">
-        <SectionHeading
-          id="cta-heading"
-          tone="ink"
-          eyebrow="Heading here?"
-          title="See what is on in"
-          accent={`${destination.name}.`}
-          body="Browse what operators are running, and hear about the rest as it opens."
-        />
+        {destination.launchStatus === "live" ? (
+          <SectionHeading
+            id="cta-heading"
+            tone="ink"
+            eyebrow="Heading here?"
+            title="See what is on in"
+            accent={`${destination.name}.`}
+            body="Browse what operators are running, and pay at the counter on the day."
+          />
+        ) : (
+          <SectionHeading
+            id="cta-heading"
+            tone="ink"
+            eyebrow="Heading here?"
+            title="Nothing on Yuvoy in"
+            accent={`${destination.name} yet.`}
+            body="See what operators are running elsewhere in the Andaman Islands."
+          />
+        )}
         <div className="mt-12 flex flex-col gap-3 sm:flex-row">
           {/* Opens the app — yuvoy-web#154. An <a>: it leaves the origin. */}
           <a
@@ -197,7 +211,7 @@ export default async function DestinationPage({
             id="related-heading"
             className="font-display text-forest tracking-display text-2xl leading-snug font-normal sm:text-3xl"
           >
-            Also opening first
+            Other destinations
           </h2>
           <DestinationGrid destinations={related} className="mt-10" />
         </Section>

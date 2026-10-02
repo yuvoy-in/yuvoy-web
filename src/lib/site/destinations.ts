@@ -87,14 +87,14 @@ const CONTENT: Record<string, DestinationCopy> = {
     name: "Havelock",
     slug: "havelock",
     region: "Andaman Islands",
-    launchStatus: "first-launch",
+    launchStatus: "live",
     shortDescription:
       "Diving, snorkelling, boat days and the widest range of water experiences.",
     introDescription:
       "Known for established dive operations, beaches and the widest range of days on the water.",
     fullDescription: [
       "Havelock, Swaraj Dweep on the ferry timetable, is where most visitors to the Andamans spend their days on the water. It has the longest-running dive operations in the islands, the widest choice of boats, and beaches that carry a reputation well beyond India.",
-      "It is also where the gap we are building for is most obvious. There is genuinely excellent diving and boat work here, run by people who have been doing it for years, and almost none of it can be found or arranged before you arrive.",
+      "It is also where the gap Yuvoy closes is most obvious. There is genuinely excellent diving and boat work here, run by people who have been doing it for years, and until now almost none of it could be found or arranged before you arrived. It is where Yuvoy opened first.",
     ],
     categories: ["Diving", "Snorkelling", "Boat days", "Shoreline experiences"],
     heroMedia: {
@@ -106,7 +106,7 @@ const CONTENT: Record<string, DestinationCopy> = {
     name: "Neil",
     slug: "neil-island",
     region: "Andaman Islands",
-    launchStatus: "first-launch",
+    launchStatus: "not-open",
     shortDescription:
       "Shallow reefs, slower island days and easy first-time water experiences.",
     introDescription:
@@ -130,7 +130,7 @@ const CONTENT: Record<string, DestinationCopy> = {
     name: "Port Blair",
     slug: "port-blair",
     region: "Andaman Islands",
-    launchStatus: "first-launch",
+    launchStatus: "not-open",
     shortDescription:
       "Food, history, markets and experiences beyond the ferry terminal.",
     introDescription:
@@ -196,10 +196,32 @@ export function availabilityMessage(destination: DestinationContent): string {
     case "opening-soon":
       return `${destination.name} opens next. Join the waitlist to hear first.`;
     case "onboarding":
-    case "first-launch":
-    default:
-      return `Yuvoy is currently onboarding experiences in ${destination.name}. Join the waitlist to hear when the first collection opens.`;
+      return `Yuvoy is currently onboarding experiences in ${destination.name}. Join the waitlist to hear when they open.`;
+    case "not-open":
+    default: {
+      /*
+        yuvoy-web#170. This said "Join the waitlist to hear when the first
+        collection opens" on every page, Havelock's included, while Havelock
+        was taking bookings. A place with nothing on Yuvoy says so plainly and
+        points at what IS open, named from this file rather than typed, so it
+        cannot fall behind when a second destination opens.
+      */
+      const open = openNames(destination);
+      return open
+        ? `Nothing in ${destination.name} is on Yuvoy yet. ${open} open now. Join the waitlist to hear when ${destination.name} opens.`
+        : `Nothing in ${destination.name} is on Yuvoy yet. Join the waitlist to hear when it opens.`;
+    }
   }
+}
+
+/** "Havelock is", "Havelock and Neil are": the open places in this market. */
+function openNames(destination: DestinationContent): string | null {
+  const names = DESTINATIONS.filter(
+    (d) => d.region === destination.region && d.launchStatus === "live",
+  ).map((d) => d.name);
+  if (names.length === 0) return null;
+  if (names.length === 1) return `${names[0]} is`;
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]} are`;
 }
 
 /** Every destination except the one given, for "related destinations" rails. */
