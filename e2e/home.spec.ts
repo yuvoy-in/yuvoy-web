@@ -2,22 +2,15 @@ import { test, expect, type Page } from "./support/session";
 import { pageText } from "./support/text";
 
 /**
- * Nothing on the page may claim a price, a rating or a review count — with
- * one owner-approved exception: the Season One phone preview, which is
- * visibly labelled as a preview and carries `data-preview` on its wrapper
- * (see docs/DESIGN_SYSTEM.md §8). The guard therefore asserts two things:
- * the rule holds everywhere *outside* that wrapper, and the label that
- * justifies the exception is actually present.
+ * Nothing on the page may claim a price, a rating or a review count, except
+ * the listing read from the API (`data-live-listing`), whose price is the
+ * API's (docs/DESIGN_SYSTEM.md §8). Until yuvoy-web#171 the exception was a
+ * mock tour with an invented operator, price and booking reference; an
+ * exemption for something this repository wrote is gone for good.
  */
 const FABRICATED = /₹|\breviews?\b|\bratings?\b/i;
 
-async function textOutsidePreview(page: Page): Promise<string> {
-  return page.evaluate(() => {
-    const clone = document.body.cloneNode(true) as HTMLElement;
-    clone.querySelectorAll("[data-preview]").forEach((n) => n.remove());
-    return clone.textContent ?? "";
-  });
-}
+const LIVE_LISTING = "[data-live-listing]";
 
 /** The homepage's registration section, which no longer has tabs. */
 const registerForm = (page: Page) => page.locator("#register");
@@ -125,50 +118,42 @@ test("the homepage speaks to travellers and points operators elsewhere", async (
   await expect(registerForm(page).getByLabel("Business name")).toHaveCount(0);
 });
 
-test("invented numbers stay inside the preview", async ({ page }) => {
+test("a price appears only on the listing the API sent", async ({ page }) => {
   await page.goto("/");
 
-  // Exactly one wrapper may carry the exception…
-  await expect(page.locator("[data-preview]")).toHaveCount(1);
+  // One panel: the real listing, or the link that stands in for it.
+  await expect(page.locator("[data-listing-panel]")).toHaveCount(1);
 
-  // …and the rule holds everywhere else.
-  expect(await textOutsidePreview(page)).not.toMatch(FABRICATED);
+  expect(await pageText(page, { exclude: LIVE_LISTING })).not.toMatch(
+    FABRICATED,
+  );
+  // Not even the listing carries a rating or a review count.
+  expect(await pageText(page)).not.toMatch(/\breviews?\b|\bratings?\b/i);
 });
 
 /*
-  The why-section tour: the rail is the demo's control surface, so clicking a
-  step must mark that step current (the phone itself is aria-hidden
-  illustration, which is exactly why the rail has to carry the state). The
-  assertion is timing-safe: seeking is synchronous, and the sought act holds
-  aria-current for its full multi-second run.
+  yuvoy-web#171. This suite builds with no API (`http://api.test`, see
+  playwright.config.ts), so the homepage renders its no-listing state, and
+  that is what this pins: no phone, nothing invented in its place, and the
+  way to the listings. The card itself is unit-tested against the API's shape
+  in src/components/landing/live-listing.test.tsx.
 */
-test("the demo rail seeks the flow and reports its position", async ({
-  page,
-}) => {
+test("with no listing to read, the why act invents none", async ({ page }) => {
   await page.goto("/");
+  const panel = page.locator("[data-listing-panel]");
 
-  const bookStep = page.getByRole("button", { name: /^Book/ });
-  await bookStep.scrollIntoViewIfNeeded();
-  await bookStep.click();
-  await expect(bookStep).toHaveAttribute("aria-current", "step");
+  await expect(panel.locator(LIVE_LISTING)).toHaveCount(0);
+  await expect(panel.locator("img")).toHaveCount(0);
+  const browse = panel.getByRole("link", { name: "Browse experiences" });
+  await expect(browse).toBeVisible();
+  await expect(browse).toHaveAttribute(
+    "href",
+    "https://app.yuvoy.in/?src=web&placement=listing",
+  );
 
-  const watchStep = page.getByRole("button", { name: /^Watch/ });
-  await watchStep.click();
-  await expect(watchStep).toHaveAttribute("aria-current", "step");
-  await expect(bookStep).not.toHaveAttribute("aria-current", "step");
-});
-
-/*
-  The phone tour is illustrative, so it carries its caption (DESIGN_SYSTEM §8)
-  and an accessible name that says so.
-*/
-test("the preview says it is a sample", async ({ page }) => {
-  await page.goto("/");
-
-  await expect(page.getByText("Sample preview")).toBeVisible();
-  await expect(
-    page.getByRole("group", { name: /nothing is bookable yet/i }),
-  ).toBeVisible();
+  // What the mock tour said about itself, and about Yuvoy.
+  await expect(page.getByText("Sample preview")).toHaveCount(0);
+  await expect(page.getByText(/nothing is bookable yet/i)).toHaveCount(0);
 });
 
 /*
@@ -235,14 +220,13 @@ test("the cover's momentum line states only true facts", async ({ page }) => {
     banned the phrase and failed on that CTA, which is the right failure for
     the wrong assertion.
 
-    So: no number of operators, signed or otherwise, anywhere the reader meets
-    — outside the preview wrapper, which is the owner-approved place for
-    illustrative content (DESIGN_SYSTEM §8). A number here is a checkable
-    claim about the business, and the last one went stale in five weeks
-    without anybody noticing.
+    So: no number of operators, signed or otherwise, anywhere the reader
+    meets, with no region exempt (the mock tour that once was is gone,
+    yuvoy-web#171). A number here is a checkable claim about the business,
+    and the last one went stale in five weeks without anybody noticing.
   */
   await expect(page.getByText(/\d+\s+founding operators/i)).toHaveCount(0);
-  const text = await pageText(page, { excludePreview: true });
+  const text = await pageText(page);
   expect(text).not.toMatch(/\b\d+\s+(founding\s+)?operators?\b/i);
 });
 

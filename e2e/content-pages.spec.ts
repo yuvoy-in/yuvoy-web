@@ -58,10 +58,9 @@ for (const route of CONTENT_ROUTES) {
 
     test("claims nothing that does not exist", async ({ page }) => {
       await page.goto(route.path);
-      // The phone tour is the one approved place illustrative numbers may
-      // appear (DESIGN_SYSTEM §8); the caption that justifies it is asserted
-      // separately below.
-      const body = await pageText(page, { excludePreview: true });
+      // No region is exempt: none of these pages carries the homepage's
+      // listing, the one place a price may appear (DESIGN_SYSTEM §8).
+      const body = await pageText(page);
       expect(body).not.toMatch(FABRICATED);
       for (const phrase of OVERCLAIMS) {
         expect(body, `${route.path} must not claim ${phrase}`).not.toMatch(

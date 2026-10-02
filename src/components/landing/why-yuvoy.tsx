@@ -1,5 +1,5 @@
 import { Section, SectionHeading } from "@/components/ui/section";
-import { ProductDemo } from "@/components/landing/product-demo";
+import { LiveListingPanel } from "@/components/landing/live-listing";
 import { Wordmark } from "@/components/brand/wordmark";
 import { ScatteredSources } from "@/components/landing/scattered-sources";
 import Image from "next/image";
@@ -9,8 +9,9 @@ import Image from "next/image";
  * one thought. Until 2026-08-06 these were two sections, the observation
  * ("The hard part was never booking.") and the demo ("Scroll. Watch.
  * Book."); a visitor met the argument twice before seeing the point once.
- * This act shows it instead: the hunt on the left, the product running on
- * the right, one arrow between them.
+ * This act shows it instead: the hunt on the left, the product on the right,
+ * one arrow between them. Since yuvoy-web#171 the right is a real listing read
+ * from the app's feed, not a tour of an invented one (see `LiveListingPanel`).
  *
  * The two sides are laid out as a two-row grid rather than two stacked
  * columns: the headers share row one and the panels share row two, so the
@@ -24,9 +25,10 @@ import Image from "next/image";
  * outside the palette. The cards and the table are illustration and are
  * `aria-hidden`; the cost chips are real content and carry the meaning for
  * assistive tech, together with the heading and lede above them. Nothing
- * here may use the words the homepage truthfulness guard bans outside the
- * preview. The reasoning behind every departure from the owner's comp is
- * documented in that file rather than repeated here.
+ * here may use the words the homepage truthfulness guard bans: only the
+ * listing the API sent may carry a price. The reasoning behind every
+ * departure from the owner's comp is documented in that file rather than
+ * repeated here.
  *
  * The act carries the owner's line drawing as a watermark behind everything
  * (2026-08-14). It is an alpha stencil with no ground of its own, so it
@@ -186,7 +188,7 @@ export function WhyYuvoy() {
 
         {/* -------------------------------------------- with Yuvoy · panel */}
         <div className="lg:col-start-3 lg:row-start-2">
-          <ProductDemo />
+          <LiveListingPanel />
         </div>
       </div>
 

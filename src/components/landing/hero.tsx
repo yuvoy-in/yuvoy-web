@@ -21,8 +21,9 @@ import { appHref } from "@/lib/site/product-links";
  * because the optimiser decoding it for every cold variant kept the page
  * from reaching network idle, which timed the e2e structure specs out.
  *
- * The product preview lives in the next act, so the cover's only job is the
- * promise: watch real experiences, make one yours (owner copy, 2026-08-06).
+ * The product, a real listing from the app, lives in the next act, so the
+ * cover's only job is the promise: watch real experiences, make one yours
+ * (owner copy, 2026-08-06).
  *
  * The facts row along the bottom is the page's momentum line and every entry
  * on it must be literally true today.

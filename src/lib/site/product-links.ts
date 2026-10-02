@@ -57,7 +57,9 @@ export type Placement =
   | "footer"
   | "menu"
   /** The traveller waitlist's thank-you, which points at the app (yuvoy-web#170). */
-  | "waitlist";
+  | "waitlist"
+  /** The homepage's real listing, or the link that stands in for it (yuvoy-web#171). */
+  | "listing";
 
 /**
  * A link into the traveller app, carrying attribution it will actually read.
@@ -70,6 +72,18 @@ export function appHref(placement: Placement, source?: LeadSource): string {
   const params = new URLSearchParams({ src: "web", placement });
   if (source && source !== "web") params.set("campaign", source);
   return `${APP_URL}/?${params.toString()}`;
+}
+
+/**
+ * A link to one listing in the traveller app, with the same attribution.
+ *
+ * The app records `src` and `placement` on every route, not only its root, so
+ * a visitor sent straight to a listing is counted the same way. The slug is
+ * the API's, so it is encoded as data rather than trusted as a path segment.
+ */
+export function appListingHref(slug: string, placement: Placement): string {
+  const params = new URLSearchParams({ src: "web", placement });
+  return `${APP_URL}/e/${encodeURIComponent(slug)}?${params.toString()}`;
 }
 
 /**
