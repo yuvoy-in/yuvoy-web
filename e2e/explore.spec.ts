@@ -37,7 +37,7 @@ test.describe("/explore", () => {
     from the homepage met both a second time. Where Yuvoy opens and how it
     works are the homepage's job; what kind of day you can have is this one's.
   */
-  test("does not repeat the homepage's destinations or product tour", async ({
+  test("does not repeat the homepage's destinations or listing", async ({
     page,
   }) => {
     await page.goto("/explore");
@@ -47,7 +47,8 @@ test.describe("/explore", () => {
         0,
       );
     }
-    await expect(page.locator("[data-preview]")).toHaveCount(0);
+    // The why act's panel, which replaced the tour (yuvoy-web#171).
+    await expect(page.locator("[data-listing-panel]")).toHaveCount(0);
   });
 
   /*
@@ -99,25 +100,28 @@ test.describe("/explore", () => {
     }
 
     /*
-      It says plainly that there is nothing to BROWSE HERE — yuvoy-web#154.
+      It says where the experiences are: in the app (yuvoy-web#170).
 
-      This asserted "no listings on Yuvoy yet", which stopped being true:
-      there are published, sellable listings in production. The check is kept
-      and re-aimed rather than deleted, because the thing it was really
-      guarding — that this page never implies you can browse or buy on it — is
-      still the rule.
+      This asserted "Nothing here is browsable or bookable", which was meant
+      of this page and read as a statement about Yuvoy while the app took
+      bookings. Before that it asserted "no listings on Yuvoy yet"
+      (yuvoy-web#154). The rule both guarded is unchanged, and the FABRICATED
+      and assurance checks above still hold it: this page shows no prices,
+      counts or Book buttons of its own.
 
-      And the retired claim is now asserted ABSENT, so a copy change cannot
-      bring back a statement about the catalogue that nothing on this site can
-      keep true.
+      Both retired claims are asserted ABSENT, so a copy change cannot bring
+      back a statement about the catalogue that the site cannot keep true.
     */
-    expect(body).toMatch(/nothing here is browsable or bookable/i);
+    expect(body).toMatch(
+      /what operators are running now, with prices and dates, is in the yuvoy app/i,
+    );
+    expect(body).not.toMatch(/nothing here is browsable or bookable/i);
     expect(body).not.toMatch(/no listings on yuvoy/i);
   });
 });
 
 /*
-  The tour lives on the homepage's why act. It was on `/explore` too until
+  The steps live on the homepage's why act. They were on `/explore` too until
   2026-08-07, which is exactly the repetition that came off.
 */
 test("the three steps are watch, understand and book, and nothing more", async ({
@@ -126,23 +130,25 @@ test("the three steps are watch, understand and book, and nothing more", async (
   await page.goto("/#how");
   const section = page.locator("#how");
 
-  for (const step of ["Watch", "Understand", "Book"]) {
-    await expect(
-      section.getByRole("button", { name: new RegExp(`^${step}`) }),
-    ).toBeVisible();
+  const steps = section
+    .getByRole("list", { name: "How it works" })
+    .getByRole("listitem");
+  await expect(steps).toHaveCount(3);
+  for (const [index, step] of ["Watch", "Understand", "Book"].entries()) {
+    await expect(steps.nth(index)).toContainText(step);
   }
   /*
-    Four, and both kinds named: the tour's three steps and the tour's pause
-    control. It was briefly five while the hunt was an auto-playing deck,
-    which needed its own pause control for WCAG 2.2.2; that deck was replaced
-    by a static scatter on 2026-08-15 and the control went with it.
-
-    The number is the point of this assertion: it exists so the eight-step
+    The counts are the point of this assertion: they exist so the eight-step
     traveller and operator journeys retired with /how-it-works cannot quietly
     come back, and so a stray control cannot appear in this act unnoticed.
-    Change it only alongside a control you can name here.
+
+    No buttons: the steps were buttons that sought the tour, and the tour had
+    a pause control, until yuvoy-web#171 replaced it with a real listing. One
+    link: that listing, or the link that stands in for it when there is none.
+    Change either only alongside a control you can name here.
   */
-  await expect(section.getByRole("button")).toHaveCount(4);
+  await expect(section.getByRole("button")).toHaveCount(0);
+  await expect(section.getByRole("link")).toHaveCount(1);
 });
 
 test.describe("the consolidated routes", () => {
@@ -248,13 +254,38 @@ test.describe("destination pages", () => {
     });
   }
 
-  test("a destination page states the pre-launch position exactly once", async ({
+  test("a destination page states where it stands exactly once", async ({
     page,
   }) => {
+    /*
+      yuvoy-web#170. Every destination said "currently onboarding ... join the
+      waitlist", Havelock's included, while Havelock took bookings. Havelock is
+      open; Neil and Port Blair have nothing on Yuvoy yet and say so, naming
+      the place that is open rather than implying all three are.
+    */
     await page.goto("/destinations/havelock");
+    expect(
+      await countInPage(page, /experiences in havelock are open for booking/i),
+    ).toBe(1);
     expect(await countInPage(page, /currently onboarding experiences/i)).toBe(
-      1,
+      0,
     );
+
+    await page.goto("/destinations/neil-island");
+    expect(await countInPage(page, /nothing in neil is on yuvoy yet/i)).toBe(1);
+    expect(await countInPage(page, /havelock is open now/i)).toBe(1);
+  });
+
+  test("a destination that is not open does not invite a look at it", async ({
+    page,
+  }) => {
+    // "See what is on in Neil" would send a traveller looking for nothing.
+    await page.goto("/destinations/port-blair");
+    expect(await countInPage(page, /see what is on in/i)).toBe(0);
+    expect(await countInPage(page, /nothing on yuvoy in/i)).toBe(1);
+
+    await page.goto("/destinations/havelock");
+    expect(await countInPage(page, /see what is on in/i)).toBe(1);
   });
 
   test("an unknown destination is a 404, not a blank page", async ({

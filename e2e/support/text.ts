@@ -22,17 +22,19 @@ import { waitForRouteReady } from "./ready";
  * DOM instead: it takes all the text, and drops only the parts that are not
  * content.
  *
- * ## The preview exception
+ * ## Leaving a region out
  *
- * `excludePreview` removes `[data-preview]` — the phone tour, which is the one
- * owner-approved place illustrative prices and seat counts may appear
- * (docs/DESIGN_SYSTEM.md §8). Any spec that passes it should also assert the
- * caption that justifies the exception is present, or the exception becomes a
- * hole rather than a carve-out.
+ * `exclude` drops every element matching a selector. The homepage passes
+ * `[data-live-listing]`: the listing read from the API is the one place a
+ * price may appear, because it is the API's price (docs/DESIGN_SYSTEM.md §8).
+ * It used to be `excludePreview`, which exempted a mock tour from the same
+ * rule, and an exempt region is where a rule stops being checked: the tour
+ * carried an invented operator for six weeks (yuvoy-web#171). Exclude real
+ * data only, never something this repository wrote.
  */
 export async function pageText(
   page: Page,
-  { excludePreview = false }: { excludePreview?: boolean } = {},
+  { exclude }: { exclude?: string } = {},
 ): Promise<string> {
   /*
     Wait for the route to have rendered before reading a single character.
@@ -57,7 +59,7 @@ export async function pageText(
   */
   await waitForRouteReady(page);
 
-  return page.evaluate((dropPreview) => {
+  return page.evaluate((dropSelector) => {
     const clone = document.body.cloneNode(true) as HTMLElement;
     // Scripts and styles are not content. The dev overlay and the route
     // announcer are the framework talking to itself.
@@ -82,18 +84,18 @@ export async function pageText(
       DOM here instead of using `innerText`.
     */
     clone.querySelectorAll("[hidden]").forEach((node) => node.remove());
-    if (dropPreview) {
-      clone.querySelectorAll("[data-preview]").forEach((node) => node.remove());
+    if (dropSelector) {
+      clone.querySelectorAll(dropSelector).forEach((node) => node.remove());
     }
     return clone.textContent ?? "";
-  }, excludePreview);
+  }, exclude ?? null);
 }
 
 /** How many times a pattern occurs in the page's readable text. */
 export async function countInPage(
   page: Page,
   pattern: RegExp,
-  options?: { excludePreview?: boolean },
+  options?: { exclude?: string },
 ): Promise<number> {
   const text = await pageText(page, options);
   const global = new RegExp(

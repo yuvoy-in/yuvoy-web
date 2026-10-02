@@ -58,10 +58,9 @@ for (const route of CONTENT_ROUTES) {
 
     test("claims nothing that does not exist", async ({ page }) => {
       await page.goto(route.path);
-      // The phone tour is the one approved place illustrative numbers may
-      // appear (DESIGN_SYSTEM §8); the caption that justifies it is asserted
-      // separately below.
-      const body = await pageText(page, { excludePreview: true });
+      // No region is exempt: none of these pages carries the homepage's
+      // listing, the one place a price may appear (DESIGN_SYSTEM §8).
+      const body = await pageText(page);
       expect(body).not.toMatch(FABRICATED);
       for (const phrase of OVERCLAIMS) {
         expect(body, `${route.path} must not claim ${phrase}`).not.toMatch(
@@ -231,7 +230,9 @@ test("/about does not ask for the waitlist", async ({ page }) => {
   await page.goto("/about");
 
   await expect(
-    page.getByRole("heading", { name: /be first to experience yuvoy/i }),
+    page.getByRole("heading", {
+      name: /real experiences, from the people who run them/i,
+    }),
   ).toHaveCount(0);
   await expect(
     page.getByRole("main").getByRole("link", { name: /join the waitlist/i }),
@@ -313,9 +314,9 @@ test.describe("the footer's closing call to action", () => {
     test(`${path} closes with it`, async ({ page }) => {
       await page.goto(path);
       await expect(
-        page
-          .getByRole("contentinfo")
-          .getByRole("heading", { name: /be first to experience yuvoy/i }),
+        page.getByRole("contentinfo").getByRole("heading", {
+          name: /real experiences, from the people who run them/i,
+        }),
       ).toBeVisible();
     });
   }
@@ -324,9 +325,9 @@ test.describe("the footer's closing call to action", () => {
     test(`${path} does not`, async ({ page }) => {
       await page.goto(path);
       await expect(
-        page
-          .getByRole("contentinfo")
-          .getByRole("heading", { name: /be first to experience yuvoy/i }),
+        page.getByRole("contentinfo").getByRole("heading", {
+          name: /real experiences, from the people who run them/i,
+        }),
       ).toHaveCount(0);
     });
   }

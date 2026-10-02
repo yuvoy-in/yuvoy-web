@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   // "... · Yuvoy for Operators · Yuvoy".
   title: { absolute: "List and manage experiences · Yuvoy for Operators" },
   description:
-    "Show what you offer through real video, manage availability, and bring enquiries, bookings and payments into one place. Yuvoy is onboarding founding operators now.",
+    "Show what you offer through real video, manage availability, and bring enquiries, bookings and payments into one place. Yuvoy is open in Havelock, and operators can set up today.",
   alternates: { canonical: "/operators" },
 };
 
@@ -69,15 +69,23 @@ const STEPS = [
     body: "We help structure the details and prepare the video.",
   },
   {
-    title: "Launch",
-    body: "The experience goes live when the destination collection opens.",
+    /*
+      yuvoy-web#170: "goes live when the destination collection opens" waited
+      on a collection that had opened. What actually gates a listing going on
+      sale is our review and the documents its activity requires
+      (`Experience.bookable` in the API contract).
+    */
+    title: "Go live",
+    body: "The experience goes on sale in the app once it is reviewed and the documents it needs are checked.",
   },
 ];
 
 const BENEFITS = [
   {
-    title: "First collection",
-    body: "Be considered for the initial experience collection in your destination.",
+    // yuvoy-web#170: was "Be considered for the initial experience
+    // collection", which had already been chosen and opened.
+    title: "In the app",
+    body: "Travellers find your experiences in the Yuvoy app, filmed by you.",
   },
   {
     title: "Listing support",
@@ -148,7 +156,7 @@ export default async function OperatorsPage({
                 aria-hidden
                 className="bg-terra-soft mt-1.5 size-1 shrink-0"
               />
-              Currently onboarding in the Andaman Islands and speaking with
+              Open in Havelock, in the Andaman Islands, and speaking with
               operators in other destinations.
             </p>
           </>
@@ -243,12 +251,13 @@ export default async function OperatorsPage({
           the offer and before the application, so an operator meets it while
           deciding rather than while being persuaded.
         */}
-        <StatusNotice label="Pre-launch" className="mt-14">
+        {/* yuvoy-web#170: the label and first sentence said "pre-launch"
+            after launch. The disclosures themselves are unchanged. */}
+        <StatusNotice label="Before you apply" className="mt-14">
           <p>
-            Yuvoy is currently pre-launch. Applying starts a conversation; it
-            does not create a listing, partnership or commercial agreement.
-            Pricing, commissions and payout terms will be agreed before an
-            operator goes live.
+            Applying starts a conversation; it does not create a listing,
+            partnership or commercial agreement. Pricing, commissions and payout
+            terms will be agreed before an operator goes live.
           </p>
         </StatusNotice>
       </Section>

@@ -6,7 +6,7 @@ export const alt = "Join the Yuvoy waitlist";
 
 export default function Image() {
   return renderOg({
-    eyebrow: "Get first access",
+    eyebrow: "Hear when new places open",
     title: "Join the waitlist.",
     footer: "Experience more.",
   });

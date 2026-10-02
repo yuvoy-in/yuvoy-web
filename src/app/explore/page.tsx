@@ -21,7 +21,7 @@ export const viewport = VIEWPORT_ON_FOREST;
 export const metadata: Metadata = {
   title: "Explore experiences and destinations",
   description:
-    "See what a place actually offers through videos from the people who run the experiences. Yuvoy is opening first in the Andaman Islands.",
+    "See what a place actually offers through videos from the people who run the experiences. Yuvoy is open in Havelock, in the Andaman Islands.",
   alternates: { canonical: "/explore" },
 };
 
@@ -61,20 +61,16 @@ export const metadata: Metadata = {
  * filters nothing. Until real listings are connected this page describes kinds
  * of day; when they are, the grid takes data and nothing here needs redesign.
  *
- * ## The link out, which is not here yet
+ * ## The link out
  *
- * Every call to action on this page pointed at `/waitlist`, and that was
- * correct today: the owner's position is that we do not go live until
- * payments are integrated, so sending a traveller to a product they cannot
- * buy from would be the mistake. At launch these become links to
- * `app.yuvoy.in` carrying `src`, `code`, `placement` and `campaign` — the
- * only four parameters the app reads (`src/lib/booking/attribution.ts` in
- * yuvoy-app; `utm_*` and `ref` are silently dropped).
+ * The calls to action open `app.yuvoy.in` (yuvoy-web#154, 9 Sep 2026),
+ * carrying `src` and `placement`, which the app reads
+ * (`src/lib/booking/attribution.ts` in yuvoy-app; `utm_*` and `ref` are
+ * silently dropped). The waitlist stays as the secondary path.
  *
- * `src` must be a value on the app's accepted list, which is the API's
- * `Attribution.source` enum, and `web` is NOT on it — see yuvoy-web#154 and
- * the API issue raised from it. Nothing switches on until the owner says the
- * app is open (yuvoy-web#154).
+ * Since yuvoy-web#170 nothing on this page says the experiences cannot be
+ * booked: they are in the app. Nothing here says anyone can book right now
+ * either, because the app is due to ask for an invite (yuvoy-api#195).
  */
 const CONTENTS = [
   { href: "#experiences", label: "Experiences" },
@@ -151,19 +147,20 @@ export default function ExplorePage() {
           business.
         */}
         {/*
-          The notice says what THIS page is, not what the catalogue is.
+          The notice says what THIS page is, and where the experiences are.
 
-          "Nothing here is browsable or bookable" stays true of this page — it
-          describes kinds of day and shows no prices, counts or Book buttons,
-          which is the rule stated in this file's docblock and unchanged. What
-          it adds now is where somebody goes to do the browsing, because as of
-          9 Sep 2026 there is somewhere.
+          It said "Nothing here is browsable or bookable", which was meant of
+          this page and read as a statement about Yuvoy while the app took
+          bookings (yuvoy-web#170). The page still shows no prices, counts or
+          Book buttons, by the rule in this file's docblock; it just no longer
+          says so as if it were news. "The kinds of day Yuvoy is for" rather
+          than "what is in Havelock": not every category below has a listing
+          running yet, and the app is where that is answered.
         */}
-        <StatusNotice label="Collection preview" className="mt-14">
+        <StatusNotice label="In the app" className="mt-14">
           <p>
-            These are the kinds of day the first collection is being built
-            around. Nothing here is browsable or bookable. The experiences
-            themselves, with prices and dates, are in the app.
+            These are the kinds of day Yuvoy is for. What operators are running
+            now, with prices and dates, is in the Yuvoy app.
           </p>
         </StatusNotice>
       </Section>
@@ -210,17 +207,19 @@ export default function ExplorePage() {
       {/* --------------------------------------------------------------- ask */}
       <Section aria-labelledby="explore-cta-heading">
         <div className="mx-auto max-w-2xl text-center">
-          <p className="eyebrow text-terra-deep">Early access</p>
+          {/* yuvoy-web#170: was "Early access / Be first to experience
+              Yuvoy", over a button into an open app. */}
+          <p className="eyebrow text-terra-deep">Now open</p>
           <h2
             id="explore-cta-heading"
             className="font-display tracking-display mt-6 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-normal text-balance"
           >
-            Be first to experience{" "}
-            <em className="text-terra font-turn italic">Yuvoy.</em>
+            See what operators{" "}
+            <em className="text-terra font-turn italic">are running.</em>
           </h2>
           <p className="text-forest/75 mt-6 text-lg leading-relaxed">
-            Real experiences from the people who run them, in Havelock, Neil and
-            Port Blair.
+            Real experiences from the people who run them. Open in Havelock now,
+            in the Yuvoy app.
           </p>
           {/* Opens the app — yuvoy-web#154. An <a>: it leaves the origin. */}
           <a

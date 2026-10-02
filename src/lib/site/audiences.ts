@@ -45,19 +45,26 @@ export interface AudienceCopy {
 }
 
 export const AUDIENCE_COPY: Record<LeadAudience, AudienceCopy> = {
+  /*
+    yuvoy-web#170. This side promised "we will contact you when the first
+    experiences for your destination are ready", under "Early access" and "Be
+    first to experience Yuvoy", while the experiences were already in the app.
+    The waitlist stays, for somebody who wants to hear when a place opens
+    (owner's call, 9 Sep 2026); it no longer pretends to be the way in.
+  */
   traveller: {
     audience: "traveller",
     param: "traveller",
     tabLabel: "I'm travelling",
     tabHint: "Join the waitlist",
-    eyebrow: "Early access",
-    title: "Be first to experience",
-    accent: "Yuvoy.",
-    lede: "Join the waitlist and we will contact you when the first experiences for your destination are ready.",
+    eyebrow: "Stay in touch",
+    title: "Hear when new places",
+    accent: "open.",
+    lede: "Yuvoy is open in Havelock now. Join the waitlist to hear when new destinations and experiences open.",
     faqs: WAITLIST_FAQS,
     metaTitle: "Join the waitlist",
     metaDescription:
-      "Join the Yuvoy waitlist for first access to local dives, boat days, food and culture in Havelock, Neil and Port Blair.",
+      "Join the Yuvoy waitlist to hear when new destinations and experiences open in the Andaman Islands.",
   },
   provider: {
     audience: "provider",

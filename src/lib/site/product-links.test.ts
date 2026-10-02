@@ -3,6 +3,7 @@ import {
   APP_URL,
   OPERATOR_PORTAL_URL,
   appHref,
+  appListingHref,
   operatorPortalHref,
 } from "./product-links";
 
@@ -63,6 +64,23 @@ describe("appHref", () => {
     for (const key of [...url.searchParams.keys()]) {
       expect(["src", "code", "placement", "campaign"]).toContain(key);
     }
+  });
+});
+
+describe("appListingHref", () => {
+  it("opens the listing itself, with the same attribution", () => {
+    // yuvoy-web#171: the homepage shows a real listing and links to it.
+    expect(appListingHref("havelock-discover-scuba-nemo-reef", "listing")).toBe(
+      `${APP_URL}/e/havelock-discover-scuba-nemo-reef?src=web&placement=listing`,
+    );
+  });
+
+  it("treats the slug as data", () => {
+    // It comes from the API, so it cannot be allowed to add a path segment
+    // or a query of its own.
+    const url = new URL(appListingHref("a/b?src=evil", "listing"));
+    expect(url.pathname).toBe("/e/a%2Fb%3Fsrc%3Devil");
+    expect(url.searchParams.getAll("src")).toEqual(["web"]);
   });
 });
 

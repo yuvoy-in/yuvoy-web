@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s · Yuvoy",
   },
   description:
-    "Discover real-world experiences through videos from the people who run them. Yuvoy is opening first in the Andaman Islands.",
+    "Discover real-world experiences through videos from the people who run them. Yuvoy is open in Havelock, in the Andaman Islands.",
   applicationName: "Yuvoy",
   robots: IS_PRODUCTION ? undefined : { index: false, follow: false },
   openGraph: {
@@ -34,14 +34,14 @@ export const metadata: Metadata = {
     siteName: "Yuvoy",
     title: "Yuvoy · Discover real experiences through video",
     description:
-      "Discover real-world experiences through videos from the people who run them. Yuvoy is opening first in the Andaman Islands.",
+      "Discover real-world experiences through videos from the people who run them. Yuvoy is open in Havelock, in the Andaman Islands.",
     url: SITE_URL,
   },
   twitter: {
     card: "summary_large_image",
     title: "Yuvoy · Discover real experiences through video",
     description:
-      "Discover real-world experiences through videos from the people who run them. Yuvoy is opening first in the Andaman Islands.",
+      "Discover real-world experiences through videos from the people who run them. Yuvoy is open in Havelock, in the Andaman Islands.",
   },
 };
 

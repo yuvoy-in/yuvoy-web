@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 import { cspHeaders } from "./src/lib/site/csp";
 import { DEFAULT_HOST } from "./src/lib/analytics/config";
 import { apiBaseUrl } from "./src/lib/api/base-url";
+import { POSTER_REMOTE_PATTERN } from "./src/lib/api/listing-poster";
 import { APP_URL } from "./src/lib/site/product-links";
 import { assertNoSecretPublicVars } from "./src/lib/site/public-env";
 
@@ -81,6 +82,13 @@ const nextConfig: NextConfig = {
       brush strokes (see WaveMark).
     */
     qualities: [75, 100],
+    /*
+      The homepage's real listing (yuvoy-web#171) shows its poster through
+      the optimiser, so the image comes from this origin and the CSP's
+      `img-src 'self'` stands. One exact host and path, shared with the
+      listing reader so the two cannot disagree: src/lib/api/listing-poster.ts.
+    */
+    remotePatterns: [POSTER_REMOTE_PATTERN],
   },
   async headers() {
     /*

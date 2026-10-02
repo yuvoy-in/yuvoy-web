@@ -18,9 +18,16 @@ export interface Faq {
 /** Beneath the traveller waitlist. Three, and no more. */
 export const WAITLIST_FAQS: Faq[] = [
   {
-    question: "Can I book today?",
+    /*
+      yuvoy-web#170. This was "Can I book today? Not yet", answered on the
+      same page as a button into the app that was taking bookings. The answer
+      now says where Yuvoy is open and where the experiences are, and makes
+      no promise either way about who can book: the app is due to ask for an
+      invite (yuvoy-api#195) and says so itself (owner's call, 25 Sep 2026).
+    */
+    question: "Where is Yuvoy open?",
     answer:
-      "Not yet. Yuvoy is currently preparing its first collection of experiences.",
+      "In Havelock, in the Andaman Islands. What operators are running, with prices and dates, is in the Yuvoy app, and you pay at the counter on the day.",
   },
   {
     question: "Does joining cost anything?",
