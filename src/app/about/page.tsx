@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   // and "About Yuvoy · Yuvoy" is worse. This is the title the brief asks for.
   title: { absolute: "About Yuvoy" },
   description:
-    "Yuvoy connects people with real-world experiences and the people who run them. What it is, why it exists, and why it is opening first in the Andaman Islands.",
+    "Yuvoy connects people with real-world experiences and the people who run them. What it is, why it exists, and why it opened first in the Andaman Islands.",
   alternates: { canonical: "/about" },
 };
 
@@ -148,7 +148,7 @@ export default function AboutPage() {
           </div>
         </div>
         <p className="font-display tracking-display mt-14 text-2xl leading-snug font-normal text-balance sm:text-3xl">
-          Yuvoy is being built to make{" "}
+          Yuvoy is built to make{" "}
           <em className="text-terra-soft font-turn italic">
             both sides simpler.
           </em>
@@ -164,9 +164,9 @@ export default function AboutPage() {
           body={
             <>
               <p>
-                Yuvoy is opening first in the Andaman Islands, where experiences
+                Yuvoy opened first in the Andaman Islands, where experiences
                 depend on real operators, changing conditions and local
-                knowledge. It is the first launch, not the limit of the
+                knowledge. It is the first market, not the limit of the
                 platform.
               </p>
               <p className="mt-4">
@@ -210,14 +210,21 @@ export default function AboutPage() {
           id="status-heading"
           tone="ink"
           eyebrow="Where we are"
-          title="Preparing the"
-          accent="first launch."
+          title="Open in"
+          accent="Havelock."
         />
+        {/*
+          yuvoy-web#170. This said "Nothing on the site is bookable yet" while
+          the app took bookings. It now says where Yuvoy is open and where the
+          experiences are, and makes no promise either way about who can book
+          (the app is due to ask for an invite, yuvoy-api#195).
+        */}
         <StatusNotice tone="ink" className="mt-10">
           <p>
-            Yuvoy is currently preparing its first launch. The traveller
-            waitlist and founding-operator applications are open. Nothing on the
-            site is bookable yet.
+            Yuvoy is open in Havelock, in the Andaman Islands. What operators
+            are running, with prices and dates, is in the Yuvoy app, and you pay
+            at the counter on the day. Operators can set their business up at
+            operators.yuvoy.in. Neil and Port Blair are not open yet.
           </p>
         </StatusNotice>
         {/*

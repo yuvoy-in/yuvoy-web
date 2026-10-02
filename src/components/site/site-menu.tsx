@@ -300,10 +300,12 @@ export function SiteMenu({
               {/* The room a desktop has and a phone does not. Informational
                   only, so there is nothing here to miss on a small screen. */}
               <div className="hidden lg:col-span-5 lg:block lg:pt-2">
+                {/* yuvoy-web#170: said Season One "opens ... when the water
+                    clears", after it had opened. */}
                 <p className="font-display text-forest tracking-display text-2xl leading-snug text-balance">
-                  Season One opens in the Andaman Islands{" "}
+                  Season One is open in{" "}
                   <em className="text-terra font-turn italic">
-                    when the water clears.
+                    the Andaman Islands.
                   </em>
                 </p>
                 <p className="text-forest/75 mt-5 max-w-xs leading-relaxed">

@@ -38,7 +38,7 @@ Short, structured, no filler — but never drop a caveat or risk. Before → Aft
 
 - Conventional Commits (`feat:`, `fix:`, `chore:`, `refactor:`, `docs:`). **No `Co-Authored-By` trailer.**
 - Protected `main`/`dev`, PR-only. Branch `feat/*` off `dev`.
-- **`pnpm verify` is the gate, and it runs locally.** Typecheck, lint, format, unit tests, production build, full e2e — ~80s, enforced by `.husky/pre-push`. **GitHub Actions runs deployments only** (2 min to staging on push to `dev`, 2 min to production on push to `main`); CI is `workflow_dispatch` only. This is a cost decision made on 2026-08-14 at 90% of the free Actions quota with no budget to exceed it — the reasoning, and what to restore first when that changes, is in `.github/workflows/ci.yml` and `production.yml`.
+- **`pnpm verify` is the gate, and it runs locally.** Typecheck, lint, format, unit tests, production build, full e2e — ~80s, enforced by `.husky/pre-push`. **GitHub Actions runs deployments only** (2 min to staging on push to `dev`; production is deployed by Vercel's Git integration on push to `main`, and `production.yml` is a manual redeploy since 24 Sep 2026); CI is `workflow_dispatch` only. This is a cost decision made on 2026-08-14 at 90% of the free Actions quota with no budget to exceed it — the reasoning, and what to restore first when that changes, is in `.github/workflows/ci.yml` and `production.yml`.
 - `SKIP_VERIFY=1 git push` bypasses the gate. Nothing downstream will catch what it lets through.
 
 ## Modes

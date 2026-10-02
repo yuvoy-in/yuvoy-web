@@ -27,7 +27,7 @@ test.describe("/waitlist", () => {
     await expect(page).toHaveURL(/\/waitlist$/);
     await expect(
       rendered(page.getByRole("heading", { level: 1 })),
-    ).toContainText("Be first to experience Yuvoy.");
+    ).toContainText("Hear when new places open.");
   });
 
   test("defaults to the traveller audience", async ({ page }) => {
@@ -167,7 +167,9 @@ test.describe("/waitlist", () => {
     // The footer's closing CTA block, not its site map: the map may list the
     // waitlist as a route, but the page must not ask twice.
     await expect(
-      footer.getByRole("heading", { name: /be first to experience yuvoy/i }),
+      footer.getByRole("heading", {
+        name: /real experiences, from the people who run them/i,
+      }),
     ).toHaveCount(0);
   });
 });
@@ -292,8 +294,8 @@ test.describe("/waitlist audience tabs", () => {
     await page.goto("/waitlist");
 
     const main = rendered(page.getByRole("main"));
-    await expect(main).toContainText("Early access");
-    await expect(main).toContainText("Can I book today?");
+    await expect(main).toContainText("Stay in touch");
+    await expect(main).toContainText("Where is Yuvoy open?");
     await expect(
       main.getByRole("button", { name: "Join the waitlist" }),
     ).toBeVisible();
@@ -306,8 +308,8 @@ test.describe("/waitlist audience tabs", () => {
     await expect(main).toContainText("Applying");
     await expect(main).toContainText("Does applying cost anything?");
     // The traveller's side is gone entirely, not merely hidden behind it.
-    await expect(main).not.toContainText("Early access");
-    await expect(main).not.toContainText("Can I book today?");
+    await expect(main).not.toContainText("Stay in touch");
+    await expect(main).not.toContainText("Where is Yuvoy open?");
     await expect(rendered(page.getByRole("heading", { level: 1 }))).toHaveCount(
       1,
     );

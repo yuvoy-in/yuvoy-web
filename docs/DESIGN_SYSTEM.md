@@ -43,7 +43,7 @@ Brand Kit v2. Every ratio below is measured (sRGB relative luminance, WCAG 2.2) 
 | `terra`      | `#BE7149` | Accent — decoration and LARGE display text only (3.72:1)       |
 | `terra-deep` | `#985028` | Text-capable accent (5.98:1 on paper); never a CTA fill        |
 | `terra-soft` | `#D89772` | Accent text on forest (5.36:1)                                 |
-| `device`     | `#0A100E` | **The preview bezel only** — an object's colour, not a surface |
+| `device`     | `#0A100E` | **The phone's bezel only**: an object's colour, not a surface. |
 
 ### Measured contrast
 
@@ -175,7 +175,7 @@ Two budgets, and they are not the same thing — this is the ruling that resolve
 ## 4. Radius, spacing, sizing, grid
 
 - **Radius: `rounded-edge` (2px) — the editorial near-square.** Buttons, inputs, cards and panels all share it. **Pills are not part of the system** (v1 used them; v2 does not).
-- **`--radius-device` (2.25rem) — the one rounded object in the system**: the Season One phone-preview frame. It depicts hardware, not UI; nothing else may use it. (Tiny `rounded-full` dots inside the preview depict hardware/avatars and share this exemption.)
+- **`--radius-device` (2.25rem), the one rounded object in the system**: the phone frame the homepage's live listing sits in (§8). It depicts hardware, not UI; nothing else may use it. (The tiny `rounded-full` camera dot on the frame depicts hardware and shares this exemption.)
 - **`bg-device` — the bezel's near-black**, on that same frame and nothing else (owner direction, 2026-08-06). `forest` was tried and reads green at 4px of bezel. This is **not a second dark surface**: it is what a phone's frame is made of, and `Section` still offers one dark tone and no choice to make. `palette.test.ts` pins that exactly one element in `src` carries `bg-device`, and that it is darker than `forest` — the moment a section takes it, the site has two darks again. Not pure `#000`, which sits harder than anything else on the page and rims the frame against paper.
 - **The bezel's padding and the screen's radius are one measurement.** The screen is `calc(var(--radius-device) - <bezel padding>)`; change the padding without the radius and the two curves stop being concentric, which shows as an uneven bezel at the corners.
 - **`device-frame` — the one gradient and the one shadow in the system**, on that same frame and nothing else (owner direction, 2026-08-06). The frame is an object resting on the page rather than a panel drawn on it, which is the whole reason it may be lit or cast at all. It carries a diagonal rail gradient, a 1px specular edge and a top highlight (so it reads as milled metal rather than a border), then two soft drop shadows — a tight contact one and a wide ambient one with negative spread so it cannot bloom into a halo. Every value is a `color-mix` on a token: the highlights are `paper` lifting `device`, and the shadows are `forest`, never black, which would grey the paper under it. `device-key` draws the volume and wake buttons from the same mix. Everywhere else, hairlines still do the work shadows do elsewhere.
@@ -317,25 +317,18 @@ somebody forgot to finish. The reference this was drawn from rounds its card;
 ours does not, for the reason in §4 — a soft card would be the one rounded
 object on a page of square ones.
 
-### The preview surface (owner-approved exception, 2026-08-03)
+### The live listing (yuvoy-web#171, replacing the preview surface)
 
-The **Season One phone preview** (`ProductDemo`) is the one place illustrative product content may appear — prices, seat counts, operator lines — under three conditions, all enforced:
+**No product fact is ever written into this site.** The homepage's why act shows one real listing, the newest on the app's browse surface (`GET /v1/experiences`, stable between requests; the reel feed is shuffled per visit), read from the public API (`src/lib/api/live-listing.ts`) and drawn on the phone frame (`LiveListingPanel`). It is the one place a price may appear, because the price is the API's. The rules, all enforced:
 
-0. **At most one per page.** It appears twice on the site — the homepage's why act and `/explore`'s how-it-works section — and each page carries exactly one, asserted by `e2e/home.spec.ts` and `e2e/explore.spec.ts`. Its rail copy may differ per page through `actCopy` (the homepage's headline has already made the argument, so the rail is a caption; `/explore` _is_ the explanation, so it is specific). Only the sentence changes: the acts, the script and the timings are the same object on both, because a page may describe the tour differently and must never restage it.
+1. **Every word on the card is a field the API sent**: title, activity, place, operator, price and the unit phrase (`pricingUnitLabel`, verbatim, never derived). "Verified" appears only when `operator.verified` is true. The caption under the frame says "A real listing on Yuvoy". `live-listing.test.tsx` holds the card to this.
+2. **Nothing that a cached page would get wrong.** The page is static and regenerated at most every five minutes while people visit, and after a quiet night the first visitor sees the night-old copy. A price or a name survives that; the next date and the seats left do not, so the card shows neither, and the app is one tap away with both.
+3. **No listing, no card.** When the API cannot be read or nothing is listed, the panel says where the listings are and links there. It never stands an illustration in for a listing, and the read never throws: `/go/<source>` renders on every request with no earlier copy to fall back on, so a throw there would be an error page.
+4. **The poster is the operator's own footage**, served through this site's optimiser from one allowed host (`src/lib/api/listing-poster.ts`, shared with `next.config.ts`).
+5. **The guards.** `e2e/home.spec.ts` bans a price, rating or review count everywhere outside `[data-live-listing]`, and ratings and reviews inside it too. `src/lib/site/invented-content.test.ts` reads every string and JSX text in `src/` and fails on a price, a seat count, a booking reference or a rating written into code.
 
-1. The frame is **visibly captioned** ("Sample preview") and its wrapper carries `data-preview`; the frame's accessible name states outright that nothing is bookable yet, and the e2e guards ban invented numbers everywhere _outside_ that wrapper (see `e2e/support/text.ts`, which also strips Next's dev-mode RSC payload — `page.textContent("body")` includes `<script>` text and therefore sees every string twice).
-
-   > The wording moved twice on 2026-08-06 (owner direction): the "Season One preview" badge pinned to the frame, then the longer caption under it, then the present two words. **A caption must stay narrower than the screen it labels** — the long one was wider than a phone, and on a shared `w-fit` wrapper that sized the wrapper to the caption, stretched the frame block to match and left the screen's slack down its right edge. The frame carries its own `w-fit` now, but the rule stands.
-   >
-   > The caption says "sample", not "not bookable". The page's plain-language statement lives in the registration section's first answer — "Can I book something today? No, and we won't pretend otherwise." — which `home.spec.ts` asserts alongside the caption.
-
-2. Its "footage" is **moving colour built from brand tokens** (`film-*` + `caustics` utilities, `color-mix` only) — unmistakably an illustration, never a fake photograph or a real-looking screenshot.
-3. Claims **outside** the preview stay literally true, and the preview is **not** a licence for any claim at all — it covers illustrative _prices, seat counts and operator lines_, which is what §8 says and what it means.
-
-   > A **rating, a review count or a guest testimonial is not on that list**, inside the wrapper or outside it. The rulebook bans them "in copy, **in mock data**, in structured data, or in an OG image", and reviews are the one thing this product has publicly said it will not fabricate — they do not exist until real completed bookings produce them, and the traveller app shows none anywhere for the same reason. On 2026-09-09 the preview was carrying a `4.9 (132)` rating and a five-star testimonial bylined "Meera · last week"; both were removed (yuvoy-web#151).
-   >
-   > Neither is a **platform guarantee**. "Certified crew", "Insured" and "Free cancel · 24h" were chips on the preview's detail screen while `/safety` on the same site said no operator has been verified by us, insurance handling is not built, and no cancellation or refund policy has been written or approved. A guarantee is a claim about Yuvoy, not about the mock listing, and it belongs in the preview only once it is true.
-   >
-   > The "3 founding operators signed" count used to be named here as the worked example of a true claim, owner-confirmed on 2026-08-03. It went stale, and nobody noticed for five weeks — the owner confirmed on 2026-09-09 that it is not accurate. **A fact that needs re-confirming to stay true cannot live on the page**, which is why the momentum line now carries two facts rather than three and why `home.spec.ts` asserts the absence of any operator count rather than pinning a number.
+> **What this replaced.** From 2026-08-03 to yuvoy-web#171 (2 Oct 2026) the frame held `ProductDemo`, a five-screen auto-playing tour of an invented operator, invented prices, an invented seat count and an invented booking reference, captioned "Sample preview" and exempted from the e2e guard by a `data-preview` wrapper. Real operators went live while it was still there, and the site was then showing a made-up dive school beside real ones. **An exemption for something this repository wrote is where a rule stops being checked**, and the owner chose a real listing over keeping it (2 Oct 2026). Do not bring back an illustrative surface; if the API cannot supply something, the page does without it.
+>
+> Two lessons from its history still stand. **A caption must stay narrower than the screen it labels**: on a `w-fit` wrapper a wider caption sizes the frame's column and leaves slack down one edge (2026-08-06). And **a rating, a review count or a guest testimonial never appears**, inside the frame or outside it: they do not exist until real completed bookings produce them (yuvoy-web#151 removed a `4.9 (132)` and a five-star quote from the tour on 2026-09-09).
 
 Any pasted export is oversized vs. real scale: calibrate the ratio, snap every value to a token, re-express with flex/grid, mobile-first.

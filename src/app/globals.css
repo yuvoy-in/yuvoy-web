@@ -382,7 +382,7 @@
 
 /*
   The cover's atmosphere (owner direction, 2026-08-05: "more dramatic"):
-  lagoon light, built from tokens the same way the preview's film is. Two
+  lagoon light, built from tokens with color-mix and nothing else. Two
   layers breathe on slow, offset cycles — a paper glow high in the water and
   terra warmth low at the horizon — so the field reads as a place with light
   moving through it rather than a flat panel. Fills are exempt from the
@@ -661,7 +661,7 @@
     /* The scatter's own canvas.
 
        Two rows of three, sized against a budget rather than to taste: the
-       product preview opposite is 615px of intrinsic content, and the left
+       listing phone opposite is 615px of intrinsic content, and the left
        half must not run past it (owner direction, 2026-08-15) or the act
        reads as lopsided. This canvas plus the shortlist card, the chips and
        the gaps between them is what has to fit inside that number, which is
@@ -804,223 +804,6 @@
   );
 }
 
-/* ------------------------------------------------- the product preview */
-
-/*
-  Illustrated "footage" for the Season One preview phone. Real footage is
-  deliberately not used — these are moving colour fields built entirely from
-  brand tokens via color-mix, so the preview is unmistakably an illustration
-  wearing the palette, never a fake photograph.
-
-  `film` is the moving canvas; `film-a/b/c/d` are the four scenes (dawn dive,
-  shallows, night water, market sunrise). `caustics` lays drifting light over
-  a scene. All of it is neutralised globally by prefers-reduced-motion.
-*/
-@keyframes yuvoy-film-pan {
-  from {
-    transform: scale(1.06) translate(0, 0);
-  }
-  to {
-    transform: scale(1.16) translate(-2%, -3%);
-  }
-}
-
-@keyframes yuvoy-film-drift {
-  from {
-    transform: translate(-4%, 2%);
-  }
-  to {
-    transform: translate(5%, -4%);
-  }
-}
-
-@keyframes yuvoy-film-sweep {
-  from {
-    transform: translateX(-10%);
-  }
-  to {
-    transform: translateX(10%);
-  }
-}
-
-@utility film {
-  position: absolute;
-  inset: -8%;
-  animation: yuvoy-film-pan 18s ease-in-out infinite alternate;
-}
-
-@utility film-a {
-  /* Dawn dive — light water giving way to depth. */
-  background: linear-gradient(
-    165deg,
-    color-mix(in oklab, var(--color-forest) 45%, var(--color-paper)) 0%,
-    color-mix(in oklab, var(--color-forest) 76%, var(--color-paper)) 48%,
-    var(--color-forest) 100%
-  );
-}
-
-@utility film-b {
-  /* Shallows — the reef walk, sunlit from above. */
-  background: linear-gradient(
-    170deg,
-    color-mix(in oklab, var(--color-forest) 28%, var(--color-paper)) 0%,
-    color-mix(in oklab, var(--color-forest) 58%, var(--color-paper)) 55%,
-    color-mix(in oklab, var(--color-forest) 88%, var(--color-paper)) 100%
-  );
-}
-
-@utility film-c {
-  /* Night water — near-dark, an ember of warmth at the horizon. */
-  background: linear-gradient(
-    160deg,
-    color-mix(in oklab, var(--color-forest) 90%, var(--color-paper)) 0%,
-    var(--color-forest) 55%,
-    color-mix(in oklab, var(--color-forest) 78%, var(--color-terra)) 100%
-  );
-}
-
-@utility film-d {
-  /* Market sunrise — terracotta warmth settling into forest. */
-  background: linear-gradient(
-    160deg,
-    color-mix(in oklab, var(--color-terra) 72%, var(--color-forest)) 0%,
-    color-mix(in oklab, var(--color-terra) 42%, var(--color-forest)) 42%,
-    var(--color-forest) 100%
-  );
-}
-
-@utility caustics {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-
-  &::before {
-    content: "";
-    position: absolute;
-    inset: -30%;
-    background:
-      radial-gradient(
-        50% 38% at 22% 24%,
-        color-mix(in srgb, var(--color-paper) 16%, transparent),
-        transparent 65%
-      ),
-      radial-gradient(
-        44% 34% at 78% 68%,
-        color-mix(in srgb, var(--color-paper) 10%, transparent),
-        transparent 65%
-      );
-    animation: yuvoy-film-drift 11s ease-in-out infinite alternate;
-  }
-
-  &::after {
-    content: "";
-    position: absolute;
-    inset: -30%;
-    background: repeating-linear-gradient(
-      115deg,
-      color-mix(in srgb, var(--color-paper) 7%, transparent) 0 2px,
-      transparent 2px 26px
-    );
-    animation: yuvoy-film-sweep 8s ease-in-out infinite alternate;
-    opacity: 0.7;
-  }
-}
-
-/*
-  The why-section tour's act meter: each step's underline fills over that
-  act's real duration, so the rail reads like a video timeline. Duration and
-  play-state ride inline styles from ProductDemo (they are runtime state);
-  linear timing because a progress meter must move at constant speed. Under
-  reduced motion the global rule collapses it to a full bar, which is the
-  right resting state: the tour does not auto-play there, so the bar marks
-  the current step instead of timing it.
-*/
-@keyframes yuvoy-demo-fill {
-  from {
-    transform: scaleX(0);
-  }
-  to {
-    transform: scaleX(1);
-  }
-}
-
-@utility demo-fill {
-  transform-origin: left;
-  animation-name: yuvoy-demo-fill;
-  animation-timing-function: linear;
-  animation-fill-mode: both;
-}
-
-/*
-  The same meter, drawn by the tile's OWN border below `lg`.
-
-  Three SVG-overlay versions failed in a row (owner reports, 2026-08-15): an
-  overlay reproduces the box's geometry from the outside, and CSS borders and
-  SVG strokes rasterise independently — at a fractional layout position or a
-  non-integer zoom they snap to device pixels differently and a hairline of
-  the underlying edge survives beside the drawn one. A border cannot misalign
-  with itself, so the meter IS the border: a conic sweep repaints the border
-  band terra as the act runs, from 12 o'clock, clockwise.
-
-  `@property` registers the stop as a real percentage, which is what lets a
-  gradient animate smoothly instead of flipping at the keyframe midpoint. The
-  `background` shorthand carries the tile's forest fill on its padding-box
-  layer — a shorthand resets background-color, so the fill must ride here.
-  The sweep's rest colour is that same forest: the border vanishes into the
-  fill at 0% and the terra edge grows out of it.
-
-  Duration and play-state ride inline styles from ProductDemo, exactly like
-  `demo-fill` above. Under reduced motion the global rule collapses it to a
-  full border, the right resting state: nothing auto-plays there, so the
-  border marks the current step rather than timing it.
-*/
-@property --yuvoy-trace {
-  syntax: "<percentage>";
-  inherits: false;
-  initial-value: 0%;
-}
-
-@keyframes yuvoy-demo-trace {
-  from {
-    --yuvoy-trace: 0%;
-  }
-  to {
-    --yuvoy-trace: 100%;
-  }
-}
-
-@utility demo-trace {
-  border-color: transparent;
-  background:
-    linear-gradient(var(--color-forest), var(--color-forest)) padding-box,
-    conic-gradient(var(--color-terra) var(--yuvoy-trace), var(--color-forest) 0)
-      border-box;
-  animation-name: yuvoy-demo-trace;
-  animation-timing-function: linear;
-  animation-fill-mode: both;
-}
-
-/*
-  The active step's sentence, arriving under that row. Only one is ever shown,
-  so it has to announce the change itself — a swap with no movement reads as a
-  glitch. Short and small: this answers a step change, so it sits inside the
-  250ms interaction budget rather than performing an entrance.
-*/
-@keyframes yuvoy-demo-copy {
-  from {
-    opacity: 0;
-    transform: translateY(0.25rem);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@utility demo-copy {
-  animation: yuvoy-demo-copy 250ms var(--ease-interaction) both;
-}
-
 /*
   The header sliding out of the way on the way down the page, and back on the
   way up. HeaderShell sets the data attribute; the movement lives here so every
@@ -1128,7 +911,7 @@
 
 /*
   The brand veil — the site's entrance (see BrandIntro). Not a flat card but a
-  scene from the brand's world: night water (the film-c gradient language,
+  scene from the brand's world: night water (forest depths with
   an ember of terracotta warmth at the bottom edge), the owner's island
   horizon along the foot (silhouettes and a moonlit glint, per the comp in
   design/brand-source/intro.png), crossed by sparse particle swells — tiny paper
@@ -1204,7 +987,7 @@
   padding-bottom: 3rem;
   /* Night water: a faint paper lift where the surface would be, forest
      depths, and an ember of terracotta warmth at the bottom edge — all
-     color-mix on brand tokens, the film utilities' rule, so no second dark
+     color-mix on brand tokens, so no second dark
      ever exists. */
   background:
     radial-gradient(

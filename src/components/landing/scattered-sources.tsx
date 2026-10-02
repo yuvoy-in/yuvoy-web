@@ -243,12 +243,12 @@ export function ScatteredSources() {
       `h-full` + `justify-between` from `lg`, and neither below it.
 
       Side by side, the two halves of the act share a grid row, so the row is
-      as tall as the taller of them — the product preview — and anything the
+      as tall as the taller of them (the listing phone), and anything the
       left half does not use is dead space under it. Measured at 1440 that was
       94px of the 615 (owner report, 2026-08-15).
 
       Spreading the three blocks to fill it is self-correcting: whatever the
-      preview's height turns out to be, the scatter, the shortlist and the
+      phone's height turns out to be, the scatter, the shortlist and the
       costs distribute themselves across it, so this cannot silently
       re-open the gap when either side changes.
 
@@ -452,8 +452,9 @@ export function ScatteredSources() {
 
       {/*
         The shortlist, on its own card. Every cell is a question mark on
-        purpose: inventing depths and levels would be the fabrication the page
-        confines to the preview surface, and the unknowns ARE the point.
+        purpose: inventing depths and levels would be fabrication, which this
+        site no longer allows anywhere (yuvoy-web#171), and the unknowns ARE
+        the point.
 
         Column cells are narrow where the column is narrow — on a phone, and
         again at `lg` where this sits in a 362px track — and wide only at the

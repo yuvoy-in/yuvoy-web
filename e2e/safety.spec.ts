@@ -20,21 +20,46 @@ test.describe("/safety", () => {
     /*
       Each of these must be explicitly disclaimed somewhere on the page.
 
-      The page was simplified on 2026-08-06 from two full sections into a list
-      of standards plus one status panel. **No disclosure was dropped**, which
-      is exactly what this test exists to hold: if a future edit tightens the
-      panel and one of these disappears, the gap has been hidden rather than
-      fixed, and on a page about open water that is the failure mode that
-      matters.
+      The four gaps this asserted until yuvoy-web#170 (no operator verified,
+      no cancellation policy, no waiver or medical handling, no incident
+      support) described a Yuvoy that had not opened. Two became false, which
+      on this page is as wrong as an overclaim. What is still a gap is still
+      named, and this holds it: if a future edit tightens the panel and one of
+      these disappears, the gap has been hidden rather than fixed.
     */
     for (const gap of [
-      /no operator on yuvoy has been verified by us/i,
-      /no cancellation or refund policy has been written or approved/i,
-      /none of it is collected anywhere on this site/i,
-      /incident reporting and on-the-ground support are planned, not running/i,
+      /yuvoy does not run the experiences/i,
+      /does not collect waivers/i,
+      /does not arrange insurance/i,
+      /not an emergency line/i,
     ]) {
       expect(body, `missing disclosure: ${gap}`).toMatch(gap);
     }
+  });
+
+  test("says what is checked, in the contract's own terms", async ({
+    page,
+  }) => {
+    /*
+      The page's claims about checks are the API's rules, restated: a listing
+      sells only while its required documents are "on file, verified and
+      unexpired" (`Experience.bookable`), and the cancellation policy is shown
+      before booking. Pinned so the wording cannot drift into an assurance the
+      product does not back.
+    */
+    await page.goto("/safety");
+    const body = await pageText(page);
+    expect(body).toMatch(/on file with us, checked by our team and in date/i);
+    expect(body).toMatch(/cancellation policy is on its page before you book/i);
+  });
+
+  test("no longer says Yuvoy is closed", async ({ page }) => {
+    // yuvoy-web#170: the page said booking was not live after it was.
+    await page.goto("/safety");
+    const body = await pageText(page);
+    expect(body).not.toMatch(
+      /booking is not live|until yuvoy opens|before launch/i,
+    );
   });
 
   test("makes no assurance it cannot back", async ({ page }) => {

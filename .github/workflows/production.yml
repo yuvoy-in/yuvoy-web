@@ -1,8 +1,13 @@
 name: Production deployment
 
-# Production deploys on push to `main`. The gate in front of it is local.
+# A MANUAL redeploy of yuvoy.in, and nothing else.
 #
-# ## This is a deliberate downgrade, and the reasoning it replaces matters
+# Vercel's Git integration deploys `main` on every push (connected 20 Sep
+# 2026), so this workflow no longer runs on push. For four days it did both:
+# every release deployed production twice, and the two builds raced for the
+# domain. The gate in front of a release is still local, as below.
+#
+# ## History: why this ran on `push` until 24 Sep 2026
 #
 # Until 2026-08-14 this waited on `workflow_run: [CI]` so it could deploy only
 # after CI went green **on the exact commit**. That existed for a real reason:
@@ -34,11 +39,9 @@ name: Production deployment
 # Actions minutes are not the binding constraint.
 on:
   # Manual redeploy. NEXT_PUBLIC_* values are inlined at build time, so
-  # changing one in Vercel does nothing until a rebuild — which previously
-  # meant pushing a commit for a config-only change.
+  # changing one in Vercel does nothing until a rebuild. Vercel's own
+  # Redeploy button does the same job.
   workflow_dispatch:
-  push:
-    branches: [main]
 
 concurrency:
   group: deploy-production
