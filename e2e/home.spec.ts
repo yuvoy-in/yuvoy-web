@@ -164,9 +164,14 @@ test("with no listing to read, the why act invents none", async ({ page }) => {
 */
 test("the registration FAQ says where Yuvoy is open", async ({ page }) => {
   await page.goto("/");
-  // In the DOM whether or not the disclosure is open.
+  /*
+    In the DOM whether or not the disclosure is open. Scoped to the form and
+    anchored to the answer's start: the footer and the site menu say "Open
+    in Havelock, in the Andaman Islands." too, and a page-wide substring
+    match is a strict-mode failure, not a check of this answer.
+  */
   await expect(
-    page.getByText("In Havelock, in the Andaman Islands.", { exact: false }),
+    registerForm(page).getByText(/^In Havelock, in the Andaman Islands\. /),
   ).toBeAttached();
   await expect(
     page.getByText("Yuvoy is currently preparing its first collection", {
