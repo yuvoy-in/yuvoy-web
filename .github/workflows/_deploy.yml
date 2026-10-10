@@ -1,6 +1,11 @@
-# Reusable deploy — called by the env-named workflows (staging.yml / production.yml)
-# so GitHub notifications read "Staging deployment" / "Production deployment".
-# Deploys via the Vercel CLI (works on Hobby with a private org repo).
+# Reusable deploy, called by the env-named workflows (staging.yml and
+# production.yml) so GitHub notifications read "Staging deployment" or
+# "Production deployment". Deploys via the Vercel CLI (works on Hobby with a
+# private org repo).
+#
+# deploy-watchdog.yml calls it too, with `fallback_branch` set, when Vercel
+# never picked up a push to `main`. Only then does it ask once more, right
+# before uploading, whether the deploy is still needed.
 name: _deploy
 
 on:
@@ -9,13 +14,23 @@ on:
       ref:
         description: >
           Commit to deploy. Leave empty for the checkout default (the commit
-          that triggered the caller). Production passes an explicit SHA because
-          it is triggered by `workflow_run`, where the default is the *default
-          branch's* head rather than the commit CI actually tested — which for a
-          staging-style caller would silently deploy the wrong branch.
+          that triggered the caller). deploy-watchdog.yml passes the commit it
+          watched.
         type: string
         required: false
         default: ""
+      fallback_branch:
+        description: >-
+          Set only by deploy-watchdog.yml, to the branch the push went to.
+          `ref` is then uploaded only if Vercel still has not picked it up
+          and it is still that branch's head.
+        type: string
+        required: false
+        default: ""
+    outputs:
+      deployed:
+        description: "true once the build is uploaded."
+        value: ${{ jobs.deploy.outputs.deployed }}
     secrets:
       VERCEL_TOKEN:
         required: true
@@ -28,6 +43,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 12
+    outputs:
+      deployed: ${{ steps.ship.outputs.deployed }}
     env:
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -40,7 +57,7 @@ jobs:
       # evidence of *what* went out is the Vercel dashboard, and a gated deploy
       # is worth nothing if you cannot show it shipped the commit CI passed.
       - run: echo "Deploying $(git rev-parse HEAD)" >> "$GITHUB_STEP_SUMMARY"
-      # Deploy without git-author metadata — Vercel Hobby blocks private-repo
+      # Deploy without git-author metadata: Vercel Hobby blocks private-repo
       # deploys whose commit author isn't the account owner. No .git → no author.
       - run: rm -rf .git
       - uses: pnpm/action-setup@v4
@@ -53,7 +70,7 @@ jobs:
       # PINNED, not `@latest`.
       #
       # On 1 Sep 2026 `vercel@59.11.0` shipped depending on `@vercel/go@9.0.0`,
-      # which was never published — the registry answers 404 for it. Every
+      # which was never published: the registry answers 404 for it. Every
       # deploy in every repo failed on `npm error notarget`, with nothing wrong
       # in any of them.
       #
@@ -63,4 +80,22 @@ jobs:
       - run: npm i -g vercel@59.10.0
       - run: vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
       - run: vercel build --prod --token="$VERCEL_TOKEN"
-      - run: vercel deploy --prebuilt --prod --archive=tgz --token="$VERCEL_TOKEN"
+      # A fallback deploy asks once more before uploading: the build takes
+      # minutes, and in that time Vercel may have picked the push up after
+      # all, or the branch may have moved on. Anything but `missing` skips the
+      # upload, and `unknown` fails the run. Staging and a manual redeploy
+      # never ask.
+      - id: still-missed
+        if: ${{ inputs.fallback_branch != '' }}
+        run: node scripts/check-vercel-pickup.mjs "$GITHUB_REPOSITORY" "$REF" "$BRANCH"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUSHED_AT: ${{ github.event.repository.pushed_at }}
+          REF: ${{ inputs.ref }}
+          BRANCH: ${{ inputs.fallback_branch }}
+          PICKUP_DEADLINE_S: "0"
+      - id: ship
+        if: ${{ inputs.fallback_branch == '' || steps.still-missed.outputs.verdict == 'missing' }}
+        run: |
+          vercel deploy --prebuilt --prod --archive=tgz --token="$VERCEL_TOKEN"
+          echo "deployed=true" >> "$GITHUB_OUTPUT"
