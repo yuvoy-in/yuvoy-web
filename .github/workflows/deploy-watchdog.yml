@@ -1,0 +1,86 @@
+# yuvoy.in: deploys a push to `main` that Vercel never picked up.
+#
+# Vercel's Git integration deploys every push to `main`, and on 10 Oct 2026
+# it silently did not, in yuvoy-app: release #174 merged, Vercel posted no
+# status and made no deployment, nothing retried, and app.yuvoy.in served the
+# release before it for hours. This site deploys the same way. A push lost on
+# its way to Vercel cannot be prevented from here (the Vercel GitHub App is
+# the only channel and only Vercel can read its delivery log), so this
+# notices the loss and deploys from Actions instead.
+#
+#   1. Waits up to three minutes for the commit status Vercel posts for
+#      yuvoy.in's project. It normally arrives within seconds, and any state
+#      counts: a build Vercel ran and failed is a decision to look at, not a
+#      lost push.
+#   2. Only if none came, and `main` still points at the commit, deploys it
+#      with the same steps as production.yml. _deploy.yml asks once more
+#      right before uploading, since the build takes minutes.
+#
+# Only yuvoy.in's project is watched: staging.yuvoy.in already serves the
+# tree a release promotes, deployed from `dev` by staging.yml. This repo has
+# no post-deploy audit, so after a fallback deploy look at yuvoy.in by hand.
+#
+# About one Actions minute per release while Vercel is fine. If Vercel's Git
+# deploys are ever turned off on purpose, delete this file with them, or it
+# deploys every push from Actions.
+#
+# Ported from yuvoy-app (11 Oct 2026). The rules live in
+# scripts/vercel-pickup.mjs and are tested in src/app/vercel-pickup.test.ts.
+# A dry run, which deploys nothing:
+#
+#   GITHUB_TOKEN=$(gh auth token) PICKUP_DEADLINE_S=0 \
+#     node scripts/check-vercel-pickup.mjs yuvoy-in/yuvoy-web <sha>
+name: Deploy watchdog
+
+on:
+  push:
+    branches: [main]
+
+# Reading a commit's statuses needs `statuses: read`, which the token no
+# longer gets once any permission is named. Everything this calls inherits
+# these and can only narrow them.
+permissions:
+  contents: read
+  statuses: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      verdict: ${{ steps.pickup.outputs.verdict }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - id: pickup
+        run: node scripts/check-vercel-pickup.mjs "$GITHUB_REPOSITORY" "$GITHUB_SHA" "$GITHUB_REF_NAME"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PUSHED_AT: ${{ github.event.repository.pushed_at }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_PROD }}
+
+  redeploy:
+    needs: check
+    if: needs.check.outputs.verdict == 'missing'
+    # production.yml's group, so this queues behind a manual redeploy instead
+    # of racing it for the domain. A manual redeploy started while this runs
+    # cancels it (production.yml cancels in progress) and ships `main` itself.
+    # On the job, not the workflow: one run holding the same group at both
+    # levels would wait on itself.
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
+    uses: ./.github/workflows/_deploy.yml
+    with:
+      ref: ${{ github.sha }}
+      fallback_branch: ${{ github.ref_name }}
+    secrets:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_PROD }}

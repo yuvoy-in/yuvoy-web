@@ -7,12 +7,17 @@ name: Production deployment
 # every release deployed production twice, and the two builds raced for the
 # domain. The gate in front of a release is still local, as below.
 #
+# The same deploy also runs on its own when Vercel never picks up a push to
+# `main` (deploy-watchdog.yml, since 11 Oct 2026). It joins this workflow's
+# `deploy-production` group: it queues behind a manual redeploy, and a manual
+# redeploy started while it runs cancels it and ships `main` itself.
+#
 # ## History: why this ran on `push` until 24 Sep 2026
 #
 # Until 2026-08-14 this waited on `workflow_run: [CI]` so it could deploy only
 # after CI went green **on the exact commit**. That existed for a real reason:
 # deploying straight off `push` raced CI, and on the 2026-08-07 release the
-# site was live and serving before the e2e job finished — which then failed.
+# site was live and serving before the e2e job finished, which then failed.
 # Nothing was actually wrong that time, but "we found out afterwards" is not a
 # release process.
 #
@@ -23,8 +28,8 @@ name: Production deployment
 #
 # **What now stands in its place**, in order of when it catches something:
 #
-# 1. `.husky/pre-push` runs `pnpm verify` — typecheck, lint, format, unit
-#    tests, production build, full e2e — against the exact tree being pushed.
+# 1. `.husky/pre-push` runs `pnpm verify` (typecheck, lint, format, unit
+#    tests, production build, full e2e) against the exact tree being pushed.
 #    Nothing reaches `dev` without passing it.
 # 2. Staging deploys from `dev` and is looked at before anything is promoted.
 #    A release is a promotion of a tree that has been on staging, not a new
@@ -54,7 +59,7 @@ jobs:
       # Empty: checkout's default is the pushed commit on a `push`, and the
       # dispatched ref on a manual run. The explicit SHA that used to be
       # passed here existed only because `workflow_run` reports the default
-      # branch's context rather than the tested commit's — with that trigger
+      # branch's context rather than the tested commit's. With that trigger
       # gone, the default is correct for both events.
       ref: ""
     secrets:
