@@ -82,9 +82,13 @@ feature crosses the API, the apps, the admin console and the docs.
   Gist, Notion or any personal account. People here use different Claude accounts;
   documents must live in one place the team controls, and personal links cannot be
   moved or revoked.
-- Access is given by Hima privately: the reading password, and publishing access as it
-  is set up. Never put a password, key or token in an issue, a commit or a document.
-  Until you can publish yourself, ask on your issue and Hima's side publishes it.
+- **To publish:** the wiki is the private repository `yuvoy-in/yuvoy-docs`. Add
+  `public/<name>.html` (one self-contained file) and its card in `public/index.html` on a
+  branch, open a pull request, and merging it into `main` deploys it in about a minute.
+  Never deploy by hand: a hand deploy replaces the whole site with your copy. How-to: the
+  repository's `README.md`.
+- Hima gives the reading password privately. Never put a password, key or token in an
+  issue, a commit or a document.
 
 ## 5. Working together
 
