@@ -34,3 +34,30 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Clone all seven repositories
+
+Yuvoy is one system in seven repositories. Clone every one you have access to,
+side by side in one folder, even if you work in only one of them. The team rules
+are in [`AGENTS.md`](AGENTS.md).
+
+| Repository       | What it is                                    | Built by  |
+| ---------------- | --------------------------------------------- | --------- |
+| `yuvoy-api`      | Go API, the source of truth for every app     | Hima      |
+| `yuvoy-admin`    | staff console                                 | Hima      |
+| `yuvoy-lens`     | internal view of the lead pipeline            | Hima      |
+| `yuvoy-mobile`   | the traveller app and the operator app (Expo) | Vishwanth |
+| `yuvoy-app`      | traveller web app, app.yuvoy.in               | Vishwanth |
+| `yuvoy-operator` | operator web portal, operators.yuvoy.in       | Vishwanth |
+| `yuvoy-web`      | yuvoy.in landing page                         | Vishwanth |
+
+```bash
+mkdir -p ~/yuvoy && cd ~/yuvoy
+git clone https://github.com/yuvoy-in/yuvoy-api.git
+git clone https://github.com/yuvoy-in/yuvoy-admin.git
+git clone https://github.com/yuvoy-in/yuvoy-lens.git
+git clone https://github.com/yuvoy-in/yuvoy-mobile.git
+git clone https://github.com/yuvoy-in/yuvoy-app.git
+git clone https://github.com/yuvoy-in/yuvoy-operator.git
+git clone https://github.com/yuvoy-in/yuvoy-web.git
+```
