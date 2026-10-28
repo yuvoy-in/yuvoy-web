@@ -95,14 +95,14 @@ jobs:
             next-${{ runner.os }}-
 
       # Builds and starts the app, then runs the suite against it. Testing the
-      # dev server instead was both slower and less truthful — it leaves a
+      # dev server instead was both slower and less truthful: it leaves a
       # duplicate copy of each route in the DOM that the shipped build does not.
       - run: pnpm test:e2e
 
       # The traces and screenshots Playwright keeps for a failed test. Without
       # this a red CI run gives a stack trace and nothing to look at, and the
       # only way to see what the page actually looked like is to reproduce it
-      # locally — which is precisely what does not work for a failure that only
+      # locally, which is precisely what does not work for a failure that only
       # happens on a slower machine.
       - name: Upload Playwright report
         if: failure()
