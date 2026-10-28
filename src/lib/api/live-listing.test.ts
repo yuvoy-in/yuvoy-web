@@ -9,7 +9,10 @@ import { POSTER_HOST } from "./listing-poster";
 const poster = (id: string) =>
   `https://${POSTER_HOST}/${id}/thumbnails/thumbnail.jpg`;
 
-/** The shape `GET /v1/experiences` returned on 2 Oct 2026, one item. */
+/**
+ * The shape `GET /v1/experiences` returned on 2 Oct 2026, one item, with
+ * `host` beside `operator` as the API has sent it since yuvoy-api#511.
+ */
 function listing(overrides: Record<string, unknown> = {}) {
   return {
     id: "e1",
@@ -29,6 +32,7 @@ function listing(overrides: Record<string, unknown> = {}) {
       aspectRatio: "9:16",
     },
     operator: { id: "o1", name: "Blue Dunghi Divers", verified: true },
+    host: { id: "o1", name: "Blue Dunghi Divers", verified: true },
     ...overrides,
   };
 }
@@ -83,11 +87,74 @@ describe("firstListing", () => {
 
   it("shows Verified only on the API's word", () => {
     const unverified = listing({
+      host: { name: "Somebody New", verified: false },
       operator: { name: "Somebody New", verified: false },
     });
     expect(firstListing({ items: [unverified] })?.operator.verified).toBe(
       false,
     );
+  });
+
+  /*
+    yuvoy-web#181. The API renamed the business party to "host" (D-049) and
+    sends `host` beside the deprecated `operator` until the traveller
+    cut-over, step P7, stops sending `operator`. Read only `operator` and every
+    item fails the schema that day: the homepage goes to its no-listing state
+    and nothing is logged, because an empty answer is not a failure.
+  */
+  describe("who runs it: host, and operator until the cut-over", () => {
+    it("reads host when the API sends both, and prefers it", () => {
+      const both = listing({
+        host: { id: "h1", name: "Read From Host", verified: true },
+        operator: { id: "h1", name: "Read From Operator", verified: false },
+      });
+      expect(firstListing({ items: [both] })?.operator).toEqual({
+        name: "Read From Host",
+        verified: true,
+      });
+    });
+
+    it("reads host alone, as the API will send it after the cut-over", () => {
+      const after = listing({
+        operator: undefined,
+        host: { id: "h1", name: "Blue Dunghi Divers", verified: false },
+      });
+      expect(firstListing({ items: [after] })?.operator).toEqual({
+        name: "Blue Dunghi Divers",
+        verified: false,
+      });
+    });
+
+    it("falls back to operator when host is absent, as an older API sends it", () => {
+      const before = listing({
+        host: undefined,
+        operator: { id: "o1", name: "Blue Dunghi Divers", verified: true },
+      });
+      expect(firstListing({ items: [before] })?.operator).toEqual({
+        name: "Blue Dunghi Divers",
+        verified: true,
+      });
+    });
+
+    it("falls back to operator when host is there but unreadable", () => {
+      const odd = listing({
+        host: { name: "   ", verified: "yes" },
+        operator: { id: "o1", name: "Blue Dunghi Divers", verified: true },
+      });
+      expect(firstListing({ items: [odd] })?.operator.name).toBe(
+        "Blue Dunghi Divers",
+      );
+    });
+
+    it("steps past a listing with neither, rather than printing nobody", () => {
+      const usable = listing({ slug: "usable" });
+      const items = [
+        listing({ host: undefined, operator: undefined }),
+        listing({ host: { name: "" }, operator: null }),
+        usable,
+      ];
+      expect(firstListing({ items })?.slug).toBe("usable");
+    });
   });
 
   it("treats an empty list as no listing, not as a failure", () => {

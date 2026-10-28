@@ -12,7 +12,7 @@ import type { Money } from "@/lib/format/money";
  * booking reference. Reading a listing instead of writing a mock means the
  * homepage cannot show anything the app would not: the same listing, the same
  * price and unit, the same operator, and "Verified" only where the API says
- * `operator.verified`.
+ * `host.verified` (or `operator.verified`, below).
  *
  * ## What it carries, and what it leaves behind
  *
@@ -34,6 +34,23 @@ import type { Money } from "@/lib/format/money";
  * is shuffled for every visit (yuvoy-api#213, decision D-042), so reading it
  * here would put a different listing on the homepage, and a different poster
  * through the image optimiser, every time the page regenerated.
+ *
+ * ## `host`, and `operator` until the cut-over - yuvoy-web#181
+ *
+ * The API renamed the business party to "host" (D-049). Each item now carries
+ * `host` beside `operator`, the same `OperatorSummary` under two names, and
+ * `operator` is deprecated: the rename's traveller cut-over (step P7, planned
+ * for about 18 Nov 2026) stops sending it. This reads `host` and falls back
+ * to `operator`, so it works against an API from either side of that day.
+ *
+ * Reading only `operator` was the trap. After P7 every item would fail the
+ * schema, `firstListing` would step past all of them, and the homepage would
+ * quietly show its no-listing state with nothing logged, because an empty
+ * answer is not a failure. Reading only `host` would have the same effect on
+ * any API older than yuvoy-api#511. The fallback can go once P7 has shipped.
+ *
+ * `LiveListing.operator` keeps its name. It is this site's own field, the card
+ * reads it, and renaming it is not part of moving to the new API name.
  *
  * ## When the read fails
  *
@@ -67,6 +84,7 @@ export interface LiveListing {
   activity: string | null;
   /** "Havelock (Swaraj Dweep)", as the API names it. */
   place: string | null;
+  /** Who runs it: the API's `host`, or `operator` where `host` is absent. */
   operator: { name: string; verified: boolean };
   /** Absent until a real contracted price exists. Never a placeholder. */
   price: Money | null;
@@ -77,6 +95,9 @@ export interface LiveListing {
 
 const text = z.string().trim().min(1);
 
+/** The two fields the card prints from `OperatorSummary`. */
+const PartySchema = z.object({ name: text, verified: z.boolean() });
+
 const MoneySchema = z.object({
   amountMinor: z.number().int().positive(),
   currency: z.string().regex(/^[A-Z]{3}$/),
@@ -86,6 +107,10 @@ const MoneySchema = z.object({
  * Only the fields the card prints. Anything else on the item is ignored, so
  * the API can grow without this breaking. A malformed optional field is read
  * as absent rather than costing the whole listing.
+ *
+ * `host` and `operator` are each optional here, and a malformed one reads as
+ * absent, but a listing still needs one of the two to be shown: a card with
+ * nobody running it is not one this page prints. `firstListing` enforces that.
  */
 const ListingSchema = z.object({
   slug: text,
@@ -94,7 +119,8 @@ const ListingSchema = z.object({
   activityTypeLabel: text.optional().catch(undefined),
   fromPrice: MoneySchema.optional().catch(undefined),
   pricingUnitLabel: text.optional().catch(undefined),
-  operator: z.object({ name: text, verified: z.boolean() }),
+  host: PartySchema.optional().catch(undefined),
+  operator: PartySchema.optional().catch(undefined),
   heroMedia: z.object({
     posterUrl: z.string().refine(isAllowedPoster),
     alt: z.string().trim().optional().catch(undefined),
@@ -114,6 +140,10 @@ export function firstListing(body: unknown): LiveListing | null {
     if (!parsed.success) continue;
 
     const experience = parsed.data;
+    // `host` first; `operator` only until the cut-over stops sending it.
+    const party = experience.host ?? experience.operator;
+    if (!party) continue;
+
     const media = experience.heroMedia;
     const price = experience.fromPrice ?? null;
     return {
@@ -121,7 +151,7 @@ export function firstListing(body: unknown): LiveListing | null {
       title: experience.title,
       activity: experience.activityTypeLabel ?? null,
       place: experience.location ?? null,
-      operator: experience.operator,
+      operator: { name: party.name, verified: party.verified },
       price,
       // The unit belongs to the price; without one it describes nothing.
       priceUnit: price ? (experience.pricingUnitLabel ?? null) : null,
