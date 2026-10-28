@@ -111,7 +111,7 @@ test("the homepage speaks to travellers and points operators elsewhere", async (
     name: /apply as a founding host/i,
   });
   await expect(operatorCta).toHaveCount(1);
-  await expect(operatorCta).toHaveAttribute("href", "/operators#apply");
+  await expect(operatorCta).toHaveAttribute("href", "/hosts#apply");
 
   // The traveller form is the one that renders, with its own fields.
   await expect(registerForm(page).getByLabel("Name")).toBeVisible();
@@ -280,7 +280,7 @@ test("the header sends operators to their own page", async ({ page }) => {
     .getByRole("banner")
     .getByRole("link", { name: "For hosts" })
     .click();
-  await expect(page).toHaveURL(/\/operators$/);
+  await expect(page).toHaveURL(/\/hosts$/);
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
     /yuvoy helps people find and book it/i,
   );
@@ -307,7 +307,7 @@ test("#providers now carries operators to the application itself", async ({
 
   // The homepage has no operator form to open any more, so the long-lived
   // anchor must land on the one that does rather than on nothing.
-  await expect(page).toHaveURL(/\/operators#apply$/);
+  await expect(page).toHaveURL(/\/hosts#apply$/);
   // And it lands on the application itself, not a notice standing in for it
   // (yuvoy-in/yuvoy-api#4 shipped 2026-08-07).
   await expect(page.locator("#apply")).toContainText(/Business name/i);

@@ -223,7 +223,7 @@ export default function AboutPage() {
             Yuvoy is open in Havelock, in the Andaman Islands. What hosts are
             running, with prices and dates, is in the Yuvoy app, and you pay at
             the counter on the day. Hosts can set their business up at
-            operators.yuvoy.in. Neil and Port Blair are not open yet.
+            hosts.yuvoy.in. Neil and Port Blair are not open yet.
           </p>
         </StatusNotice>
         {/*

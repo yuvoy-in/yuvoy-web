@@ -84,7 +84,7 @@ export const VIEWPORT_ON_CREAM: Viewport = {
 };
 
 /**
- * For routes that open on a forest cover: `/`, `/explore`, `/operators`,
+ * For routes that open on a forest cover: `/`, `/explore`, `/hosts`,
  * `/about`, `/contact`, `/go/[source]`, `/waitlist`. Add the export in the
  * same change that gives a route a dark first surface — the header's
  * `COVER_ROUTES` list in use-header-chrome.ts is the companion registry,

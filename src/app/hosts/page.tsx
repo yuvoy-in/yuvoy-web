@@ -26,12 +26,16 @@ export const metadata: Metadata = {
   title: { absolute: "List and manage experiences · Yuvoy for Hosts" },
   description:
     "Show what you offer through real video, manage availability, and bring enquiries, bookings and payments into one place. Yuvoy is open in Havelock, and hosts can set up today.",
-  alternates: { canonical: "/operators" },
+  alternates: { canonical: "/hosts" },
 };
 
 /**
- * The operator page: the whole operator case, and the application at the end
- * of it.
+ * The host page: the whole host case, and the application at the end of it.
+ *
+ * It was `/operators` until D-049 renamed the businesses hosts
+ * (yuvoy-mobile#397). The old path answers with a permanent redirect to this
+ * one, query and fragment kept, from `next.config.ts`; see the comment there
+ * for why it is permanent when the site's consolidation redirects are not.
  *
  * Framed as an **application**, not a signup — an operator is agreeing to a
  * conversation, not to terms. That distinction is the whole page.
@@ -120,7 +124,7 @@ const CONTENTS = [
  * the contract's enum to `web`, so a junk or hostile value can never reach the
  * API and come back as a 400 the applicant would read as a broken form.
  *
- * **The canonical stays `/operators`, and the query is not stripped after
+ * **The canonical stays `/hosts`, and the query is not stripped after
  * reading.** This page is indexable, unlike `/go/*`, so `?source=ferry` could
  * otherwise be shared or crawled as a second URL for the same page — the
  * static canonical in `metadata` above already collapses them, which is the
@@ -129,7 +133,7 @@ const CONTENTS = [
  * change on every campaign arrival, to solve a problem the canonical already
  * solves.
  */
-export default async function OperatorsPage({
+export default async function HostsPage({
   searchParams,
 }: {
   searchParams: Promise<{ source?: string }>;

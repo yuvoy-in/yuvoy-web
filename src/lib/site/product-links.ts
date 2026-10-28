@@ -9,7 +9,7 @@ import type { LeadSource } from "@/lib/leads/registry";
  * nothing to send anybody to, and stopped being correct on launch.
  *
  * This is NOT the D-102 cutover. The app stays on `app.yuvoy.in` and the
- * portal on `operators.yuvoy.in`; the root domain keeps this site. That move
+ * portal on `hosts.yuvoy.in`; the root domain keeps this site. That move
  * is yuvoy-app#12 and is separately deferred.
  *
  * ## The four parameters, and the one that was wrong
@@ -41,7 +41,13 @@ import type { LeadSource } from "@/lib/leads/registry";
  */
 
 export const APP_URL = "https://app.yuvoy.in";
-export const OPERATOR_PORTAL_URL = "https://operators.yuvoy.in";
+/*
+  The portal's address since D-049 (yuvoy-mobile#397). `operators.yuvoy.in`
+  serves the same portal and keeps answering, so links already sent still
+  work; this site names the new one. The constant keeps its old name: it is
+  read by code, not by people.
+*/
+export const OPERATOR_PORTAL_URL = "https://hosts.yuvoy.in";
 
 /**
  * Where on this site the tap happened. "Which card, which boat, which door."

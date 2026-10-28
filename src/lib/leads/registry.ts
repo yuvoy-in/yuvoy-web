@@ -80,7 +80,12 @@ export function isDestinationKey(v: string): boolean {
  */
 
 /**
- * `/operators`, carrying the campaign source when there is one.
+ * `/hosts`, carrying the campaign source when there is one.
+ *
+ * The function keeps its old name; only the path moved (D-049,
+ * yuvoy-mobile#397). Every internal link to the business page goes through
+ * here or through `nav.ts`, so links land on `/hosts` directly rather than
+ * through the `/operators` redirect.
  *
  * Organic traffic gets a clean URL: `source=web` is the default the contract
  * already applies, so putting it in the query would only add a parameter that
@@ -88,7 +93,7 @@ export function isDestinationKey(v: string): boolean {
  */
 export function operatorHref(source: LeadSource, hash = ""): string {
   const query = source !== "web" ? `?source=${encodeURIComponent(source)}` : "";
-  return `/operators${query}${hash}`;
+  return `/hosts${query}${hash}`;
 }
 
 /**

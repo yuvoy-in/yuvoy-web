@@ -269,7 +269,7 @@ export function SiteMenu({
                         >
                           <Link
                             href={
-                              item.href === "/operators"
+                              item.href === "/hosts"
                                 ? operatorHref(campaignSource)
                                 : item.href
                             }

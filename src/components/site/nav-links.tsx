@@ -43,9 +43,7 @@ export function NavLinks({
           <Link
             key={item.href}
             href={
-              item.href === "/operators"
-                ? operatorHref(campaignSource)
-                : item.href
+              item.href === "/hosts" ? operatorHref(campaignSource) : item.href
             }
             aria-current={current ? "page" : undefined}
             className={cn(

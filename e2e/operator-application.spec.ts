@@ -4,7 +4,7 @@ import type { Locator, Page } from "@playwright/test";
 /**
  * Only the visible copy of a control.
  *
- * `/operators` renders the form once; `/waitlist` renders both audiences and
+ * `/hosts` renders the form once; `/waitlist` renders both audiences and
  * hides one. Filtering on visibility is what the waitlist suite already does,
  * and it keeps a locator here from matching the hidden twin if these pages
  * ever share a shell.
@@ -88,7 +88,7 @@ async function fillApplication(page: Page) {
 test("an application reaches the onboarding queue, not just the mailing list", async ({
   page,
 }) => {
-  await page.goto("/operators");
+  await page.goto("/hosts");
   const seen = await captureWrites(page);
 
   const form = await fillApplication(page);
@@ -144,7 +144,7 @@ test("a decline is never sent as privacyAccepted: false", async ({ page }) => {
     default would turn a decline into a refused submission the applicant could
     not explain.
   */
-  await page.goto("/operators");
+  await page.goto("/hosts");
   const seen = await captureWrites(page);
 
   const form = rendered(
@@ -176,7 +176,7 @@ test("a failed application is reported as a failure", async ({ page }) => {
     application decided the message. That scenario cannot occur any more, and
     asserting it would be testing a shape the code no longer has.
   */
-  await page.goto("/operators");
+  await page.goto("/hosts");
   await captureWrites(page, { application: 503 });
 
   const form = await fillApplication(page);
@@ -222,7 +222,7 @@ test("the operator form asks for a number, because an application needs one", as
     Submitting without one must fail HERE rather than at the API, so the
     applicant can fix it while they are still looking at the form.
   */
-  await page.goto("/operators");
+  await page.goto("/hosts");
   const seen = await captureWrites(page);
 
   const form = rendered(

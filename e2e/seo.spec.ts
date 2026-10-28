@@ -10,7 +10,7 @@ const INDEXABLE = [
   "/",
   "/explore",
   "/waitlist",
-  "/operators",
+  "/hosts",
   "/contact",
   "/safety",
   "/destinations/havelock",
@@ -162,12 +162,13 @@ const KEPT_AS_WRITTEN: Record<string, number> = {
 };
 
 /**
- * Two names this rule does not own yet: the portal's address and the footer
- * link into it. They are names of a place rather than the noun, and they move
- * with the route in yuvoy-mobile#397, which also drops them from this list.
+ * The noun, and the old portal address with it: `\b` matches before the dot,
+ * so "operators.yuvoy.in" counts. That is intended. The site names
+ * hosts.yuvoy.in since yuvoy-mobile#397, and "Host sign-in" with it. The one
+ * place the old address can still appear is the API's own success sentence
+ * after an application, which is shown as sent and is not on any page walked
+ * here.
  */
-const NOT_YET_RENAMED = [/\boperators\.yuvoy\.in\b/gi, /\bOperator sign-in\b/g];
-
 const BUSINESS_NOUN = /\boperators?\b/gi;
 
 test.describe("one word for the business", () => {
@@ -189,8 +190,7 @@ test.describe("one word for the business", () => {
         .first()
         .getAttribute("content");
 
-      let text = [await page.title(), description ?? "", body].join("\n");
-      for (const name of NOT_YET_RENAMED) text = text.replace(name, "");
+      const text = [await page.title(), description ?? "", body].join("\n");
       const found = text.match(BUSINESS_NOUN) ?? [];
 
       expect(
@@ -264,13 +264,15 @@ test.describe("sitemap and robots", () => {
     request,
   }) => {
     const xml = await (await request.get("/sitemap.xml")).text();
-    // The four consolidated routes are redirects now. A redirect in a
-    // sitemap is crawl budget spent on a URL that no longer answers.
+    // The four consolidated routes are redirects now, and so is `/operators`
+    // (to `/hosts`, yuvoy-mobile#397). A redirect in a sitemap is crawl
+    // budget spent on a URL that no longer answers.
     for (const excluded of [
       "/go/",
       "/philosophy",
       "/privacy",
       "/terms",
+      "/operators",
       "/how-it-works",
       "/travellers",
       "/experiences",

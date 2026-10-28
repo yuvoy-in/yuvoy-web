@@ -12,7 +12,7 @@ import { CONTACT_CHANNEL_LIST } from "@/lib/site/contact";
  * the page is actually asking for — the waitlist, or the application — and two
  * asks in a row is how both get ignored.
  *
- * It closes the homepage and `/operators`, which is why it lives in `site/`
+ * It closes the homepage and `/hosts`, which is why it lives in `site/`
  * rather than `landing/`: both pages end in an ask, and the person who did
  * not take it is exactly the person with a question.
  *

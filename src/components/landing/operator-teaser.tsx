@@ -18,7 +18,7 @@ import { operatorHref, type LeadSource } from "@/lib/leads/registry";
  * This is three sentences and a way out. It answers the question a traveller
  * genuinely has after watching the product tour ("who is filming all this?")
  * and it gives an operator who landed here a door, rather than making them
- * hunt the header for it. The full case still lives on `/operators` and is
+ * hunt the header for it. The full case still lives on `/hosts` and is
  * still the only place it is made.
  *
  * ## The surface (owner direction, 2026-08-07)
@@ -81,7 +81,7 @@ export function OperatorTeaser({ source }: { source: LeadSource }) {
             rendered by the same page an operator scanned into, so a link that
             dropped it would lose the attribution exactly the way the legacy
             anchor did (yuvoy-web#70). `operatorHref` returns a clean
-            `/operators` for organic traffic. */}
+            `/hosts` for organic traffic. */}
         <Link
           href={operatorHref(source, "#apply")}
           className={cn(
