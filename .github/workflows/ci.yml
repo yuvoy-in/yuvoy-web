@@ -2,10 +2,12 @@ name: CI
 
 # Runs on every pull request into `main` or `dev`, and by hand.
 #
-# The `main` and `dev` rulesets require `quality` and `e2e` to pass on the exact
-# head, with the branch level with its base, before a pull request can merge
-# (yuvoy-mobile#403, decision D-052). `main` deploys to production on every
-# push, so this is the check standing between a merge and the live site.
+# The `main` and `dev` rulesets require `quality` and `e2e` to pass before a pull
+# request can merge (yuvoy-mobile#403, decision D-052). On `dev` the branch
+# must also be up to date with `dev`. On `main` that setting is off: release
+# merge commits never go back into `dev`, so every release PR would read as
+# behind. `main` deploys to production on every push, so this is the check
+# standing between a merge and the live site.
 #
 # This was manual only from 14 Aug 2026, to save Actions minutes. That budget
 # belongs to the org's private repositories: this repository is public, so its
