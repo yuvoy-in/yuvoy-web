@@ -41,7 +41,7 @@ export default function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy"
-      updated="8 August 2026"
+      updated="29 October 2026"
       intro={
         <p>
           Yuvoy is not open yet. The only personal information this site
@@ -147,6 +147,15 @@ export default function PrivacyPage() {
 
       <LegalSection heading="Analytics">
         <AnalyticsDisclosure />
+        {/* yuvoy-api#560: the API keeps an account class (customer, staff,
+            test, demo, store review) on a signed-in traveller's events before
+            they choose, and nothing that identifies them. Shown whether or not
+            this site runs analytics, because the app links here. */}
+        <p>
+          While you are signed in and have not yet chosen whether to share
+          analytics, we note only what kind of account an event came from (for
+          example a customer or a test account), never who you are.
+        </p>
         <p>
           One thing runs without asking: Vercel Speed Insights, which measures
           how quickly pages load. It records performance timings only. It does
