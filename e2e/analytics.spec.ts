@@ -146,6 +146,12 @@ test("the privacy page describes exactly what runs", async ({ page }) => {
   expect(body).toMatch(/No product analytics are running on this site/i);
   expect(body).toMatch(/there is no cookie banner/i);
 
+  // Before an analytics choice the API keeps only the account class
+  // (yuvoy-api#560), and the app links here, so this shows either way.
+  expect(body).toContain(
+    "While you are signed in and have not yet chosen whether to share analytics, we note only what kind of account an event came from (for example a customer or a test account), never who you are.",
+  );
+
   // Speed Insights does run, so it is disclosed, with its actual scope.
   expect(body).toMatch(/Speed Insights/);
   expect(body).toMatch(/performance timings only/i);
