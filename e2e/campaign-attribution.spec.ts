@@ -54,7 +54,7 @@ test.describe("campaign attribution", () => {
       await page.goto(`/go/${source}`);
 
       await expect(
-        page.getByRole("banner").getByRole("link", { name: "For Operators" }),
+        page.getByRole("banner").getByRole("link", { name: "For Hosts" }),
       ).toHaveAttribute("href", `/operators?source=${source}`);
     });
   }
@@ -75,7 +75,7 @@ test.describe("campaign attribution", () => {
     await expect(
       page
         .getByRole("dialog", { name: "Site menu" })
-        .getByRole("link", { name: "For Operators" }),
+        .getByRole("link", { name: "For Hosts" }),
     ).toHaveAttribute("href", "/operators?source=kiosk");
   });
 
@@ -85,7 +85,7 @@ test.describe("campaign attribution", () => {
     await page.goto("/go/hotel");
 
     await expect(
-      page.getByRole("link", { name: /apply as a founding operator/i }).first(),
+      page.getByRole("link", { name: /apply as a founding host/i }).first(),
     ).toHaveAttribute("href", "/operators?source=hotel#apply");
   });
 
@@ -99,10 +99,10 @@ test.describe("campaign attribution", () => {
     await page.goto("/");
 
     await expect(
-      page.getByRole("banner").getByRole("link", { name: "For Operators" }),
+      page.getByRole("banner").getByRole("link", { name: "For Hosts" }),
     ).toHaveAttribute("href", "/operators");
     await expect(
-      page.getByRole("link", { name: /apply as a founding operator/i }).first(),
+      page.getByRole("link", { name: /apply as a founding host/i }).first(),
     ).toHaveAttribute("href", "/operators#apply");
   });
 

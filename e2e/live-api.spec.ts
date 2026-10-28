@@ -153,7 +153,7 @@ test.describe("live API", () => {
     await panel.getByLabel("WhatsApp number").fill(phone);
     await panel.getByText(/I agree to the/).click();
     await panel
-      .getByRole("button", { name: "Apply as a founding operator" })
+      .getByRole("button", { name: "Apply as a founding host" })
       .click();
 
     await expect(panel.getByRole("status")).toContainText(

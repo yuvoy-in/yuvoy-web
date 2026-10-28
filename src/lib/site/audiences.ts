@@ -19,6 +19,11 @@ import type { LeadAudience } from "@/lib/leads/registry";
  *
  * Truthfulness rules apply to every string here: no dates, no counts, no queue
  * positions, no commercial terms.
+ *
+ * The business is a **host** in every string here (D-049, yuvoy-mobile#396):
+ * the word a reader meets on yuvoy.in matches the apps. "Where you operate"
+ * in the lede is the verb and stays. The code names (`provider`,
+ * `OPERATOR_FAQS`) are not read by anybody and keep their old shape.
  */
 export interface AudienceCopy {
   audience: LeadAudience;
@@ -70,10 +75,10 @@ export const AUDIENCE_COPY: Record<LeadAudience, AudienceCopy> = {
     audience: "provider",
     param: "provider",
     tabLabel: "I run experiences",
-    tabHint: "Apply as an operator",
+    tabHint: "Apply as a host",
     eyebrow: "Applying",
     title: "Apply as a",
-    accent: "founding operator.",
+    accent: "founding host.",
     /*
       The second half used to read "A member of the team reads it and comes
       back to you directly" — the same promise yuvoy-web#150 removed from the
@@ -91,9 +96,9 @@ export const AUDIENCE_COPY: Record<LeadAudience, AudienceCopy> = {
     */
     lede: "Tell us who you are, where you operate and what you offer. You do not have to wait for us: you can set your business up at operators.yuvoy.in with the same number.",
     faqs: OPERATOR_FAQS,
-    metaTitle: "Apply as a founding operator",
+    metaTitle: "Apply as a founding host",
     metaDescription:
-      "Apply to list your experiences on Yuvoy as a founding operator. Applying starts a conversation; it does not create a listing or a commercial agreement.",
+      "Apply to list your experiences on Yuvoy as a founding host. Applying starts a conversation; it does not create a listing or a commercial agreement.",
   },
 };
 

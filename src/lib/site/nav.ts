@@ -8,7 +8,7 @@ import { OPERATOR_PORTAL_URL } from "@/lib/site/product-links";
  *
  * ## The header names three routes and the call to action
  *
- * Explore, For Operators, About, then Join Waitlist (owner direction,
+ * Explore, For Hosts, About, then Join Waitlist (owner direction,
  * 2026-08-06). That is the whole of the primary navigation, on every
  * breakpoint. It replaced a five-item bar — Experiences, Destinations, How it
  * works, For travellers, For operators — whose first four all answered the
@@ -56,8 +56,13 @@ export const SITE_ROUTES: SiteRoute[] = [
     footer: "explore",
   },
   {
+    /*
+      "For Hosts", not "For Operators": the businesses are hosts on every
+      surface a reader meets (D-049, yuvoy-mobile#396). Only the label moved
+      here; the route is still `/operators` until its own rename.
+    */
     href: "/operators",
-    label: "For Operators",
+    label: "For Hosts",
     inHeader: true,
     inMenu: true,
     footer: "yuvoy",
@@ -127,7 +132,7 @@ export const FOOTER_EXTRAS: Partial<
     repository: the marketing site linked to neither.
 
     The footer is the right home for the OPERATOR one specifically. The
-    "Apply as a founding operator" call to action deliberately still points at
+    "Apply as a founding host" call to action deliberately still points at
     the on-site form, because that form carries the campaign `source` through
     to a lead row and the portal reads no attribution at all — sending a
     `/go/hotel` arrival straight to `operators.yuvoy.in` would lose the

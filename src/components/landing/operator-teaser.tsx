@@ -55,7 +55,7 @@ export function OperatorTeaser({ source }: { source: LeadSource }) {
     <Section aria-labelledby="operators-heading">
       <SectionHeading
         id="operators-heading"
-        eyebrow="For operators"
+        eyebrow="For hosts"
         title="You run the experience."
         accent="Yuvoy helps people find it."
         body="Show what you offer through real video, manage availability, and bring enquiries, bookings and payments into one place."
@@ -93,14 +93,14 @@ export function OperatorTeaser({ source }: { source: LeadSource }) {
             "flex w-full sm:w-auto",
           )}
         >
-          Apply as a founding operator
+          Apply as a founding host
           <ButtonArrow />
         </Link>
         <Link
           href={operatorHref(source)}
           className="label tap-target text-forest/75 hover:text-forest underline underline-offset-4 transition-colors duration-200"
         >
-          See how Yuvoy works for operators
+          See how Yuvoy works for hosts
         </Link>
       </div>
     </Section>

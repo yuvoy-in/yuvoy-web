@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "./support/session";
+import { pageText } from "./support/text";
 import {
   ALLOWED_TYPES,
   FORBIDDEN_TYPES,
@@ -109,8 +110,8 @@ test.describe("metadata", () => {
         Nothing failed, because a title is not load-bearing, which is exactly
         why it needs a check rather than a reader.
 
-        Counted rather than pattern-matched: "Yuvoy for Operators" is a
-        legitimate second word on the operator door and is one mention, not two.
+        Counted rather than pattern-matched: "Yuvoy for Hosts" is a legitimate
+        second word on the host door and is one mention, not two.
       */
       const brand = (title.match(/Yuvoy/g) ?? []).length;
       expect(brand, `${path} names the brand ${brand} times: "${title}"`).toBe(
@@ -121,6 +122,83 @@ test.describe("metadata", () => {
       descriptions.set(path, description!);
     }
   });
+});
+
+/**
+ * One word for the business, on every page a reader can find: **host**.
+ *
+ * D-049 renamed the businesses that run experiences from operators to hosts,
+ * and yuvoy-mobile#396 moved this site over. The word sat in more places than
+ * the issue listed, and the rest were found by reading. A copy rule held only
+ * by a reader comes apart on the next edit, and a page that says "For Hosts"
+ * in the header and "Real operators" further down reads as two names for one
+ * thing. So this walks every indexable route and fails on the old noun in
+ * anything a person meets there: the page text, the `<title>` and the meta
+ * description a search result shows.
+ *
+ * What is deliberately not checked, each for its own reason:
+ * - The verb. "Where you operate" is not the noun, and `\b` keeps it out.
+ * - Code names, comments, API paths (`/v1/operator-applications`) and the
+ *   `listing.operator` field. None of them is text on the page.
+ * - The listing read from the API (`[data-live-listing]`). It carries a real
+ *   business's own name, which is theirs to choose, not ours to correct.
+ * - `/terms` and `/privacy`. Not walked, and listed in `LEGAL_PENDING` so that
+ *   they stay out when they join the sitemap: their wording is legal text
+ *   waiting on the owner and counsel (yuvoy-web#182), and changes there,
+ *   the noun included, ship with that review and not with a copy sweep.
+ */
+const LEGAL_PENDING = ["/terms", "/privacy"];
+
+/**
+ * Pages that may still say the old word, and exactly how many times.
+ *
+ * A dated journal article keeps the words it was published with: its body is
+ * a record of what was said on 2 August. Only its later "Update:" line speaks
+ * for today, and that line says host. A count rather than an exemption, so the
+ * update line coming back as "operators" still fails here.
+ */
+const KEPT_AS_WRITTEN: Record<string, number> = {
+  "/journal/why-the-andamans": 2,
+};
+
+/**
+ * Two names this rule does not own yet: the portal's address and the footer
+ * link into it. They are names of a place rather than the noun, and they move
+ * with the route in yuvoy-mobile#397, which also drops them from this list.
+ */
+const NOT_YET_RENAMED = [/\boperators\.yuvoy\.in\b/gi, /\bOperator sign-in\b/g];
+
+const BUSINESS_NOUN = /\boperators?\b/gi;
+
+test.describe("one word for the business", () => {
+  /*
+    The business side of `/waitlist` is not a separate indexable URL (its
+    canonical is `/waitlist`), but it is the page printed on QR codes and the
+    one that speaks to a host most directly, so it is walked as well.
+  */
+  const paths = [...INDEXABLE, "/waitlist?audience=provider"].filter(
+    (path) => !LEGAL_PENDING.includes(path),
+  );
+
+  for (const path of paths) {
+    test(`${path} calls the business a host`, async ({ page }) => {
+      await page.goto(path);
+      const body = await pageText(page, { exclude: "[data-live-listing]" });
+      const description = await page
+        .locator('meta[name="description"]')
+        .first()
+        .getAttribute("content");
+
+      let text = [await page.title(), description ?? "", body].join("\n");
+      for (const name of NOT_YET_RENAMED) text = text.replace(name, "");
+      const found = text.match(BUSINESS_NOUN) ?? [];
+
+      expect(
+        found.length,
+        `${path} says ${JSON.stringify(found)} for the business; D-049 says host`,
+      ).toBe(KEPT_AS_WRITTEN[path] ?? 0);
+    });
+  }
 });
 
 test.describe("structured data", () => {

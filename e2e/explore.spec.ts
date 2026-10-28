@@ -94,6 +94,7 @@ test.describe("/explore", () => {
       /\bavailable (today|now)\b/i,
       /\bbook now\b/i,
       /\bverified operator/i,
+      /\bverified host/i,
       /\bsold out\b/i,
     ]) {
       expect(body, `/explore must not claim ${claim}`).not.toMatch(claim);
@@ -113,7 +114,7 @@ test.describe("/explore", () => {
       back a statement about the catalogue that the site cannot keep true.
     */
     expect(body).toMatch(
-      /what operators are running now, with prices and dates, is in the yuvoy app/i,
+      /what hosts are running now, with prices and dates, is in the yuvoy app/i,
     );
     expect(body).not.toMatch(/nothing here is browsable or bookable/i);
     expect(body).not.toMatch(/no listings on yuvoy/i);

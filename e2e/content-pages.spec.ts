@@ -25,7 +25,7 @@ const CONTENT_ROUTES = [
   {
     path: "/operators",
     h1: /yuvoy helps people find and book it/i,
-    title: /Yuvoy for Operators/,
+    title: /Yuvoy for Hosts/,
   },
   {
     path: "/about",
@@ -148,7 +148,7 @@ test("/operators is an application, at the right proportions", async ({
   const body = await pageText(page);
   for (const disclosure of [
     /does not create a listing, partnership or commercial agreement/i,
-    /pricing, commissions and payout terms will be agreed before an operator goes live/i,
+    /pricing, commissions and payout terms will be agreed before a host goes live/i,
     /your existing customers and channels remain yours/i,
   ]) {
     expect(body, `missing disclosure: ${disclosure}`).toMatch(disclosure);
@@ -165,7 +165,7 @@ test("/operators is an application, at the right proportions", async ({
 
   await expect(
     page.locator("#apply").getByRole("heading", {
-      name: /apply as a founding operator/i,
+      name: /apply as a founding host/i,
     }),
   ).toBeVisible();
 });
@@ -204,7 +204,7 @@ test("audience pages send each audience to the right form", async ({
   // Operators do not leave their page to apply: the section is on it.
   await page.goto("/operators");
   await page
-    .getByRole("link", { name: "Apply as a founding operator" })
+    .getByRole("link", { name: "Apply as a founding host" })
     .first()
     .click();
   await expect(page).toHaveURL(/\/operators#apply$/);
@@ -214,7 +214,7 @@ test("audience pages send each audience to the right form", async ({
   ).toBeVisible();
   await expect(
     page.locator("#apply").getByRole("button", {
-      name: "Apply as a founding operator",
+      name: "Apply as a founding host",
     }),
   ).toBeVisible();
 });
@@ -270,7 +270,7 @@ test("the primary routes appear in the site navigation", async ({ page }) => {
   const nav = page.getByRole("banner").getByRole("navigation", {
     name: "Primary",
   });
-  for (const label of ["Explore", "For Operators", "About"]) {
+  for (const label of ["Explore", "For Hosts", "About"]) {
     await expect(
       nav.getByRole("link", { name: label, exact: true }),
     ).toBeVisible();

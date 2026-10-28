@@ -20,11 +20,12 @@ export const viewport = VIEWPORT_ON_FOREST;
 
 export const metadata: Metadata = {
   // Absolute: the layout template appends " · Yuvoy", and this title already
-  // names the product ("Yuvoy for Operators"). Without this it reads
-  // "... · Yuvoy for Operators · Yuvoy".
-  title: { absolute: "List and manage experiences · Yuvoy for Operators" },
+  // names the product ("Yuvoy for Hosts"). Without this it reads
+  // "... · Yuvoy for Hosts · Yuvoy". Hosts, not operators, since D-049
+  // (yuvoy-mobile#396): the word on every surface a reader meets.
+  title: { absolute: "List and manage experiences · Yuvoy for Hosts" },
   description:
-    "Show what you offer through real video, manage availability, and bring enquiries, bookings and payments into one place. Yuvoy is open in Havelock, and operators can set up today.",
+    "Show what you offer through real video, manage availability, and bring enquiries, bookings and payments into one place. Yuvoy is open in Havelock, and hosts can set up today.",
   alternates: { canonical: "/operators" },
 };
 
@@ -104,7 +105,7 @@ const BENEFITS = [
 const CONTENTS = [
   { href: "#system", label: "One place to run it" },
   { href: "#joining", label: "How joining works" },
-  { href: "#benefits", label: "Founding operators" },
+  { href: "#benefits", label: "Founding hosts" },
   { href: "#apply", label: "Questions & applying" },
 ];
 
@@ -138,7 +139,7 @@ export default async function OperatorsPage({
   return (
     <main>
       <PageIntro
-        eyebrow="For operators"
+        eyebrow="For hosts"
         title="Run the experience."
         accent="Yuvoy helps people find and book it."
         lede={
@@ -148,7 +149,7 @@ export default async function OperatorsPage({
               bring enquiries, bookings and payments into one place.
             </p>
             {/* Where we are onboarding. Deliberately not a permanent
-                restriction to three islands: operators elsewhere are being
+                restriction to three islands: hosts elsewhere are being
                 spoken to, and a page that says otherwise turns them away at
                 the door. */}
             <p className="label text-paper/70 mt-8 flex items-start gap-2.5">
@@ -156,8 +157,8 @@ export default async function OperatorsPage({
                 aria-hidden
                 className="bg-terra-soft mt-1.5 size-1 shrink-0"
               />
-              Open in Havelock, in the Andaman Islands, and speaking with
-              operators in other destinations.
+              Open in Havelock, in the Andaman Islands, and speaking with hosts
+              in other destinations.
             </p>
           </>
         }
@@ -174,7 +175,7 @@ export default async function OperatorsPage({
             "flex w-full sm:inline-flex sm:w-auto",
           )}
         >
-          Apply as a founding operator
+          Apply as a founding host
           <ButtonArrow />
         </a>
       </PageIntro>
@@ -227,9 +228,9 @@ export default async function OperatorsPage({
       <Section id="benefits" aria-labelledby="benefits-heading">
         <SectionHeading
           id="benefits-heading"
-          eyebrow="Founding operators"
+          eyebrow="Founding hosts"
           title="Built with the"
-          accent="first operators."
+          accent="first hosts."
         />
         <ul className="border-paper-line mt-14 grid grid-cols-1 gap-x-10 gap-y-10 border-t pt-10 sm:grid-cols-2">
           {BENEFITS.map((benefit) => (
@@ -257,7 +258,7 @@ export default async function OperatorsPage({
           <p>
             Applying starts a conversation; it does not create a listing,
             partnership or commercial agreement. Pricing, commissions and payout
-            terms will be agreed before an operator goes live.
+            terms will be agreed before a host goes live.
           </p>
         </StatusNotice>
       </Section>

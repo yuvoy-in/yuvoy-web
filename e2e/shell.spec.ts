@@ -606,7 +606,7 @@ test.describe("header on scroll", () => {
     await page.goto("/");
     await page
       .getByRole("banner")
-      .getByRole("link", { name: "For Operators", exact: true })
+      .getByRole("link", { name: "For Hosts", exact: true })
       .click();
 
     await expect(page).toHaveURL(/\/operators$/);
@@ -672,7 +672,7 @@ test.describe("header", () => {
     await expect(
       header.getByRole("link", { name: "Yuvoy home" }),
     ).toBeVisible();
-    for (const label of ["Explore", "For Operators", "About"]) {
+    for (const label of ["Explore", "For Hosts", "About"]) {
       await expect(
         header.getByRole("link", { name: label, exact: true }),
       ).toBeVisible();
@@ -773,7 +773,7 @@ test.describe("header on a phone", () => {
 
     for (const label of [
       "Explore",
-      "For Operators",
+      "For Hosts",
       "About",
       "Journal",
       "Safety",

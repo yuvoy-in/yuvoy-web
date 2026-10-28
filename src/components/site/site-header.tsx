@@ -17,7 +17,7 @@ import { appHref } from "@/lib/site/product-links";
  *
  * ## What it names
  *
- * From `lg` up: the mark, three routes (Explore, For Operators, About) and the
+ * From `lg` up: the mark, three routes (Explore, For Hosts, About) and the
  * call to action. Below `lg`: the mark and the menu trigger, and nothing else.
  *
  * The phone bar carried a centred operator link and a small waitlist button

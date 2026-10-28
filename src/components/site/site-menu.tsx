@@ -310,7 +310,7 @@ export function SiteMenu({
                 </p>
                 <p className="text-forest/75 mt-5 max-w-xs leading-relaxed">
                   {ANNOUNCEMENT.short}. More destinations join as their
-                  experiences and operators are ready.
+                  experiences and hosts are ready.
                 </p>
               </div>
             </div>

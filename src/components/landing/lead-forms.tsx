@@ -428,9 +428,8 @@ function SuccessNotice({
           names what a traveller can do without waiting for anybody.
         */
         <p className="text-paper/70 mt-4 leading-relaxed">
-          You do not have to wait: Yuvoy is open in Havelock now, and what
-          operators are running is{" "}
-          {/* An <a>: this leaves the origin (yuvoy-web#154). */}
+          You do not have to wait: Yuvoy is open in Havelock now, and what hosts
+          are running is {/* An <a>: this leaves the origin (yuvoy-web#154). */}
           <a
             href={appHref("waitlist")}
             className="text-paper underline underline-offset-4"
@@ -1143,13 +1142,13 @@ function ProviderForm({ context }: { context: LeadContext }) {
         registerMarketing={register("marketingOptIn")}
       />
 
-      {/* The operator button says what the operator is doing. It read "Join
+      {/* The host button says what the host is doing. It read "Join
           the waitlist" until 2026-08-06, which is the traveller's action and
-          the wrong promise: an operator is applying, and the difference
+          the wrong promise: a host is applying, and the difference
           between an application and a signup is the whole framing of the
           page this form sits on. */}
       <Button type="submit" variant="paper" size="lg" disabled={isSubmitting}>
-        {isSubmitting ? "Sending…" : "Apply as a founding operator"}
+        {isSubmitting ? "Sending…" : "Apply as a founding host"}
       </Button>
 
       <p className="text-paper/70 text-xs">

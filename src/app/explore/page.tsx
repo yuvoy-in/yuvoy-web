@@ -83,7 +83,7 @@ const EXPECTATIONS = [
     body: "Experience level, timing and what to bring should be clear before you book.",
   },
   {
-    title: "Real operators",
+    title: "Real hosts",
     body: "Experiences are shown by the people who actually run them.",
   },
   {
@@ -159,8 +159,8 @@ export default function ExplorePage() {
         */}
         <StatusNotice label="In the app" className="mt-14">
           <p>
-            These are the kinds of day Yuvoy is for. What operators are running
-            now, with prices and dates, is in the Yuvoy app.
+            These are the kinds of day Yuvoy is for. What hosts are running now,
+            with prices and dates, is in the Yuvoy app.
           </p>
         </StatusNotice>
       </Section>
@@ -214,7 +214,7 @@ export default function ExplorePage() {
             id="explore-cta-heading"
             className="font-display tracking-display mt-6 text-[clamp(2.125rem,5vw,3.375rem)] leading-[1.04] font-normal text-balance"
           >
-            See what operators{" "}
+            See what hosts{" "}
             <em className="text-terra font-turn italic">are running.</em>
           </h2>
           <p className="text-forest/75 mt-6 text-lg leading-relaxed">
