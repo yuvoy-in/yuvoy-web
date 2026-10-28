@@ -1,31 +1,22 @@
 name: CI
 
-# MANUAL ONLY. This suite is the same one that now runs locally before every
-# push (`pnpm verify`, wired to .husky/pre-push), so running it here as well
-# on every push and every pull request was paying for the same answer twice.
+# Runs on every pull request into `main` or `dev`, and by hand.
 #
-# ## Why (2026-08-14)
+# The `main` and `dev` rulesets require `quality` and `e2e` to pass on the exact
+# head, with the branch level with its base, before a pull request can merge
+# (yuvoy-mobile#403, decision D-052). `main` deploys to production on every
+# push, so this is the check standing between a merge and the live site.
 #
-# The account reached 90% of its 2,000 free Actions minutes with 20 days of
-# the cycle left, and there is no budget to spend past it. Measured on this
-# repo, a CI run bills 7 minutes (quality 78s -> 2, e2e 250s -> 5; GitHub
-# rounds each job up to the minute) and a deploy bills 2. One change reaching
-# production ran CI four times — on the feature PR, on the push to `dev`, on
-# the release PR, and on the push to `main` — for 32 minutes, of which 28 was
-# CI re-testing trees that had already passed, because a squash merge lands
-# the same tree the PR just tested.
-#
-# Actions now does deployments only: 2 minutes to staging, 2 to production.
-# Correctness moved to the pre-push hook, which runs the identical commands on
-# the identical lockfile before anything leaves the machine.
-#
-# **Keep this workflow.** It is the second opinion on a machine that is not
-# the author's, and it is worth 7 minutes before a release or when a failure
-# smells like it might be environmental — the `/waitlist` structure flake is
-# exactly that class. Run it from the Actions tab, or:
+# This was manual only from 14 Aug 2026, to save Actions minutes. That budget
+# belongs to the org's private repositories: this repository is public, so its
+# GitHub-hosted runs cost nothing. The pre-push hook (`pnpm verify`) still runs
+# the same suite before anything leaves the machine; this is the second opinion
+# on a machine that is not the author's.
 #
 #     gh workflow run CI --ref <branch>
 on:
+  pull_request:
+    branches: [main, dev]
   workflow_dispatch:
 
 concurrency:
