@@ -27,6 +27,9 @@ const SHELL_ROUTES = [
   "/go/ferry",
   "/privacy",
   "/terms",
+  // Reached by its link only, never the menu (yuvoy-web#177). With no API
+  // stub here it shows "soon", which is what a visitor sees today.
+  "/submit",
 ];
 
 const MOBILE = { width: 390, height: 844 };
