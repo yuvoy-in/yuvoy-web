@@ -30,7 +30,10 @@ export const metadata: Metadata = {
  * "nothing is running" because nothing is.
  *
  * Two things are deliberately absent rather than invented:
- *  - A retention period. None has been set, so none is claimed.
+ *  - A retention period for the waitlist, operator and contact forms. None
+ *    has been set, so none is claimed. Events sent through `/submit` are the
+ *    exception: their periods are the API's purge step (R3-T3 Q14), stated
+ *    in "If you send us an event" (yuvoy-web#177).
  *  - A grievance-officer address. India's DPDP Act expects one; there is no
  *    monitored inbox yet, and publishing an unread address would be worse
  *    than publishing none. Raised with the owner.
@@ -45,9 +48,10 @@ export default function PrivacyPage() {
       intro={
         <p>
           Yuvoy is not open yet. The only personal information this site
-          collects is what you type into one of its two forms: the waitlist and
-          operator application, or the contact form. This page describes exactly
-          what that is, what happens to it, and how to get it removed.
+          collects is what you type into one of its three forms: the waitlist
+          and operator application, the contact form, or the form for sending us
+          an event. This page describes exactly what that is, what happens to
+          it, and how to get it removed.
         </p>
       }
     >
@@ -142,6 +146,34 @@ export default function PrivacyPage() {
         <p>
           Messages work the other way round: they are never merged. Two
           questions from the same address are two questions, and both are kept.
+        </p>
+      </LegalSection>
+
+      <LegalSection heading="If you send us an event">
+        <p>
+          The form asks for the event (its name, what kind of thing it is, where
+          and when it is, the venue, the price, a link to its page and a line
+          about it), the organiser&rsquo;s name, your email address, and a tick
+          to confirm you can list it.
+        </p>
+        <p>
+          We send a 6-digit code to that email address to check it is yours.
+          Nothing reaches our team until the code is confirmed.
+        </p>
+        <p>
+          A person at Yuvoy checks every event before it shows, and we email you
+          once with our decision. If we list it, the event appears on Yuvoy with
+          a link to its page. Your email address is never shown on Yuvoy; only
+          the people running Yuvoy can see it.
+        </p>
+        <p>
+          An event whose code is never confirmed is deleted after 7 days. Your
+          email address is deleted 90 days after our decision, and the rest of
+          the record a year after it.
+        </p>
+        <p>
+          To have it removed sooner, message us from the email address you used,
+          and we will act on it.
         </p>
       </LegalSection>
 
