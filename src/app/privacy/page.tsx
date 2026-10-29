@@ -163,13 +163,21 @@ export default function PrivacyPage() {
         <p>
           A person at Yuvoy checks every event before it shows, and we email you
           once with our decision. If we list it, the event appears on Yuvoy with
-          a link to its page. Your email address is never shown on Yuvoy; only
-          the people running Yuvoy can see it.
+          a link to its page, or it corrects an event already on Yuvoy. Your
+          email address is never shown on Yuvoy; only the people running Yuvoy
+          can see it.
         </p>
         <p>
-          An event whose code is never confirmed is deleted after 7 days. Your
-          email address is deleted 90 days after our decision, and the rest of
-          the record a year after it.
+          With the event we keep a scrambled form of your internet address,
+          which cannot be turned back into the address. It is used only to limit
+          how many events can be sent from one place.
+        </p>
+        <p>
+          An event whose code is never confirmed is deleted after 7 days, and
+          one that is confirmed but never decided is deleted 90 days after the
+          code was confirmed. Your email address and the scrambled internet
+          address are deleted 90 days after our decision, and the rest of the
+          record a year after it.
         </p>
         <p>
           To have it removed sooner, message us from the email address you used,

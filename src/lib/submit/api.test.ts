@@ -18,6 +18,9 @@ const INPUT: EventSubmissionInput = {
 
 const ID = "6f1c2b0e-8a4d-4c1e-9d55-0d3f0a9c7b21";
 
+/** The long dash the API's words may carry, built from its code point. */
+const LONG_DASH = String.fromCodePoint(0x2014);
+
 function json(
   status: number,
   body: unknown,
@@ -173,7 +176,7 @@ describe("submitEvent", () => {
 
   it("removes a long dash from the API's words and nothing else", async () => {
     vi.mocked(fetch).mockResolvedValue(
-      json(503, refusal("unavailable", "Paused — try again later.")),
+      json(503, refusal("unavailable", `Paused ${LONG_DASH} try again later.`)),
     );
     expect(await submitEvent(INPUT)).toEqual({
       kind: "paused",
