@@ -21,6 +21,12 @@ const rendered = (locator: Locator) => locator.filter({ visible: true });
  * onboarding queue was never told they were there.
  *
  * The form said "somebody will call". Nobody could.
+ *
+ * Since yuvoy-web#181 it posts to `POST /v1/host-applications`, the same
+ * operation under the host name (D-049). The operator path is deprecated and
+ * the traveller cut-over deletes it, so this suite intercepts the host path
+ * only: a form that drifted back to the old one would record no application
+ * here and fail every test that expects one.
  */
 
 interface Captured {
@@ -42,7 +48,7 @@ async function captureWrites(
 ): Promise<Captured> {
   const seen: Captured = { applications: [], leads: [] };
 
-  await page.route("**/v1/operator-applications", async (route) => {
+  await page.route("**/v1/host-applications", async (route) => {
     seen.applications.push(route.request().postDataJSON());
     const status = opts.application ?? 202;
     await route.fulfill({
@@ -120,7 +126,7 @@ test("an application reaches the onboarding queue, not just the mailing list", a
     that mattered left an application with no consent record on a site whose
     privacy policy says we hold one.
 
-    `POST /operator-applications` now takes the consent itself and writes the
+    `POST /host-applications` now takes the consent itself and writes the
     application, the lead, its consent record and the ops alert in one
     transaction, linked. So the assertion inverts: the consent is ON the
     application, and there is no second call to half-fail.
@@ -215,7 +221,7 @@ test("the operator form asks for a number, because an application needs one", as
   page,
 }) => {
   /*
-    `POST /operator-applications` requires `phone` — "the three fields needed
+    `POST /host-applications` requires `phone`: "the three fields needed
     to have a conversation: the business, a person, and a number that can be
     dialled". The traveller waitlist is untouched and still email-only.
 

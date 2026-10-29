@@ -14,32 +14,37 @@
 # When the contract moves: re-pull, `pnpm codegen`, commit both.
 repo=yuvoy-in/yuvoy-api
 path=contracts/openapi.yaml
-# 9 Sep 2026: forward from 2dc9472adb63, across every deploy since. Additive
-# to everything this site reads.
+# 29 Oct 2026: forward from d4a09f197ea4, 451 commits, to master at
+# ad4fa894 (yuvoy-web#181). Additive to everything this site reads: every
+# schema it types against (`LeadInput` and its parts, `LeadAcceptance`,
+# `MessageInput`, `MessageAcceptance`, `MessageTopic`, `Money`, `Utm`) is
+# byte-identical at both refs.
 #
 # Consumed in this change:
-#   - `POST /operator-applications` gains `privacyAccepted`, `marketingOptIn`
-#     and `utm` (yuvoy-web#157). One call now writes the application, the lead,
-#     its submission history, its consent record and the ops alert in a single
-#     transaction, and links them. This site was making two independent writes
-#     that could half-succeed — and the failure that mattered left an
-#     application with NO consent record, on a site whose privacy policy says
-#     we hold one.
-#
-#     `privacyAccepted` is a TRI-STATE and is treated as one: omitted behaves
-#     as this endpoint always has, `true` writes both, and `false` is refused
-#     with 400 because recording a marketing contact for somebody who declined
-#     is the one outcome it must not produce. This form never sends `false` —
-#     it cannot be submitted without the box ticked.
+#   - `POST /host-applications` (`submitHostApplication`, yuvoy-api#511), the
+#     new path of the business application. Same body, same 202 with
+#     `received` and `next`, same 400 and 429; only the path, the operationId
+#     and the tag differ. `POST /operator-applications` is now `deprecated`,
+#     "kept until the traveller cut-over (D-049)", and P7 of that rename (about
+#     18 Nov 2026) removes it. Left on the old path, this form would answer
+#     404 from that day.
+#   - `ExperienceSummary.host`, beside `ExperienceSummary.operator`, which is
+#     deprecated and goes at the same cut-over. The homepage listing reads
+#     `host` and falls back to `operator`, so it shows a listing on both sides
+#     of P7. Without it, every item would fail to parse and the homepage would
+#     quietly show its no-listing state.
 #
 # Landed and not consumed here, deliberately:
-#   - `Attribution.source` gains `web` (yuvoy-api#134 → #135). It is the value
-#     the launch-day links into the app carry, and it is read by yuvoy-app
-#     rather than by this site.
-#   - `/search` filters and `Scan.destinationKey` — traveller app surfaces.
+#   - `OperatorSummary.slug` and the host page paths. The listing card does not
+#     link to the business, so there is nothing to build a URL for yet.
+#   - `Attribution.source` gains `host` and `creator`. Read by yuvoy-app.
+#   - The rest of the host rename (`hostName`, `hostSlug` beside the old
+#     names) and the traveller and host app surfaces this site does not call.
 #
-# Checked with `git ls-remote` rather than the REST API, which served a stale
-# SHA twice on 8 Sep and cost a retracted issue.
-ref=d4a09f197ea4f70e4cbaf2dc05d4f002c3cb19f6
+# Full SHA from `gh api repos/yuvoy-in/yuvoy-api/commits/ad4fa894`, matched
+# against `git ls-remote` (it is master's head on 29 Oct). The local file's git
+# blob SHA, 76a4e0d1937721b9dfa0b5f6f5418d936ec98762, equals the one GitHub
+# reports for the file at this ref.
+ref=ad4fa894f96729bbb899b4cc47b46625b1862f83
 branch=master
-pinned_on=2026-09-09
+pinned_on=2026-10-29

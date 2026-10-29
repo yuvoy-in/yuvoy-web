@@ -9,9 +9,14 @@ import { dedash } from "@/lib/format/dedash";
  * application was answered `400` and the form stood down behind a "coming
  * soon" notice for a fortnight (yuvoy-api#4). Deriving the type means the
  * disagreement is a build failure instead.
+ *
+ * From `submitHostApplication`, the operation this posts to (yuvoy-web#181).
+ * Its body is the same as the deprecated `submitOperatorApplication`, field
+ * for field, at the pinned contract. The exported names here keep "operator"
+ * on purpose: they are code names, and renaming them is not this change.
  */
 export type OperatorApplicationInput =
-  operations["submitOperatorApplication"]["requestBody"]["content"]["application/json"];
+  operations["submitHostApplication"]["requestBody"]["content"]["application/json"];
 
 /** Every way an application can conclude. The form renders each one honestly. */
 export type ApplicationResult =
@@ -22,7 +27,21 @@ export type ApplicationResult =
   | { kind: "offline" };
 
 /**
- * Files an operator application — `POST /v1/operator-applications`.
+ * Files an operator application: `POST /v1/host-applications`.
+ *
+ * ## Why the host path - yuvoy-web#181
+ *
+ * This posted to `POST /v1/operator-applications` until 29 Oct 2026. The API
+ * renamed the business party to "host" (D-049) and shipped this path beside
+ * the old one in yuvoy-api#511; the old path is `deprecated`, "kept until the
+ * traveller cut-over", and that cut-over (step P7, planned for about 18 Nov
+ * 2026) deletes it. A form still on the old path would answer 404 from that
+ * day, and every applicant would be told the application had not gone
+ * through. Both paths are live now, so moving early costs nothing.
+ *
+ * Nothing else moved with it. Body, `202` with `received` and `next`, `400`
+ * and `429` are identical between the two operations in the pinned contract,
+ * so every outcome below is read exactly as before.
  *
  * ## Why this exists at all, and what it is not
  *
@@ -90,7 +109,7 @@ export async function submitOperatorApplication(
 
   let res: Response;
   try {
-    res = await fetch(`${base}/v1/operator-applications`, {
+    res = await fetch(`${base}/v1/host-applications`, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(input),
