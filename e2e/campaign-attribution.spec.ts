@@ -23,7 +23,7 @@ import { CAMPAIGN_SOURCES } from "../src/lib/leads/registry";
  * href — which is exactly where it went wrong, and is checkable everywhere.
  */
 
-const OPERATOR_PATHS = ["/operators", "/operators?source=ferry"];
+const OPERATOR_PATHS = ["/hosts", "/hosts?source=ferry"];
 
 test.describe("campaign attribution", () => {
   /*
@@ -44,7 +44,7 @@ test.describe("campaign attribution", () => {
           const url = new URL(page.url());
           return `${url.pathname}${url.search}${url.hash}`;
         })
-        .toBe(`/operators?source=${source}#apply`);
+        .toBe(`/hosts?source=${source}#apply`);
     });
 
     test(`the header's operator link carries "${source}" on /go/${source}`, async ({
@@ -54,8 +54,8 @@ test.describe("campaign attribution", () => {
       await page.goto(`/go/${source}`);
 
       await expect(
-        page.getByRole("banner").getByRole("link", { name: "For Operators" }),
-      ).toHaveAttribute("href", `/operators?source=${source}`);
+        page.getByRole("banner").getByRole("link", { name: "For Hosts" }),
+      ).toHaveAttribute("href", `/hosts?source=${source}`);
     });
   }
 
@@ -75,8 +75,8 @@ test.describe("campaign attribution", () => {
     await expect(
       page
         .getByRole("dialog", { name: "Site menu" })
-        .getByRole("link", { name: "For Operators" }),
-    ).toHaveAttribute("href", "/operators?source=kiosk");
+        .getByRole("link", { name: "For Hosts" }),
+    ).toHaveAttribute("href", "/hosts?source=kiosk");
   });
 
   test("the homepage's operator act carries the source on a campaign route", async ({
@@ -85,8 +85,8 @@ test.describe("campaign attribution", () => {
     await page.goto("/go/hotel");
 
     await expect(
-      page.getByRole("link", { name: /apply as a founding operator/i }).first(),
-    ).toHaveAttribute("href", "/operators?source=hotel#apply");
+      page.getByRole("link", { name: /apply as a founding host/i }).first(),
+    ).toHaveAttribute("href", "/hosts?source=hotel#apply");
   });
 
   /*
@@ -99,11 +99,11 @@ test.describe("campaign attribution", () => {
     await page.goto("/");
 
     await expect(
-      page.getByRole("banner").getByRole("link", { name: "For Operators" }),
-    ).toHaveAttribute("href", "/operators");
+      page.getByRole("banner").getByRole("link", { name: "For Hosts" }),
+    ).toHaveAttribute("href", "/hosts");
     await expect(
-      page.getByRole("link", { name: /apply as a founding operator/i }).first(),
-    ).toHaveAttribute("href", "/operators#apply");
+      page.getByRole("link", { name: /apply as a founding host/i }).first(),
+    ).toHaveAttribute("href", "/hosts#apply");
   });
 
   /*
@@ -116,7 +116,7 @@ test.describe("campaign attribution", () => {
       page,
     }) => {
       const response = await page.goto(
-        `/operators?source=${encodeURIComponent(junk)}`,
+        `/hosts?source=${encodeURIComponent(junk)}`,
       );
       expect(response?.status(), `?source=${junk} should not error`).toBe(200);
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
@@ -124,7 +124,7 @@ test.describe("campaign attribution", () => {
   }
 
   /*
-    `/operators` is indexable, unlike `/go/*`. Without a canonical, every
+    `/hosts` is indexable, unlike `/go/*`. Without a canonical, every
     campaign query would be a separate URL for one page.
   */
   test("every campaign URL canonicalises to the bare route", async ({
@@ -134,8 +134,56 @@ test.describe("campaign attribution", () => {
       await page.goto(path);
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
         "href",
-        /\/operators$/,
+        /\/hosts$/,
       );
     }
+  });
+});
+
+/**
+ * `/operators` moved to `/hosts` (D-049, yuvoy-mobile#397), and every link
+ * already out there still has to land.
+ *
+ * Printed QR codes, shared links and bookmarks carry the old path with a
+ * campaign source and often `#apply`. The redirect is permanent (308; the
+ * reason is at the redirect in `next.config.ts`), and a permanent redirect
+ * that dropped the query would lose the source on every printed code for as
+ * long as browsers cache it, which is indefinitely. So both halves are
+ * checked: what the server answers, and where a browser ends up.
+ */
+test.describe("/operators redirects to /hosts", () => {
+  for (const [from, to] of [
+    ["/operators", "/hosts"],
+    ["/operators?source=ferry", "/hosts?source=ferry"],
+    ["/operators/opengraph-image", "/hosts/opengraph-image"],
+  ]) {
+    test(`${from} answers 308 to ${to}`, async ({ request }) => {
+      const response = await request.get(from, { maxRedirects: 0 });
+      expect(response.status()).toBe(308);
+      // Compared as path and query: Next may answer with a relative or an
+      // absolute Location, and either is correct.
+      const location = new URL(
+        response.headers()["location"] ?? "",
+        "http://localhost",
+      );
+      expect(`${location.pathname}${location.search}`).toBe(to);
+    });
+  }
+
+  test("a printed link lands with its source and its fragment", async ({
+    page,
+  }) => {
+    // The fragment never reaches the server; the browser re-applies it to
+    // the redirect's target. This is the half only a browser can show.
+    await page.goto("/operators?source=hotel#apply");
+    await expect
+      .poll(() => {
+        const url = new URL(page.url());
+        return `${url.pathname}${url.search}${url.hash}`;
+      })
+      .toBe("/hosts?source=hotel#apply");
+    await expect(
+      page.locator("#apply").getByLabel("Business name"),
+    ).toBeVisible();
   });
 });

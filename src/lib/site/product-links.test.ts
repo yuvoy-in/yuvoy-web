@@ -85,6 +85,16 @@ describe("appListingHref", () => {
 });
 
 describe("operatorPortalHref", () => {
+  it("points at hosts.yuvoy.in", () => {
+    /*
+      D-049, yuvoy-mobile#397. The portal answers on both domains and this
+      site names the new one. The assertions below use the constant, so they
+      would pass on either address; this one pins which.
+    */
+    expect(OPERATOR_PORTAL_URL).toBe("https://hosts.yuvoy.in");
+    expect(operatorPortalHref()).toBe("https://hosts.yuvoy.in/signup");
+  });
+
   it("opens the signup door, not the portal root", () => {
     /*
       The root redirects through `/today` to `/sign-in`, which is the wrong

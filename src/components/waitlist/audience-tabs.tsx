@@ -29,7 +29,7 @@ import type { LeadAudience } from "@/lib/leads/registry";
  *
  * First person and mutually exclusive — "I'm travelling" / "I run
  * experiences". Below each, the act it leads to ("Join the waitlist" /
- * "Apply as an operator"), because the difference between the two sides is a
+ * "Apply as a host"), because the difference between the two sides is a
  * difference in what happens next, and a visitor should not have to press one
  * to find out. Both come from `AUDIENCE_COPY`, so they cannot disagree with
  * the page they open.

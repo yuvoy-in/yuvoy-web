@@ -169,7 +169,7 @@ export default async function DestinationPage({
             eyebrow="Heading here?"
             title="See what is on in"
             accent={`${destination.name}.`}
-            body="Browse what operators are running, and pay at the counter on the day."
+            body="Browse what hosts are running, and pay at the counter on the day."
           />
         ) : (
           <SectionHeading
@@ -178,7 +178,7 @@ export default async function DestinationPage({
             eyebrow="Heading here?"
             title="Nothing on Yuvoy in"
             accent={`${destination.name} yet.`}
-            body="See what operators are running elsewhere in the Andaman Islands."
+            body="See what hosts are running elsewhere in the Andaman Islands."
           />
         )}
         <div className="mt-12 flex flex-col gap-3 sm:flex-row">

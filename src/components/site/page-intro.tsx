@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { ANNOUNCEMENT } from "@/lib/site/launch";
 
 /**
- * The title spread that opens `/explore`, `/operators` and `/about`.
+ * The title spread that opens `/explore`, `/hosts` and `/about`.
  *
  * ## The composition
  *
@@ -22,7 +22,7 @@ import { ANNOUNCEMENT } from "@/lib/site/launch";
  * Both pointed at sections already half visible below the fold, which makes a
  * call to action out of a scroll — the reader's own next gesture does the same
  * thing, faster. Removed on owner direction. `children` still exists for the
- * one page with a genuine action to offer at the top: `/operators`, whose
+ * one page with a genuine action to offer at the top: `/hosts`, whose
  * whole purpose is the application.
  *
  * ## The header contract
@@ -49,7 +49,7 @@ export function PageIntro({
   lede: ReactNode;
   /** In-page anchors, in the order the sections appear. */
   contents: { href: string; label: string }[];
-  /** An optional action. Only `/operators` has one worth putting up here. */
+  /** An optional action. Only `/hosts` has one worth putting up here. */
   children?: ReactNode;
 }) {
   return (

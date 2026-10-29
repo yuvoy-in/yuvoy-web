@@ -108,10 +108,10 @@ test("the homepage speaks to travellers and points operators elsewhere", async (
 
   // But the way out exists, once, and lands on the application.
   const operatorCta = page.getByRole("link", {
-    name: /apply as a founding operator/i,
+    name: /apply as a founding host/i,
   });
   await expect(operatorCta).toHaveCount(1);
-  await expect(operatorCta).toHaveAttribute("href", "/operators#apply");
+  await expect(operatorCta).toHaveAttribute("href", "/hosts#apply");
 
   // The traveller form is the one that renders, with its own fields.
   await expect(registerForm(page).getByLabel("Name")).toBeVisible();
@@ -220,10 +220,10 @@ test("the cover's momentum line states only true facts", async ({ page }) => {
   await expect(page.getByText("No payment required")).toHaveCount(0);
   /*
     The banned thing is a COUNT of operators, not the phrase "founding
-    operator" — which is a legitimate call to action on this page and across
-    the site ("Apply as a founding operator"). A first pass at this check
-    banned the phrase and failed on that CTA, which is the right failure for
-    the wrong assertion.
+    operator", which was a legitimate call to action on this page and across
+    the site, and is "Apply as a founding host" since D-049. A first pass at
+    this check banned the phrase and failed on that CTA, which is the right
+    failure for the wrong assertion.
 
     So: no number of operators, signed or otherwise, anywhere the reader
     meets, with no region exempt (the mock tour that once was is gone,
@@ -231,8 +231,12 @@ test("the cover's momentum line states only true facts", async ({ page }) => {
     and the last one went stale in five weeks without anybody noticing.
   */
   await expect(page.getByText(/\d+\s+founding operators/i)).toHaveCount(0);
+  await expect(page.getByText(/\d+\s+founding hosts/i)).toHaveCount(0);
   const text = await pageText(page);
   expect(text).not.toMatch(/\b\d+\s+(founding\s+)?operators?\b/i);
+  // The businesses are hosts now (D-049, yuvoy-mobile#396), so the count
+  // would come back in that word. Both are held.
+  expect(text).not.toMatch(/\b\d+\s+(founding\s+)?hosts?\b/i);
 });
 
 test("the cover CTA opens the app, carrying attribution", async ({ page }) => {
@@ -274,9 +278,9 @@ test("the header sends operators to their own page", async ({ page }) => {
 
   await page
     .getByRole("banner")
-    .getByRole("link", { name: "For operators" })
+    .getByRole("link", { name: "For hosts" })
     .click();
-  await expect(page).toHaveURL(/\/operators$/);
+  await expect(page).toHaveURL(/\/hosts$/);
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
     /yuvoy helps people find and book it/i,
   );
@@ -303,7 +307,7 @@ test("#providers now carries operators to the application itself", async ({
 
   // The homepage has no operator form to open any more, so the long-lived
   // anchor must land on the one that does rather than on nothing.
-  await expect(page).toHaveURL(/\/operators#apply$/);
+  await expect(page).toHaveURL(/\/hosts#apply$/);
   // And it lands on the application itself, not a notice standing in for it
   // (yuvoy-in/yuvoy-api#4 shipped 2026-08-07).
   await expect(page.locator("#apply")).toContainText(/Business name/i);

@@ -41,8 +41,8 @@ export function FooterCta() {
         </em>
       </h2>
       <p className="text-paper/70 mt-5 max-w-xl leading-relaxed sm:mt-6 sm:text-lg">
-        Yuvoy is open in Havelock, in the Andaman Islands. See what operators
-        are running, and pay at the counter on the day.
+        Yuvoy is open in Havelock, in the Andaman Islands. See what hosts are
+        running, and pay at the counter on the day.
       </p>
       {/* An <a>: this leaves the origin (yuvoy-web#154). */}
       <a

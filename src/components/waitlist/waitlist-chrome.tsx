@@ -11,7 +11,7 @@ import { hasInternalHistory } from "@/components/site/navigation-history";
  * ## Why the site header comes off here
  *
  * Every other route wants navigation. This one wants a form filled in. The
- * standing header carries Explore, For Operators, About and a "Join Waitlist"
+ * standing header carries Explore, For Hosts, About and a "Join Waitlist"
  * button — three ways off the page and one that points at the page you are
  * already on, which is the shape of a header that has stopped reading its own
  * route. In its place: the mark, centred, and one way back.

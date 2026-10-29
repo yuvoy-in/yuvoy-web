@@ -16,8 +16,8 @@ import { VIEWPORT_ON_FOREST } from "@/lib/site/theme";
  * framing of what they are agreeing to.
  *
  * The canonical stays `/waitlist` for both. They are two views of one route,
- * not two documents, and the operator case has a page of its own in
- * `/operators` — pointing a second canonical at a query string would split the
+ * not two documents, and the host case has a page of its own in
+ * `/hosts`. Pointing a second canonical at a query string would split the
  * route's signals between them for nothing.
  */
 

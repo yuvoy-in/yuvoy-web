@@ -23,6 +23,8 @@ import { getJournalPosts } from "@/lib/journal/posts";
  * - `/how-it-works`, `/travellers`, `/experiences`, `/destinations` — folded
  *   into `/explore` on 2026-08-06 and now redirects. A redirect in a sitemap
  *   is a crawl budget spent on a URL that no longer answers.
+ * - `/operators`: a permanent redirect to `/hosts` since D-049
+ *   (yuvoy-mobile#397), for the same reason.
  *
  * Adding a route here without a `page.tsx` is a promise to a crawler we cannot
  * keep, so the e2e suite fetches every URL in this sitemap and fails on
@@ -40,7 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/", priority: 1, changeFrequency: "weekly" },
     { path: "/explore", priority: 0.9, changeFrequency: "weekly" },
     { path: "/waitlist", priority: 0.9, changeFrequency: "monthly" },
-    { path: "/operators", priority: 0.8, changeFrequency: "monthly" },
+    { path: "/hosts", priority: 0.8, changeFrequency: "monthly" },
     { path: "/safety", priority: 0.8, changeFrequency: "monthly" },
     { path: "/about", priority: 0.6, changeFrequency: "yearly" },
     { path: "/contact", priority: 0.6, changeFrequency: "yearly" },

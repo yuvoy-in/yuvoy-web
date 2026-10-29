@@ -7,7 +7,7 @@ import { StatusNotice } from "@/components/site/status-notice";
 export const metadata: Metadata = {
   title: "Trust & safety",
   description:
-    "What Yuvoy checks before an operator can sell, where each listing's cancellation policy is shown, and, plainly, what Yuvoy does not do.",
+    "What Yuvoy checks before a host can sell, where each listing's cancellation policy is shown, and, plainly, what Yuvoy does not do.",
   alternates: { canonical: "/safety" },
 };
 
@@ -45,7 +45,14 @@ export const metadata: Metadata = {
  *
  * What the page does NOT say: that anyone can book right now (the app is due
  * to ask for an invite, yuvoy-api#195), or any assurance e2e/safety.spec.ts
- * bans ("all operators are checked", "fully insured", "we verify").
+ * bans ("all hosts are checked", "fully insured", "we verify").
+ *
+ * ## Host, not operator (D-049, yuvoy-mobile#396)
+ *
+ * The businesses are **hosts** on every surface a reader meets, so the copy
+ * here says host. The API still names the field `OperatorSummary.verified` in
+ * the contract this site is pinned to, which is why the code references above
+ * keep the old word: they quote the contract, not the page.
  *
  * Before changing anything, read the "Honest conditions" entry on `/explore`:
  * both surfaces make the same promise about conditions taking priority over a
@@ -53,12 +60,12 @@ export const metadata: Metadata = {
  */
 const STANDARDS = [
   {
-    title: "Operators are checked before they sell",
-    body: "A listing can only be booked while every document its activity requires is on file with us, checked by our team and in date. If one lapses, the listing stops selling. An operator is marked Verified only when every document they must hold is in place.",
+    title: "Hosts are checked before they sell",
+    body: "A listing can only be booked while every document its activity requires is on file with us, checked by our team and in date. If one lapses, the listing stops selling. A host is marked Verified only when every document they must hold is in place.",
   },
   {
     title: "Requirements made clear",
-    body: "A listing says what the day asks of you: its requirements and the operator's own safety notes. Where an activity needs it, such as diving, checkout asks health questions and a minimum age before a booking is made.",
+    body: "A listing says what the day asks of you: its requirements and the host's own safety notes. Where an activity needs it, such as diving, checkout asks health questions and a minimum age before a booking is made.",
   },
   {
     title: "The cancellation policy, up front",
@@ -123,8 +130,8 @@ export default function SafetyPage() {
         */}
         <StatusNotice tone="ink" className="mt-12 max-w-3xl">
           <p>
-            Yuvoy does not run the experiences. The operator running your trip
-            is who looks after you on the day.
+            Yuvoy does not run the experiences. The host running your trip is
+            who looks after you on the day.
           </p>
           <p>
             Yuvoy does not collect waivers and does not arrange insurance for

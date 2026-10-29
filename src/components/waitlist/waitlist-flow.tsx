@@ -34,7 +34,7 @@ import type { LeadAudience } from "@/lib/leads/registry";
  *
  * They are the things still going through somebody's head *while* they fill it
  * in — "can I book today?", "does applying cost anything?" — which is the same
- * arrangement the homepage and `/operators` already use. On a phone they sit
+ * arrangement the homepage and `/hosts` already use. On a phone they sit
  * after the form rather than before it: a visitor who arrived to register
  * should reach the first field without scrolling past an accordion, and the
  * one with a question will scroll for it.

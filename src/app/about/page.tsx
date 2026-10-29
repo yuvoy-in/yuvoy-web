@@ -55,7 +55,7 @@ const PRINCIPLES = [
     body: "Tell people what the day involves before they commit.",
   },
   {
-    title: "Build around operators",
+    title: "Build around hosts",
     body: "Create tools that support how experiences work in the real world.",
   },
 ];
@@ -77,11 +77,11 @@ export default function AboutPage() {
           eyebrow="What Yuvoy is"
           title="One place to discover and book"
           accent="real experiences."
-          body="For travellers, Yuvoy makes it easier to see what an experience is really like before choosing it. For operators, it brings discovery, availability and bookings into one place."
+          body="For travellers, Yuvoy makes it easier to see what an experience is really like before choosing it. For hosts, it brings discovery, availability and bookings into one place."
         />
 
         {/*
-          Traveller ↔ Yuvoy ↔ operator, drawn as three terms on one line
+          Traveller ↔ Yuvoy ↔ host, drawn as three terms on one line
           rather than as a diagram of boxes and arrows. Both sides are real
           content; the connectors are the only decoration and are hidden from
           assistive tech, so the relationship reads as three things rather
@@ -111,7 +111,7 @@ export default function AboutPage() {
             className="bg-paper-line h-px w-10 justify-self-center sm:w-full sm:min-w-8"
           />
           <div className="sm:text-right">
-            <p className="label text-forest/75">Operator</p>
+            <p className="label text-forest/75">Host</p>
             <p className="text-forest/75 mt-3 leading-relaxed">
               Shows what they run, and manages it in one place.
             </p>
@@ -139,7 +139,7 @@ export default function AboutPage() {
           </div>
           <div>
             <h3 className="font-display tracking-display text-xl leading-snug font-normal">
-              For operators
+              For hosts
             </h3>
             <p className="text-paper/70 mt-3 leading-relaxed">
               The people running them manage marketing, enquiries, schedules and
@@ -165,9 +165,8 @@ export default function AboutPage() {
             <>
               <p>
                 Yuvoy opened first in the Andaman Islands, where experiences
-                depend on real operators, changing conditions and local
-                knowledge. It is the first market, not the limit of the
-                platform.
+                depend on real hosts, changing conditions and local knowledge.
+                It is the first market, not the limit of the platform.
               </p>
               <p className="mt-4">
                 It is also built around an established diving operation in
@@ -221,10 +220,10 @@ export default function AboutPage() {
         */}
         <StatusNotice tone="ink" className="mt-10">
           <p>
-            Yuvoy is open in Havelock, in the Andaman Islands. What operators
-            are running, with prices and dates, is in the Yuvoy app, and you pay
-            at the counter on the day. Operators can set their business up at
-            operators.yuvoy.in. Neil and Port Blair are not open yet.
+            Yuvoy is open in Havelock, in the Andaman Islands. What hosts are
+            running, with prices and dates, is in the Yuvoy app, and you pay at
+            the counter on the day. Hosts can set their business up at
+            hosts.yuvoy.in. Neil and Port Blair are not open yet.
           </p>
         </StatusNotice>
         {/*

@@ -88,13 +88,7 @@ const COVER_ABOVE = REVEAL_ABOVE + DIRECTION_DELTA;
  * on every load. Add a route here in the same change that gives it a
  * `data-dark-hero` section.
  */
-const COVER_ROUTES = new Set([
-  "/",
-  "/explore",
-  "/operators",
-  "/about",
-  "/contact",
-]);
+const COVER_ROUTES = new Set(["/", "/explore", "/hosts", "/about", "/contact"]);
 
 function isCoverRoute(pathname: string): boolean {
   return COVER_ROUTES.has(pathname) || pathname.startsWith("/go/");

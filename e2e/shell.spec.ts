@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "./support/session";
+import type { Locator } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 import { waitForRouteReady } from "./support/ready";
@@ -16,7 +17,7 @@ const SHELL_ROUTES = [
   "/",
   "/explore",
   "/waitlist",
-  "/operators",
+  "/hosts",
   "/contact",
   "/safety",
   "/destinations/havelock",
@@ -121,6 +122,63 @@ test.describe("site shell", () => {
     const text = (await footer.textContent()) ?? "";
     for (const network of ["instagram", "facebook", "twitter", "linkedin"]) {
       expect(text.toLowerCase()).not.toContain(network);
+    }
+  });
+
+  /*
+    The business page is `/hosts` and the portal is hosts.yuvoy.in, since
+    D-049 (yuvoy-mobile#397).
+
+    `/operators` still answers, with a permanent redirect, so a link left on
+    it would not look broken: it would cost every visitor one more hop and
+    keep the old word in the address bar for a moment. Nothing on the page
+    shows the difference, so the hrefs themselves are read, in the header
+    (desktop), the footer and the menu (phone), where the business page is
+    linked from.
+  */
+  test("links the business page and the portal by their new names", async ({
+    page,
+  }) => {
+    const hrefsIn = (scope: Locator) =>
+      scope
+        .getByRole("link")
+        .evaluateAll((links) =>
+          links.map((l) => (l as HTMLAnchorElement).getAttribute("href") ?? ""),
+        );
+
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/");
+    const header = page.getByRole("banner");
+    const footer = page.getByRole("contentinfo");
+
+    await expect(
+      header.getByRole("link", { name: "For Hosts", exact: true }),
+    ).toHaveAttribute("href", "/hosts");
+    await expect(
+      footer.getByRole("link", { name: "Host sign-in", exact: true }),
+    ).toHaveAttribute("href", "https://hosts.yuvoy.in");
+    await expect(footer.getByText("Operator sign-in")).toHaveCount(0);
+    // Read before the menu opens: the open dialog takes the page behind it
+    // out of the accessibility tree.
+    const hrefs = [...(await hrefsIn(header)), ...(await hrefsIn(footer))];
+
+    await page.setViewportSize(MOBILE);
+    await openMenu(page);
+    const menu = page.getByRole("dialog", { name: "Site menu" });
+    await expect(
+      menu.getByRole("link", { name: "For Hosts", exact: true }),
+    ).toHaveAttribute("href", "/hosts");
+    hrefs.push(...(await hrefsIn(menu)));
+
+    expect(hrefs.length).toBeGreaterThan(0);
+    for (const href of hrefs) {
+      expect(
+        href,
+        "a link still goes through the /operators redirect",
+      ).not.toMatch(/^\/operators(?:[/?#]|$)/);
+      expect(href, "a link still names the old portal address").not.toContain(
+        "operators.yuvoy.in",
+      );
     }
   });
 
@@ -443,7 +501,7 @@ test.describe("header on scroll", () => {
       );
     });
 
-  for (const path of ["/", "/operators", "/explore"]) {
+  for (const path of ["/", "/hosts", "/explore"]) {
     test(`${path} wears the cover down it, and the bar back up it`, async ({
       page,
     }) => {
@@ -494,7 +552,7 @@ test.describe("header on scroll", () => {
     page,
   }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/operators");
+    await page.goto("/hosts");
     await waitForRouteReady(page);
 
     const edge = await coverEdge(page);
@@ -594,7 +652,7 @@ test.describe("header on scroll", () => {
     paper on top of a forest cover for the whole visit (owner report,
     2026-08-08).
 
-    `/operators` is the case that showed it. It reads `searchParams`, so it is
+    `/hosts` is the case that showed it. It reads `searchParams`, so it is
     dynamic and its navigation reliably passes through the fallback; `/go/*` is
     dynamic for the same reason. A static cover route like `/explore` renders
     instantly and never exposed the bug, which is why direct-navigation
@@ -606,10 +664,10 @@ test.describe("header on scroll", () => {
     await page.goto("/");
     await page
       .getByRole("banner")
-      .getByRole("link", { name: "For Operators", exact: true })
+      .getByRole("link", { name: "For Hosts", exact: true })
       .click();
 
-    await expect(page).toHaveURL(/\/operators$/);
+    await expect(page).toHaveURL(/\/hosts$/);
     // The cover is the first thing on the page, and the page is at the top.
     await waitForRouteReady(page);
     await expect(header(page)).toHaveCSS("background-color", TRANSPARENT);
@@ -672,7 +730,7 @@ test.describe("header", () => {
     await expect(
       header.getByRole("link", { name: "Yuvoy home" }),
     ).toBeVisible();
-    for (const label of ["Explore", "For Operators", "About"]) {
+    for (const label of ["Explore", "For Hosts", "About"]) {
       await expect(
         header.getByRole("link", { name: label, exact: true }),
       ).toBeVisible();
@@ -773,7 +831,7 @@ test.describe("header on a phone", () => {
 
     for (const label of [
       "Explore",
-      "For Operators",
+      "For Hosts",
       "About",
       "Journal",
       "Safety",

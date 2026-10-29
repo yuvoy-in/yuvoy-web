@@ -190,8 +190,7 @@ function NoListing() {
     <div className="rounded-edge border-paper-line bg-paper-deep flex w-full max-w-sm flex-col items-start gap-4 border p-6 lg:max-w-xs lg:flex-none">
       <p className="label text-terra-deep">In the Yuvoy app</p>
       <p className="text-forest/75 leading-relaxed">
-        What operators are running now, with prices and dates, is in the Yuvoy
-        app.
+        What hosts are running now, with prices and dates, is in the Yuvoy app.
       </p>
       <a
         href={appHref("listing")}
