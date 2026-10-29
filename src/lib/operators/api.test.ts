@@ -49,13 +49,32 @@ describe("submitOperatorApplication", () => {
     await submitOperatorApplication(INPUT);
 
     const [url, init] = vi.mocked(fetch).mock.calls[0] as [string, RequestInit];
-    expect(url).toBe("http://api.test/v1/operator-applications");
+    expect(url).toBe("http://api.test/v1/host-applications");
     expect(init.method).toBe("POST");
     expect(JSON.parse(String(init.body))).toMatchObject({
       businessName: "Nemo Reef Divers",
       contactName: "Asha Menon",
       phone: "+919000000000",
     });
+  });
+
+  it("posts to the host path, not the operator path the cut-over deletes", async () => {
+    /*
+      yuvoy-web#181. `POST /v1/operator-applications` is deprecated in the
+      pinned contract and the host rename's traveller cut-over (D-049, step
+      P7) removes it. From that day a form still posting there gets a 404,
+      which this file reads as "not filed", so every applicant would be told
+      to try again for good. The host path is live beside it now.
+    */
+    vi.mocked(fetch).mockResolvedValue(
+      jsonResponse(202, { received: true, next: "call" }),
+    );
+    await submitOperatorApplication(INPUT);
+
+    expect(fetch).toHaveBeenCalledTimes(1);
+    const [url] = vi.mocked(fetch).mock.calls[0] as [string, RequestInit];
+    expect(new URL(url).pathname).toBe("/v1/host-applications");
+    expect(url).not.toContain("operator-applications");
   });
 
   it("classifies a 202 as received", async () => {
