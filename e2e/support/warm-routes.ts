@@ -56,6 +56,7 @@ const ROUTES = [
   "/go/hotel",
   "/go/instagram",
   "/go/direct",
+  "/submit",
   "/sitemap.xml",
   "/robots.txt",
 ];
