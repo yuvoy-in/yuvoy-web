@@ -183,8 +183,8 @@ type ProviderValues = z.infer<typeof providerSchema>;
  * The operator side stood as a "Coming soon" notice until 2026-08-07, because
  * the deployed API still required three fields the form had stopped asking
  * for and answered `400` to every complete application. `yuvoy-in/yuvoy-api#4`
- * shipped and the notice went with it; both surfaces that render this — the
- * `/waitlist` operator tab and `/operators` — got the real form in the same
+ * shipped and the notice went with it; both surfaces that render this (the
+ * `/waitlist` operator tab and `/hosts`) got the real form in the same
  * change, which is the point of there being one component.
  *
  * Exported because `/waitlist` composes the two sides itself: there, the
@@ -211,7 +211,7 @@ export function LeadFormPanel({
  * and every outcome the API can produce — recorded, updated, invalid,
  * rate-limited, unavailable, offline — has its own truthful UI state.
  *
- * **One audience, always.** The homepage speaks to travellers and `/operators`
+ * **One audience, always.** The homepage speaks to travellers and `/hosts`
  * speaks to operators, and neither should show the other's door. The audience
  * picker that used to live here moved to `/waitlist`, which is the one surface
  * that offers both — and it belongs there rather than here, because choosing a
@@ -413,10 +413,16 @@ function SuccessNotice({
               The fallback, for a success that carried no `next`. It promises
               no call either — that is the whole point of the change — and it
               names the same door the API's sentence names.
+
+              hosts.yuvoy.in since D-049 (yuvoy-mobile#397). The API's own
+              sentence above may still say operators.yuvoy.in until its side
+              of the rename ships, and it is shown as sent: both addresses
+              serve the same portal, and rewriting the API's words here is
+              exactly what this block exists not to do.
             */
             <>
               We have your application. You do not have to wait for us: you can
-              set your business up at operators.yuvoy.in with this number now.
+              set your business up at hosts.yuvoy.in with this number now.
             </>
           )}
         </p>
@@ -428,9 +434,8 @@ function SuccessNotice({
           names what a traveller can do without waiting for anybody.
         */
         <p className="text-paper/70 mt-4 leading-relaxed">
-          You do not have to wait: Yuvoy is open in Havelock now, and what
-          operators are running is{" "}
-          {/* An <a>: this leaves the origin (yuvoy-web#154). */}
+          You do not have to wait: Yuvoy is open in Havelock now, and what hosts
+          are running is {/* An <a>: this leaves the origin (yuvoy-web#154). */}
           <a
             href={appHref("waitlist")}
             className="text-paper underline underline-offset-4"
@@ -1143,13 +1148,13 @@ function ProviderForm({ context }: { context: LeadContext }) {
         registerMarketing={register("marketingOptIn")}
       />
 
-      {/* The operator button says what the operator is doing. It read "Join
+      {/* The host button says what the host is doing. It read "Join
           the waitlist" until 2026-08-06, which is the traveller's action and
-          the wrong promise: an operator is applying, and the difference
+          the wrong promise: a host is applying, and the difference
           between an application and a signup is the whole framing of the
           page this form sits on. */}
       <Button type="submit" variant="paper" size="lg" disabled={isSubmitting}>
-        {isSubmitting ? "Sending…" : "Apply as a founding operator"}
+        {isSubmitting ? "Sending…" : "Apply as a founding host"}
       </Button>
 
       <p className="text-paper/70 text-xs">

@@ -38,6 +38,22 @@ describe("FOOTER_EXTRAS reach the footer", () => {
     expect(hrefs).toContain(OPERATOR_PORTAL_URL);
   });
 
+  it("calls it Host sign-in, on hosts.yuvoy.in", () => {
+    // D-049, yuvoy-mobile#397: the label and the address moved together.
+    const items = FOOTER_COLUMNS.flatMap((c) => c.items);
+    expect(items).toContainEqual({
+      href: "https://hosts.yuvoy.in",
+      label: "Host sign-in",
+    });
+    expect(items.map((i) => i.label)).not.toContain("Operator sign-in");
+  });
+
+  it("sends the business page link to /hosts, not through the redirect", () => {
+    const hrefs = FOOTER_COLUMNS.flatMap((c) => c.items.map((i) => i.href));
+    expect(hrefs).toContain("/hosts");
+    expect(hrefs).not.toContain("/operators");
+  });
+
   it("keeps the market inside Explore rather than after it", () => {
     // `explore` orders its extra deliberately: the launch market has to read
     // as something WITHIN Explore, not as a sibling appended to the end.

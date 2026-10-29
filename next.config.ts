@@ -183,6 +183,36 @@ const nextConfig: NextConfig = {
         destination: `${APP_URL}/e/:path*`,
         permanent: false,
       },
+      /*
+        The business page moved from `/operators` to `/hosts` (D-049,
+        yuvoy-mobile#397).
+
+        **Permanent (308), against the 307 rule in the docblock above, on
+        purpose.** That rule keeps a redirect temporary while the decision
+        behind it might still be undone, because a browser caches a permanent
+        one indefinitely. This decision is not of that kind: D-049 retired the
+        word "operator" for the businesses everywhere, the API and the apps
+        included, so there is no shape this could be reverted to. A 308 also
+        tells a search engine to move `/operators`' standing to `/hosts`, which
+        a 307 does not. The cost is real and accepted: undoing this would need
+        a new path, not a revert.
+
+        Query and fragment both survive, which is the contract for printed QR
+        codes and shared links: Next carries the query across, and the browser
+        re-applies `#apply` to the new URL. So `/operators?source=ferry#apply`
+        lands on `/hosts?source=ferry#apply`. The `:path*` entry covers
+        `/operators/opengraph-image` and anything else under the old path.
+
+        This shipped in the same change as the `/hosts` page itself. A 308 to
+        a page that does not exist yet would be cached by every browser that
+        saw it, pointing at a 404, for good.
+      */
+      { source: "/operators", destination: "/hosts", permanent: true },
+      {
+        source: "/operators/:path*",
+        destination: "/hosts/:path*",
+        permanent: true,
+      },
     ];
   },
 };

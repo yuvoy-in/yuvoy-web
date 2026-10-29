@@ -69,12 +69,17 @@ test.describe("/safety", () => {
     // Present-tense assurances that would be false today.
     const FALSE_ASSURANCES = [
       /\ball operators are (verified|vetted|checked)\b/i,
+      // The same assurance in the word the page uses now (D-049,
+      // yuvoy-mobile#396). The operator patterns stay: the old word must not
+      // come back as a promise either.
+      /\ball hosts are (verified|vetted|checked)\b/i,
       /\bfully (insured|covered)\b/i,
       /\bwe verify\b/i,
       /\bwe vet\b/i,
       /\bguaranteed refund\b/i,
       /\bmoney[- ]back\b/i,
       /\bcertified operators\b/i,
+      /\bcertified hosts\b/i,
       /\bsafety guaranteed\b/i,
     ];
     for (const claim of FALSE_ASSURANCES) {

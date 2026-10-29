@@ -57,12 +57,18 @@ test.describe("/waitlist", () => {
     await expect(
       rendered(page.getByRole("tab", { name: /run experiences/i })),
     ).toHaveAttribute("aria-selected", "true");
+    // The tab's hint names the act in the word the apps use (D-049,
+    // yuvoy-mobile#396). It is `aria-hidden`, so it is read as text, not as
+    // part of the tab's accessible name.
+    await expect(
+      rendered(page.getByRole("tab", { name: /run experiences/i })),
+    ).toContainText("Apply as a host");
     await expect(rendered(page.locator("#panel-provider"))).toContainText(
       /Business name/i,
     );
     await expect(
       rendered(page.getByRole("heading", { level: 1 })),
-    ).toContainText("Apply as a founding operator");
+    ).toContainText("Apply as a founding host");
   });
 
   test("an unknown audience falls back to traveller rather than failing", async ({
@@ -195,7 +201,7 @@ test.describe("/waitlist masthead", () => {
 
     // The site nav is gone at every breakpoint: no routes inline, no call to
     // action pointing at this page, and no menu trigger standing in for them.
-    for (const label of ["Explore", "For Operators", "About"]) {
+    for (const label of ["Explore", "For Hosts", "About"]) {
       await expect(banner.getByRole("link", { name: label })).toHaveCount(0);
     }
     await expect(
@@ -304,7 +310,7 @@ test.describe("/waitlist audience tabs", () => {
 
     await expect(
       rendered(page.getByRole("heading", { level: 1 })),
-    ).toContainText("Apply as a founding operator");
+    ).toContainText("Apply as a founding host");
     await expect(main).toContainText("Applying");
     await expect(main).toContainText("Does applying cost anything?");
     // The traveller's side is gone entirely, not merely hidden behind it.
@@ -354,7 +360,7 @@ test.describe("/waitlist audience tabs", () => {
     ).toHaveAttribute("aria-selected", "true");
     await expect(
       rendered(page.getByRole("heading", { level: 1 })),
-    ).toContainText("Apply as a founding operator");
+    ).toContainText("Apply as a founding host");
   });
 
   /*
@@ -377,7 +383,7 @@ test.describe("/waitlist audience tabs", () => {
     await expect(operator).toHaveAttribute("aria-selected", "true");
     await expect(
       rendered(page.getByRole("heading", { level: 1 })),
-    ).toContainText("Apply as a founding operator");
+    ).toContainText("Apply as a founding host");
 
     await page.keyboard.press("ArrowLeft");
     await expect(traveller).toBeFocused();

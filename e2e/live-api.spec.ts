@@ -131,19 +131,19 @@ test.describe("live API", () => {
 
       Since #63 the homepage — and therefore every `/go/<source>` route — is
       travellers-only, so the operator anchor no longer opens a form in place.
-      `LegacyProviderAnchor` redirects to `/operators#apply`, where the
+      `LegacyProviderAnchor` redirects to `/hosts#apply`, where the
       single-audience form renders with no tablist and no tabpanel, so this is
       scoped to the section rather than to a panel (#71).
 
       **The campaign source now survives that hop** (#70). It rides in the
       query, because a client-side `replace` leaves no referrer for anything
-      downstream to infer from, and `/operators` validates it against the
+      downstream to infer from, and `/hosts` validates it against the
       contract's enum before it can reach the payload. The assertion below was
       left deliberately failing by #71 rather than relaxed to "web"; this is
       the change that turns it green.
     */
     await page.goto("/go/ferry#providers");
-    await expect(page).toHaveURL(/\/operators\?source=ferry#apply$/);
+    await expect(page).toHaveURL(/\/hosts\?source=ferry#apply$/);
     const panel = page.locator("#apply");
 
     const phone = uniquePhone();
@@ -153,7 +153,7 @@ test.describe("live API", () => {
     await panel.getByLabel("WhatsApp number").fill(phone);
     await panel.getByText(/I agree to the/).click();
     await panel
-      .getByRole("button", { name: "Apply as a founding operator" })
+      .getByRole("button", { name: "Apply as a founding host" })
       .click();
 
     await expect(panel.getByRole("status")).toContainText(

@@ -8,7 +8,7 @@ import { OPERATOR_PORTAL_URL } from "@/lib/site/product-links";
  *
  * ## The header names three routes and the call to action
  *
- * Explore, For Operators, About, then Join Waitlist (owner direction,
+ * Explore, For Hosts, About, then Join Waitlist (owner direction,
  * 2026-08-06). That is the whole of the primary navigation, on every
  * breakpoint. It replaced a five-item bar — Experiences, Destinations, How it
  * works, For travellers, For operators — whose first four all answered the
@@ -56,8 +56,15 @@ export const SITE_ROUTES: SiteRoute[] = [
     footer: "explore",
   },
   {
-    href: "/operators",
-    label: "For Operators",
+    /*
+      "For Hosts", not "For Operators": the businesses are hosts on every
+      surface a reader meets (D-049, yuvoy-mobile#396), and the page moved to
+      `/hosts` with them (yuvoy-mobile#397). `nav-links.tsx` and
+      `site-menu.tsx` match on this exact href to add the campaign source, so
+      it changes in all three places together.
+    */
+    href: "/hosts",
+    label: "For Hosts",
     inHeader: true,
     inMenu: true,
     footer: "yuvoy",
@@ -127,18 +134,20 @@ export const FOOTER_EXTRAS: Partial<
     repository: the marketing site linked to neither.
 
     The footer is the right home for the OPERATOR one specifically. The
-    "Apply as a founding operator" call to action deliberately still points at
+    "Apply as a founding host" call to action deliberately still points at
     the on-site form, because that form carries the campaign `source` through
     to a lead row and the portal reads no attribution at all — sending a
-    `/go/hotel` arrival straight to `operators.yuvoy.in` would lose the
+    `/go/hotel` arrival straight to `hosts.yuvoy.in` would lose the
     attribution silently and permanently, which is the exact failure
     yuvoy-web#70 was raised for. The applicant is told about the portal by the
     API's own `next` sentence on the success screen (yuvoy-web#150).
 
-    So this is the door for an operator who already has an account, which the
-    form is not.
+    So this is the door for a host who already has an account, which the
+    form is not. "Host sign-in" since D-049 (yuvoy-mobile#397), and it opens
+    hosts.yuvoy.in. Somebody signed in on operators.yuvoy.in signs in once
+    more there: the portal's session is per domain. Expected, not a fault.
   */
-  yuvoy: [{ href: OPERATOR_PORTAL_URL, label: "Operator sign-in" }],
+  yuvoy: [{ href: OPERATOR_PORTAL_URL, label: "Host sign-in" }],
 };
 
 /**
@@ -254,7 +263,7 @@ export function hidesSiteChrome(pathname: string): boolean {
  * |---|---|
  * | `/`, `/go/*` | closes on the registration form itself |
  * | `/waitlist` | is the form |
- * | `/operators` | closes on the application |
+ * | `/hosts` | closes on the application |
  * | `/explore` | its own closing act |
  * | `/about` | explains the company; does not convert |
  * | `/contact` | a conversation, not a conversion |

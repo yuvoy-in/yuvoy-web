@@ -225,7 +225,7 @@ WCAG 2.2 AA, enforced not assumed:
 - **The header names three routes and the call to action** (owner direction, 2026-08-06): Explore, For Operators, About, then Join Waitlist, inline from `lg` up. **Adding a fourth nav item is a design change, not a routing one** — it goes through review, and `e2e/shell.spec.ts` pins the link count so it cannot arrive by accident.
 - **Below `lg` the bar carries two things: the mark and the menu trigger.** It carried a centred operator link and a small CTA button until 2026-08-06; three competing targets in 64px reads as a toolbar rather than a masthead, and left the mark no room. Both live in the shutter menu now, where the CTA is pinned at full size at the foot of the panel.
 - **Journal stays out of the desktop bar** until there is enough of it to earn a slot. It is in `MENU_ITEMS` and the footer meanwhile. `inHeader`, `inMenu` and `footer` are set explicitly per route rather than derived — the menu carries Safety (a Trust-column route) and omits the legal pages (pinned separately), and every derived rule got one of those wrong.
-- **The site is addressed to travellers by default.** The homepage, and any future page that does not say otherwise, speaks to them; the operator _case_ belongs on `/operators`. The homepage carries a three-sentence introduction and one way out to it (`OperatorTeaser`) — that is the bound, and `e2e/home.spec.ts` holds it: no operator form, no audience picker, no tooling argument. A page that pitches both audiences at once ends up asking the visitor to self-identify before it has earned the right to (see `LeadForms`' `audiences` prop, which is how a page commits to one).
+- **The site is addressed to travellers by default.** The homepage, and any future page that does not say otherwise, speaks to them; the host _case_ belongs on `/hosts`. The homepage carries a three-sentence introduction and one way out to it (`OperatorTeaser`): that is the bound, and `e2e/home.spec.ts` holds it: no operator form, no audience picker, no tooling argument. A page that pitches both audiences at once ends up asking the visitor to self-identify before it has earned the right to (see `LeadForms`' `audiences` prop, which is how a page commits to one).
 - Footer columns with no entries are dropped rather than rendered empty.
 - `CONTACT_CHANNELS` is empty by design: an unmonitored address is worse than none, so the footer omits the whole row until a real channel is confirmed.
 
@@ -242,9 +242,10 @@ machine that ever saw one. They are promoted to permanent only once the shape
 has held for a season. (`/destinations/neil` → `/destinations/neil-island` _is_
 308: that is a canonical slug fix, not a structural bet.)
 
-Permanent public structure: `/` · `/explore` · `/operators` · `/about` ·
+Permanent public structure: `/` · `/explore` · `/hosts` · `/about` ·
 `/safety` · `/journal` · `/waitlist` · `/privacy` · `/terms` ·
-`/destinations/[slug]`.
+`/destinations/[slug]`. (`/hosts` was `/operators` until D-049; the old path
+is a permanent redirect, yuvoy-mobile#397.)
 
 ### Destinations are data, not pages
 

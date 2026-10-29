@@ -20,17 +20,22 @@ export const viewport = VIEWPORT_ON_FOREST;
 
 export const metadata: Metadata = {
   // Absolute: the layout template appends " · Yuvoy", and this title already
-  // names the product ("Yuvoy for Operators"). Without this it reads
-  // "... · Yuvoy for Operators · Yuvoy".
-  title: { absolute: "List and manage experiences · Yuvoy for Operators" },
+  // names the product ("Yuvoy for Hosts"). Without this it reads
+  // "... · Yuvoy for Hosts · Yuvoy". Hosts, not operators, since D-049
+  // (yuvoy-mobile#396): the word on every surface a reader meets.
+  title: { absolute: "List and manage experiences · Yuvoy for Hosts" },
   description:
-    "Show what you offer through real video, manage availability, and bring enquiries, bookings and payments into one place. Yuvoy is open in Havelock, and operators can set up today.",
-  alternates: { canonical: "/operators" },
+    "Show what you offer through real video, manage availability, and bring enquiries, bookings and payments into one place. Yuvoy is open in Havelock, and hosts can set up today.",
+  alternates: { canonical: "/hosts" },
 };
 
 /**
- * The operator page: the whole operator case, and the application at the end
- * of it.
+ * The host page: the whole host case, and the application at the end of it.
+ *
+ * It was `/operators` until D-049 renamed the businesses hosts
+ * (yuvoy-mobile#397). The old path answers with a permanent redirect to this
+ * one, query and fragment kept, from `next.config.ts`; see the comment there
+ * for why it is permanent when the site's consolidation redirects are not.
  *
  * Framed as an **application**, not a signup — an operator is agreeing to a
  * conversation, not to terms. That distinction is the whole page.
@@ -104,7 +109,7 @@ const BENEFITS = [
 const CONTENTS = [
   { href: "#system", label: "One place to run it" },
   { href: "#joining", label: "How joining works" },
-  { href: "#benefits", label: "Founding operators" },
+  { href: "#benefits", label: "Founding hosts" },
   { href: "#apply", label: "Questions & applying" },
 ];
 
@@ -119,7 +124,7 @@ const CONTENTS = [
  * the contract's enum to `web`, so a junk or hostile value can never reach the
  * API and come back as a 400 the applicant would read as a broken form.
  *
- * **The canonical stays `/operators`, and the query is not stripped after
+ * **The canonical stays `/hosts`, and the query is not stripped after
  * reading.** This page is indexable, unlike `/go/*`, so `?source=ferry` could
  * otherwise be shared or crawled as a second URL for the same page — the
  * static canonical in `metadata` above already collapses them, which is the
@@ -128,7 +133,7 @@ const CONTENTS = [
  * change on every campaign arrival, to solve a problem the canonical already
  * solves.
  */
-export default async function OperatorsPage({
+export default async function HostsPage({
   searchParams,
 }: {
   searchParams: Promise<{ source?: string }>;
@@ -138,7 +143,7 @@ export default async function OperatorsPage({
   return (
     <main>
       <PageIntro
-        eyebrow="For operators"
+        eyebrow="For hosts"
         title="Run the experience."
         accent="Yuvoy helps people find and book it."
         lede={
@@ -148,7 +153,7 @@ export default async function OperatorsPage({
               bring enquiries, bookings and payments into one place.
             </p>
             {/* Where we are onboarding. Deliberately not a permanent
-                restriction to three islands: operators elsewhere are being
+                restriction to three islands: hosts elsewhere are being
                 spoken to, and a page that says otherwise turns them away at
                 the door. */}
             <p className="label text-paper/70 mt-8 flex items-start gap-2.5">
@@ -156,8 +161,8 @@ export default async function OperatorsPage({
                 aria-hidden
                 className="bg-terra-soft mt-1.5 size-1 shrink-0"
               />
-              Open in Havelock, in the Andaman Islands, and speaking with
-              operators in other destinations.
+              Open in Havelock, in the Andaman Islands, and speaking with hosts
+              in other destinations.
             </p>
           </>
         }
@@ -174,7 +179,7 @@ export default async function OperatorsPage({
             "flex w-full sm:inline-flex sm:w-auto",
           )}
         >
-          Apply as a founding operator
+          Apply as a founding host
           <ButtonArrow />
         </a>
       </PageIntro>
@@ -227,9 +232,9 @@ export default async function OperatorsPage({
       <Section id="benefits" aria-labelledby="benefits-heading">
         <SectionHeading
           id="benefits-heading"
-          eyebrow="Founding operators"
+          eyebrow="Founding hosts"
           title="Built with the"
-          accent="first operators."
+          accent="first hosts."
         />
         <ul className="border-paper-line mt-14 grid grid-cols-1 gap-x-10 gap-y-10 border-t pt-10 sm:grid-cols-2">
           {BENEFITS.map((benefit) => (
@@ -257,7 +262,7 @@ export default async function OperatorsPage({
           <p>
             Applying starts a conversation; it does not create a listing,
             partnership or commercial agreement. Pricing, commissions and payout
-            terms will be agreed before an operator goes live.
+            terms will be agreed before a host goes live.
           </p>
         </StatusNotice>
       </Section>

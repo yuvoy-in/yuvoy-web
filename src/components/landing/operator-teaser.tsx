@@ -18,7 +18,7 @@ import { operatorHref, type LeadSource } from "@/lib/leads/registry";
  * This is three sentences and a way out. It answers the question a traveller
  * genuinely has after watching the product tour ("who is filming all this?")
  * and it gives an operator who landed here a door, rather than making them
- * hunt the header for it. The full case still lives on `/operators` and is
+ * hunt the header for it. The full case still lives on `/hosts` and is
  * still the only place it is made.
  *
  * ## The surface (owner direction, 2026-08-07)
@@ -55,7 +55,7 @@ export function OperatorTeaser({ source }: { source: LeadSource }) {
     <Section aria-labelledby="operators-heading">
       <SectionHeading
         id="operators-heading"
-        eyebrow="For operators"
+        eyebrow="For hosts"
         title="You run the experience."
         accent="Yuvoy helps people find it."
         body="Show what you offer through real video, manage availability, and bring enquiries, bookings and payments into one place."
@@ -81,7 +81,7 @@ export function OperatorTeaser({ source }: { source: LeadSource }) {
             rendered by the same page an operator scanned into, so a link that
             dropped it would lose the attribution exactly the way the legacy
             anchor did (yuvoy-web#70). `operatorHref` returns a clean
-            `/operators` for organic traffic. */}
+            `/hosts` for organic traffic. */}
         <Link
           href={operatorHref(source, "#apply")}
           className={cn(
@@ -93,14 +93,14 @@ export function OperatorTeaser({ source }: { source: LeadSource }) {
             "flex w-full sm:w-auto",
           )}
         >
-          Apply as a founding operator
+          Apply as a founding host
           <ButtonArrow />
         </Link>
         <Link
           href={operatorHref(source)}
           className="label tap-target text-forest/75 hover:text-forest underline underline-offset-4 transition-colors duration-200"
         >
-          See how Yuvoy works for operators
+          See how Yuvoy works for hosts
         </Link>
       </div>
     </Section>

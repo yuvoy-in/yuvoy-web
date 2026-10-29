@@ -23,9 +23,9 @@ const CONTENT_ROUTES = [
     title: /Explore experiences and destinations/,
   },
   {
-    path: "/operators",
+    path: "/hosts",
     h1: /yuvoy helps people find and book it/i,
-    title: /Yuvoy for Operators/,
+    title: /Yuvoy for Hosts/,
   },
   {
     path: "/about",
@@ -72,7 +72,7 @@ for (const route of CONTENT_ROUTES) {
     /*
       The consumer pages speak plainly. These are the internal and investor
       terms the rebuild moved out of public copy; "Experience OS" is exempt on
-      /operators, where it is allowed to appear once as a product name, and
+      /hosts, where it is allowed to appear once as a product name, and
       nowhere else.
     */
     test("uses plain language, not the internal vocabulary", async ({
@@ -97,10 +97,10 @@ for (const route of CONTENT_ROUTES) {
       }
 
       const osMentions = (body.match(/Experience OS/gi) ?? []).length;
-      if (route.path === "/operators") {
+      if (route.path === "/hosts") {
         expect(
           osMentions,
-          "Experience OS may appear once on /operators, as a product name",
+          "Experience OS may appear once on /hosts, as a product name",
         ).toBeLessThanOrEqual(1);
       } else {
         expect(osMentions).toBe(0);
@@ -137,10 +137,8 @@ for (const route of CONTENT_ROUTES) {
   rather than a section of retractions, and a button that says what the
   operator is doing.
 */
-test("/operators is an application, at the right proportions", async ({
-  page,
-}) => {
-  await page.goto("/operators");
+test("/hosts is an application, at the right proportions", async ({ page }) => {
+  await page.goto("/hosts");
 
   await expect(page.locator("#joining").getByRole("listitem")).toHaveCount(4);
 
@@ -148,7 +146,7 @@ test("/operators is an application, at the right proportions", async ({
   const body = await pageText(page);
   for (const disclosure of [
     /does not create a listing, partnership or commercial agreement/i,
-    /pricing, commissions and payout terms will be agreed before an operator goes live/i,
+    /pricing, commissions and payout terms will be agreed before a host goes live/i,
     /your existing customers and channels remain yours/i,
   ]) {
     expect(body, `missing disclosure: ${disclosure}`).toMatch(disclosure);
@@ -160,12 +158,12 @@ test("/operators is an application, at the right proportions", async ({
     /guaranteed revenue/i,
     /we guarantee/i,
   ]) {
-    expect(body, `/operators must not claim ${claim}`).not.toMatch(claim);
+    expect(body, `/hosts must not claim ${claim}`).not.toMatch(claim);
   }
 
   await expect(
     page.locator("#apply").getByRole("heading", {
-      name: /apply as a founding operator/i,
+      name: /apply as a founding host/i,
     }),
   ).toBeVisible();
 });
@@ -202,19 +200,19 @@ test("audience pages send each audience to the right form", async ({
   );
 
   // Operators do not leave their page to apply: the section is on it.
-  await page.goto("/operators");
+  await page.goto("/hosts");
   await page
-    .getByRole("link", { name: "Apply as a founding operator" })
+    .getByRole("link", { name: "Apply as a founding host" })
     .first()
     .click();
-  await expect(page).toHaveURL(/\/operators#apply$/);
+  await expect(page).toHaveURL(/\/hosts#apply$/);
   // The application itself, not a notice standing in for it.
   await expect(
     page.locator("#apply").getByLabel("Business name"),
   ).toBeVisible();
   await expect(
     page.locator("#apply").getByRole("button", {
-      name: "Apply as a founding operator",
+      name: "Apply as a founding host",
     }),
   ).toBeVisible();
 });
@@ -249,7 +247,7 @@ test("/about does not ask for the waitlist", async ({ page }) => {
   it, so both are located by their section's anchor.
 */
 test("both FAQs stay short, and open on the keyboard", async ({ page }) => {
-  await page.goto("/operators");
+  await page.goto("/hosts");
   // Inside the application act. The questions were a section of their own
   // until 2026-08-07; they are now the left column beside the ask, which is
   // how the homepage has always closed.
@@ -270,7 +268,7 @@ test("the primary routes appear in the site navigation", async ({ page }) => {
   const nav = page.getByRole("banner").getByRole("navigation", {
     name: "Primary",
   });
-  for (const label of ["Explore", "For Operators", "About"]) {
+  for (const label of ["Explore", "For Hosts", "About"]) {
     await expect(
       nav.getByRole("link", { name: label, exact: true }),
     ).toBeVisible();
@@ -300,7 +298,7 @@ test.describe("the footer's closing call to action", () => {
   const DOES_NOT = [
     "/", // closes on the registration form itself
     "/waitlist", // is the form
-    "/operators", // closes on the application
+    "/hosts", // closes on the application
     "/explore",
     "/about",
     "/contact", // a conversation, not a conversion

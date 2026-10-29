@@ -27,7 +27,7 @@ export const WAITLIST_FAQS: Faq[] = [
     */
     question: "Where is Yuvoy open?",
     answer:
-      "In Havelock, in the Andaman Islands. What operators are running, with prices and dates, is in the Yuvoy app, and you pay at the counter on the day.",
+      "In Havelock, in the Andaman Islands. What hosts are running, with prices and dates, is in the Yuvoy app, and you pay at the counter on the day.",
   },
   {
     question: "Does joining cost anything?",

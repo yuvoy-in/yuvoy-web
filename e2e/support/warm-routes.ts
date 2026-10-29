@@ -39,7 +39,7 @@ import { request, type FullConfig } from "@playwright/test";
 const ROUTES = [
   "/",
   "/explore",
-  "/operators",
+  "/hosts",
   "/about",
   "/contact",
   "/waitlist",

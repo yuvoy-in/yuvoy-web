@@ -106,14 +106,14 @@ export function OperatorSystem() {
                 ))}
               </ul>
               {/* No call to action here (owner direction, 2026-08-07). The
-                  cover carries "Apply as a founding operator" two screens up
+                  cover carries "Apply as a founding host" two screens up
                   and the page closes on the application itself; a third
                   instance in between makes the page read as though it is
                   chasing rather than explaining. */}
               {/* The product name, once, as a footnote. Nothing above needs
                   it to make sense — that is the condition for it appearing. */}
               <p className="label text-paper/60 mt-8">
-                Yuvoy Experience OS · operators.yuvoy.in
+                Yuvoy Experience OS · hosts.yuvoy.in
               </p>
             </div>
           </div>
