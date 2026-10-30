@@ -53,6 +53,6 @@ export const OPERATOR_FAQS: Faq[] = [
   {
     question: "What happens after I apply?",
     answer:
-      "Someone from the Yuvoy team reads your application and contacts you to understand the experience and destination.",
+      "You do not have to wait for us: you can set your business up at hosts.yuvoy.in with the same number straight away.",
   },
 ];

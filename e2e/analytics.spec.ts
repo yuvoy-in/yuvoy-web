@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "./support/session";
+import { waitForRouteReady } from "./support/ready";
 import { pageText } from "./support/text";
 
 /**
@@ -43,6 +44,12 @@ function watchRequests(page: Page, baseURL: string | undefined) {
   return { analytics: thirdPartyAnalytics, all: () => urls };
 }
 
+/*
+  These tests wait for the load event, the route and a fixed 1200ms, NOT
+  `networkidle`. The homepage's images kept the network busy on a loaded server
+  (yuvoy-web#182's push, 31 Oct: all three tests timed out at 30s on all three
+  tries), and a script or SDK that would fire has loaded by then anyway.
+*/
 test.describe("analytics consent", () => {
   test("makes no analytics request before a choice is made", async ({
     page,
@@ -51,7 +58,7 @@ test.describe("analytics consent", () => {
     const seen = watchRequests(page, baseURL);
 
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await waitForRouteReady(page);
     // Interact, in case an event would fire on engagement. Scrolling and a
     // real click on the page body — not on a heading, which is large, sticky-
     // header-adjacent and not meant to be a click target.
@@ -75,7 +82,7 @@ test.describe("analytics consent", () => {
       window.localStorage.setItem("yuvoy.analytics-consent", "denied"),
     );
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await waitForRouteReady(page);
     await page.mouse.wheel(0, 2000);
     await page.waitForTimeout(1200);
 
@@ -124,7 +131,8 @@ test.describe("Vercel Analytics removal", () => {
   test("no Vercel Analytics script is served", async ({ page, baseURL }) => {
     const seen = watchRequests(page, baseURL);
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await waitForRouteReady(page);
+    await page.waitForTimeout(1200);
 
     // @vercel/analytics injects /_vercel/insights/script.js from our own
     // origin, so this checks every request rather than third-party hosts.
