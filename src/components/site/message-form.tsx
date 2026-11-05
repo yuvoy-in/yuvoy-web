@@ -29,7 +29,7 @@ type MessageTopic = components["schemas"]["MessageTopic"];
  * units, which is what the API counts too.
  *
  * Email uses `isPlausibleEmail`, not Zod's `.email()`, for the reason given in
- * `lead-forms.tsx`: every rule beyond "could not be delivered under any
+ * `lead-forms-schema.ts`: every rule beyond "could not be delivered under any
  * reading" is another way to refuse somebody's real address.
  */
 const TOPIC_VALUES = CONTACT_TOPICS.map((topic) => topic.value) as [
@@ -109,7 +109,7 @@ export function MessageForm() {
     identity changes every render. Not style: React Compiler refuses to memoize
     any component that calls `watch()`, so the form and everything under it
     would re-render on every keystroke — for a counter that depends on one
-    field. Same reasoning as `ContactFields` in `lead-forms.tsx`.
+    field. Same reasoning as `ContactFields` in `lead-forms-fields.tsx`.
   */
   const typed = useWatch({ control, name: "message" }) ?? "";
 

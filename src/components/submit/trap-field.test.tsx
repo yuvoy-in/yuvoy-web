@@ -17,7 +17,7 @@ function Harness() {
 /**
  * The trap a person never meets (issue case 11, point 7 A). jsdom has no
  * layout, so "off screen" is asserted on the class that moves it, and the
- * browser half (never in view, never reached by Tab) is in e2e/submit.spec.ts.
+ * browser half (never in view, never reached by Tab) is in e2e/submit-sending.spec.ts.
  */
 describe("TrapField", () => {
   it("is labelled for a screen reader, which is told to leave it", () => {

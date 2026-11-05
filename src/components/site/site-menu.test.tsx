@@ -7,7 +7,7 @@ vi.mock("next/navigation", () => ({ usePathname: () => "/" }));
 
 // jsdom's `<dialog>` and matchMedia gaps are shimmed in vitest.setup.ts.
 // Escape, the focus trap and focus restoration need a real browser and are
-// asserted in e2e/shell.spec.ts instead.
+// asserted in e2e/shell-header.spec.ts instead.
 
 describe("SiteMenu", () => {
   it("starts closed and announces that to assistive tech", () => {

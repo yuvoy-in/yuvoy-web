@@ -11,7 +11,6 @@ import {
   WRONG_CODE,
   FAILED,
   OFFLINE,
-  today,
   refusal,
   receipt,
   STUB,
