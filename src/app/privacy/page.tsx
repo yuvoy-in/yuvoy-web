@@ -227,9 +227,9 @@ export default function PrivacyPage() {
           <strong className="text-forest font-bold">Our team</strong> sees, for
           each person who asks: their first name, an age band from the birth
           year they gave (for example 25 to 29), the women-only tick if the
-          table has one, when they asked, and whether they did not come twice in
-          the last 90 days. A staff member sees your phone number or email only
-          by confirming who they are and giving a reason, and each time is
+          table has one, when they asked, and how many tables they did not come
+          to in the last 90 days. A staff member sees your phone number or email
+          only by confirming who they are and giving a reason, and each time is
           recorded.
         </p>
         <p>
