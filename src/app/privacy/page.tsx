@@ -30,7 +30,7 @@ export const metadata: Metadata = {
  * "nothing is running" because nothing is.
  *
  * Two things are deliberately absent rather than invented:
- *  - A retention period for the waitlist, operator and contact forms. None
+ *  - A retention period for the waitlist, host and contact forms. None
  *    has been set, so none is claimed. Events sent through `/submit` are the
  *    exception: their periods are the API's purge step (R3-T3 Q14), stated
  *    in "If you send us an event" (yuvoy-web#177).
@@ -44,14 +44,14 @@ export default function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy"
-      updated="29 October 2026"
+      updated="6 November 2026"
       intro={
         <p>
-          Yuvoy is not open yet. The only personal information this site
-          collects is what you type into one of its three forms: the waitlist
-          and operator application, the contact form, or the form for sending us
-          an event. This page describes exactly what that is, what happens to
-          it, and how to get it removed.
+          Yuvoy is open in Havelock, in the Andaman Islands. The only personal
+          information this site collects is what you type into one of its three
+          forms: the waitlist and host application, the contact form, or the
+          form for sending us an event. This page describes exactly what that
+          is, what happens to it, and how to get it removed.
         </p>
       }
     >
@@ -69,7 +69,7 @@ export default function PrivacyPage() {
         </p>
         <p>
           <strong className="text-forest font-bold">
-            If you apply as an operator:
+            If you apply as a host:
           </strong>{" "}
           your name, your business name and your email address, plus a WhatsApp
           number if you give one. It asked which destinations you cover and what
@@ -100,8 +100,8 @@ export default function PrivacyPage() {
 
       <LegalSection heading="Why we collect it">
         <p>
-          To contact you about Yuvoy opening and, for operators, to have a
-          conversation about what you offer. That is the whole purpose.
+          To contact you about Yuvoy, for example when it opens in a new place,
+          and, for hosts, about what you offer. That is the whole purpose.
         </p>
         <p>
           A message you send through the contact form is used to answer you, and
@@ -139,7 +139,7 @@ export default function PrivacyPage() {
 
       <LegalSection heading="If you register more than once">
         <p>
-          Submitting the waitlist or operator form again with the same contact
+          Submitting the waitlist or host form again with the same contact
           updates your existing entry rather than creating a second one. Each
           individual submission is kept as history so we can see what changed.
         </p>

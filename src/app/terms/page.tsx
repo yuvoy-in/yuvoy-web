@@ -5,7 +5,7 @@ import { LegalPage, LegalSection } from "@/components/site/legal-page";
 export const metadata: Metadata = {
   title: "Terms",
   description:
-    "The terms that apply to this pre-launch Yuvoy site: what joining the waitlist does, what it does not commit anyone to, and who you are dealing with today.",
+    "The terms that apply to the yuvoy.in site: what joining the waitlist or applying as a host does, what it does not commit anyone to, and where booking happens.",
   // See the note on /privacy — indexing flips atomically once reviewed, and
   // all three halves of that flip were restored together on 2026-09-09
   // (yuvoy-web#152).
@@ -13,34 +13,38 @@ export const metadata: Metadata = {
 };
 
 /**
- * Terms of use for the pre-launch site.
+ * Terms of use for yuvoy.in.
  *
- * Scoped to what the site actually is: a waitlist. There is no booking, no
- * payment, no account and no marketplace transaction, so there is nothing to
- * write terms about beyond registration itself — and writing speculative
- * booking or refund terms now would describe a product that does not exist.
+ * Scoped to what this site actually is. Yuvoy is open in Havelock, but booking
+ * happens in the Yuvoy app (app.yuvoy.in), not here: this site takes no
+ * booking, no payment and no account, so there is nothing to write terms about
+ * beyond the waitlist and the host application. Booking or refund terms here
+ * would describe something this site does not do.
  *
  * A full Terms of Service, covering bookings, payments, cancellations and the
- * operator relationship, is a separate document for when those exist.
+ * host relationship, is a separate document and is not written yet
+ * (yuvoy-web#182).
  */
 export default function TermsPage() {
   return (
     <LegalPage
       title="Terms"
-      updated="2 August 2026"
+      updated="6 November 2026"
       intro={
         <p>
-          This site is a waitlist for a product that has not opened yet. These
-          terms cover what joining it does and does not mean. They are short
-          because the site does very little.
+          Yuvoy is open in Havelock, in the Andaman Islands. This site,
+          yuvoy.in, tells you about it and takes a waitlist and host
+          applications. These terms cover what using it does and does not mean.
+          They are short because the site does very little.
         </p>
       }
     >
-      <LegalSection heading="What Yuvoy is today">
+      <LegalSection heading="What this site is">
         <p>
-          A pre-launch site. You cannot book anything, pay for anything, or
-          create an account. Nothing listed on this site is an offer of a
-          specific experience, price, date or availability.
+          Somewhere to read about Yuvoy, join the waitlist or apply as a host.
+          You cannot book anything, pay for anything, or create an account on
+          this site. Nothing listed on it is an offer of a specific experience,
+          price, date or availability.
         </p>
         <p>
           Everything described as planned is exactly that: a description of what
@@ -50,9 +54,10 @@ export default function TermsPage() {
 
       <LegalSection heading="What joining the waitlist means">
         <p>
-          It means we may contact you about Yuvoy opening. It creates no
-          booking, no payment obligation, no queue position and no guarantee of
-          availability or priority, for travellers or for operators.
+          It means we may contact you about Yuvoy, for example when it opens in
+          a new place. It creates no booking, no payment obligation, no queue
+          position and no guarantee of availability or priority, for travellers
+          or for hosts.
         </p>
         <p>
           You can ask to be removed at any time. See the{" "}
@@ -66,11 +71,11 @@ export default function TermsPage() {
         </p>
       </LegalSection>
 
-      <LegalSection heading="Applying as an operator">
+      <LegalSection heading="Applying as a host">
         <p>
-          Applying starts a conversation. It does not create a listing, a
-          partnership, an agency relationship or any exclusivity, and it does
-          not commit either side to commercial terms.
+          Applying tells us about you and your business. It does not create a
+          listing, a partnership, an agency relationship or any exclusivity, and
+          it does not commit either side to commercial terms.
         </p>
         <p>
           No commission rate, settlement schedule or payout arrangement has been
@@ -79,12 +84,16 @@ export default function TermsPage() {
         </p>
       </LegalSection>
 
-      <LegalSection heading="Experiences you arrange now">
+      <LegalSection heading="Booking an experience">
         <p>
-          Until Yuvoy opens, any experience you take in the islands is arranged
-          directly between you and the operator running it, under their terms
-          and their insurance. Yuvoy is not a party to that arrangement, does
-          not vet those operators, and takes no responsibility for it.
+          Booking happens in the Yuvoy app, not on this site, and these terms do
+          not cover it.
+        </p>
+        <p>
+          An experience you arrange directly with a host, outside Yuvoy, is
+          between you and that host, under their terms and their insurance.
+          Yuvoy is not a party to that arrangement, does not vet it, and takes
+          no responsibility for it.
         </p>
       </LegalSection>
 
@@ -110,10 +119,10 @@ export default function TermsPage() {
 
       <LegalSection heading="Changes">
         <p>
-          These terms will be replaced by a fuller agreement before booking
-          opens, one that covers payments, cancellations and the operator
-          relationship, none of which exist yet. Until then, the date at the top
-          tells you when this was last revised.
+          A fuller agreement, covering bookings, payments, cancellations and the
+          host relationship, is still to be published. Until then these terms
+          cover this site only, and the date at the top tells you when they were
+          last revised.
         </p>
       </LegalSection>
 
