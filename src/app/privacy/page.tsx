@@ -185,6 +185,89 @@ export default function PrivacyPage() {
         </p>
       </LegalSection>
 
+      {/* yuvoy-api#407 (R8-T1 tables): who sees what is R8-a section 3 and
+          the API's table read (venue for an approved guest while listed or
+          up to 30 days after the end); the records are the R8-a purge and
+          erasure steps; the ban kept after an erasure is yuvoy-api#502
+          (R10-T2, D-050), two years, re-applied on an email, staff check on
+          a number. Wording waits on Sai Teja on yuvoy-api#382. */}
+      <LegalSection heading="If you join a table">
+        <p>
+          A table is a small meet-up you can ask to join in the Yuvoy app. What
+          each person sees is set by where they stand.
+        </p>
+        <p>
+          <strong className="text-forest font-bold">Anyone</strong>, signed in
+          or not, sees the table itself: its title and description, the kind of
+          venue and the area (for example &ldquo;A caf&eacute; in
+          Indiranagar&rdquo;), when it starts and ends, the note on getting
+          home, how many are going, whether it is for women only, the
+          leader&rsquo;s first name and whether they are from Yuvoy or a club,
+          the cost, and the event it is around.
+        </p>
+        <p>
+          <strong className="text-forest font-bold">
+            Once you ask for a seat,
+          </strong>{" "}
+          you also see the first names of the guests already approved. Once you
+          are approved, people who ask after you see your first name the same
+          way. At a table for women, only approved guests see these names.
+        </p>
+        <p>
+          <strong className="text-forest font-bold">
+            Once you are approved,
+          </strong>{" "}
+          you see the venue&rsquo;s name and address, a map, the meeting point
+          and our team&rsquo;s WhatsApp number for the day. They show while the
+          table is listed and for 30 days after it ends. They do not show while
+          a table is being checked, once it is cancelled, or once you have
+          withdrawn.
+        </p>
+        <p>
+          <strong className="text-forest font-bold">Our team</strong> sees, for
+          each person who asks: their first name, an age band from the birth
+          year they gave (for example 25 to 29), the women-only tick if the
+          table has one, when they asked, and whether they did not come twice in
+          the last 90 days. A staff member sees your phone number or email only
+          by confirming who they are and giving a reason, and each time is
+          recorded.
+        </p>
+        <p>
+          Other guests, the leader and the public never see your phone number,
+          surname, email or photo. Guests cannot message each other in the app.
+        </p>
+        <p>
+          <strong className="text-forest font-bold">Tables for women.</strong>{" "}
+          To ask for a seat at one, you tick &ldquo;This table is for women. I
+          confirm I am a woman.&rdquo; That tick is all we ask. We do not record
+          a gender on your profile. Our team may decline a request, and acts on
+          reports.
+        </p>
+        <p>
+          <strong className="text-forest font-bold">
+            How long we keep it.
+          </strong>{" "}
+          Your requests and seats are deleted 12 months after the table ends. If
+          you report a problem with a table, we keep the reason you picked, the
+          name you gave and your note; the note is deleted one year after we
+          have dealt with the report.
+        </p>
+        <p>
+          <strong className="text-forest font-bold">
+            If you are banned from tables,
+          </strong>{" "}
+          you are taken off every upcoming table you asked for or were approved
+          for, and the ban is kept with our team&rsquo;s note on it. If you
+          close your account, your seats and the ban are deleted with it. For
+          two years after that we keep a scrambled form of each phone number and
+          email address you signed in with, which cannot be turned back into the
+          number or address, with the ban&rsquo;s reason, who made it and when.
+          If you sign up again with the same email address in those two years,
+          the ban applies again. A matching phone number is only shown to our
+          team to decide, because numbers are passed on to new owners.
+        </p>
+      </LegalSection>
+
       <LegalSection heading="Analytics">
         <AnalyticsDisclosure />
         {/* yuvoy-api#560: the API keeps an account class (customer, staff,
