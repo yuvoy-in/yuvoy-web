@@ -12,7 +12,11 @@ import {
 import { useLeadAnalytics } from "@/lib/analytics/use-lead-analytics";
 import { LAUNCH_MARKET } from "@/lib/leads/registry";
 import type { LeadContext } from "./lead-forms";
-import { providerSchema, type ProviderValues } from "./lead-forms-schema";
+import {
+  placeServerErrors,
+  providerSchema,
+  type ProviderValues,
+} from "./lead-forms-schema";
 import {
   OutcomeNotice,
   SuccessNotice,
@@ -141,18 +145,20 @@ export function ProviderForm({ context }: { context: LeadContext }) {
         Anything else unrecognised is raised to the form's own error state,
         where it is visible and truthful rather than swallowed. That guard
         earned its keep once already, in the window before #4 deployed.
+
+        A 400 that names no field at all shows the API's own sentence there
+        too (yuvoy-web#190): the host application route sends "who should we
+        ask for?" with no details, and the button did nothing.
       */
-      const unknown: string[] = [];
-      for (const [field, message] of Object.entries(res.fields)) {
-        if (field in values) {
-          setError(field as keyof ProviderValues, { message });
-        } else if (field === "contact") {
-          setError("email", { message });
-        } else {
-          unknown.push(message);
-        }
+      const placed = placeServerErrors(
+        res.fields,
+        Object.keys(values),
+        res.message,
+      );
+      for (const [field, message] of placed.onFields) {
+        setError(field, { message });
       }
-      setUnknownFieldErrors(unknown);
+      setUnknownFieldErrors(placed.shown);
     } else {
       setUnknownFieldErrors([]);
     }

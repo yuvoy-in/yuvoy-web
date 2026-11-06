@@ -117,6 +117,22 @@ describe("submitOperatorApplication", () => {
     });
   });
 
+  it("keeps the API's sentence on a 400 with no details (#190)", async () => {
+    vi.mocked(fetch).mockResolvedValue(
+      jsonResponse(400, {
+        error: {
+          code: "invalid_request",
+          message: "application: who should we ask for?",
+        },
+      }),
+    );
+    expect(await submitOperatorApplication(INPUT)).toEqual({
+      kind: "invalid",
+      message: "application: who should we ask for?",
+      fields: {},
+    });
+  });
+
   it("classifies a 429 as rate limited", async () => {
     vi.mocked(fetch).mockResolvedValue(jsonResponse(429, {}));
     expect((await submitOperatorApplication(INPUT)).kind).toBe("rate_limited");

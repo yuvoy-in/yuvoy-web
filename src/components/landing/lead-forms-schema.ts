@@ -130,6 +130,16 @@ export const travellerSchema = z.object({
  */
 export const providerSchema = z.object({
   ...sharedSchema,
+  /*
+    At least 2 characters on this form only (yuvoy-web#190): `POST
+    /v1/host-applications` sets minLength 2 on both names, while `/v1/leads`,
+    which the traveller form calls, keeps 1. A one-letter name used to pass
+    here and come back as a 400 with no field named.
+  */
+  contactName: sharedSchema.contactName.min(
+    2,
+    "Name must be at least 2 characters.",
+  ),
   email: requiredEmailSchema,
   whatsapp: z
     .string()
@@ -140,8 +150,37 @@ export const providerSchema = z.object({
     .string()
     .trim()
     .min(1, "Enter your business name.")
+    .min(2, "Business name must be at least 2 characters.")
     .max(160, "Business name must be 160 characters or fewer."),
 });
 
 export type TravellerValues = z.infer<typeof travellerSchema>;
 export type ProviderValues = z.infer<typeof providerSchema>;
+
+/**
+ * Where each part of a host application's 400 goes (yuvoy-web#190).
+ *
+ * A field this form renders gets its own message. `contact` goes on the email
+ * input, since email is the channel this form requires. Anything else is shown
+ * in the form's own error box. When the API named no field at all, its own
+ * sentence goes in that box, so a refusal is never a button that does nothing.
+ */
+export function placeServerErrors(
+  fields: Record<string, string>,
+  known: readonly string[],
+  message: string,
+): { onFields: [keyof ProviderValues, string][]; shown: string[] } {
+  const onFields: [keyof ProviderValues, string][] = [];
+  const shown: string[] = [];
+  for (const [field, text] of Object.entries(fields)) {
+    if (known.includes(field)) {
+      onFields.push([field as keyof ProviderValues, text]);
+    } else if (field === "contact") {
+      onFields.push(["email", text]);
+    } else {
+      shown.push(text);
+    }
+  }
+  if (onFields.length === 0 && shown.length === 0) shown.push(message);
+  return { onFields, shown };
+}
